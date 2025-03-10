@@ -10,4 +10,4 @@ This is a Maven project. Integration into Eclipse or any other IDE should be eas
 TODO: 
 - add executable JAR file and its build in pom.xml
 - compound user interface that guides through intonation topics
-- explanatory documentation for each of the dem apps
+- explanatory documentation for each of the demo apps
