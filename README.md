@@ -8,6 +8,6 @@ General information about the topic is in src/main/java/fri/music/package.html.
 This is a Maven project. Integration into Eclipse or any other IDE should be easy, there are no external dependencies except JUnit 5.
 
 TODO: 
-- executable JAR file
+- add executable JAR file and its build in pom.xml
 - compound user interface that guides through intonation topics
 - explanatory documentation for each of the dem apps
