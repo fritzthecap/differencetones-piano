@@ -1,0 +1,19 @@
+
+Display difference tones on a sine-wave piano.
+
+Display high notes variants when playing a low tone as difference tone,
+    on SineWavePiano.
+    
+Scale builder: build a 12-tone scale from different variants of all intervals.
+    See https://en.wikipedia.org/wiki/12_equal_temperament#Table
+    
+Let make a self-built scale available as tuning for TuneablePiano.
+
+Comparison of just-intonation scales with the equal temperament scale.
+    (Kind of that has been implemented in JustIntonation.centDeviation)
+
+Optimizer for just-intonation that combines different available interval variants
+    to find a 12-tone scale with no unjust intervals and no unjust difference tones.
+    Most music pieces do not use all 12 semitones, they just deviate into maybe 2 or 3
+    other keys. I want to find a scale for a given set of semitones that has the least
+    dissonant difference tones and unequal (unjust) intervals.
