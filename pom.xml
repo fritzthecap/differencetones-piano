@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>fri.music</groupId>
-    <artifactId>difference-tones</artifactId>
+    <artifactId>differencetones-piano</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
