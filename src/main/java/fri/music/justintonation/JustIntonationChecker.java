@@ -572,12 +572,12 @@ public class JustIntonationChecker
             final List<Interval> intervals = configuration.checkAgainst5LimitIntervals
                 ? Stream.<Interval>of( // take the expected intervals from 5-limit tuning
                         Intervals.MAJOR_SECOND_9_8,
-                        Intervals.MINOR_THIRD_6_5,
-                        Intervals.MAJOR_THIRD_5_4,
-                        Intervals.FOURTH_4_3,
-                        Intervals.FIFTH_3_2,
-                        Intervals.MINOR_SIXTH_8_5,
-                        Intervals.MAJOR_SIXTH_5_3,
+                        Intervals.MINOR_THIRD,
+                        Intervals.MAJOR_THIRD,
+                        Intervals.FOURTH,
+                        Intervals.FIFTH,
+                        Intervals.MINOR_SIXTH,
+                        Intervals.MAJOR_SIXTH,
                         Intervals.MINOR_SEVENTH_16_9,
                         Intervals.OCTAVE).toList()
                 : Stream.of(

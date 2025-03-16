@@ -192,6 +192,9 @@ public class FrequencySliders
         final JTextField octavesTextField = createTextField(70, "Octaves");
         final JTextField nearestIntervalTextField = createTextField(190, "Nearest Pure Interval");
         nearestIntervalTextField.setHorizontalAlignment(SwingConstants.LEFT);
+        final JTextField enterFractionTextField = createTextField(110, "Enter Fraction", true);
+        enterFractionTextField.setText("/");
+        enterFractionTextField.setToolTipText("Changes Frequency 1");
         
         // handle cursor keys or manual note input
         final KeyListener keyboardListener = new KeyAdapter() {
@@ -228,6 +231,23 @@ public class FrequencySliders
         };
         note1TextField.addKeyListener(keyboardListener);
         note2TextField.addKeyListener(keyboardListener);
+        
+        enterFractionTextField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final String fraction = ((JTextField) e.getSource()).getText();
+                final int breakLine = fraction.indexOf("/");
+                if (breakLine <= 0)
+                    return;
+                final String string1 = fraction.substring(0, breakLine).strip();
+                final String string2 = fraction.substring(breakLine + 1).strip();
+                final long dividend = Long.valueOf(string1);
+                final long divisor = Long.valueOf(string2);
+                final double frequency2 = frequencyPanel2.getValue();
+                final double frequency = frequency2 * ((double) dividend / (double) divisor);
+                frequencyPanel1.setValue(frequency);
+            }
+        });
         
         // handle changes in sliders
         frequencySliderListener = new ChangeListener() {
@@ -296,6 +316,7 @@ public class FrequencySliders
         panel.add(octavesTextField);
         panel.add(nearestIntervalTextField);
         panel.add(fractionTextField);
+        panel.add(enterFractionTextField);
         
         return panel;
     }

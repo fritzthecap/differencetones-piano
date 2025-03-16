@@ -40,9 +40,12 @@ public class JustIntonationDemo
             }
         }
         else { // display a scale
-            final ToneSystem toneSystem = new JustIntonation(440, ToneSystem.DEFAULT_BASETONE_IPN_NAME, ToneSystem.MAXIMUM_OCTAVES);
+            final ToneSystem toneSystem = new JustIntonation(
+                    ToneSystem.DEFAULT_REFERENCE_FREQUENCY, // 440 
+                    ToneSystem.DEFAULT_BASETONE_IPN_NAME, // C0
+                    ToneSystem.MAXIMUM_OCTAVES); // 10
             System.out.println(toneSystem);
-            System.out.println("IPN-Name\tFrequency\tRatio\tCent\tCent-Deviation");
+            System.out.println("IPN-Name (MIDI)\tFreq.\tRatio\tCent\tCent-Deviation");
             
             final Tone[] tones = toneSystem.tones();
             for (int i = 0; i < tones.length; i++)

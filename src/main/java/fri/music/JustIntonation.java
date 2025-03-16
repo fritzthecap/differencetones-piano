@@ -17,12 +17,12 @@ public class JustIntonation extends AbstractToneSystem
     {
         /**
          * @return the name of this interval.
-         *      Every name must start with one of the names used in <code>intervalName()</code>.
+         *      Every name must start with one of the names used in <code>ToneSystem.INTERVAL_NAMES</code>.
          */
         String name();
         
         /**
-         * Use <code>dividendForOctave()</code> to implement this!
+         * Use <code>dividendForOctave()</code> (see below) to implement this!
          * @param octave the octave for the dividend of this interval, not the IPN-octave!
          * @return the dividend of this interval, according to given octave.
          */
@@ -120,7 +120,9 @@ public class JustIntonation extends AbstractToneSystem
     
     
     /**
-     * Collection of different 12-tone tuning intervals for just-intonation. 
+     * Collection of different 12-tone tuning intervals for just-intonation.
+     * By convention every enum-name must start with a name given in <code>ToneSystem.INTERVAL_NAMES.</code>
+     * <p/>
      * The "5-limit" tuning restricts both dividend and divisor to integer-powers of 2, 3 and 5.
      * @see https://en.wikipedia.org/wiki/Five-limit_tuning
      */
@@ -129,21 +131,21 @@ public class JustIntonation extends AbstractToneSystem
         UNISON                 ( 1,  1),
         
         /** Defaults from 5-limit tuning. */
-        MINOR_SECOND_16_15     (16, 15),
-        MAJOR_SECOND_10_9      (10,  9), // symmetric to 9/5
-        MAJOR_SECOND_9_8       ( 9,  8), // preferable, symmetric to 16/9
-        MINOR_THIRD_6_5        ( 6,  5),
-        MAJOR_THIRD_5_4        ( 5,  4),
-        FOURTH_4_3             ( 4,  3),
-        TRITONE_AUG4_45_32     (45, 32),
-        TRITONE_DIM5_64_45     (64, 45),
-        FIFTH_3_2              ( 3,  2),
-        MINOR_SIXTH_8_5        ( 8,  5),
-        MAJOR_SIXTH_5_3        ( 5,  3),
-        MINOR_SEVENTH_16_9     (16,  9), // preferable, symmetric to 9/8
-        MINOR_SEVENTH_9_5      ( 9,  5), // symmetric to 10/9
-        MAJOR_SEVENTH_15_8     (15,  8),
-        OCTAVE                 ( 2,  1),
+        MINOR_SECOND       (16, 15),
+        MAJOR_SECOND_10_9  (10,  9), // symmetric to 9/5
+        MAJOR_SECOND_9_8   ( 9,  8), // preferable, symmetric to 16/9
+        MINOR_THIRD        ( 6,  5),
+        MAJOR_THIRD        ( 5,  4),
+        FOURTH             ( 4,  3),
+        TRITONE_AUG4_45_32 (45, 32),
+        TRITONE_DIM5_64_45 (64, 45),
+        FIFTH              ( 3,  2),
+        MINOR_SIXTH        ( 8,  5),
+        MAJOR_SIXTH        ( 5,  3),
+        MINOR_SEVENTH_16_9 (16,  9), // preferable, symmetric to 9/8
+        MINOR_SEVENTH_9_5  ( 9,  5), // symmetric to 10/9
+        MAJOR_SEVENTH      (15,  8),
+        OCTAVE             ( 2,  1),
         
         /** Not part of 5-limit but quite consonant. */
         TRITONE_17_12          (17, 12),
@@ -175,7 +177,7 @@ public class JustIntonation extends AbstractToneSystem
         MAJOR_SIXTH_HARMONIC        (  27,  16),
         MINOR_SEVENTH_HARMONIC_7_4  ( MINOR_SEVENTH_7LIMIT.dividend, MINOR_SEVENTH_7LIMIT.divisor), // 7/4, the "sweet" harmonic seventh
         MINOR_SEVENTH_HARMONIC_29_16(  29,  16),
-        MAJOR_SEVENTH_HARMONIC_15_8 ( MAJOR_SEVENTH_15_8.dividend, MAJOR_SEVENTH_15_8.divisor), // 15/8
+        MAJOR_SEVENTH_HARMONIC_15_8 ( MAJOR_SEVENTH.dividend, MAJOR_SEVENTH.divisor), // 15/8
         MAJOR_SEVENTH_HARMONIC_31_16(  31,  16),
         
         /** Pythagorean tuning, take missing from 5-limit. This tuning was abandoned in 16th century due to dissonant thirds and sixths. */
@@ -250,47 +252,47 @@ public class JustIntonation extends AbstractToneSystem
     {
         /** 5-limit-tuning, good for major tunes. */
         LIMIT_5_SYMMETRIC_1(new Intervals[] {
-                Intervals.MINOR_SECOND_16_15,
+                Intervals.MINOR_SECOND,
                 Intervals.MAJOR_SECOND_9_8,
-                Intervals.MINOR_THIRD_6_5,
-                Intervals.MAJOR_THIRD_5_4,
-                Intervals.FOURTH_4_3,
+                Intervals.MINOR_THIRD,
+                Intervals.MAJOR_THIRD,
+                Intervals.FOURTH,
                 Intervals.TRITONE_AUG4_45_32,
-                Intervals.FIFTH_3_2,
-                Intervals.MINOR_SIXTH_8_5,
-                Intervals.MAJOR_SIXTH_5_3,
+                Intervals.FIFTH,
+                Intervals.MINOR_SIXTH,
+                Intervals.MAJOR_SIXTH,
                 Intervals.MINOR_SEVENTH_16_9,
-                Intervals.MAJOR_SEVENTH_15_8,
+                Intervals.MAJOR_SEVENTH,
                 Intervals.OCTAVE,
             }),
         /** Another 5-limit-tuning, good for the parallel minor. */
         LIMIT_5_SYMMETRIC_2(new Intervals[] {
-                Intervals.MINOR_SECOND_16_15,
+                Intervals.MINOR_SECOND,
                 Intervals.MAJOR_SECOND_10_9,
-                Intervals.MINOR_THIRD_6_5,
-                Intervals.MAJOR_THIRD_5_4,
-                Intervals.FOURTH_4_3,
+                Intervals.MINOR_THIRD,
+                Intervals.MAJOR_THIRD,
+                Intervals.FOURTH,
                 Intervals.TRITONE_AUG4_45_32,
-                Intervals.FIFTH_3_2,
-                Intervals.MINOR_SIXTH_8_5,
-                Intervals.MAJOR_SIXTH_5_3,
+                Intervals.FIFTH,
+                Intervals.MINOR_SIXTH,
+                Intervals.MAJOR_SIXTH,
                 Intervals.MINOR_SEVENTH_9_5,
-                Intervals.MAJOR_SEVENTH_15_8,
+                Intervals.MAJOR_SEVENTH,
                 Intervals.OCTAVE,
             }),
         /** Asymmetric: minor seventh and major second do not have same distance from tonic. */
         LIMIT_5_ASYMMETRIC(new Intervals[] {
-                Intervals.MINOR_SECOND_16_15,
+                Intervals.MINOR_SECOND,
                 Intervals.MAJOR_SECOND_9_8,
-                Intervals.MINOR_THIRD_6_5,
-                Intervals.MAJOR_THIRD_5_4,
-                Intervals.FOURTH_4_3,
+                Intervals.MINOR_THIRD,
+                Intervals.MAJOR_THIRD,
+                Intervals.FOURTH,
                 Intervals.TRITONE_AUG4_45_32,
-                Intervals.FIFTH_3_2,
-                Intervals.MINOR_SIXTH_8_5,
-                Intervals.MAJOR_SIXTH_5_3,
+                Intervals.FIFTH,
+                Intervals.MINOR_SIXTH,
+                Intervals.MAJOR_SIXTH,
                 Intervals.MINOR_SEVENTH_9_5,
-                Intervals.MAJOR_SEVENTH_15_8,
+                Intervals.MAJOR_SEVENTH,
                 Intervals.OCTAVE,
             }),
         /** Overtone scale, all difference-tones fit perfectly. */
@@ -298,10 +300,10 @@ public class JustIntonation extends AbstractToneSystem
                 Intervals.MINOR_SECOND_HARMONIC,
                 Intervals.MAJOR_SECOND_HARMONIC,
                 Intervals.MINOR_THIRD_HARMONIC,
-                Intervals.MAJOR_THIRD_5_4,
+                Intervals.MAJOR_THIRD,
                 Intervals.FOURTH_HARMONIC,
                 Intervals.TRITONE_AUG4_HARMONIC,
-                Intervals.FIFTH_3_2,
+                Intervals.FIFTH,
                 Intervals.MINOR_SIXTH_HARMONIC_13_8,
                 Intervals.MAJOR_SIXTH_HARMONIC,
                 Intervals.MINOR_SEVENTH_HARMONIC_7_4,
@@ -314,9 +316,9 @@ public class JustIntonation extends AbstractToneSystem
                 Intervals.MAJOR_SECOND_PYTHAG,
                 Intervals.MINOR_THIRD_PYTHAG,
                 Intervals.MAJOR_THIRD_PYTHAG,
-                Intervals.FOURTH_4_3,
+                Intervals.FOURTH,
                 Intervals.TRITONE_AUG4_PYTHAG,
-                Intervals.FIFTH_3_2,
+                Intervals.FIFTH,
                 Intervals.MINOR_SIXTH_PYTHAG,
                 Intervals.MAJOR_SIXTH_PYTHAG,
                 Intervals.MINOR_SEVENTH_PYTHAG,
