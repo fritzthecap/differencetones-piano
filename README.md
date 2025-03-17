@@ -11,3 +11,11 @@ TODO:
 - compound user interface that guides through intonation topics
 - explanatory documentation for each of the demo apps
 - add executable JAR file and its build in pom.xml
+
+Screenshots:
+
+![FrequencySliders](https://github.com/user-attachments/assets/4a134319-491f-46e3-934e-e7230072d185)
+
+![MidiSynthesizer](https://github.com/user-attachments/assets/855ab972-3ee0-45ca-850f-a78848afc5db)
+
+![DifferenceTonesPiano](https://github.com/user-attachments/assets/0891df68-2e05-4c03-bde7-857476a80a04)
