@@ -80,6 +80,13 @@ public class Tones
     public Tone[] getEnclosingTones(double frequency) {
         int low = 0;
         int high = tones.length - 1;
+        
+        if (tones[low].frequency > frequency) // out of tone range on bottom
+            return new Tone[] { tones[low], null };
+        
+        if (tones[high].frequency < frequency) // out of tone range on top
+            return new Tone[] { null, tones[high] };
+        
         while (high > low + 1) {
             final int mid = low + (high - low) / 2;
             final  Tone tone = tones[mid];
@@ -90,13 +97,6 @@ public class Tones
             else // found frequency exactly
                 return new Tone[] { tone, tone };
         }
-        
-        if (tones[low].frequency > frequency) // out of tone range on bottom
-            return new Tone[] { tones[low], null };
-        
-        if (tones[high].frequency < frequency) // out of tone range on top
-            return new Tone[] { null, tones[high] };
-        
         return new Tone[] { tones[low], tones[high] };
     }
     
