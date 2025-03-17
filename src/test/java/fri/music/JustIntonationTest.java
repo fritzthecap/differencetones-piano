@@ -1,12 +1,9 @@
 package fri.music;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import fri.music.JustIntonation.ChromaticScales;
 import fri.music.JustIntonation.JustTone;
-import fri.music.JustIntonation.Interval;
 
 class JustIntonationTest
 {
@@ -179,7 +176,7 @@ class JustIntonationTest
     }
 
     private void assertDistance(JustTone lowerTone, JustTone upperTone, int expectedDividend, int expectedDivisor) {
-        final long[] distance = Interval.distance(lowerTone.interval, lowerTone.octave, upperTone.interval, upperTone.octave);
+        final long[] distance = lowerTone.distance(upperTone);
         assertEquals(expectedDividend, distance[0]);
         assertEquals(expectedDivisor,  distance[1]);
     }

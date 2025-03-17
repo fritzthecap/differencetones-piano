@@ -168,14 +168,19 @@ class DifferenceToneInversionsTest
         final DifferenceToneInversions differenceToneInversions = new DifferenceToneInversions(
                 new DifferenceToneInversions.Configuration(
                     toneSystem.tones(),
+                    //ToneSystem.semitoneSteps(ToneSystem.MAJOR_SECOND),
+                    //ToneSystem.semitoneSteps(ToneSystem.MINOR_SEVENTH),
                     DifferenceTones.TOLERANT_DEVIATION_EDO_12)
             );
         
         final List<TonePair> generatingC3 = differenceToneInversions.getIntervalsGenerating("C3");
         
-        boolean containsDissonant = generatingC3.stream()
+        boolean containsDissonant;
+        
+        containsDissonant = generatingC3.stream()
             .anyMatch(tonePair -> tonePair.lowerTone().ipnName.startsWith("B"));
         assertTrue(containsDissonant);
+        // when this fails, edge-cases go wrong in Tones.getEnclosingTones()
         
         differenceToneInversions.removeDissonant(false);
         

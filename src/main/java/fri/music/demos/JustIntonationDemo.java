@@ -3,7 +3,6 @@ package fri.music.demos;
 import fri.music.JustIntonation;
 import fri.music.JustIntonation.ChromaticScales;
 import fri.music.JustIntonation.JustTone;
-import fri.music.JustIntonation.Interval;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
@@ -34,7 +33,7 @@ public class JustIntonationDemo
                 final JustTone tone1 = (JustTone) tones.forIpnName(firstTone);
                 final JustTone tone2 = (JustTone) tones.forIpnName(secondTone);
                 
-                final long[] distance = Interval.distance(tone1.interval, tone1.octave, tone2.interval, tone2.octave);
+                final long[] distance = tone1.distance(tone2);
                 
                 System.out.println("Distance between "+tone1.ipnName+" and "+tone2.ipnName+" = "+(distance[0]+"/"+distance[1]));
             }

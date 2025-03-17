@@ -13,6 +13,7 @@ class TonesTest
         enclosingTones = tones.getEnclosingTones(ToneSystem.DEFAULT_REFERENCE_FREQUENCY);
         assertEquals("A4", enclosingTones[0].ipnName);
         assertEquals("A4", enclosingTones[1].ipnName);
+        assertEquals(enclosingTones[0], enclosingTones[1]);
 
         enclosingTones = tones.getEnclosingTones(ToneSystem.DEFAULT_REFERENCE_FREQUENCY + 2.0);
         assertEquals("A4", enclosingTones[0].ipnName);
@@ -25,5 +26,19 @@ class TonesTest
         enclosingTones = tones.getEnclosingTones(tones.getLowest().frequency + 0.1);
         assertEquals("C0", enclosingTones[0].ipnName);
         assertEquals("C#0", enclosingTones[1].ipnName);
+    }
+    
+    @Test
+    void getEnclosingTonesWhenFrequencyOutOfRange() {
+        final Tones tones = new Tones(new EqualTemperament().tones());
+        Tone[] enclosingTones;
+
+        enclosingTones = tones.getEnclosingTones(tones.getHighest().frequency + 4.0);
+        assertNull(enclosingTones[0]);
+        assertEquals("C10", enclosingTones[1].ipnName);
+
+        enclosingTones = tones.getEnclosingTones(tones.getLowest().frequency - 50.0);
+        assertEquals("C0", enclosingTones[0].ipnName);
+        assertNull(enclosingTones[1]);
     }
 }

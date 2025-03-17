@@ -51,6 +51,7 @@ class MathUtilTest
         long[] fraction;
         
         fraction = MathUtils.toFraction(1.333333333333333);
+        System.out.println(fraction[0]+"/"+fraction[1]);
         assertEquals(4, fraction[0]);
         assertEquals(3, fraction[1]);
         
@@ -104,19 +105,19 @@ class MathUtilTest
         MathUtils.Fraction fraction;
         
         fraction = new MathUtils.Fraction(1.3333333333333333);
-        assertEquals(4, fraction.getNumerator().intValue());
-        assertEquals(3, fraction.getDenominator().intValue());
+        assertEquals(4, fraction.getDividend().intValue());
+        assertEquals(3, fraction.getDivisor().intValue());
 
         fraction = new MathUtils.Fraction(1.6666666666666667);
-        assertEquals(5, fraction.getNumerator().intValue());
-        assertEquals(3, fraction.getDenominator().intValue());
+        assertEquals(5, fraction.getDividend().intValue());
+        assertEquals(3, fraction.getDivisor().intValue());
 
         fraction = new MathUtils.Fraction(1.7777777777777777);
-        assertEquals(16, fraction.getNumerator().intValue());
-        assertEquals(9, fraction.getDenominator().intValue());
+        assertEquals(16, fraction.getDividend().intValue());
+        assertEquals(9, fraction.getDivisor().intValue());
 
         fraction = new MathUtils.Fraction(1.5999999999999999);
-        assertEquals(8, fraction.getNumerator().intValue());
-        assertEquals(5, fraction.getDenominator().intValue());
+        assertEquals(8, fraction.getDividend().intValue());
+        assertEquals(5, fraction.getDivisor().intValue());
     }
 }

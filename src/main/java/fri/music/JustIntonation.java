@@ -251,7 +251,7 @@ public class JustIntonation extends AbstractToneSystem
     public enum ChromaticScales implements ChromaticScale
     {
         /** 5-limit-tuning, good for major tunes. */
-        LIMIT_5_SYMMETRIC_1(new Intervals[] {
+        LIMIT_5_SYMMETRIC_1(new Interval[] {
                 Intervals.MINOR_SECOND,
                 Intervals.MAJOR_SECOND_9_8,
                 Intervals.MINOR_THIRD,
@@ -266,7 +266,7 @@ public class JustIntonation extends AbstractToneSystem
                 Intervals.OCTAVE,
             }),
         /** Another 5-limit-tuning, good for the parallel minor. */
-        LIMIT_5_SYMMETRIC_2(new Intervals[] {
+        LIMIT_5_SYMMETRIC_2(new Interval[] {
                 Intervals.MINOR_SECOND,
                 Intervals.MAJOR_SECOND_10_9,
                 Intervals.MINOR_THIRD,
@@ -281,7 +281,7 @@ public class JustIntonation extends AbstractToneSystem
                 Intervals.OCTAVE,
             }),
         /** Asymmetric: minor seventh and major second do not have same distance from tonic. */
-        LIMIT_5_ASYMMETRIC(new Intervals[] {
+        LIMIT_5_ASYMMETRIC(new Interval[] {
                 Intervals.MINOR_SECOND,
                 Intervals.MAJOR_SECOND_9_8,
                 Intervals.MINOR_THIRD,
@@ -296,7 +296,7 @@ public class JustIntonation extends AbstractToneSystem
                 Intervals.OCTAVE,
             }),
         /** Overtone scale, all difference-tones fit perfectly. */
-        HARMONIC_SERIES(new Intervals[] {
+        HARMONIC_SERIES(new Interval[] {
                 Intervals.MINOR_SECOND_HARMONIC,
                 Intervals.MAJOR_SECOND_HARMONIC,
                 Intervals.MINOR_THIRD_HARMONIC,
@@ -311,7 +311,7 @@ public class JustIntonation extends AbstractToneSystem
                 Intervals.OCTAVE,
             }),
         /** Pythagorean scale. */
-        PYTHAGOREAN(new Intervals[] {
+        PYTHAGOREAN(new Interval[] {
                 Intervals.MINOR_SECOND_PYTHAG,
                 Intervals.MAJOR_SECOND_PYTHAG,
                 Intervals.MINOR_THIRD_PYTHAG,
@@ -486,7 +486,7 @@ public class JustIntonation extends AbstractToneSystem
     @Override
     protected Object getCacheKey() {
         // use lowest start-note for caching tones
-        final String lowestInZeroOctave = removeOctave(baseToneIpnName())+"0"; // "E0" from "E3"
+        final String lowestInZeroOctave = removeOctave(baseToneIpnName())+"0"; // e.g. "E0" from "E3"
         return new CacheKey(referenceFrequency(), lowestInZeroOctave, chromaticScale);
     }
     
@@ -520,7 +520,7 @@ public class JustIntonation extends AbstractToneSystem
             final Interval calculationInterval;
             if (octaveReached) {
                 octave++;
-                calculationInterval = Intervals.UNISON; // avoid 2/1 because octave will give the power-number of 2
+                calculationInterval = Intervals.UNISON; // avoid 2/1 because *octave* will give the power-number for 2
             }
             else {
                 calculationInterval = interval;
@@ -574,11 +574,11 @@ public class JustIntonation extends AbstractToneSystem
     public static class JustTone extends Tone
     {
         /** The <code>modalScaleStartIpnName</code>-based octave number of the tone (not IPN-octave!). */
-        public final int octave;
+        private final int octave;
         /** The interval this tone was calculated from (as upper tone). **/
-        public final Interval interval;
+        private final Interval interval;
         /** The deviation from the standard cent count where 1 semi-tone = 100 cent. **/
-        public final int centDeviation;
+        private final int centDeviation;
         
         /**
          * @param tone the tone from equal-temperament to represent.
@@ -591,6 +591,11 @@ public class JustIntonation extends AbstractToneSystem
             this.octave = octave;
             this.interval = interval;
             this.centDeviation = centDeviation;
+        }
+        
+        /** @return the distance of this lower tone to given upper tone as fraction. */
+        public long[] distance(JustTone upperTone) {
+            return Interval.distance(interval, octave, upperTone.interval, upperTone.octave);
         }
         
         @Override

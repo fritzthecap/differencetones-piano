@@ -65,7 +65,18 @@ public class Tones
         return frequenciesToTones.get(frequency);
     }
 
-    /** Binary search for given frequency */
+    /**
+     * Fast binary search for given frequency.
+     * The tones array must be sorted by lowest frequency first and highest last.
+     * @return the tones enclosing given frequency, never null. 
+     *      When Tone[0] == Tone[1], then the frequency matched exactly.
+     *      But Tone[0] could be null and Tone[1] not null,
+     *      this means the given frequency is above highest available tone
+     *      and Tone[1] then is the highest available tone.
+     *      Or Tone[1] could be null and Tone[0] not null,
+     *      this means the given frequency is below lowest available tone
+     *      and Tone[0] then is the lowest available tone.
+     */
     public Tone[] getEnclosingTones(double frequency) {
         int low = 0;
         int high = tones.length - 1;
@@ -80,8 +91,11 @@ public class Tones
                 return new Tone[] { tone, tone };
         }
         
-        if (tones[low].frequency > frequency || tones[high].frequency < frequency)
-            return new Tone[] { null, null };
+        if (tones[low].frequency > frequency) // out of tone range on bottom
+            return new Tone[] { tones[low], null };
+        
+        if (tones[high].frequency < frequency) // out of tone range on top
+            return new Tone[] { null, tones[high] };
         
         return new Tone[] { tones[low], tones[high] };
     }

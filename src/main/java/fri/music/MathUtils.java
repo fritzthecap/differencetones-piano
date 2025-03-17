@@ -51,14 +51,14 @@ public final class MathUtils
     private static long gcd(long x, long y) {
         return (y == 0L) ? x : gcd(y, x % y);
     }
-
     
+
     /** 1.5 -> 3/2 */
     public static long[] toFraction(double number) {
         final Fraction fraction = new Fraction(number);
         return new long[] { 
-                fraction.getNumerator().longValue(), 
-                fraction.getDenominator().longValue() 
+                fraction.getDividend().longValue(), 
+                fraction.getDivisor().longValue() 
             };
     }
 
@@ -66,8 +66,8 @@ public final class MathUtils
     public static long[] reduceFraction(long dividend, long divisor) {
         final Fraction fraction = new Fraction(dividend, divisor);
         return new long[] { 
-                fraction.getNumerator().longValue(), 
-                fraction.getDenominator().longValue() 
+                fraction.getDividend().longValue(), 
+                fraction.getDivisor().longValue() 
             };
     }
     
@@ -175,12 +175,12 @@ public final class MathUtils
         }
 
         /** @return the reduced dividend (numerator). */
-        public BigInteger getNumerator() {
+        public BigInteger getDividend() {
             return dividend;
         }
         
         /** @return the reduced divisor (denominator). */
-        public BigInteger getDenominator() {
+        public BigInteger getDivisor() {
             return divisor;
         }
     }   // end class Fraction

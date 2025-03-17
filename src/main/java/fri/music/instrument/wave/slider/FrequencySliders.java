@@ -194,7 +194,7 @@ public class FrequencySliders
         nearestIntervalTextField.setHorizontalAlignment(SwingConstants.LEFT);
         final JTextField enterFractionTextField = createTextField(110, "Enter Fraction", true);
         enterFractionTextField.setText("/");
-        enterFractionTextField.setToolTipText("Changes Frequency 1");
+        enterFractionTextField.setToolTipText("Changes Frequency 1 on ENTER-Key");
         
         // handle cursor keys or manual note input
         final KeyListener keyboardListener = new KeyAdapter() {
@@ -210,9 +210,10 @@ public class FrequencySliders
                     }
                     else {
                         final Tone[] enclosingTones = tones.getEnclosingTones(findSource(e).getValue());
-                        nextTone = down ? enclosingTones[0] : enclosingTones[0];
+                        nextTone = down ? enclosingTones[0] : enclosingTones[1];
                     }
-                    findSource(e).setValue(nextTone.frequency);
+                    if (nextTone != null)
+                        findSource(e).setValue(nextTone.frequency);
                 }
             }
             public void keyReleased(KeyEvent e) {
@@ -235,17 +236,25 @@ public class FrequencySliders
         enterFractionTextField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String fraction = ((JTextField) e.getSource()).getText();
+                final JTextField textField = (JTextField) e.getSource();
+                textField.setForeground(Color.BLACK); // could have been in error state
+                final String fraction = textField.getText();
                 final int breakLine = fraction.indexOf("/");
-                if (breakLine <= 0)
+                if (breakLine < 0)
                     return;
                 final String string1 = fraction.substring(0, breakLine).strip();
                 final String string2 = fraction.substring(breakLine + 1).strip();
-                final long dividend = Long.valueOf(string1);
-                final long divisor = Long.valueOf(string2);
-                final double frequency2 = frequencyPanel2.getValue();
-                final double frequency = frequency2 * ((double) dividend / (double) divisor);
-                frequencyPanel1.setValue(frequency);
+                try {
+                    final long dividend = Long.valueOf(string1);
+                    final long divisor = Long.valueOf(string2);
+                    final double frequency2 = frequencyPanel2.getValue();
+                    final double frequency = frequency2 * ((double) dividend / (double) divisor);
+                    frequencyPanel1.setValue(frequency);
+                }
+                catch (NumberFormatException ex) {
+                    System.err.println("Please enter a valid fraction! Could not parse '"+fraction+"'");
+                    textField.setForeground(Color.RED);
+                }
             }
         });
         

@@ -1,6 +1,7 @@
 package fri.music.differencetones.composer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import fri.music.*;
 import fri.music.differencetones.DifferenceToneInversions;
@@ -9,6 +10,7 @@ import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.wavegenerator.SineWaveSoundChannel;
 
+@Disabled("TODO: finish this test's implementation!")
 class ComposerTest
 {
     @Test
@@ -25,6 +27,7 @@ class ComposerTest
         testComposer(toneSystem, deviation);
     }
     
+    // TODO: add assertions
     private void testComposer(AbstractToneSystem toneSystem, double deviation) {
         System.out.println(toneSystem);
         final Tones tones = new Tones(toneSystem.tones());

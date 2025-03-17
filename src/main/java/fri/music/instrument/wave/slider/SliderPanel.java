@@ -321,8 +321,10 @@ class SliderPanel
         
         if (tone == null) { // in between micro-tones
             final Tone[] enclosingTones = tones.getEnclosingTones(frequency);
-            if (enclosingTones[0] == null || enclosingTones[1] == null)
+            if (enclosingTones[1] == null) // frequency is below lowest tone
                 return frequencySlider.getMinimum();
+            if (enclosingTones[0] == null) // frequency is above highest tone
+                return frequencySlider.getMaximum();
             
             tone = enclosingTones[0]; // take lower plus micro-tones
             

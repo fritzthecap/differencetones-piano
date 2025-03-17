@@ -24,7 +24,7 @@ public interface ToneSystem
     /** The lowest tone's MIDI-number, highest is 132. */
     int DEFAULT_BASETONE_MIDI_NUMBER = 12;
     
-    /** Default number of octaves from DEFAULT_LOWEST_IPN_NAME, so the range will be "C0" to "C10". */
+    /** Default number of octaves from DEFAULT_LOWEST_IPN_NAME, so the range will be from "C0" to "C10" (including). */
     int MAXIMUM_OCTAVES = 10;
     
     /** Audible limit for "C0", although even 20 Hertz is still hard to hear. */
