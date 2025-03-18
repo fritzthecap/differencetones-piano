@@ -10,11 +10,9 @@ import fri.music.instrument.PianoWithHold;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.SmartComboBox;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
-import fri.music.wavegenerator.SawtoothWaveGenerator;
 import fri.music.wavegenerator.SineWaveGenerator;
-import fri.music.wavegenerator.SquareWaveGenerator;
-import fri.music.wavegenerator.TriangleWaveGenerator;
 import fri.music.wavegenerator.WaveGenerator;
+import fri.music.wavegenerator.WaveNames;
 
 /**
  * Piano that can play different wave-forms like sine, sawtooth and square.
@@ -34,39 +32,19 @@ public class WavePiano extends PianoWithHold
 
         final JComponent pianoPanel = super.getKeyboard();
         
-        final JComboBox<String> waveChoice = new SmartComboBox(getWaveGeneratorClassnames());
+        final JComboBox<String> waveChoice = new SmartComboBox(WaveNames.getNames());
         waveChoice.setBorder(BorderFactory.createTitledBorder("Wavetype"));
         waveChoice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String simpleName = (String) waveChoice.getSelectedItem();
-                
-                final String waveGenClassName = SineWaveGenerator.class.getName();
-                final String packageName = waveGenClassName.substring(0, waveGenClassName.lastIndexOf("."));
-                try {
-                    @SuppressWarnings("unchecked")
-                    Class<? extends WaveGenerator> generatorClass = (Class<? extends WaveGenerator>) 
-                        Class.forName(packageName+"."+simpleName+"WaveGenerator");
-                    
-                    ((GenericWaveSoundChannel) getSoundChannel()).setGeneratorClass(generatorClass);
-                }
-                catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                }
+                final String waveName = (String) waveChoice.getSelectedItem();
+                final Class<? extends WaveGenerator> waveClass = WaveNames.getClass(waveName);
+                ((GenericWaveSoundChannel) getSoundChannel()).setGeneratorClass(waveClass);
             }
         });
         
         getControlPanel().add(waveChoice, 2);
         
         return this.pianoPanel = pianoPanel;
-    }
-
-    private String[] getWaveGeneratorClassnames() {
-        return new String[] {
-            SineWaveGenerator.class.getSimpleName().substring(0, 4),
-            TriangleWaveGenerator.class.getSimpleName().substring(0, 8),
-            SawtoothWaveGenerator.class.getSimpleName().substring(0, 8),
-            SquareWaveGenerator.class.getSimpleName().substring(0, 6),
-        };
     }
 }

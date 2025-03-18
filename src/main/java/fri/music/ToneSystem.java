@@ -19,8 +19,11 @@ public interface ToneSystem
     /** Twelve-tone scales length. */
     int SEMITONES_PER_OCTAVE = IPN_BASE_NAMES.length;
     
+    /** The lowest octave number for C-based IPN note names. */
+    int LOWEST_OCTAVE = 0;
+    
     /** The lowest tone's IPN-name, highest is "C10". */
-    String DEFAULT_BASETONE_IPN_NAME = "C0";
+    String DEFAULT_BASETONE_IPN_NAME = IPN_BASE_NAMES[0]+LOWEST_OCTAVE;
     /** The lowest tone's MIDI-number, highest is 132. */
     int DEFAULT_BASETONE_MIDI_NUMBER = 12;
     

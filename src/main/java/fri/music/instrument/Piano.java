@@ -27,9 +27,10 @@ public class Piano
     {
         public final int octaves;
         public final String lowestToneIpnName;
+        public final int lowestToneOctaveBasedOnC;
         public final boolean isVertical;
         public final int blackKeyWidth;
-        public final boolean colouredWhiteKeys;
+        public final boolean colouredOctaves;
         
         public final int blackKeyHeight;
         public final int whiteKeyWidth;
@@ -53,13 +54,20 @@ public class Piano
          * @param isVertical true for a flipped bottom-to-top piano, null or false for default horizontal orientation.
          * @param blackKeyWidthPixels width of a black key, all others will be proportional to this, default is 16.
          */
-        public Configuration(int octaves, String lowestToneIpnName, Boolean isVertical, int blackKeyWidthPixels, Boolean colouredWhiteKeys) {
+        public Configuration(int octaves, String lowestToneIpnName, Boolean isVertical, int blackKeyWidthPixels, Boolean colouredOctaves) {
             this.octaves = (octaves <= 0 || octaves > ToneSystem.MAXIMUM_OCTAVES) ? ToneSystem.MAXIMUM_OCTAVES : octaves;
+            
             this.isVertical = (isVertical == null) ? false : isVertical;
+            
             this.lowestToneIpnName = (lowestToneIpnName == null) ? "C0" : lowestToneIpnName;
+            // peel the "5" out of "C5" in lowestToneIpnName
+            final String onlyDigits = this.lowestToneIpnName.replaceAll("[^0-9\\-]", ""); // delete non-digits
+            this.lowestToneOctaveBasedOnC = (onlyDigits.length() > 0) ? Integer.valueOf(onlyDigits) : 0;
+            
             this.blackKeyWidth = (blackKeyWidthPixels <= 0) ? 16 : blackKeyWidthPixels;
             // for the black keys of a horizontal piano, 28 pixels are minimum to see the the IPN-name
-            this.colouredWhiteKeys = (colouredWhiteKeys == null) ? false : colouredWhiteKeys;
+            
+            this.colouredOctaves = (colouredOctaves == null) ? false : colouredOctaves;
             
             this.blackKeyHeight = (this.blackKeyWidth * 9) / 2;
             this.whiteKeyWidth = (this.blackKeyWidth * 3) / 2;
@@ -128,8 +136,8 @@ public class Piano
                         setBounds(offset, 0, config.whiteKeyWidth, config.whiteKeyHeight);
                     }
                     
-                    if (config.colouredWhiteKeys)
-                        setBackground(OctaveColor.forOctave(octaveBasedOnScaleStart));
+                    if (config.colouredOctaves)
+                        setBackground(OctaveColor.forOctave(config.lowestToneOctaveBasedOnC + octaveBasedOnScaleStart));
                     else
                         setBackground(Color.WHITE);
                 }

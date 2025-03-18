@@ -141,7 +141,7 @@ public class PianoWithVolume extends PianoWithSound
         return volumeSlider;
     }
 
-    /** @return the velocity slider. */
+    /** @return the touch-velocity slider. */
     protected JSlider getVelocitySlider() {
         return velocitySlider;
     }

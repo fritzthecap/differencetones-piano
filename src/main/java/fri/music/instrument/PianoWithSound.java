@@ -62,19 +62,14 @@ public class PianoWithSound extends Piano
     public static class Keyboard extends Piano.Keyboard
     {
         protected final int lowestToneMidiNumber;
-        protected final int lowestToneOctaveBasedOnC; // octave number appears in IPN-name
         
         public Keyboard(PianoWithSound.Configuration config) {
             super(config);
             
-            // peel the "5" out of "C5" in lowestToneIpnName
-            final String onlyDigits = config.lowestToneIpnName.replaceAll("[^0-9\\-]", ""); // delete non-digits
-            this.lowestToneOctaveBasedOnC = (onlyDigits.length() > 0) ? Integer.valueOf(onlyDigits) : 1;
-            
             final int semitoneInOctaveBasedOnC = ScaleTypes.cBasedSemitoneIndex(config.lowestToneIpnName);
             this.lowestToneMidiNumber = 
                     ToneSystem.DEFAULT_BASETONE_MIDI_NUMBER + // 12
-                    (lowestToneOctaveBasedOnC * ToneSystem.SEMITONES_PER_OCTAVE) + // 12
+                    (config.lowestToneOctaveBasedOnC * ToneSystem.SEMITONES_PER_OCTAVE) + // 12
                     semitoneInOctaveBasedOnC;
         }
         
@@ -113,7 +108,7 @@ public class PianoWithSound extends Piano
                         semitoneInOctave;
                 
                 this.ipnName = ScaleTypes.ipnName(
-                        config.lowestToneIpnName, lowestToneOctaveBasedOnC + octaveBasedOnScaleStart, semitoneInOctave);
+                        config.lowestToneIpnName, config.lowestToneOctaveBasedOnC + octaveBasedOnScaleStart, semitoneInOctave);
                 
                 if (config().showMidiNumberAsTooltip)
                     setToolTipText(""+midiNoteNumber);
