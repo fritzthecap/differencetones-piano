@@ -84,7 +84,7 @@ public class IntervalPlayingPiano extends PianoWithHold
         getControlPanel().add(intervalPanel, 2);
         
         final TuningComponent tuningComponent = newTuningComponent();
-        getControlPanel().add(tuningComponent.getToneSystemChoice(null), 3);
+        getControlPanel().add(tuningComponent.getTuningChoice(null), 3);
         
         moveControlPanelBelowKeyboard();
         

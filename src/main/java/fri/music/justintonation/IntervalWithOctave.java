@@ -1,7 +1,7 @@
 package fri.music.justintonation;
 
 import java.util.List;
-import fri.music.JustIntonation.Interval;
+import fri.music.AbstractJustIntonation.Interval;
 import fri.music.MathUtils;
 
 /**

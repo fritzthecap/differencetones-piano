@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  * Tones of "equal temperament" tuning (today's standard), 
  * where one octave is divided into 12 equally sized semi-tone steps.
+ * This class represents only one tuning.
  * <pre>
  *   frequency = FREQUENCY_A4 * Math.pow(2, semitoneOffsetFromA4 / 12.0);
  * </pre>

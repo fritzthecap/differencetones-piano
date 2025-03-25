@@ -4,8 +4,8 @@ import static fri.music.ToneSystem.*;
 import java.util.ArrayList;
 import java.util.List;
 import fri.music.JustIntonation.Intervals;
-import fri.music.JustIntonation.Interval;
-import fri.music.JustIntonation.ChromaticScale;
+import fri.music.AbstractJustIntonation.Interval;
+import fri.music.AbstractJustIntonation.ChromaticScale;
 import fri.music.ToneSystem;
 
 /**

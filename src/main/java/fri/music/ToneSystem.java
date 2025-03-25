@@ -59,7 +59,7 @@ public interface ToneSystem
     /** @return the name of this tone-system. */
     String name();
     
-    /** @return the actual frequency of the reference-note "A4" (REFERENCE_FREQUENCY_IPN_NAME). */
+    /** @return the actual frequency of the reference-note "A4" (REFERENCE_FREQUENCY_IPN_NAME), to be overridden. */
     double referenceFrequency();
     
     /** @return the actual lowest note of this tone-system, for just-intonation the note the scale was built upon. */

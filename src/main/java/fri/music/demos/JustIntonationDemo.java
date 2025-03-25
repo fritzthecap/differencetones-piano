@@ -2,7 +2,7 @@ package fri.music.demos;
 
 import fri.music.JustIntonation;
 import fri.music.JustIntonation.ChromaticScales;
-import fri.music.JustIntonation.JustTone;
+import fri.music.AbstractJustIntonation.JustTone;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;

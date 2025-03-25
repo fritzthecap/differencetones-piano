@@ -170,7 +170,7 @@ public class FrequencySliders
                 tones.getOctaves(), 
                 null, 
                 listener);
-        return tuning.getToneSystemChoice(toneSystem);
+        return tuning.getTuningChoice(toneSystem);
     }
 
     private void createFrequencySliderPanels(JSlider amplitudeSlider, JSlider gainSlider, JComboBox<String> waveChoice) {

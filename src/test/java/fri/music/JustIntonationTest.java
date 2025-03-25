@@ -3,7 +3,7 @@ package fri.music;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import fri.music.JustIntonation.ChromaticScales;
-import fri.music.JustIntonation.JustTone;
+import fri.music.AbstractJustIntonation.JustTone;
 
 class JustIntonationTest
 {

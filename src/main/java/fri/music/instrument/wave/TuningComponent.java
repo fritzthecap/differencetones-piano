@@ -29,7 +29,7 @@ public class TuningComponent
     private final WaveSoundChannel soundChannel;
     private final Listener listener;
     
-    private JComboBox<String> toneSystemChoice;
+    private JComboBox<String> tuningChoice;
     
     public TuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
         this(lowestToneIpnName, octaves, soundChannel, null);
@@ -44,22 +44,29 @@ public class TuningComponent
         this.listener = listener;
     }
     
-    public JComboBox<String> getToneSystemChoice(ToneSystem initialToneSystem) {
-        if (this.toneSystemChoice != null)
-            return this.toneSystemChoice;
+    /**
+     * Call this to get a UI-control for choosing tunings.
+     * @param initialTuning optional, the name of a tuning to select initially.
+     * @return a UI-control that lets choose tunings 
+     *      and sets the chosen tuning into the optional sound-channel
+     *      and notifies the optional listener.
+     */
+    public JComboBox<String> getTuningChoice(ToneSystem initialTuning) {
+        if (this.tuningChoice != null)
+            return this.tuningChoice;
 
-        final String[] tonesystemNames = getTonesystemNames();
-        final JComboBox<String> toneSystemChoice = new SmartComboBox(tonesystemNames);
-        toneSystemChoice.setBorder(BorderFactory.createTitledBorder("Tuning"));
+        final String[] tuningNames = getTuningNames();
+        final JComboBox<String> tuningChoice = new SmartComboBox(tuningNames);
+        tuningChoice.setBorder(BorderFactory.createTitledBorder("Tuning"));
         
-        if (initialToneSystem != null)
-            toneSystemChoice.setSelectedIndex(getSelectedIndex(initialToneSystem, tonesystemNames));
+        if (initialTuning != null)
+            tuningChoice.setSelectedIndex(getInitiallySelectedIndex(initialTuning, tuningNames));
         
-        toneSystemChoice.addActionListener(new ActionListener() {
+        tuningChoice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String name = (String) toneSystemChoice.getSelectedItem();
-                final ToneSystem toneSystem = toToneSystem(name);
+                final String name = (String) tuningChoice.getSelectedItem();
+                final ToneSystem toneSystem = toTuning(name);
                 
                 if (soundChannel != null)
                     soundChannel.setTones(toneSystem.tones());
@@ -69,18 +76,22 @@ public class TuningComponent
             }
         });
         
-        return this.toneSystemChoice = toneSystemChoice;
+        return this.tuningChoice = tuningChoice;
     }
 
-    private String[] getTonesystemNames() {
+    /** Called once when building the choice. */
+    private String[] getTuningNames() {
         final String SPACE = " ";
         final List<String> scales = new ArrayList<>();
         
-        scales.add(EqualTemperament.class.getSimpleName()+" (12-TET, EDO-12)"); // default tone-system on top
+        // put default tone-system on top of list
+        scales.add(EqualTemperament.class.getSimpleName()+SPACE+"(12-TET, EDO-12)");
+        
+        // add different just-intonations below
         scales.addAll(
             Stream.of(JustIntonation.ChromaticScales.values())
                 .map(scale -> 
-                    scale.name()+SPACE+
+                    scale.name()+SPACE+ // chooseable name must start with chromaticScale.name()
                     (scale.name().startsWith("HARMONIC")
                         ? "(Overtone Scale)"
                         : "("+JustIntonation.class.getSimpleName()+")"))
@@ -89,26 +100,32 @@ public class TuningComponent
         return scales.toArray(new String[scales.size()]);
     }
     
-    private int getSelectedIndex(ToneSystem initialToneSystem, String[] tonesystemNames) {
-        final String namePartToSearch = (initialToneSystem instanceof JustIntonation)
-            ? ((JustIntonation) initialToneSystem).chromaticScale.name()
-            : initialToneSystem.getClass().getSimpleName(); // EqualTemperament
-        
-        return IntStream.range(0, tonesystemNames.length)
-            .filter(index -> tonesystemNames[index].contains(namePartToSearch))
-            .findFirst()
-            .orElseThrow();
-    }
-    
-    private ToneSystem toToneSystem(String name) {
-        if (name.startsWith(EqualTemperament.class.getSimpleName()))
+    /** Called every time an item was selected from choice. */
+    private ToneSystem toTuning(final String chosenName) {
+        if (chosenName.startsWith(EqualTemperament.class.getSimpleName()))
             return new EqualTemperament(lowestToneIpnName, octaves);
         
-        final JustIntonation.ChromaticScale twelveToneScale = Stream.of(JustIntonation.ChromaticScales.values())
-                .filter(scale -> name.startsWith(scale.name()))
+        final JustIntonation.ChromaticScale twelveToneScale = 
+            Stream.of(JustIntonation.ChromaticScales.values())
+                .filter(scale -> matchTuning(chosenName, scale.name()))
                 .findFirst()
                 .orElseThrow();
         
         return new JustIntonation(lowestToneIpnName, octaves, twelveToneScale);
+    }
+    
+    private int getInitiallySelectedIndex(ToneSystem initialTuning, final String[] tuningNames) {
+        final String namePrefix = (initialTuning instanceof JustIntonation)
+            ? ((JustIntonation) initialTuning).chromaticScale.name()
+            : initialTuning.getClass().getSimpleName(); // "EqualTemperament"
+        
+        return IntStream.range(0, tuningNames.length)
+            .filter(index -> matchTuning(tuningNames[index], namePrefix))
+            .findFirst()
+            .orElseThrow();
+    }
+    
+    private boolean matchTuning(String choosableTuningName, String namePrefix) {
+        return choosableTuningName.startsWith(namePrefix);
     }
 }
