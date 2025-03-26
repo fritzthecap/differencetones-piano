@@ -1,8 +1,5 @@
 package fri.music;
 
-import java.util.Hashtable;
-import java.util.Map;
-
 /**
  * Tones of "equal temperament" tuning (today's standard), 
  * where one octave is divided into 12 equally sized semi-tone steps.
@@ -25,8 +22,6 @@ import java.util.Map;
  */
 public final class EqualTemperament extends AbstractToneSystem
 {
-    private static final Map<Object,Tone[]> frequencyOfA4ToTones = new Hashtable<>();
-    
     public EqualTemperament() {
         this(-1.0);
     }
@@ -63,11 +58,6 @@ public final class EqualTemperament extends AbstractToneSystem
         return super.name()+" alias EDO-12 alias 12-TET";
     }
     
-    
-    @Override
-    protected Map<Object,Tone[]> tonesCache() {
-        return frequencyOfA4ToTones;
-    }
     
     @Override
     protected Object getCacheKey() {

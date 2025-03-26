@@ -1,6 +1,7 @@
 package fri.music;
 
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -9,6 +10,9 @@ import java.util.stream.IntStream;
  */
 public abstract class AbstractToneSystem implements ToneSystem
 {
+    /** The global cache for the fully built tone-arrays. */
+    public static final Map<Object,Tone[]> tonesCache = new Hashtable<>();
+    
     /** The actual start tone of this tone-system, can be different from <code>baseToneIpnName()</code>. */
     public final String modalScaleStartIpnName;
     /** The actual number of octaves of this tone-system. */
@@ -78,21 +82,18 @@ public abstract class AbstractToneSystem implements ToneSystem
     
     protected final Tone[] getOrCreateCachedTones() {
         final Object hashKey = getCacheKey();
-        final Tone[] cachedTones = tonesCache().get(hashKey);
+        final Tone[] cachedTones = tonesCache.get(hashKey);
         if (cachedTones != null)
             return cachedTones;
             
         final Tone[] calculatedTones = createTones();
-        tonesCache().put(hashKey, calculatedTones);
+        tonesCache.put(hashKey, calculatedTones);
         
         return calculatedTones;
     }
 
     /** Sub-classes MUST define a cache-key for caching full 12-tone scales. */
     protected abstract Object getCacheKey();
-
-    /** Sub-classes MUST provide a cache for caching full 12-tone scales. */
-    protected abstract Map<Object,Tone[]> tonesCache();
 
     /** Sub-classes MUST provide the creation of full 12-tone scales for caching. */
     protected abstract Tone[] createTones();

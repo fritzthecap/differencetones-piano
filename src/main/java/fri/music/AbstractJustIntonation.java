@@ -1,7 +1,5 @@
 package fri.music;
 
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
@@ -137,8 +135,6 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
     }
     
     
-    private static final Map<Object,Tone[]> cachKeyToTones = new Hashtable<>();
-    
     public final ChromaticScale chromaticScale;
     
     /**
@@ -184,11 +180,6 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
     
     
     protected record CacheKey(double frequencyOfA4, String lowestInZeroOctave, ChromaticScale chromaticScale) {
-    }
-    
-    @Override
-    protected Map<Object,Tone[]> tonesCache() {
-        return cachKeyToTones;
     }
     
     @Override
