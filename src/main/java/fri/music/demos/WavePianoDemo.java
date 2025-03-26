@@ -1,7 +1,5 @@
 package fri.music.demos;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import fri.music.ScaleTypes;
@@ -19,15 +17,10 @@ public class WavePianoDemo
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, 16);
-        final WavePiano wavePiano = new WavePiano(config, null);
-        final JComponent pianoPanel = wavePiano.getKeyboard();
+        final WavePiano piano = new WavePiano(config, null);
+        final JComponent pianoPanel = piano.getKeyboard();
         
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent windowEvent) {
-                wavePiano.destroyKeyboard(pianoPanel);
-            }
-        });
+        frame.addWindowListener(piano.getWindowClosingListener());
         frame.add(pianoPanel);
         frame.pack();
         frame.setLocationRelativeTo(null);

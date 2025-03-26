@@ -12,14 +12,14 @@ public class FrequencySlidersDemo
         frame.setTitle("FrequencySlider Demo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        final FrequencySliders frequencySlider = new FrequencySliders();
+        final FrequencySliders frequencySliders = new FrequencySliders();
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                frequencySlider.close();
+                frequencySliders.close();
             }
         });
-        frame.getContentPane().add(frequencySlider.panel);
+        frame.getContentPane().add(frequencySliders.panel);
         frame.setSize(1200, 410);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

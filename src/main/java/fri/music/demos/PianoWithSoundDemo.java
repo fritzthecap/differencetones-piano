@@ -1,7 +1,5 @@
 package fri.music.demos;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import fri.music.ScaleTypes;
@@ -15,19 +13,14 @@ public class PianoWithSoundDemo
         final String lowestToneIpnName = "D3";
         
         final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame("PianoWithSound ("+scale+", "+octaves+" Octaves)");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, true, 14);
         final PianoWithSound piano = new PianoWithSound(config, new SineWaveSoundChannel(null));
         final JComponent pianoPanel = piano.getKeyboard();
         
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent windowEvent) {
-                piano.destroyKeyboard(pianoPanel);
-            }
-        });
+        final JFrame frame = new JFrame("PianoWithSound ("+scale+", "+octaves+" Octaves)");
+        frame.addWindowListener(piano.getWindowClosingListener());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(pianoPanel);
         frame.pack();
         frame.setLocationRelativeTo(null);

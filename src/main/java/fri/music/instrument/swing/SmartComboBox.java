@@ -1,4 +1,4 @@
-package fri.music.instrument;
+package fri.music.instrument.swing;
 
 import java.awt.Dimension;
 import javax.swing.JComboBox;

@@ -1,7 +1,5 @@
 package fri.music.demos;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Synthesizer;
@@ -24,16 +22,11 @@ public class MidiSynthesizerDemo
         synthesizer.open();
         final MidiSynthesizer.Configuration config = 
                 new MidiSynthesizer.Configuration(octaves, lowestToneIpnName, false, 16, null, null, true);
-        final MidiSynthesizer midiSynthesizer = new MidiSynthesizer(config, synthesizer);
-        final JComponent midiKeyboard = midiSynthesizer.getKeyboard();
+        final MidiSynthesizer piano = new MidiSynthesizer(config, synthesizer);
+        final JComponent pianoPanel = piano.getKeyboard();
         
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent windowEvent) {
-                midiSynthesizer.destroyKeyboard(midiKeyboard);
-            }
-        });
-        frame.add(midiKeyboard);
+        frame.addWindowListener(piano.getWindowClosingListener());
+        frame.add(pianoPanel);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

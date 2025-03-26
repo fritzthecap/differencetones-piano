@@ -1,12 +1,19 @@
 package fri.music.instrument.wave;
 
-import static fri.music.ToneSystem.*;
+import static fri.music.ToneSystem.FIFTH;
+import static fri.music.ToneSystem.FOURTH;
+import static fri.music.ToneSystem.MAJOR_SIXTH;
+import static fri.music.ToneSystem.MAJOR_THIRD;
+import static fri.music.ToneSystem.MINOR_SIXTH;
+import static fri.music.ToneSystem.MINOR_THIRD;
+import static fri.music.ToneSystem.TRITONE;
+import static fri.music.ToneSystem.semitoneSteps;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import fri.music.SoundChannel;
 import fri.music.instrument.PianoWithSound;
+import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
  * Piano that auto-plays a configured triad when pressing a key.
@@ -29,7 +36,7 @@ public class TriadPlayingPiano extends IntervalPlayingPiano
     
     private int[] selectedSemitoneSteps = triadToSemitones.get("");
     
-    public TriadPlayingPiano(PianoWithSound.Configuration config, SoundChannel channel) {
+    public TriadPlayingPiano(PianoWithSound.Configuration config, WaveSoundChannel channel) {
         super(config, channel);
     }
     

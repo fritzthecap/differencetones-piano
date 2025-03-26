@@ -7,6 +7,9 @@ import java.awt.Graphics;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -294,10 +297,19 @@ public class PianoWithSound extends Piano
         return this.keyList = keyList;
     }
     
-    /** Removes mouse listener from all keys. */
+    /** @return a WindowListener that calls <code>destroyKeyboard()</code> on window-closing event. */
+    public WindowListener getWindowClosingListener() {
+        return new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                destroyKeyboard(pianoPanel);
+            }
+        };
+    }
+    
+    /** Removes mouse listener from all keys and turns off all sound. */
     public void destroyKeyboard(JComponent pianoPanel) {
         for (Keyboard.Key key : getKeys())
             key.removeMouseListener(getMouseHandler());
-        getSoundChannel().allNotesOff();
+        getSoundChannel().allNotesOff(); // closes all sound-channels
     }
 }

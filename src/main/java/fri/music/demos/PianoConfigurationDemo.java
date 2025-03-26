@@ -7,19 +7,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-import fri.music.SoundChannel;
 import fri.music.instrument.ConfigurationPanel;
 import fri.music.instrument.PianoWithSound;
 
 public class PianoConfigurationDemo
 {
-    private static int instance = 0;
+    private static List<JFrame> frames = new ArrayList<>();
     
     public static void main(String[] args) {
         final ConfigurationPanel configurationPanel = new ConfigurationPanel();
@@ -28,20 +29,15 @@ public class PianoConfigurationDemo
         showPianoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final SoundChannel soundChannel = configurationPanel.getSoundChannel();
-                final PianoWithSound piano = new PianoWithSound(
-                        configurationPanel.getPianoConfiguration(), 
-                        soundChannel);
+                final PianoWithSound piano = configurationPanel.getPiano();
                 final JComponent pianoPanel = piano.getKeyboard();
                 
-                instance++;
-                final JFrame frame = startFrame("Piano "+instance, pianoPanel, WindowConstants.DISPOSE_ON_CLOSE);
-                frame.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent windowEvent) {
-                        piano.destroyKeyboard(pianoPanel);
-                    }
-                });
+                final JFrame frame = startFrame(
+                        piano.getClass().getSimpleName()+" "+(frames.size() + 1), 
+                        pianoPanel, 
+                        WindowConstants.DISPOSE_ON_CLOSE);
+                frame.addWindowListener(piano.getWindowClosingListener());
+                frames.add(frame);
             }
         });
         
@@ -53,7 +49,15 @@ public class PianoConfigurationDemo
         mainPanel.add(configurationPanel.panel, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        startFrame("Piano Configuration Demo", mainPanel, WindowConstants.EXIT_ON_CLOSE);
+        final JFrame mainFrame = startFrame("Piano Configuration Demo", mainPanel, WindowConstants.EXIT_ON_CLOSE);
+        mainFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                for (JFrame frame : frames)
+                    if (frame.isVisible())
+                        frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+            }
+        });
     }
     
     private static JFrame startFrame(String title, JComponent content, int actionOnClose) {

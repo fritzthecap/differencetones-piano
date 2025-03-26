@@ -12,11 +12,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import fri.music.SoundChannel;
 import fri.music.instrument.PianoWithHold;
 import fri.music.instrument.PianoWithSound;
-import fri.music.instrument.SmartComboBox;
-import fri.music.instrument.SmartPanel;
+import fri.music.instrument.swing.SmartComboBox;
+import fri.music.instrument.swing.SmartPanel;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -42,7 +41,7 @@ public class IntervalPlayingPiano extends PianoWithHold
     private JComponent pianoPanel;
     private int selectedSemitoneSteps = 0;
     
-    public IntervalPlayingPiano(PianoWithSound.Configuration config, SoundChannel channel) {
+    public IntervalPlayingPiano(PianoWithSound.Configuration config, WaveSoundChannel channel) {
         super(config, channel);
     }
     

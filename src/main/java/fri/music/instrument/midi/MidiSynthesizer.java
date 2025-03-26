@@ -6,15 +6,13 @@ import java.util.LinkedHashSet;
 import java.util.SequencedSet;
 import javax.sound.midi.Instrument;
 import javax.sound.midi.MidiChannel;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Synthesizer;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import fri.music.instrument.PianoWithHold;
 import fri.music.instrument.PianoWithSound;
-import fri.music.instrument.SmartComboBox;
+import fri.music.instrument.swing.SmartComboBox;
 
 /**
  * Different instruments for the piano keyboard.
@@ -25,20 +23,20 @@ public class MidiSynthesizer extends PianoWithHold
     private final MidiChannel midiChannel;
     private JComponent pianoPanel;
     
-    public MidiSynthesizer() throws MidiUnavailableException {
-        this(MidiSystem.getSynthesizer());
+    public MidiSynthesizer() {
+        this((PianoWithSound.Configuration) null);
+    }
+    public MidiSynthesizer(PianoWithSound.Configuration config) {
+        this(config, SynthesizerFactory.getOpenSynthesizer());
     }
     public MidiSynthesizer(Synthesizer synthesizer) {
         this(null, synthesizer);
     }
     public MidiSynthesizer(PianoWithSound.Configuration config, Synthesizer synthesizer) {
-        this(config, synthesizer, synthesizer.getChannels()[0]);
-    }
-    public MidiSynthesizer(PianoWithSound.Configuration config, Synthesizer synthesizer, MidiChannel channel) {
-        super(config, new MidiSoundChannel(channel));
+        super(config, new MidiSoundChannel(synthesizer));
         
-        this.midiChannel = channel;
         this.synthesizer = synthesizer;
+        this.midiChannel = synthesizer.getChannels()[0];
     }
     
     @Override

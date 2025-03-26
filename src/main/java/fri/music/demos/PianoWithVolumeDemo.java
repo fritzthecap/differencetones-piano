@@ -1,7 +1,5 @@
 package fri.music.demos;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import fri.music.ScaleTypes;
@@ -20,15 +18,10 @@ public class PianoWithVolumeDemo
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, 12);
-        final PianoWithVolume pianoWithVolume = new PianoWithVolume(config, new SineWaveSoundChannel(null));
-        final JComponent pianoPanel = pianoWithVolume.getKeyboard();
+        final PianoWithVolume piano = new PianoWithVolume(config, new SineWaveSoundChannel(null));
+        final JComponent pianoPanel = piano.getKeyboard();
         
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent windowEvent) {
-                pianoWithVolume.destroyKeyboard(pianoPanel);
-            }
-        });
+        frame.addWindowListener(piano.getWindowClosingListener());
         frame.add(pianoPanel);
         frame.pack();
         frame.setLocationRelativeTo(null);

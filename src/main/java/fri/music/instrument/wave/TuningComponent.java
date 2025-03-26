@@ -11,14 +11,19 @@ import javax.swing.JComboBox;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
-import fri.music.instrument.SmartComboBox;
+import fri.music.instrument.swing.SmartComboBox;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
- * Lets change tunings on a wave-soundchannel.
+ * Lets change tunings on a wave-soundchannel, or notifies a listener.
  */
 public class TuningComponent
 {
+    /** 
+     * If no sound-channel is given to constructor, 
+     * this listener will be notified on any tuning change.
+     * It is possible to use both listener and sound-channel.
+     */
     public interface Listener
     {
         void tuningChanged(ToneSystem toneSystem);
@@ -91,7 +96,7 @@ public class TuningComponent
         scales.addAll(
             Stream.of(JustIntonation.ChromaticScales.values())
                 .map(scale -> 
-                    scale.name()+SPACE+ // chooseable name must start with chromaticScale.name()
+                    scale.name()+SPACE+ // visible name must start with chromaticScale.name()
                     (scale.name().startsWith("HARMONIC")
                         ? "(Overtone Scale)"
                         : "("+JustIntonation.class.getSimpleName()+")"))

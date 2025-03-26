@@ -6,14 +6,14 @@ import fri.music.SoundChannel;
 
 public class MidiSoundChannel implements SoundChannel
 {
-    private final MidiChannel delegate;
+    public final MidiChannel delegate;
     
     /** Chooses channel[0] of given synthesizer as sound channel. */
     public MidiSoundChannel(Synthesizer synthesizer) {
         this(synthesizer.getChannels()[0]);
     }
     
-    public MidiSoundChannel(MidiChannel delegate) {
+    private MidiSoundChannel(MidiChannel delegate) {
         this.delegate = delegate;
     }
 

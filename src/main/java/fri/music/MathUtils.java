@@ -57,8 +57,8 @@ public final class MathUtils
     public static long[] toFraction(double number) {
         final Fraction fraction = new Fraction(number);
         return new long[] { 
-                fraction.getDividend().longValue(), 
-                fraction.getDivisor().longValue() 
+                fraction.dividend.longValue(), 
+                fraction.divisor.longValue() 
             };
     }
 
@@ -66,8 +66,8 @@ public final class MathUtils
     public static long[] reduceFraction(long dividend, long divisor) {
         final Fraction fraction = new Fraction(dividend, divisor);
         return new long[] { 
-                fraction.getDividend().longValue(), 
-                fraction.getDivisor().longValue() 
+                fraction.dividend.longValue(), 
+                fraction.divisor.longValue() 
             };
     }
     
@@ -78,9 +78,12 @@ public final class MathUtils
         private static final double DEFAULT_EPSILON = 1e-5; // 1.0e-20
         private static final int DEFAULT_ITERATIONS = 100; // 10000
 
-        private final double doubleValue;
-        private final BigInteger dividend; // numerator
-        private final BigInteger divisor; // denominator
+        /** The calculated-by-division or constructor-given value. */
+        public final double doubleValue;
+        /** The reduced dividend (numerator). */
+        public final BigInteger dividend;
+        /** The reduced divisor (denominator). */
+        public final BigInteger divisor;
 
         /**
          * @param dividend numerator, the number above the fraction line.
@@ -166,22 +169,6 @@ public final class MathUtils
                 dividend = BigInteger.valueOf(p1);
                 divisor  = BigInteger.valueOf(q1);
             }
-        }
-
-        
-        /** @return the calculated-by-division or constructor-given value. */
-        public double doubleValue() {
-            return doubleValue;
-        }
-
-        /** @return the reduced dividend (numerator). */
-        public BigInteger getDividend() {
-            return dividend;
-        }
-        
-        /** @return the reduced divisor (denominator). */
-        public BigInteger getDivisor() {
-            return divisor;
         }
     }   // end class Fraction
     
