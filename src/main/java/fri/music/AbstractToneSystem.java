@@ -25,7 +25,7 @@ public abstract class AbstractToneSystem implements ToneSystem
      * @param modalScaleStartIpnName the lowest note of the tone array resulting from a tones() call.
      *      When baseToneIpnName is "C0" and modalScaleStartIpnName is "A0" you will get an A-minor scale,
      *      built upon a C-major scale (AEOLIAN mode). Thus it is the specifier for the modal scale you want.
-     *      By default it is baseToneIpnName.
+     *      By default it is <code>baseToneIpnName</code>.
      * @param octaves the 0-n number of octaves + 1 to return.
      *      When zero, just the lowest tone is returned,
      *      when less than zero, ToneSystem.DEFAULT_OCTAVES octaves will be returned.
@@ -34,10 +34,10 @@ public abstract class AbstractToneSystem implements ToneSystem
         this.frequencyOfA4 = (frequencyOfA4 <= 0.0) ? ToneSystem.DEFAULT_REFERENCE_FREQUENCY : frequencyOfA4;
         this.baseToneIpnName = (baseToneIpnName == null) ? ToneSystem.DEFAULT_BASETONE_IPN_NAME : baseToneIpnName;
         this.modalScaleStartIpnName = (modalScaleStartIpnName == null) ? this.baseToneIpnName : modalScaleStartIpnName;
-        this.octaves = calculateOctaves(octaves, this.modalScaleStartIpnName);
+        this.octaves = checkForMaximumOctaves(octaves, this.modalScaleStartIpnName);
     }
     
-    private int calculateOctaves(int octaves, String modalScaleStartIpnName) {
+    private int checkForMaximumOctaves(int octaves, String modalScaleStartIpnName) {
         final int startNoteOctave = getOctave(modalScaleStartIpnName);
         final String startNoteWithoutOctave = removeOctave(modalScaleStartIpnName);
         final boolean isC = startNoteWithoutOctave.equals(ToneSystem.IPN_BASE_NAMES[0]);
@@ -45,7 +45,8 @@ public abstract class AbstractToneSystem implements ToneSystem
 
         if (octaves < 0) // number of octaves was NOT specified, calculate possible maximum
             return maximumOctaves;
-        else if (octaves > 0 && octaves > maximumOctaves)
+        
+        if (octaves > 0 && octaves > maximumOctaves)
             throw new IllegalArgumentException(octaves+" octaves not possible for "+this.baseToneIpnName+", maximum is "+maximumOctaves);
 
         return octaves;
@@ -77,9 +78,9 @@ public abstract class AbstractToneSystem implements ToneSystem
     
     protected final Tone[] getOrCreateCachedTones() {
         final Object hashKey = getCacheKey();
-        final Tone[] tones = tonesCache().get(hashKey);
-        if (tones != null)
-            return tones;
+        final Tone[] cachedTones = tonesCache().get(hashKey);
+        if (cachedTones != null)
+            return cachedTones;
             
         final Tone[] calculatedTones = createTones();
         tonesCache().put(hashKey, calculatedTones);
@@ -87,17 +88,22 @@ public abstract class AbstractToneSystem implements ToneSystem
         return calculatedTones;
     }
 
+    /** Sub-classes MUST define a cache-key for caching full 12-tone scales. */
     protected abstract Object getCacheKey();
 
+    /** Sub-classes MUST provide a cache for caching full 12-tone scales. */
     protected abstract Map<Object,Tone[]> tonesCache();
 
+    /** Sub-classes MUST provide the creation of full 12-tone scales for caching. */
     protected abstract Tone[] createTones();
 
     
+    /** @return the given IPN-name without trailing octave-number. */
     protected final String removeOctave(String ipnName) {
         return ipnName.replaceAll("[0-9\\-]", "");
     }
     
+    /** @return the octave-number from given IPN-name. */
     protected final int getOctave(String ipnName) {
         return Integer.valueOf(ipnName.replaceAll("[^0-9\\-]", ""));
     }

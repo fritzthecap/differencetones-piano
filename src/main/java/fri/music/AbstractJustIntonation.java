@@ -7,6 +7,8 @@ import java.util.stream.IntStream;
 
 /**
  * Interfaces and default implementations for just-intonations.
+ * Use this as base-class when your 12-tone scale builds upon fractions.
+ * See <code>dividend()</code> and <code>divisor()</code> in Interval.
  */
 public abstract class AbstractJustIntonation extends AbstractToneSystem
 {
@@ -14,32 +16,29 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
     public interface Interval
     {
         /**
-         * @return the name of this interval.
-         *      Every name must start with one of the names used in <code>ToneSystem.INTERVAL_NAMES</code>.
+         * @return the name of this interval. Every such name must start with
+         *      one of the names used in <code>ToneSystem.INTERVAL_NAMES</code>.
          */
         String name();
         
         /**
-         * Use <code>dividendForOctave()</code> (see below) to implement this!
-         * @param octave the octave for the dividend of this interval, not the IPN-octave!
-         * @return the dividend of this interval, according to given octave.
+         * @return the interval's simple dividend, independent of octave.
          */
-        int dividend(int octave);
+        int basicDividend();
         
         /**
          * @return the divisor of this interval.
          */
-        public int divisor();
+        int divisor();
         
         
         /**
-         * Default implementation to calculate the interval's dividend.
-         * @param baseDividend the interval's simple dividend, independent of octave.
-         * @param octave the octave for the interval of the dividend, not the IPN-octave!
-         * @return the dividend of this interval, according to given base-dividend and octave.
+         * Default implementation to calculate the interval's dividend from octave and <code>basicDividend()</code>.
+         * @param octave the 0-n octave for the dividend of this interval, not the IPN-octave!
+         * @return the dividend of this interval, according to given octave.
          */
-        default int dividendForOctave(int baseDividend, int octave) {
-            return baseDividend * (int) Math.pow(2, octave); // 2^0=1, 2^1=2, 2^2=4, 2^3=8,.... 
+        default int dividend(int octave) {
+            return basicDividend() * (int) Math.pow(2, octave); // 2^0=1, 2^1=2, 2^2=4, 2^3=8, .... 
         }
         
         /**

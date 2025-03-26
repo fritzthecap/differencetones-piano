@@ -51,7 +51,7 @@ class MathUtilTest
         long[] fraction;
         
         fraction = MathUtils.toFraction(1.333333333333333);
-        System.out.println(fraction[0]+"/"+fraction[1]);
+        //System.out.println(fraction[0]+"/"+fraction[1]);
         assertEquals(4, fraction[0]);
         assertEquals(3, fraction[1]);
         

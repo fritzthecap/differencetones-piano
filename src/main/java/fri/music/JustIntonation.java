@@ -6,10 +6,11 @@ import java.util.stream.Stream;
 
 /**
  * Various 12-tone scales using different fractions for tone steps.
- * This class contains as much tone-systems (called tunings) 
+ * This class contains as much 12-tone-systems (called "tunings") 
  * as <code>ChromaticScales</code> elements were implemented. 
- * Their different <code>name()</code> implementations use
- * <code>chromaticScale.name()</code>.
+ * To distinguish their <code>name()</code> implementations, the
+ * <code>chromaticScale.name()</code> from super-class gets appended
+ * to the simple class-name.
  */
 public class JustIntonation extends AbstractJustIntonation
 {
@@ -103,8 +104,8 @@ public class JustIntonation extends AbstractJustIntonation
         }
         
         /** {@inheritDoc}. */
-        public int dividend(int octave) {
-            return dividendForOctave(dividend, octave);
+        public int basicDividend() {
+            return dividend;
         }
         
         /** {@inheritDoc}. */

@@ -57,7 +57,7 @@ public final class EqualTemperament extends AbstractToneSystem
         super(frequencyOfA4, baseToneIpnName, baseToneIpnName, octaves);
     }
     
-    /** {@inheritDoc} */
+    /** Appends other popular names to super-imlementation. */
     @Override
     public String name() {
         return super.name()+" alias EDO-12 alias 12-TET";
