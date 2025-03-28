@@ -9,6 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -32,7 +35,7 @@ import fri.music.instrument.wave.TuningComponent;
 import fri.music.wavegenerator.SineWaveGenerator;
 import fri.music.wavegenerator.WaveGenerator;
 
-public class FrequencySliders
+public class FrequencyDifferenceSliders
 {
     public static final String RECOMMENDED_LOWEST = "C3";
     public static final int RECOMMENDED_OCTAVES = 5;
@@ -50,11 +53,11 @@ public class FrequencySliders
     private JustIntonation.Interval[] justIntervals;
 
     /** Render tone range C3 - C8. */
-    public FrequencySliders() {
+    public FrequencyDifferenceSliders() {
         this(new JustIntonation(RECOMMENDED_LOWEST, RECOMMENDED_OCTAVES));
     }
     
-    public FrequencySliders(ToneSystem toneSystem) {
+    public FrequencyDifferenceSliders(ToneSystem toneSystem) {
         tones = new Tones(toneSystem.tones());
         
         initializeJustIntervals(toneSystem);
@@ -71,6 +74,16 @@ public class FrequencySliders
         
         panel = new JScrollPane(
                 layoutMainPanel(amplitudeSlider, gainSlider, waveChoice, tuningChoice, infoPanel));
+    }
+    
+    /** @return a window-listener to be used for a JFrame showing this panel. */
+    public WindowListener getWindowClosingListener() {
+        return new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                close();
+            }
+        };
     }
 
     /** Ends playing sounds and releases resources. */

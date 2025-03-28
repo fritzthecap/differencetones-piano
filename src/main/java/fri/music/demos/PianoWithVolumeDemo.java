@@ -17,7 +17,7 @@ public class PianoWithVolumeDemo
         final JFrame frame = new JFrame("PianoWithVolume ("+scale+", "+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, 12);
+        final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, 13);
         final PianoWithVolume piano = new PianoWithVolume(config, new SineWaveSoundChannel(null));
         final JComponent pianoPanel = piano.getKeyboard();
         

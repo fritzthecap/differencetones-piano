@@ -80,6 +80,17 @@ public class DifferenceSliderPanel extends SliderPanel
         if (tertiaryDifference != null)
             tertiaryDifference.setValue(frequency1, frequency2);
     }
+    
+    @Override
+    public void close() {
+        super.close();
+        
+        if (secondaryDifference != null)
+            secondaryDifference.close();
+        
+        if (tertiaryDifference != null)
+            tertiaryDifference.close();
+    }
 
     protected double calculateDifference(double frequency1, double frequency2) {
         return DifferenceToneMath.primaryDifference(frequency1, frequency2);

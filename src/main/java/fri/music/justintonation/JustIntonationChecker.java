@@ -138,7 +138,7 @@ public class JustIntonationChecker
                 final String harmonicIntervals = firstResult.harmonicIntervals().stream()
                         .map(interval -> interval.name()+"("+interval.ratioString(0)+")")
                         .collect(Collectors.joining(", "));
-                sb.append("Checked against "+firstResult.harmonicIntervals().size()+" intervals: "+harmonicIntervals+newline);
+                sb.append("Checking "+firstResult.harmonicIntervals().size()+" intervals: "+harmonicIntervals+newline);
             }
             
             final Set<IntervalCheckResult> unjustIntervalsUnique = diatonicScaleResults.stream()

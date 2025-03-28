@@ -22,6 +22,8 @@ package fri.music;
  */
 public final class EqualTemperament extends AbstractToneSystem
 {
+    public static final String NAME_POSTFIX = "(EDO-12, 12-TET)";
+    
     public EqualTemperament() {
         this(-1.0);
     }
@@ -55,7 +57,7 @@ public final class EqualTemperament extends AbstractToneSystem
     /** Appends other popular names to super-imlementation. */
     @Override
     public String name() {
-        return super.name()+" alias EDO-12 alias 12-TET";
+        return super.name()+" "+NAME_POSTFIX;
     }
     
     

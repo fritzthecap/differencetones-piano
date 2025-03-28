@@ -47,15 +47,15 @@ public class JustIntonationCheckerDemo
                 ChromaticScales.HARMONIC_SERIES);
         System.out.println(result);
         
-//        result = new JustIntonationChecker(configuration).check(
-//                ChromaticScale.PYTHAGOREAN);
-//        System.out.println(result);
+        result = new JustIntonationChecker(configuration).check(
+                ChromaticScales.PYTHAGOREAN);
+        System.out.println(result);
         
 //      result = new JustIntonationChecker(configuration).check(
-//              ChromaticScale.LIMIT_7);
+//              ChromaticScales.LIMIT_7);
 //      System.out.println(result);
 //      result = new JustIntonationChecker(configuration).check(
-//              ChromaticScale.LIMIT_17);
+//              ChromaticScales.LIMIT_17);
 //      System.out.println(result);
     }
 }

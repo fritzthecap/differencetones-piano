@@ -90,7 +90,7 @@ public class TuningComponent
         final List<String> scales = new ArrayList<>();
         
         // put default tone-system on top of list
-        scales.add(EqualTemperament.class.getSimpleName()+SPACE+"(12-TET, EDO-12)");
+        scales.add(EqualTemperament.class.getSimpleName()+SPACE+EqualTemperament.NAME_POSTFIX);
         
         // add different just-intonations below
         scales.addAll(

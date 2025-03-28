@@ -40,7 +40,7 @@ public class ConfigurationPanel
     private JComboBox<String> lowestToneScaleName;
     private JSlider lowestToneOctave;
     private JCheckBox isVertical;
-    private JSlider blackKeyWidthPixels;
+    private JSlider blackKeyPixelWidth;
     private JCheckBox showIpnNameOnKey;
     private JCheckBox showMidiNumberAsTooltip;
     private JCheckBox colouredOctaves;
@@ -89,7 +89,7 @@ public class ConfigurationPanel
         panel.add(octaves);
         panel.add(lowestTonePanel);
         panel.add(moveLeftOptionsPanel);
-        panel.add(blackKeyWidthPixels);
+        panel.add(blackKeyPixelWidth);
         panel.add(moveLeftSoundPanel);
     }
 
@@ -134,7 +134,7 @@ public class ConfigurationPanel
             octaves.getValue(),
             ""+lowestToneBaseName.getSelectedItem()+lowestToneOctave.getValue(),
             isVertical.isSelected(),
-            blackKeyWidthPixels.getValue(),
+            blackKeyPixelWidth.getValue(),
             showIpnNameOnKey.isSelected(),
             showMidiNumberAsTooltip.isSelected(),
             colouredOctaves.isSelected()
@@ -195,11 +195,11 @@ public class ConfigurationPanel
         this.isVertical = new JCheckBox("Vertical"); // selected = false by default
         isVertical.setBorder(BorderFactory.createTitledBorder("Vertical Piano"));
         
-        this.blackKeyWidthPixels = new JSlider(4, 60, 16);
-        blackKeyWidthPixels.setBorder(BorderFactory.createTitledBorder("Black Key Pixel Width"));
-        blackKeyWidthPixels.setPaintLabels(true);
-        blackKeyWidthPixels.setPaintTicks(true);
-        blackKeyWidthPixels.setMajorTickSpacing(4);
+        this.blackKeyPixelWidth = new JSlider(4, 60, 16);
+        blackKeyPixelWidth.setBorder(BorderFactory.createTitledBorder("Black Key Pixel Width"));
+        blackKeyPixelWidth.setPaintLabels(true);
+        blackKeyPixelWidth.setPaintTicks(true);
+        blackKeyPixelWidth.setMajorTickSpacing(4);
         
         this.showIpnNameOnKey = new JCheckBox("IPN-Names on Keys");
         showIpnNameOnKey.setSelected(true);

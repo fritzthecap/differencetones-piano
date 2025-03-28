@@ -73,6 +73,6 @@ public class Tone
         return ipnName+" ("+midiNumber+"),\t"+formattedFrequency();
     }
     protected final String centToString() {
-        return cent+"¢";
+        return cent+" ¢";
     }
 }

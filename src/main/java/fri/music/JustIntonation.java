@@ -239,8 +239,10 @@ public class JustIntonation extends AbstractJustIntonation
         private final Interval[] intervals;
         
         private ChromaticScales(Interval[] intervals) {
-            if (intervals.length != 12)
-                throw new IllegalArgumentException("Scales must have exactly 12 intervals: "+name());
+            if (intervals.length != ToneSystem.SEMITONES_PER_OCTAVE)
+                throw new IllegalArgumentException(
+                        "A ChromaticScale must have exactly "+ToneSystem.SEMITONES_PER_OCTAVE+
+                        " intervals, received "+intervals.length+" in "+name());
             
             final Set<Interval> checkSet = new HashSet<>();
             for (Interval interval : intervals)
@@ -306,20 +308,9 @@ public class JustIntonation extends AbstractJustIntonation
         this(-1.0, baseToneIpnName, null, octaves, chromaticScale);
     }
     /**
-     * Tones of "just intonation" tuning (ancient system), 
-     * where one octave is divided into 12 differently sized semi-tone steps.
-     * @param frequencyOfA4 the desired frequency of tone "A4" (IPN-name).
-     * @param baseToneIpnName the build-note for the requested tone array e.g. "E3" or "G1".
-     *      It is the tone the chromaticScale is built upon, calculated from frequencyOfA4.
-     *      This is NOT the <code>referenceIpnName</code>!
-     * @param modalScaleStartIpnName the start-note of the tone array resulting from a tones() call.
-     *      When baseToneIpnName is "C0" and modalScaleStartIpnName is "A0" you will get an A-minor scale,
-     *      built upon a C-major scale (AEOLIAN mode). Thus it is the specifier for the modal scale you want.
-     *      By default it is baseToneIpnName.
-     * @param octaves the 0-n number of octaves + 1 to return.
-     *      When zero, just the lowest tone is returned,
-     *      when less than zero, 9 octaves will be returned.
-     * @param chromaticScale the scale for calculating frequencies from intervals.
+     * Tones of "just intonation" tuning, where one octave is divided into 
+     * 12 differently sized semi-tone steps.
+     * For documentation of parameters see super-class.
      */
     public JustIntonation(
             double frequencyOfA4, 

@@ -28,7 +28,8 @@ public class GenericWaveSoundChannel extends WaveSoundChannel
     }
     
     /**
-     * Sets a new type of wave-generator.
+     * Sets a new type of wave-generator. 
+     * All currently playing tones will continue on their new generator.
      * @param generatorClass required, the class of the new generator.
      */
     public void setGeneratorClass(Class<? extends WaveGenerator> generatorClass) {

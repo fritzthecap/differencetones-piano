@@ -5,8 +5,9 @@ import java.util.stream.IntStream;
 
 /**
  * Interfaces and default implementations for just-intonations.
- * Use this as base-class when your 12-tone scale builds upon fractions.
- * See <code>dividend()</code> and <code>divisor()</code> in Interval.
+ * Use this as base-class when your 12-tone scale builds upon fractions,
+ * like exposed by <code>dividend()</code> and <code>divisor()</code>
+ * in <code>Interval</code>.
  */
 public abstract class AbstractJustIntonation extends AbstractToneSystem
 {
@@ -31,8 +32,8 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
         
         
         /**
-         * Default implementation to calculate the interval's dividend from octave and <code>basicDividend()</code>.
-         * @param octave the 0-n octave for the dividend of this interval, not the IPN-octave!
+         * Calculates the interval's dividend from octave and <code>basicDividend()</code>.
+         * @param octave the 0-n octave for the dividend of this interval (this is NOT the IPN-octave!).
          * @return the dividend of this interval, according to given octave.
          */
         default int dividend(int octave) {
@@ -135,14 +136,13 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
     }
     
     
+    /** The interval collection this 12-tone tuning is built from. */
     public final ChromaticScale chromaticScale;
     
     /**
-     * Tones of "just intonation" tuning (ancient system), 
-     * where one octave is divided into 12 differently sized semi-tone steps.
      * @param frequencyOfA4 the desired frequency of tone "A4" (IPN-name).
      * @param baseToneIpnName the build-note for the requested tone array e.g. "E3" or "G1".
-     *      It is the tone the chromaticScale is built upon, calculated from frequencyOfA4.
+     *      It is the tone the chromaticScale is built upon, calculated from <code>frequencyOfA4</code>.
      *      This is NOT the <code>referenceIpnName</code>!
      * @param modalScaleStartIpnName the start-note of the tone array resulting from a tones() call.
      *      When baseToneIpnName is "C0" and modalScaleStartIpnName is "A0" you will get an A-minor scale,

@@ -92,10 +92,16 @@ public abstract class AbstractToneSystem implements ToneSystem
         return calculatedTones;
     }
 
-    /** Sub-classes MUST define a cache-key for caching full 12-tone scales. */
+    /** Sub-classes MUST define a cache-key for caching maximum-length 12-tone scales starting from zero-octave. */
     protected abstract Object getCacheKey();
 
-    /** Sub-classes MUST provide the creation of full 12-tone scales for caching. */
+    /**
+     * @return a 12-tone scale with length <code>ToneSystem.MAXIMUM_OCTAVES</code>, 
+     *      starting from zero-octave, to be cached. Mind that this is not what
+     *      the constructor may request, but a basic full scale that is the base for it.
+     *      The lowest tone depends on the type of <code>ToneSystem</code> implementation
+     *      and possibly needs to be considered in <code>getCacheKey()</code>.
+     */
     protected abstract Tone[] createTones();
 
     
