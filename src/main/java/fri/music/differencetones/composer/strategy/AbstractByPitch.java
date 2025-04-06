@@ -7,6 +7,7 @@ public abstract class AbstractByPitch extends AbstractStrategy
     protected int indexByPitch;
     protected TonePair bestByPitch;
     
+    @Override
     protected void initialize(StrategyContext context) {
         super.initialize(context);
         

@@ -81,11 +81,13 @@ public class PianoWithSound extends Piano
         }
     
         /** Overridden to deliver another type of black key. */
+        @Override
         protected Piano.Keyboard.Key newBlackKey(int absoluteIndexInBlackKeys) {
             return new PianoWithSound.Keyboard.Key(false, absoluteIndexInBlackKeys);
         }
 
         /** Overridden to deliver another type of white key. */
+        @Override
         protected Piano.Keyboard.Key newWhiteKey( int absoluteIndexInWhiteKeys) {
             return new PianoWithSound.Keyboard.Key(true, absoluteIndexInWhiteKeys);
         }
@@ -118,6 +120,7 @@ public class PianoWithSound extends Piano
             }
             
             /** Overridden to optionally paint note names onto all keys of the keyboard. */
+            @Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (config().showIpnNameOnKey == false)
@@ -168,18 +171,21 @@ public class PianoWithSound extends Piano
         }
         
         /** Listens to key presses to start a tone. */
+        @Override
         public void mousePressed(MouseEvent e) {
             final Keyboard.Key key = getKey(e);
             noteOn(key);
             mouseOverKey = key; // start glissando
         }
         /** Listens to key releases to stop a tone. */
+        @Override
         public void mouseReleased(MouseEvent e) {
             final Keyboard.Key key = getKey(e);
             noteOff(key);
             stopGlissando(key);
         }
         /** Listens to mouse drag to play entered key as glissando. */
+        @Override
         public void mouseEntered(MouseEvent e) {
             final Keyboard.Key changedMouseOverKey = getChangedMouseOverKey(e);
             if (changedMouseOverKey != null) { // mouse is still pressed and entered another key
@@ -300,6 +306,7 @@ public class PianoWithSound extends Piano
     /** @return a WindowListener that calls <code>destroyKeyboard()</code> on window-closing event. */
     public WindowListener getWindowClosingListener() {
         return new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {
                 destroyKeyboard(pianoPanel);
             }

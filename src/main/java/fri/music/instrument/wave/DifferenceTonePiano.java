@@ -44,6 +44,7 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
         return this.pianoPanel = pianoPanel;
     }
     
+    @Override
     protected TuningComponent newTuningComponent() {
         final TuningComponent.Listener tuningChangeListener = new TuningComponent.Listener() {
             @Override

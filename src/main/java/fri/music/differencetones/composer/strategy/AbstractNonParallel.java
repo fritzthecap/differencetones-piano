@@ -4,6 +4,7 @@ public abstract class AbstractNonParallel extends AbstractByPitch
 {
     protected boolean mustAvoidParallelMove;
     
+    @Override
     protected void initialize(StrategyContext context) {
         super.initialize(context);
         

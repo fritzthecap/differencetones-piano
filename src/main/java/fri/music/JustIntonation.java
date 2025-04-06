@@ -104,11 +104,13 @@ public class JustIntonation extends AbstractJustIntonation
         }
         
         /** {@inheritDoc}. */
+        @Override
         public int basicDividend() {
             return dividend;
         }
         
         /** {@inheritDoc}. */
+        @Override
         public int divisor() {
             return divisor;
         }
@@ -254,6 +256,7 @@ public class JustIntonation extends AbstractJustIntonation
             this.intervals = intervals;
         }
         
+        @Override
         public Interval[] intervals() {
             return intervals;
         }
