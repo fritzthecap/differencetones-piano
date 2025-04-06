@@ -15,6 +15,10 @@ import fri.music.differencetones.DifferenceToneMath;
 
 public class DifferenceSliderPanel extends SliderPanel
 {
+    private static final String arrowExpand = "\u23F7";
+    private static final String arrowCollapse = "\u23F6";
+
+    private final JButton expandButton;
     private DifferenceSliderPanel secondaryDifference;
     private DifferenceSliderPanel tertiaryDifference;
     
@@ -26,17 +30,17 @@ public class DifferenceSliderPanel extends SliderPanel
             JSlider gainSlider, 
             JComboBox<String> waveChoice)
     {
-        this(tones, title, numberLabel, amplitudeSlider, gainSlider, waveChoice, true);
+        this(true, tones, title, numberLabel, amplitudeSlider, gainSlider, waveChoice);
     }
     
     private DifferenceSliderPanel(
+            boolean isPrimaryDifference,
             Tones tones, 
             String title, 
             String numberLabel, 
             JSlider amplitudeSlider,
             JSlider gainSlider, 
-            JComboBox<String> waveChoice,
-            boolean isPrimaryDifference)
+            JComboBox<String> waveChoice)
     {
         super(tones, title, numberLabel, amplitudeSlider, gainSlider, waveChoice);
         
@@ -44,23 +48,38 @@ public class DifferenceSliderPanel extends SliderPanel
         
         if (isPrimaryDifference) {
             secondaryDifference = 
-                new DifferenceSliderPanel(tones, "Secondary", numberLabel, amplitudeSlider, gainSlider, waveChoice, false) {
+                new DifferenceSliderPanel(false, tones, "Secondary", numberLabel, amplitudeSlider, gainSlider, waveChoice) {
                     @Override
                     protected double calculateDifference(double frequency1, double frequency2) {
                         return DifferenceToneMath.secondaryDifference(frequency1, frequency2);
                     }
                 };
+            secondaryDifference.startStop.setText(secondaryDifference.startStop.getText()+" (2nd)");
+            
             tertiaryDifference = 
-                new DifferenceSliderPanel(tones, "Tertiary", numberLabel, amplitudeSlider, gainSlider, waveChoice, false) {
+                new DifferenceSliderPanel(false, tones, "Tertiary", numberLabel, amplitudeSlider, gainSlider, waveChoice) {
                     @Override
                     protected double calculateDifference(double frequency1, double frequency2) {
                         return DifferenceToneMath.tertiaryDifference(frequency1, frequency2);
                     }
                 };
-            sliderPanel.add(createExpandablePanel(), BorderLayout.NORTH);
+            tertiaryDifference.startStop.setText(tertiaryDifference.startStop.getText()+" (3rd)");
+            
+            expandButton = createExpandButton();
+            sliderPanel.add(expandButton, BorderLayout.NORTH);
+            sliderPanel.add(createExpandablePanel(), BorderLayout.SOUTH);
+        }
+        else {
+            expandButton = null;
         }
     }
 
+    
+    /** Called from setValue() to calculate difference tone for given frequencies. To be overridden. */
+    protected double calculateDifference(double frequency1, double frequency2) {
+        return DifferenceToneMath.primaryDifference(frequency1, frequency2);
+    }
+    
     /** Disables "Play" button when no valid difference-tone exists. */
     @Override
     public void setValue(double frequency) {
@@ -74,84 +93,77 @@ public class DifferenceSliderPanel extends SliderPanel
         final double difference = someFrequencyIsZero ? 0.0 : calculateDifference(frequency1, frequency2);
         setValue(difference);
         
-        if (secondaryDifference != null)
+        if (expandButton != null) {
             secondaryDifference.setValue(frequency1, frequency2);
-        
-        if (tertiaryDifference != null)
             tertiaryDifference.setValue(frequency1, frequency2);
+        }
+    }
+    
+    /** @return true if also secondary and tertiary difference is visible. */
+    public boolean isExpanded() {
+        return expandButton != null && expandButton.getText().equals(arrowExpand) == false;
+    }
+    
+    /** Shows or hides secondary and tertiary difference. */
+    public void setExpanded(boolean expanded) {
+        if (expandButton != null && isExpanded() != expanded)
+            expandButton.doClick();
     }
     
     @Override
     public void close() {
         super.close();
         
-        if (secondaryDifference != null)
+        if (expandButton != null) {
             secondaryDifference.close();
-        
-        if (tertiaryDifference != null)
             tertiaryDifference.close();
+        }
     }
 
-    protected double calculateDifference(double frequency1, double frequency2) {
-        return DifferenceToneMath.primaryDifference(frequency1, frequency2);
-    }
-    
     @Override
     public String getNote() {
         return isOnMinimum() ? "" : super.getNote();
     }
     
+    
     private boolean isOnMinimum() {
         return frequencySlider.getValue() <= frequencySlider.getMinimum();
     }
     
-    private JComponent createExpandablePanel() {
-        final JButton expandButton = new JButton("\u23F7"); // arrow down  
-        final JButton collapseButton = new JButton("\u23F6"); // arrow up
+    private JButton createExpandButton() {
+        final JButton expandButton = new JButton(arrowExpand);
         expandButton.setToolTipText("Click to also see Secondary and Tertiary Difference Tones");
-        collapseButton.setToolTipText("Click to see only Primary Difference Tone");
-        
         final Dimension size = new Dimension(-1, 18);
         expandButton.setMaximumSize(size);
         expandButton.setPreferredSize(size);
-        collapseButton.setMaximumSize(size);
-        collapseButton.setPreferredSize(size);
-        
-        final JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setVisible(false);
-        
-        final JPanel buttonPanel = new JPanel(new BorderLayout());
-        buttonPanel.add(expandButton);
+        return expandButton;
+    }
+    
+    private JComponent createExpandablePanel() {
+        final JPanel secondaryTertiaryPanel = new JPanel();
+        secondaryTertiaryPanel.setLayout(new BoxLayout(secondaryTertiaryPanel, BoxLayout.Y_AXIS));
+        secondaryTertiaryPanel.setVisible(isExpanded());
         
         expandButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                centerPanel.setVisible(true);
+                final boolean becomeVisible = (isExpanded() == false);
+                secondaryTertiaryPanel.setVisible(becomeVisible);
                 
-                buttonPanel.remove(expandButton);
-                buttonPanel.add(collapseButton);
-                buttonPanel.revalidate();
-                buttonPanel.repaint();
-            }
-        });
-        collapseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                centerPanel.setVisible(false);
-                
-                buttonPanel.remove(collapseButton);
-                buttonPanel.add(expandButton);
-                buttonPanel.revalidate();
-                buttonPanel.repaint();
+                if (becomeVisible) {
+                    expandButton.setText(arrowCollapse);
+                    expandButton.setToolTipText("Click to see only Primary Difference Tone");
+                }
+                else {
+                    expandButton.setText(arrowExpand);
+                    expandButton.setToolTipText("Click to also see Secondary and Tertiary Difference Tones");
+                }
             }
         });
         
-        centerPanel.add(secondaryDifference.sliderPanel);
-        centerPanel.add(tertiaryDifference.sliderPanel);
+        secondaryTertiaryPanel.add(secondaryDifference.sliderPanel);
+        secondaryTertiaryPanel.add(tertiaryDifference.sliderPanel);
         
-        sliderPanel.add(centerPanel, BorderLayout.SOUTH);
-        
-        return buttonPanel;
+        return secondaryTertiaryPanel;
     }
 }

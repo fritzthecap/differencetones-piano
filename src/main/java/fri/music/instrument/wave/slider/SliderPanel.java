@@ -30,7 +30,7 @@ import fri.music.wavegenerator.WaveGenerator;
 /**
  * One frequency slider and its functionality.
  */
-class SliderPanel
+public class SliderPanel
 {
     public static final String DEFAULT_INITIAL_VALUE = "C6";
     public static final String START_LABEL = "Play";
@@ -45,9 +45,10 @@ class SliderPanel
     /** The "Play" button, to click upon. */
     public final JButton startStop;
     
-    protected final Tones tones; // when tones change, this panel will be abandoned
+    protected final Tones tones; // final: when tones change, this panel will be abandoned
     
     protected final JSlider frequencySlider;
+    
     private final Map<Double,JLabel> sliderLabels = new Hashtable<>();
     private JLabel currentlyMarkedLabel;
     
@@ -238,6 +239,7 @@ class SliderPanel
         final JSlider frequencySlider = new JSlider();
         
         frequencySlider.addMouseListener(new MouseAdapter() {
+            /** Moves the slider knob to the given event location when it was a right-mouse click.*/
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (((JComponent) e.getSource()).isEnabled() && SwingUtilities.isRightMouseButton(e)) {
@@ -248,6 +250,7 @@ class SliderPanel
             }
         });
         frequencySlider.addMouseMotionListener(new MouseMotionAdapter() {
+            /** Sets the slider's tooltip text to the frequency of the note the mouse is over.*/
             @Override
             public void mouseMoved(MouseEvent e) {
                 final Integer sliderValue = new SliderMouseEventLocator(e).sliderValue;

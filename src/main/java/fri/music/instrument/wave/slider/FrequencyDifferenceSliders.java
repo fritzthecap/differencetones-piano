@@ -1,7 +1,6 @@
 package fri.music.instrument.wave.slider;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -9,9 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -19,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -29,172 +24,99 @@ import fri.music.JustIntonation;
 import fri.music.MathUtils;
 import fri.music.Tone;
 import fri.music.ToneSystem;
-import fri.music.Tones;
-import fri.music.instrument.swing.SmartComboBox;
-import fri.music.instrument.wave.TuningComponent;
-import fri.music.wavegenerator.SineWaveGenerator;
-import fri.music.wavegenerator.WaveGenerator;
 
-public class FrequencyDifferenceSliders
+/**
+ * Displays two frequency sliders and their difference-tone.
+ * Optionally also secondary and tertiary difference-tone can be viewed.
+ * Sound can be turned on and off for each slider.
+ * The sliders render note names and their frequencies.
+ */
+public class FrequencyDifferenceSliders extends AbstractFrequencySliders
 {
-    public static final String RECOMMENDED_LOWEST = "C3";
-    public static final int RECOMMENDED_OCTAVES = 5;
-    
-    /** Contains all of the UI. */
-    public final JComponent panel;
-    
     private SliderPanel frequencyPanel1;
     private SliderPanel frequencyPanel2;
     private DifferenceSliderPanel differenceFrequencyPanel;
-    
-    private ChangeListener frequencySliderListener;
-    
-    private Tones tones;
-    private JustIntonation.Interval[] justIntervals;
+    private ChangeListener frequencySliderInfoListener; // stored here for recreation
+    private JustIntonation.Interval[] pureIntervals;
 
     /** Render tone range C3 - C8. */
     public FrequencyDifferenceSliders() {
-        this(new JustIntonation(RECOMMENDED_LOWEST, RECOMMENDED_OCTAVES));
+        this(null);
     }
     
+    /** Render given tone range. */
     public FrequencyDifferenceSliders(ToneSystem toneSystem) {
-        tones = new Tones(toneSystem.tones());
-        
-        initializeJustIntervals(toneSystem);
-        
-        final JSlider amplitudeSlider = createAmplitudeSlider();
-        final JSlider gainSlider = createGainSlider();
-        
-        final JComboBox<String> waveChoice = createWaveChoice();
-        final JComboBox<String> tuningChoice = createTuningChoice(toneSystem, amplitudeSlider, gainSlider, waveChoice);
-        
-        createFrequencySliderPanels(amplitudeSlider, gainSlider, waveChoice);
-        
-        final JComponent infoPanel = createInfoPanel();
-        
-        panel = new JScrollPane(
-                layoutMainPanel(amplitudeSlider, gainSlider, waveChoice, tuningChoice, infoPanel));
+        super(toneSystem);
     }
     
-    /** @return a window-listener to be used for a JFrame showing this panel. */
-    public WindowListener getWindowClosingListener() {
-        return new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                close();
-            }
-        };
+    @Override
+    protected void initializeTones(ToneSystem toneSystem) {
+        super.initializeTones(toneSystem);
+        initializeJustIntervals(toneSystem);
     }
-
-    /** Ends playing sounds and releases resources. */
-    public void close() {
-        frequencyPanel1.close();
-        frequencyPanel2.close();
-        differenceFrequencyPanel.close();
-    }
-
+    
     private void initializeJustIntervals(ToneSystem toneSystem) {
         final JustIntonation.ChromaticScale chromaticScale = toneSystem instanceof JustIntonation
                 ? ((JustIntonation) toneSystem).chromaticScale
                 : JustIntonation.ChromaticScales.LIMIT_5_SYMMETRIC_1;
         
         final JustIntonation.Interval[] intervals = chromaticScale.intervals();
-        justIntervals = new JustIntonation.Interval[intervals.length + 1];
-        justIntervals[0] = JustIntonation.Intervals.UNISON;
-        System.arraycopy(intervals, 0, justIntervals, 1, intervals.length);
-    }
-
-    private JSlider createAmplitudeSlider() {
-        final JSlider amplitudeSlider = new JSlider();
-        amplitudeSlider.setPaintLabels(true);
-        amplitudeSlider.setPaintTicks(true);
-        amplitudeSlider.setMajorTickSpacing(10);
-        amplitudeSlider.setMinimum(0);
-        amplitudeSlider.setMaximum(127);
-        amplitudeSlider.setValue(7);
-        final ChangeListener changeListener = new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                amplitudeSlider.setBorder(BorderFactory.createTitledBorder("Amplitude: "+amplitudeSlider.getValue()));
-            }
-        };
-        amplitudeSlider.addChangeListener(changeListener);
-        changeListener.stateChanged(null);
-        return amplitudeSlider;
-    }
-
-    private JSlider createGainSlider() {
-        final JSlider gainSlider = new JSlider();
-        final WaveGenerator helper = new SineWaveGenerator();
-        gainSlider.setPaintLabels(true);
-        gainSlider.setPaintTicks(true);
-        gainSlider.setMajorTickSpacing(5);
-        gainSlider.setMinimum((int) helper.getMinimumGain());
-        gainSlider.setMaximum((int) helper.getMaximumGain());
-        gainSlider.setValue((int) helper.getGain());
-        gainSlider.setPreferredSize(new Dimension(400, 60));
-        final ChangeListener changeListener = new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                gainSlider.setBorder(BorderFactory.createTitledBorder("Gain (Decibels): "+gainSlider.getValue()));
-            }
-        };
-        gainSlider.addChangeListener(changeListener);
-        changeListener.stateChanged(null);
-        return gainSlider;
-    }
-
-    private JComboBox<String> createWaveChoice() {
-        final String[] items = new String[] { "Sine", /*"Sawtooth", "Square",*/ "Triangle" };
-        final JComboBox<String> waveChoice = new SmartComboBox(items);
-        waveChoice.setBorder(BorderFactory.createTitledBorder("Wave Form"));
-        waveChoice.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final SliderPanel[] panels = 
-                        new SliderPanel[] { frequencyPanel1, frequencyPanel2, differenceFrequencyPanel };
-                for (SliderPanel panel : panels) {
-                    if (panel.isPlaying()) { // is running
-                        panel.startStop.doClick(); // stop
-                        panel.startStop.doClick(); // restart with new wave form
-                    }
-                }
-            }
-        });
-        return waveChoice;
-    }
-
-    private JComboBox<String> createTuningChoice(
-            ToneSystem toneSystem,
-            final JSlider amplitudeSlider, 
-            final JSlider gainSlider, 
-            final JComboBox<String> waveChoice)
-    {
-        final TuningComponent.Listener listener = new TuningComponent.Listener() {
-            @Override
-            public void tuningChanged(ToneSystem toneSystem) {
-                tones = new Tones(toneSystem.tones());
-                initializeJustIntervals(toneSystem);
-                recreateFrequencySliderPanels(amplitudeSlider, gainSlider, waveChoice);
-            }
-        };
-        final TuningComponent tuning = new TuningComponent(
-                tones.getLowest().ipnName, 
-                tones.getOctaves(), 
-                null, 
-                listener);
-        return tuning.getTuningChoice(toneSystem);
-    }
-
-    private void createFrequencySliderPanels(JSlider amplitudeSlider, JSlider gainSlider, JComboBox<String> waveChoice) {
-        frequencyPanel1 = new SliderPanel(tones, "Frequency", "1", amplitudeSlider, gainSlider, waveChoice);
-        frequencyPanel1.setNote("D6"); // initially create a major second to generate C3 as difference tone
-        frequencyPanel2 = new SliderPanel(tones, "Frequency", "2", amplitudeSlider, gainSlider, waveChoice);
-        //frequencyPanel1.setNote("C6"); // is default
-        differenceFrequencyPanel = new DifferenceSliderPanel(tones, "Difference", "1-2", amplitudeSlider, gainSlider, waveChoice);
+        pureIntervals = new JustIntonation.Interval[intervals.length + 1];
+        pureIntervals[0] = JustIntonation.Intervals.UNISON;
+        System.arraycopy(intervals, 0, pureIntervals, 1, intervals.length);
     }
     
-    private JComponent createInfoPanel() {
+    @Override
+    protected SliderPanel[] getSliderPanels() {
+        return new SliderPanel[] {
+            frequencyPanel1,
+            frequencyPanel2,
+            differenceFrequencyPanel
+        };
+    }
+    
+    @Override
+    protected JPanel[] createFrequencySliderPanels(JSlider amplitudeSlider, JSlider gainSlider, JComboBox<String> waveChoice) {
+        frequencyPanel1 = new SliderPanel(tones(), "Frequency", "1", amplitudeSlider, gainSlider, waveChoice);
+        frequencyPanel1.setNote("D6"); // initially create a major second to generate C3 as difference tone
+        frequencyPanel2 = new SliderPanel(tones(), "Frequency", "2", amplitudeSlider, gainSlider, waveChoice);
+        //frequencyPanel1.setNote("C6"); // is default
+        differenceFrequencyPanel = new DifferenceSliderPanel(tones(), "Difference", "1-2", amplitudeSlider, gainSlider, waveChoice);
+        
+        return new JPanel[] {
+            frequencyPanel1.sliderPanel,
+            frequencyPanel2.sliderPanel,
+            differenceFrequencyPanel.sliderPanel,
+        };
+    }
+    
+    private boolean differencePanelIsExpanded;
+    
+    @Override
+    protected void beforeRecreateFrequencySliderPanels() {
+        frequencyPanel1.removeChangeListener(frequencySliderInfoListener);
+        frequencyPanel2.removeChangeListener(frequencySliderInfoListener);
+        
+        differencePanelIsExpanded = differenceFrequencyPanel.isExpanded();
+    }
+    
+    @Override
+    protected boolean shouldRestoreSliderState(SliderPanel newSliderPanel) {
+        return newSliderPanel == frequencyPanel1 || newSliderPanel == frequencyPanel2;
+    }
+    
+    @Override
+    protected void afterRecreateFrequencySliderPanels() {
+        frequencyPanel1.addChangeListener(frequencySliderInfoListener);
+        frequencyPanel2.addChangeListener(frequencySliderInfoListener);
+        
+        frequencySliderInfoListener.stateChanged(null); // update info display
+        
+        differenceFrequencyPanel.setExpanded(differencePanelIsExpanded);
+    }
+    
+    @Override
+    protected JComponent createInfoPanel() {
         final JTextField note1TextField = createTextField(60, "Note 1", true);
         final JTextField note2TextField = createTextField(60, "Note 2", true);
         final JTextField note3TextField = createTextField(70, "Note 1-2");
@@ -205,7 +127,7 @@ public class FrequencyDifferenceSliders
         final JTextField octavesTextField = createTextField(70, "Octaves");
         final JTextField nearestIntervalTextField = createTextField(190, "Nearest Pure Interval");
         nearestIntervalTextField.setHorizontalAlignment(SwingConstants.LEFT);
-        final JTextField enterFractionTextField = createTextField(110, "Enter Fraction", true);
+        final JTextField enterFractionTextField = createTextField(110, "Enter Fraction:", true);
         enterFractionTextField.setText("/");
         enterFractionTextField.setToolTipText("Changes Frequency 1 on ENTER-Key");
         
@@ -216,25 +138,26 @@ public class FrequencyDifferenceSliders
                 final boolean down = (e.getKeyCode() == KeyEvent.VK_DOWN);
                 final boolean up   = (e.getKeyCode() == KeyEvent.VK_UP);
                 if (up || down) {
-                    final Tone currentTone = tones.forIpnName(((JTextField) e.getSource()).getText());
+                    final Tone currentTone = tones().forIpnName(((JTextField) e.getSource()).getText());
                     final Tone nextTone;
                     if (currentTone != null) {
-                        nextTone = down ? tones.getNextLower(currentTone) : tones.getNextUpper(currentTone);
+                        nextTone = down ? tones().getNextLower(currentTone) : tones().getNextUpper(currentTone);
                     }
                     else {
-                        final Tone[] enclosingTones = tones.getEnclosingTones(findSource(e).getValue());
+                        final Tone[] enclosingTones = tones().getEnclosingTones(findSource(e).getValue());
                         nextTone = down ? enclosingTones[0] : enclosingTones[1];
                     }
                     if (nextTone != null)
                         findSource(e).setValue(nextTone.frequency);
                 }
             }
+            @Override
             public void keyReleased(KeyEvent e) {
                 final boolean matters = 
                         (e.getKeyCode() >= KeyEvent.VK_A && e.getKeyCode() <= KeyEvent.VK_G) ||
                         (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_9);
                 if (matters) {
-                    final Tone tone = tones.forIpnName(((JTextField) e.getSource()).getText());
+                    final Tone tone = tones().forIpnName(((JTextField) e.getSource()).getText());
                     if (tone != null)
                         findSource(e).setValue(tone.frequency);
                 }
@@ -272,7 +195,7 @@ public class FrequencyDifferenceSliders
         });
         
         // handle changes in sliders
-        frequencySliderListener = new ChangeListener() {
+        frequencySliderInfoListener = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 final double frequency1 = frequencyPanel1.getValue();
@@ -294,12 +217,17 @@ public class FrequencyDifferenceSliders
                 octavesTextField.setText(intervalInfo[1]);
                 nearestIntervalTextField.setText(intervalInfo[2]);
                 nearestIntervalTextField.setCaretPosition(0);
+                
+                final String enteredFraction = enterFractionTextField.getText().replace(" ", "");
+                final String detectedFraction = fractionTextField.getText().replace(" ", "");
+                if (detectedFraction.length() > 0 && enteredFraction.equals(detectedFraction) == false)
+                    enterFractionTextField.setText(detectedFraction);
             }
         };
-        frequencySliderListener.stateChanged(null); // display current frequency fraction
+        frequencySliderInfoListener.stateChanged(null); // display current frequency fraction
         
-        frequencyPanel1.addChangeListener(frequencySliderListener);
-        frequencyPanel2.addChangeListener(frequencySliderListener);
+        frequencyPanel1.addChangeListener(frequencySliderInfoListener);
+        frequencyPanel2.addChangeListener(frequencySliderInfoListener);
         
         final JButton startStopBoth = createStartStopBothButton();
         // handle "Play 1+2" button
@@ -370,86 +298,8 @@ public class FrequencyDifferenceSliders
     }
     
     
-    private JComponent layoutMainPanel(
-            JSlider amplitudeSlider, 
-            JSlider gainSlider, 
-            JComboBox<String> waveChoice, 
-            JComboBox<String> tuningChoice, 
-            JComponent infoPanel)
-    {
-        final JPanel frequenciesPanel = new JPanel();
-        frequenciesPanel.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createEmptyBorder(10, 10, 10, 10),
-                        BorderFactory.createRaisedSoftBevelBorder()));
-        frequenciesPanel.setLayout(new BoxLayout(frequenciesPanel, BoxLayout.Y_AXIS));
-        frequenciesPanel.add(frequencyPanel1.sliderPanel);
-        frequenciesPanel.add(frequencyPanel2.sliderPanel);
-        frequenciesPanel.add(differenceFrequencyPanel.sliderPanel);
-        
-        final JPanel settingsPanel = new JPanel();
-        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.X_AXIS));
-        settingsPanel.add(tuningChoice);
-        settingsPanel.add(waveChoice);
-        settingsPanel.add(amplitudeSlider);
-        settingsPanel.add(gainSlider);
-
-        final JPanel infoAndSettingsPanel = new JPanel();
-        infoAndSettingsPanel.setLayout(new BoxLayout(infoAndSettingsPanel, BoxLayout.Y_AXIS));
-        infoAndSettingsPanel.add(settingsPanel);
-        infoAndSettingsPanel.add(infoPanel);
-        
-        final JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.add(infoAndSettingsPanel);
-        mainPanel.add(frequenciesPanel);
-        mainPanel.add(Box.createVerticalGlue()); // TODO: doesn't work, frequency-panels still stretch!
-        
-        return mainPanel;
-    }
-    
     
     // callback methods
-    
-    private void recreateFrequencySliderPanels(JSlider amplitudeSlider, JSlider gainSlider, JComboBox<String> waveChoice) {
-        final double frequency1 = frequencyPanel1.getValue();
-        final double frequency2 = frequencyPanel2.getValue();
-        final boolean isPlaying1 = frequencyPanel1.isPlaying();
-        final boolean isPlaying2 = frequencyPanel2.isPlaying();
-        final boolean isPlaying3 = differenceFrequencyPanel.isPlaying();
-        final Container parent = frequencyPanel1.sliderPanel.getParent();
-        
-        frequencyPanel1.removeChangeListener(frequencySliderListener);
-        frequencyPanel2.removeChangeListener(frequencySliderListener);
-        parent.remove(frequencyPanel1.sliderPanel);
-        parent.remove(frequencyPanel2.sliderPanel);
-        parent.remove(differenceFrequencyPanel.sliderPanel);
-        frequencyPanel1.close();
-        frequencyPanel2.close();
-        differenceFrequencyPanel.close(); // could be playing
-        
-        createFrequencySliderPanels(amplitudeSlider, gainSlider, waveChoice);
-        
-        parent.add(frequencyPanel1.sliderPanel);
-        parent.add(frequencyPanel2.sliderPanel);
-        parent.add(differenceFrequencyPanel.sliderPanel);
-        
-        frequencyPanel1.addChangeListener(frequencySliderListener);
-        frequencyPanel2.addChangeListener(frequencySliderListener);
-        
-        frequencyPanel1.setValue(frequency1);
-        frequencyPanel2.setValue(frequency2);
-        
-        frequencySliderListener.stateChanged(null);
-        
-        parent.revalidate(); // repaints UI
-        
-        if (isPlaying1)
-            frequencyPanel1.startStop.doClick();
-        if (isPlaying2)
-            frequencyPanel2.startStop.doClick();
-        if (isPlaying3)
-            differenceFrequencyPanel.startStop.doClick();
-    }
     
     /** @return fraction, octave and nearest interval, on slider move. */
     private String[] getIntervalInfo() {
@@ -484,7 +334,7 @@ public class FrequencyDifferenceSliders
         
         double centMinimum = Double.MAX_VALUE;
         JustIntonation.Interval nearestInterval = null;
-        for (JustIntonation.Interval interval : justIntervals) {
+        for (JustIntonation.Interval interval : pureIntervals) {
             final double centDistance = centDistance(dividend, divisor, interval);
             if (centDistance < centMinimum) {
                 centMinimum = centDistance;
