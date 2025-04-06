@@ -140,7 +140,7 @@ class SliderPanel
                     startStop.setForeground(Color.RED);
                 }
                 else {
-                    close(); // waveGenerator
+                    closeWaveGenerator();
                     startStop.setText(START_LABEL+" "+numberLabel);
                     startStop.setForeground(Color.BLUE);
                 }
@@ -189,14 +189,17 @@ class SliderPanel
     }
     
     public void close() {
-        if (isPlaying())
-            waveGenerator.close();
-        waveGenerator = null;
-        
+        closeWaveGenerator();
         amplitudeSlider.removeChangeListener(amplitudeChangeListener);
         gainSlider.removeChangeListener(gainChangeListener);
     }
     
+    
+    private void closeWaveGenerator() {
+        if (isPlaying())
+            waveGenerator.close();
+        waveGenerator = null;
+    }
     
     private JButton createStartButton(String numberLabel) {
         final JButton start = new JButton(START_LABEL+" "+numberLabel);
