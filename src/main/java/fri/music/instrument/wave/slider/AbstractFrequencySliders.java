@@ -10,7 +10,6 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -293,7 +292,7 @@ public abstract class AbstractFrequencySliders
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(infoAndSettingsPanel);
         mainPanel.add(frequenciesPanel);
-        mainPanel.add(Box.createVerticalGlue()); // TODO: doesn't work, frequency-panels still stretch!
+        //mainPanel.add(Box.createVerticalGlue()); // TODO: doesn't work, frequency-panels still stretch!
         
         return mainPanel;
     }

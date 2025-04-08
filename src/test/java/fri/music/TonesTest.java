@@ -6,6 +6,15 @@ import org.junit.jupiter.api.Test;
 class TonesTest
 {
     @Test
+    void indexOf() {
+        final Tones tones = new Tones(new EqualTemperament().tones());
+        final String TEST_TONE = "C4";
+        final int indexOfC4 = tones.indexOf(TEST_TONE);
+        assertEquals(48, indexOfC4);
+        assertEquals(TEST_TONE, tones.tones[indexOfC4].ipnName);
+    }
+    
+    @Test
     void getEnclosingTones() {
         final Tones tones = new Tones(new EqualTemperament().tones());
         Tone[] enclosingTones;

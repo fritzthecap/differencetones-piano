@@ -206,7 +206,6 @@ public class SliderPanel
         final JButton start = new JButton(START_LABEL+" "+numberLabel);
         start.setForeground(Color.BLUE);
         start.setPreferredSize(STARTSTOP_BUTTON_SIZE);
-        start.setMinimumSize(STARTSTOP_BUTTON_SIZE);
         start.setMaximumSize(STARTSTOP_BUTTON_SIZE);
         return start;
     }

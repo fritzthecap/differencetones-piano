@@ -8,6 +8,9 @@ public class SmartSlider extends JSlider
     public SmartSlider() {
         super();
     }
+    public SmartSlider(int minimum, int maximum, int current) {
+        super(minimum, maximum, current);
+    }
     
     @Override
     public Dimension getMaximumSize() {

@@ -1,5 +1,6 @@
 package fri.music;
 
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -39,6 +40,17 @@ public class Tones
         this.frequenciesToTones = new Hashtable<>(this.tones.length);
         for (Tone tone : this.tones)
             frequenciesToTones.put(tone.frequency, tone);
+    }
+    
+    /**
+     * @param ipnName the IPN-name of the tone to search.
+     * @return the index in tones array for given IPN-name, or -1 if not present.
+     */
+    public int indexOf(String ipnName) {
+        final Tone tone = ipnNamesToTones.get(ipnName);
+        if (tone == null)
+            return -1;
+        return Arrays.binarySearch(tones, tone);
     }
     
     /**
@@ -118,6 +130,14 @@ public class Tones
     
     public int getOctaves() {
         return tones.length / ToneSystem.SEMITONES_PER_OCTAVE;
+    }
+
+    public int getHighestOctave() {
+        return getHighest().ipnOctave;
+    }
+
+    public int getLowestOctave() {
+        return getLowest().ipnOctave;
     }
     
     @Override

@@ -11,7 +11,7 @@ import java.util.Objects;
  * IPN = international pitch notation.
  * @see https://www.flutopedia.com/octave_notation.htm.
  */
-public class Tone
+public class Tone implements Comparable<Tone>
 {
     public static final NumberFormat frequencyFormat = new DecimalFormat("0.000");
     
@@ -45,6 +45,7 @@ public class Tone
         return ipnNameWithoutOctave;
     }
     
+    
     /** Equality goes to IPN-name only. */
     @Override
     public boolean equals(Object other) {
@@ -57,6 +58,12 @@ public class Tone
         return ipnName.hashCode();
     }
 
+    @Override
+    public int compareTo(Tone other) {
+        return midiNumber - other.midiNumber;
+    }
+    
+    
     /** @return the frequency formatted by <code>frequencyFormat</code>. */
     public final String formattedFrequency() {
         if (formattedFrequency == null)
