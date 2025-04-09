@@ -144,7 +144,7 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
                     final List<Keyboard.Key> keys = piano.getKeys();
                     final int index = findKeyboardIndex(differenceTones[0].midiNumber, keys);
                     
-                    if (index < keys.size()) {
+                    if (index >= 0 && index < keys.size()) {
                         selectedDifferenceKey = keys.get(index);
                         selectDifferenceTone(selectedDifferenceKey, true);
                     }
