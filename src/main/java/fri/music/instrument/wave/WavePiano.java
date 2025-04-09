@@ -33,7 +33,7 @@ public class WavePiano extends PianoWithHold
         final JComponent pianoPanel = super.getKeyboard();
         
         final JComboBox<String> waveChoice = new SmartComboBox(WaveNames.getNames());
-        waveChoice.setBorder(BorderFactory.createTitledBorder("Wavetype"));
+        waveChoice.setBorder(BorderFactory.createTitledBorder("Wave Form"));
         waveChoice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

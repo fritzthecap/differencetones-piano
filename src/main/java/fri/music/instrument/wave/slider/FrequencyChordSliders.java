@@ -153,14 +153,14 @@ public class FrequencyChordSliders extends AbstractFrequencySliders
         baseNoteActionListener.actionPerformed(null);
         
         final JPanel infoPanel = new JPanel();
-        infoPanel.add(Box.createHorizontalStrut(16));
+        infoPanel.add(Box.createHorizontalStrut(14));
         infoPanel.add(startStopAll);
-        infoPanel.add(Box.createHorizontalStrut(20));
+        infoPanel.add(Box.createHorizontalStrut(24));
         infoPanel.add(baseNoteChoice);
-        infoPanel.add(octaves);
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.X_AXIS));
         infoPanel.add(majorChordPanel);
         infoPanel.add(majorSeventhPanel);
+        infoPanel.add(octaves);
         
         final JPanel shiftLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         shiftLeftPanel.add(infoPanel);

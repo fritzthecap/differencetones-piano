@@ -25,19 +25,20 @@ import fri.music.instrument.swing.SmartComboBox;
 import fri.music.instrument.wave.TuningComponent;
 import fri.music.wavegenerator.SineWaveGenerator;
 import fri.music.wavegenerator.WaveGenerator;
+import fri.music.wavegenerator.WaveNames;
 
 /**
- * Common functionality needed to expose several frequency sliders.
- * This includes amplitude-, gain- and wave-controls.
+ * Common functionality needed to expose several frequency sliders. This
+ * includes amplitude-, gain- and wave-controls.
  */
 public abstract class AbstractFrequencySliders
 {
     public static final String RECOMMENDED_LOWEST = "C3";
     public static final int RECOMMENDED_OCTAVES = 5;
-    
+
     /** Contains all of the UI. Add this to some parent UI. */
     public final JComponent panel;
-    
+
     private Tones tones;
 
     /** Render given tone range, or RECOMMENDED tone range C3 - C8 when null. */
@@ -45,16 +46,16 @@ public abstract class AbstractFrequencySliders
         if (toneSystem == null)
             toneSystem = new JustIntonation(RECOMMENDED_LOWEST, RECOMMENDED_OCTAVES);
         initializeTones(toneSystem);
-        
+
         final JSlider amplitudeSlider = createAmplitudeSlider();
         final JSlider gainSlider = createGainSlider();
         final JComboBox<String> waveChoice = createWaveChoice();
         final JComboBox<String> tuningChoice = createTuningChoice(toneSystem, amplitudeSlider, gainSlider, waveChoice);
-        
+
         final JPanel[] frequencySliderPanels = createFrequencySliderPanels(amplitudeSlider, gainSlider, waveChoice);
-        
+
         final JComponent infoPanel = createInfoPanel();
-        
+
         panel = new JScrollPane(
             layoutMainPanel(
                 amplitudeSlider, 
@@ -66,7 +67,7 @@ public abstract class AbstractFrequencySliders
             )
         );
     }
-    
+
     /**
      * Called from constructor. To be overridden for additional initializations.
      * @param toneSystem the tones and frequencies to render in sliders.
@@ -74,7 +75,7 @@ public abstract class AbstractFrequencySliders
     protected void initializeTones(ToneSystem toneSystem) {
         tones = new Tones(toneSystem.tones());
     }
-    
+
     /** @return the currently rendered tones. */
     protected final Tones tones() {
         return tones;
@@ -87,46 +88,52 @@ public abstract class AbstractFrequencySliders
      * @param waveChoice the wave-chooser to listen to.
      * @return a panel containing all frequency sliders this application supports.
      */
-    protected abstract JPanel[] createFrequencySliderPanels(JSlider amplitudeSlider, JSlider gainSlider, JComboBox<String> waveChoice);
-    
+    protected abstract JPanel[] createFrequencySliderPanels(
+            JSlider amplitudeSlider, 
+            JSlider gainSlider,
+            JComboBox<String> waveChoice);
+
     /** @return the frequency sliders this application supports. */
     protected abstract SliderPanel[] getSliderPanels();
-    
-    /** @return an optional info-panel that will be shown above frequency sliders. */
+
+    /** @return default null, an optional info-panel that will be shown above frequency sliders. */
     protected JComponent createInfoPanel() {
         return null;
     }
-    
+
     /**
-     * Called when user chooses a new tuning.
+     * Called when user chooses a new tuning. 
      * Fetch state from sliders, remove them create new ones, set their state, add them.
      * @param amplitudeSlider the amplitude control to listen to.
      * @param gainSlider the gain control to listen to.
      * @param waveChoice the wave-chooser to listen to.
      */
-    //protected abstract void recreateFrequencySliderPanels(JSlider amplitudeSlider, JSlider gainSlider, JComboBox<String> waveChoice);
-    protected final void recreateFrequencySliderPanels(JSlider amplitudeSlider, JSlider gainSlider, JComboBox<String> waveChoice) {
+    protected final void recreateFrequencySliderPanels(
+            JSlider amplitudeSlider, 
+            JSlider gainSlider,
+            JComboBox<String> waveChoice)
+    {
         beforeRecreateFrequencySliderPanels();
-        
+
         final SliderPanel[] oldSliderPanels = getSliderPanels();
         final Container parent = oldSliderPanels[0].sliderPanel.getParent();
-        
+
         // collect old states
         final List<Boolean> wasPlaying = new ArrayList<>();
         final List<Double> oldFrequency = new ArrayList<>();
-        
+
         for (SliderPanel oldSliderPanel : oldSliderPanels) {
             wasPlaying.add(oldSliderPanel.isPlaying());
             oldFrequency.add(oldSliderPanel.getValue());
-            
+
             oldSliderPanel.close(); // could be playing
             parent.remove(oldSliderPanel.sliderPanel);
         }
-        
+
         createFrequencySliderPanels(amplitudeSlider, gainSlider, waveChoice);
-        
+
         final SliderPanel[] newSliderPanels = getSliderPanels();
-        
+
         // restore old states
         for (int i = 0; i < newSliderPanels.length; i++) {
             final SliderPanel newSliderPanel = newSliderPanels[i];
@@ -134,23 +141,23 @@ public abstract class AbstractFrequencySliders
             if (shouldRestoreSliderState(newSliderPanel))
                 newSliderPanel.setValue(oldFrequency.get(i));
         }
-        
+
         afterRecreateFrequencySliderPanels();
-        
+
         // restore sound
         for (int i = 0; i < newSliderPanels.length; i++) {
             final SliderPanel newSliderPanel = newSliderPanels[i];
             if (shouldRestoreSliderState(newSliderPanel) && wasPlaying.get(i))
                 newSliderPanel.startStop.doClick();
         }
-        
+
         parent.revalidate(); // repaints UI
     }
-    
+
     /** Does nothing, called from recreateFrequencySliderPanels() at beginning. */
     protected void beforeRecreateFrequencySliderPanels() {
     }
-    
+
     /** @return true, called from recreateFrequencySliderPanels() on restoring slider state, to be overridden. */
     protected boolean shouldRestoreSliderState(SliderPanel newSliderPanel) {
         return true;
@@ -159,7 +166,6 @@ public abstract class AbstractFrequencySliders
     /** Does nothing, called from recreateFrequencySliderPanels() at end. */
     protected void afterRecreateFrequencySliderPanels() {
     }
-    
 
     /** @return a window-listener to be used for a JFrame showing this panel. */
     public final WindowListener getWindowClosingListener() {
@@ -177,7 +183,6 @@ public abstract class AbstractFrequencySliders
             sliderPanel.close();
     }
 
-
     private JSlider createAmplitudeSlider() {
         final JSlider amplitudeSlider = new JSlider();
         amplitudeSlider.setPaintLabels(true);
@@ -189,7 +194,8 @@ public abstract class AbstractFrequencySliders
         final ChangeListener changeListener = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                amplitudeSlider.setBorder(BorderFactory.createTitledBorder("Amplitude: "+amplitudeSlider.getValue()));
+                amplitudeSlider.setBorder(
+                        BorderFactory.createTitledBorder("Amplitude: "+amplitudeSlider.getValue()));
             }
         };
         amplitudeSlider.addChangeListener(changeListener);
@@ -210,7 +216,8 @@ public abstract class AbstractFrequencySliders
         final ChangeListener changeListener = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                gainSlider.setBorder(BorderFactory.createTitledBorder("Gain (Decibels): "+gainSlider.getValue()));
+                gainSlider.setBorder(
+                        BorderFactory.createTitledBorder("Gain (Decibels): "+gainSlider.getValue()));
             }
         };
         gainSlider.addChangeListener(changeListener);
@@ -219,8 +226,7 @@ public abstract class AbstractFrequencySliders
     }
 
     private JComboBox<String> createWaveChoice() {
-        final String[] items = new String[] { "Sine", /*"Sawtooth", "Square",*/ "Triangle" };
-        final JComboBox<String> waveChoice = new SmartComboBox(items);
+        final JComboBox<String> waveChoice = new SmartComboBox(WaveNames.getNames());
         waveChoice.setBorder(BorderFactory.createTitledBorder("Wave Form"));
         waveChoice.addActionListener(new ActionListener() {
             @Override
@@ -237,8 +243,8 @@ public abstract class AbstractFrequencySliders
     }
 
     private JComboBox<String> createTuningChoice(
-            final ToneSystem toneSystem,
-            final JSlider amplitudeSlider, 
+            final ToneSystem toneSystem, 
+            final JSlider amplitudeSlider,
             final JSlider gainSlider, 
             final JComboBox<String> waveChoice)
     {
@@ -252,29 +258,28 @@ public abstract class AbstractFrequencySliders
         final TuningComponent tuning = new TuningComponent(
                 tones().getLowest().ipnName, 
                 tones().getOctaves(), 
-                null, 
+                null,
                 listener);
         return tuning.getTuningChoice(toneSystem);
     }
 
-    
     private JComponent layoutMainPanel(
             JSlider amplitudeSlider, 
             JSlider gainSlider, 
-            JComboBox<String> waveChoice, 
+            JComboBox<String> waveChoice,
             JComboBox<String> tuningChoice, 
-            JComponent infoPanel,
+            JComponent infoPanel, 
             JPanel[] frequencyPanels)
     {
         final JPanel frequenciesPanel = new JPanel();
         frequenciesPanel.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createEmptyBorder(10, 10, 10, 10),
-                        BorderFactory.createRaisedSoftBevelBorder()));
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                BorderFactory.createRaisedSoftBevelBorder()));
         frequenciesPanel.setLayout(new BoxLayout(frequenciesPanel, BoxLayout.Y_AXIS));
-        
+
         for (JPanel frequencyPanel : frequencyPanels)
             frequenciesPanel.add(frequencyPanel);
-        
+
         final JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.X_AXIS));
         settingsPanel.add(tuningChoice);
@@ -287,13 +292,13 @@ public abstract class AbstractFrequencySliders
         infoAndSettingsPanel.add(settingsPanel);
         if (infoPanel != null)
             infoAndSettingsPanel.add(infoPanel);
-        
+
         final JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.add(infoAndSettingsPanel);
         mainPanel.add(frequenciesPanel);
-        //mainPanel.add(Box.createVerticalGlue()); // TODO: doesn't work, frequency-panels still stretch!
-        
+        // mainPanel.add(Box.createVerticalGlue()); // TODO: doesn't work, frequency-panels still stretch!
+
         return mainPanel;
     }
 }

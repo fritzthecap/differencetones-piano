@@ -14,8 +14,8 @@ public class WaveNames
         return new String[] {
             SineWaveGenerator.class.getSimpleName().substring(0, "Sine".length()),
             TriangleWaveGenerator.class.getSimpleName().substring(0, "Triangle".length()),
-            SawtoothWaveGenerator.class.getSimpleName().substring(0, "Sawtooth".length()),
             SquareWaveGenerator.class.getSimpleName().substring(0, "Square".length()),
+            SawtoothWaveGenerator.class.getSimpleName().substring(0, "Sawtooth".length()),
         };
     }
 
