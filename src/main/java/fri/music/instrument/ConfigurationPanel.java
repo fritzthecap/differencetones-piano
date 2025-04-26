@@ -31,6 +31,10 @@ import fri.music.wavegenerator.WaveGenerator;
 import fri.music.wavegenerator.WaveNames;
 import fri.music.wavegenerator.WaveSoundChannel;
 
+/**
+ * A panel that lets configure all options for different
+ * kinds of Piano implementations, and then run them.
+ */
 public class ConfigurationPanel
 {
     public final JPanel panel;
@@ -192,8 +196,7 @@ public class ConfigurationPanel
         lowestToneOctave.setPaintTicks(true);
         lowestToneOctave.setMajorTickSpacing(1);
         
-        this.isVertical = new JCheckBox("Vertical"); // selected = false by default
-        isVertical.setBorder(BorderFactory.createTitledBorder("Vertical Piano"));
+        this.isVertical = new JCheckBox("Vertical Orientation"); // selected = false by default
         
         this.blackKeyPixelWidth = new JSlider(4, 60, 16);
         blackKeyPixelWidth.setBorder(BorderFactory.createTitledBorder("Black Key Pixel Width"));

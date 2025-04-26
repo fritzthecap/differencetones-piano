@@ -1,7 +1,11 @@
 package fri.music.justintonation;
 
 /**
- * Major and minor triads with their 1-n diatonic step-numbers.
+ * Major, minor and diminished triad chords,
+ * including all their inversions,
+ * described by their 1-n <b>diatonic</b> step-numbers.
+ * For example, the TONIC of a D-minor chord would be
+ * D-F-A-D-F, which is 1-3-5-8-10.
  */
 public enum Triad
 {
@@ -22,9 +26,10 @@ public enum Triad
     ;
 
     /**
-     * Gives the indexes within the five triad 1-n step-numbers
+     * Gives the indexes within the five <code>Triad</code> step-numbers (1-n)
      * that describe all contained different intervals, e.g. 
-     * <code>0: C-E, 1: C-G, 2: E-G, 3: E-C, 4: G-C, 5: G-E</code>.
+     * <code>0: C-E (major third), 1: C-G (fifth), 2: E-G (minor third), 
+     * 3: E-C (minor sixth), 4: G-C (fourth), 5: G-E (major sixth)</code>.
      */
     public static final int[][] intervalIndexTuples = new int[][] {
         { 0, 1 }, // C-E

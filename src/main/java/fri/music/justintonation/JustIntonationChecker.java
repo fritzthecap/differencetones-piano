@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import fri.music.JustIntonation.Intervals;
 import fri.music.AbstractJustIntonation.Interval;
+import fri.music.JustIntonation;
 import fri.music.AbstractJustIntonation.ChromaticScale;
 import fri.music.MathUtils;
 import fri.music.ScaleTypes;
@@ -25,9 +25,9 @@ import fri.music.ToneSystem;
  */
 public class JustIntonationChecker
 {
-    private static final String newline = System.getProperty("line.separator");
+    public static final String newline = System.getProperty("line.separator");
     
-    /** Check options to pass to JustIntonationChecker constructor. */
+    /** Options to pass to JustIntonationChecker constructor. */
     public static class Configuration
     {
         public final boolean showScalesOnly;
@@ -51,10 +51,8 @@ public class JustIntonationChecker
          *      then show the unjust intervals and triads only, leaving out just intervals and triads.
          * @param checkAgainst5LimitIntervals default is false, compare the diatonic scale-intervals with
          *      intervals extracted from its chromatic scale template, not with the 5-limit standard intervals.
-         *      When false, you check if the scale is coherent in itself, 
-         *      no matter if you like or dislike pythagoreian thirds.
-         *      When true (default), you declare 5-limit intervals with its
-         *      simple ratios as "the beauty standard".
+         *      When false, you check if the scale is coherent in itself, no matter if you like or dislike pythagoreian thirds.
+         *      When true, you declare 5-limit intervals with its simple ratios as "the beauty standard".
          * @param alsoCheckMajorSecondAndMinorSeventh default is false, check not only both thirds, fourth, fifth and both sixth, 
          *      but also major second and minor seventh.
          * @param checkedScaleNames list of modal scale names (IONIAN, AEOLIAN, ...), built on given chromatic scale,
@@ -64,7 +62,7 @@ public class JustIntonationChecker
          * @param showTriadsOnly default is false, display triad diagnosis only, no intervals.
          * @param considerDifferenceTones default is true, check if difference-tones of intervals are in scale and set
          *      interval unjust when not.
-         * @param checkChromaticScaleDifferenceTones default is true, check all intervals of
+         * @param checkChromaticScaleDifferenceTones default is false, check all intervals of
          *      white keys of the given chromatic scale for their difference-tones being contained in scale.
          */
         public Configuration(
@@ -86,7 +84,7 @@ public class JustIntonationChecker
             this.checkWhiteKeyScalesOnly = (checkWhiteKeyScalesOnly != null) ? checkWhiteKeyScalesOnly : true;
             this.showTriadsOnly = (showTriadsOnly != null) ? showTriadsOnly : false;
             this.considerDifferenceTones = (considerDifferenceTones != null) ? considerDifferenceTones : true;
-            this.checkChromaticScaleDifferenceTones = (checkChromaticScaleDifferenceTones != null) ? checkChromaticScaleDifferenceTones : true;
+            this.checkChromaticScaleDifferenceTones = (checkChromaticScaleDifferenceTones != null) ? checkChromaticScaleDifferenceTones : false;
         }
     }
     
@@ -194,18 +192,15 @@ public class JustIntonationChecker
         public String toString(Configuration configuration) {
             final StringBuilder sb = new StringBuilder();
             
-            final int leastCommonMultiple = MathUtils.leastCommonMultipleInt(
-                    diatonicScaleIntervals().stream().map(interval -> interval.divisor()));
-            
-            sb.append("\tScale "+scaleInfo()+",\tLCM = "+leastCommonMultiple+":"+newline);
+            sb.append("\tScale "+scaleInfo()+":"+newline);
             
             if (configuration.showTriadsOnly == false)
                 sb.append("\t\tIntervals: "+unJustIntervals().size()+" unjust instances"+newline);
             
-            if (configuration.showScalesOnly == true)
+            if (configuration.showScalesOnly == true) { // no triad or interval details
                 sb.append("\t\tTriads: "+unJustTriads().size()+" unjust instances"+newline);
-            
-            if (configuration.showScalesOnly == false) {
+            }
+            else { // configuration.showScalesOnly == false
                 if (configuration.showTriadsOnly == false) {
                     for (Map.Entry<String,List<IntervalCheckResult>> intervalResult : intervalResults().entrySet()) {
                         final String title = "\t\t\t"+intervalResult.getKey()+newline; // interval name
@@ -295,6 +290,8 @@ public class JustIntonationChecker
 
 
 
+    public static final JustIntonation.ChromaticScales LIMIT5_COMPARISON_SCALE = JustIntonation.ChromaticScales.LIMIT_5_SYMMETRIC_1;
+    
     private final Configuration configuration;
     
     public JustIntonationChecker(Configuration configuration) {
@@ -569,19 +566,11 @@ public class JustIntonationChecker
         }
         
         private List<Interval> harmonicIntervals() {
-            final List<Interval> intervals = configuration.checkAgainst5LimitIntervals
-                ? Stream.<Interval>of( // take the expected intervals from 5-limit tuning
-                        Intervals.MAJOR_SECOND_9_8,
-                        Intervals.MINOR_THIRD,
-                        Intervals.MAJOR_THIRD,
-                        Intervals.FOURTH,
-                        Intervals.FIFTH,
-                        Intervals.MINOR_SIXTH,
-                        Intervals.MAJOR_SIXTH,
-                        Intervals.MINOR_SEVENTH_16_9,
-                        Intervals.OCTAVE).toList()
-                : Stream.of(
-                        chromaticIntervals).toList(); // take the expected intervals from given chromatic scale
+            final List<Interval> intervals = Stream.of(
+                    configuration.checkAgainst5LimitIntervals
+                        ? LIMIT5_COMPARISON_SCALE.intervals()
+                        : chromaticIntervals
+                ).toList();
             
             final List<Interval> harmonicIntervals = new ArrayList<>();
             
@@ -589,6 +578,7 @@ public class JustIntonationChecker
                 harmonicIntervals.add(intervals.stream()
                         .filter(interval -> isMajorSecond(interval))
                         .findFirst().orElseThrow());
+            
             harmonicIntervals.add(intervals.stream()
                     .filter(interval -> isMinorThird(interval))
                     .findFirst().orElseThrow());
@@ -607,13 +597,11 @@ public class JustIntonationChecker
             harmonicIntervals.add(intervals.stream()
                     .filter(interval -> isMajorSixth(interval))
                     .findFirst().orElseThrow());
+            
             if (configuration.alsoCheckMajorSecondAndMinorSeventh)
                 harmonicIntervals.add(intervals.stream()
                         .filter(interval -> isMinorSeventh(interval))
                         .findFirst().orElseThrow());
-            /* harmonicIntervals.add(intervals.stream()
-                    .filter(interval -> isOctave(interval))
-                    .findFirst().orElseThrow()); */
             
             return harmonicIntervals;
         }

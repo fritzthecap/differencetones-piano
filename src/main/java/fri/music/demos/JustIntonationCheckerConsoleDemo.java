@@ -7,7 +7,7 @@ import fri.music.justintonation.JustIntonationChecker;
 import fri.music.justintonation.JustIntonationChecker.Configuration;
 import fri.music.justintonation.JustIntonationChecker.Result;
 
-public class JustIntonationCheckerDemo
+public class JustIntonationCheckerConsoleDemo
 {
     public static void main(String[] args) {
         final Boolean showScalesOnly = null;

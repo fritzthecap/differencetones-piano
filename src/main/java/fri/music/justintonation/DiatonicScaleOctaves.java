@@ -9,7 +9,8 @@ import fri.music.AbstractJustIntonation.ChromaticScale;
 import fri.music.ToneSystem;
 
 /**
- * Used for checking consistency of diatonic scales in just-intonation.
+ * Three diatonic scale octaves,
+ * used for checking consistency of diatonic scales in just-intonation.
  */
 public class DiatonicScaleOctaves
 {
@@ -51,8 +52,9 @@ public class DiatonicScaleOctaves
         
         final int octaves = 3; // needed when checking the MAJOR_SIXTH above highest note of LOCRIAN
         int previousWhiteKeyIndex = 0;
-        // pick out those intervals that belong to diatonic scales (white keys)
+        
         for (int semitoneIndex = 0; semitoneIndex < scaleLayout.length * octaves; semitoneIndex++) {
+            // pick out those intervals that belong to diatonic scales (white keys)
             if (scaleLayout[semitoneIndex % scaleLayout.length]) { // is a white key
                 final int semitoneSteps = semitoneIndex - previousWhiteKeyIndex; // will be 1 or 2
                 previousWhiteKeyIndex = semitoneIndex;

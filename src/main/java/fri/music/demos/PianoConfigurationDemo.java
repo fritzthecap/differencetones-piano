@@ -50,6 +50,7 @@ public class PianoConfigurationDemo
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
         final JFrame mainFrame = startFrame("Piano Configuration Demo", mainPanel, WindowConstants.EXIT_ON_CLOSE);
+        // MUST release wave sound generator resources for every displaying piano!
         mainFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

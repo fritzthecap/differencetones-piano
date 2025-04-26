@@ -9,7 +9,7 @@ import fri.music.AbstractJustIntonation.ChromaticScale;
 import fri.music.ToneSystem;
 
 /**
- * Chromatic scale octaves, starting with just one Interval.UNISON, 
+ * Several chromatic scale octaves, starting with just one Interval.UNISON, 
  * having subsequent Interval.OCTAVE instances.
  */
 public class ChromaticScaleOctaves
