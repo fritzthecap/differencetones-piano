@@ -70,10 +70,10 @@ public class ConfigurationPanel
         
         final JPanel displayOptionsPanel = new JPanel();
         displayOptionsPanel.setLayout(new BoxLayout(displayOptionsPanel, BoxLayout.Y_AXIS));
-        displayOptionsPanel.add(isVertical);
         displayOptionsPanel.add(showIpnNameOnKey);
         displayOptionsPanel.add(showMidiNumberAsTooltip);
         displayOptionsPanel.add(colouredOctaves);
+        displayOptionsPanel.add(isVertical);
         final JPanel moveLeftOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         moveLeftOptionsPanel.setBorder(BorderFactory.createTitledBorder("Display Options"));
         moveLeftOptionsPanel.add(displayOptionsPanel);
@@ -81,8 +81,8 @@ public class ConfigurationPanel
         final JPanel soundChoice = new JPanel();
         soundChoice.setBorder(BorderFactory.createTitledBorder("Sound"));
         soundChoice.setLayout(new BoxLayout(soundChoice, BoxLayout.Y_AXIS));
-        soundChoice.add(radioButtonMidi);
         soundChoice.add(radioButtonWave);
+        soundChoice.add(radioButtonMidi);
         final JPanel moveLeftSoundPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         moveLeftSoundPanel.add(soundChoice);
         moveLeftSoundPanel.add(waveChoice);
@@ -137,7 +137,7 @@ public class ConfigurationPanel
         return new PianoWithSound.Configuration(
             octaves.getValue(),
             ""+lowestToneBaseName.getSelectedItem()+lowestToneOctave.getValue(),
-            isVertical.isSelected(),
+            isVertical.isEnabled() && isVertical.isSelected(),
             blackKeyPixelWidth.getValue(),
             showIpnNameOnKey.isSelected(),
             showMidiNumberAsTooltip.isSelected(),
@@ -197,6 +197,7 @@ public class ConfigurationPanel
         lowestToneOctave.setMajorTickSpacing(1);
         
         this.isVertical = new JCheckBox("Vertical Orientation"); // selected = false by default
+        isVertical.setToolTipText("Please select 'PianoWithSound' to test this option");
         
         this.blackKeyPixelWidth = new JSlider(4, 60, 16);
         blackKeyPixelWidth.setBorder(BorderFactory.createTitledBorder("Black Key Pixel Width"));
@@ -215,12 +216,12 @@ public class ConfigurationPanel
     }
     
     private void buildSoundChoiceFields() {
-        this.radioButtonMidi = new JRadioButton("MIDI Synthesizer", true);
-        this.radioButtonWave = new JRadioButton("Wave Generator", false);
+        this.radioButtonWave = new JRadioButton("Wave Generator", true);
+        this.radioButtonMidi = new JRadioButton("MIDI Synthesizer", false);
         
         final ButtonGroup radioGroup = new ButtonGroup(); // exclusive selection
-        radioGroup.add(radioButtonMidi);
         radioGroup.add(radioButtonWave);
+        radioGroup.add(radioButtonMidi);
         
         final ActionListener soundSelectionListener = new ActionListener() {
             @Override
@@ -228,24 +229,29 @@ public class ConfigurationPanel
                 final boolean waveSelected = radioButtonWave.isSelected();
                 waveChoice.setEnabled(waveSelected);
                 pianoClassChoice.setEnabled(waveSelected);
+
+                final PianoClassChoiceItem selectedPiano = waveSelected ? (PianoClassChoiceItem) pianoClassChoice.getSelectedItem() : null;
+                final boolean canDisplayVertical = (selectedPiano != null && selectedPiano.pianoClass == PianoWithSound.class);
+                isVertical.setEnabled(canDisplayVertical);
             }
         };
-        radioButtonMidi.addActionListener(soundSelectionListener);
         radioButtonWave.addActionListener(soundSelectionListener);
+        radioButtonMidi.addActionListener(soundSelectionListener);
         
         this.waveChoice = new JComboBox<>(WaveNames.getNames());
         waveChoice.setBorder(BorderFactory.createTitledBorder("Wave Type"));
         
-        final PianoClassChoiceItem[] pianoClassNames = new PianoClassChoiceItem[] {
-                new PianoClassChoiceItem(PianoWithSound.class),
-                new PianoClassChoiceItem(PianoWithVolume.class),
-                new PianoClassChoiceItem(PianoWithHold.class),
-                new PianoClassChoiceItem(IntervalPlayingPiano.class),
-                new PianoClassChoiceItem(TriadPlayingPiano.class),
+        final PianoClassChoiceItem[] pianoClasses = new PianoClassChoiceItem[] {
                 new PianoClassChoiceItem(DifferenceTonePiano.class),
+                new PianoClassChoiceItem(TriadPlayingPiano.class),
+                new PianoClassChoiceItem(IntervalPlayingPiano.class),
+                new PianoClassChoiceItem(PianoWithHold.class),
+                new PianoClassChoiceItem(PianoWithVolume.class),
+                new PianoClassChoiceItem(PianoWithSound.class),
             };
-        pianoClassChoice = new JComboBox<>(pianoClassNames);
+        pianoClassChoice = new JComboBox<>(pianoClasses);
         pianoClassChoice.setBorder(BorderFactory.createTitledBorder("Piano Type"));
+        pianoClassChoice.addActionListener(soundSelectionListener);
         
         soundSelectionListener.actionPerformed(null); // enable choice according to current setting
     }

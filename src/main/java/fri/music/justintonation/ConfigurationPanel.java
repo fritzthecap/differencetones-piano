@@ -165,10 +165,10 @@ public class ConfigurationPanel
         showTriadsOnly = new JCheckBox("Show triad diagnoses only", false);
         showTriadsOnly.setToolTipText("Do not display interval diagnoses, just triad results");
         
-        considerDifferenceTones = new JCheckBox("Check the difference tones of 'just' diatonic intervals", true);
-        considerDifferenceTones.setToolTipText("Check whether difference tones, resulting from a diatonic scale's intervals, fit into the scale");
+        considerDifferenceTones = new JCheckBox("Check difference tones of 'just' diatonic intervals being in scale", true);
+        considerDifferenceTones.setToolTipText("Check whether difference tones, resulting from a diatonic scale's intervals, are scale tones");
         
-        checkChromaticScaleDifferenceTones = new JCheckBox("Check difference tones chromatically", false);
-        checkChromaticScaleDifferenceTones.setToolTipText("Check all chromatic intervals (except MINOR_SECOND) for difference-tones being in scale");
+        checkChromaticScaleDifferenceTones = new JCheckBox("Check difference tones of all chromatic intervals being in scale", false);
+        checkChromaticScaleDifferenceTones.setToolTipText("Check all intervals chromatically for difference-tone being in scale (except MINOR_SECOND)");
     }
 }
