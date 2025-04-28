@@ -19,9 +19,33 @@ import fri.music.ToneSystem;
 
 /**
  * Checks if all occurrences of a certain interval (third, fourth, fifth, sixth)
- * in a diatonic scale have the same ratio. 
- * Optionally builds all types of modal scales for this check from
- * a given chromatic scale (that is virtually based on C).
+ * in a diatonic scale have the same ratio, determined by a given just-intonation tuning.
+ * <p/>
+ * For simplicity, it always builds a chromatic scale based on C (any just-intonation
+ * tuning must be calculated by its ratios from a given base-tone, so all chromatic scales
+ * would will be the same).
+ * <p/>
+ * It then builds a given set of diatonic modal scales upon that chromatic scale.
+ * These modal scales can start at their natural base-note and use white piano-keys only, like
+ * <i>(PHRYGIAN = E F G A ..., AEOLIAN = A B C ...)</i>
+ * or, optionally, on the chromatic scale's base note and use also black piano-keys, like
+ * <i>(PHRYGIAN = C C# D# F ..., AEOLIAN = C D D# ...)</i>.
+ * For IONIAN, both would be the same.<br/>
+ * 
+ * <b>TODO:</b> does the non-white-key variant make sense?<br/>
+ * <b>TODO:</b> does the build of diatonic modal scales make sense? 
+ *              The same issues would be found in all of them!
+ * <p/>
+ * Then it checks if all minor-thirds are the same, i.e. have the same ratio-distance.
+ * It does this for any given interval, except for minor-second and major-seventh, 
+ * as these are very dissonant anyway). Thus it checks the scale's interval consistency.
+ * <p/>
+ * The same can be done for triads, as they are only a stack of intervals.
+ * The intervals in a triad can be minor/major-thirds, fourth, fifth, minor/major-sixths, 
+ * thus not triads but chords with five notes are actually checked for consistency,
+ * e.g. C4-E4-G4-C5-E5.
+ * <p/>
+ * The application reports and counts all inconsistency, and optionally also consistencies.
  */
 public class JustIntonationChecker
 {
@@ -132,12 +156,12 @@ public class JustIntonationChecker
                     .collect(Collectors.joining(", "));
             sb.append("Diatonic LCM = "+leastCommonMultiple+" (least common multiple of diatonic divisors in "+diatonicIntervalRatios+")"+newline);
             
-            if (configuration.showScalesOnly || configuration.showUnjustOnly) {
-                final String harmonicIntervals = firstResult.harmonicIntervals().stream()
-                        .map(interval -> interval.name()+"("+interval.ratioString(0)+")")
-                        .collect(Collectors.joining(", "));
-                sb.append("Checking "+firstResult.harmonicIntervals().size()+" intervals: "+harmonicIntervals+newline);
-            }
+            final String harmonicIntervals = firstResult.harmonicIntervals().stream()
+                    .map(interval -> interval.name()+"("+interval.ratioString(0)+")")
+                    .collect(Collectors.joining(", "));
+            sb.append("Checking "+firstResult.harmonicIntervals().size()+" intervals: "+harmonicIntervals+newline);
+            
+            sb.append(newline);
             
             final Set<IntervalCheckResult> unjustIntervalsUnique = diatonicScaleResults.stream()
                     .map(r -> r.unJustIntervals())
@@ -194,17 +218,35 @@ public class JustIntonationChecker
             
             sb.append("\tScale "+scaleInfo()+":"+newline);
             
-            if (configuration.showTriadsOnly == false)
-                sb.append("\t\tIntervals: "+unJustIntervals().size()+" unjust instances"+newline);
+            final long unustTriads = triadResults().stream().filter(r -> r.isJust() == false).count();
+            final String triadTitle = "\t\tTriads: "+unustTriads+" unjust of "+triadResults().size()+newline;
+
+            final long allCheckedIntervals = intervalResults().entrySet().stream().flatMap(e -> e.getValue().stream()).count();
+            final String intervalTitle = "\t\tIntervals: "+unJustIntervals().size()+" unjust of "+allCheckedIntervals+newline;
             
             if (configuration.showScalesOnly == true) { // no triad or interval details
-                sb.append("\t\tTriads: "+unJustTriads().size()+" unjust instances"+newline);
+                sb.append(triadTitle);
+                
+                if (configuration.showTriadsOnly == false)
+                    sb.append(intervalTitle);
             }
             else { // configuration.showScalesOnly == false
+                boolean titleAppended = false;
+                for (TriadCheckResult triadResult : triadResults()) {
+                    final String output = triadResult.toString(configuration, triadTitle, titleAppended);
+                    if (output.length() > 0) {
+                        titleAppended = true;
+                        sb.append(output);
+                    }
+                }
+                
                 if (configuration.showTriadsOnly == false) {
+                    if (configuration.showUnjustOnly == false || unJustIntervals().size() > 0)
+                        sb.append(intervalTitle);
+                    
                     for (Map.Entry<String,List<IntervalCheckResult>> intervalResult : intervalResults().entrySet()) {
                         final String title = "\t\t\t"+intervalResult.getKey()+newline; // interval name
-                        boolean titleAppended = false;
+                        titleAppended = false;
                         for (IntervalCheckResult checkResult : intervalResult.getValue()) {
                             final String output = checkResult.toString(configuration, title, titleAppended);
                             if (output.length() > 0) {
@@ -212,17 +254,6 @@ public class JustIntonationChecker
                                 sb.append(output);
                             }
                         }
-                    }
-                }
-                
-                final long unustTriads = triadResults().stream().filter(r -> r.isJust() == false).count();
-                final String title = "\t\tTriads: "+unustTriads+" unjust of "+triadResults().size()+newline;
-                boolean titleAppended = false;
-                for (TriadCheckResult triadResult : triadResults()) {
-                    final String output = triadResult.toString(configuration, title, titleAppended);
-                    if (output.length() > 0) {
-                        titleAppended = true;
-                        sb.append(output);
                     }
                 }
             }

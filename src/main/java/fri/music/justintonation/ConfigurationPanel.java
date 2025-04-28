@@ -18,7 +18,8 @@ import fri.music.JustIntonation;
 import fri.music.ScaleTypes;
 
 /**
- * Lets configure the <code>JustIntonationChecker</code> class.
+ * Lets configure the <code>JustIntonationChecker</code> class
+ * to see data about just-intonation scales and their harmony issues.
  */
 public class ConfigurationPanel
 {
@@ -45,15 +46,14 @@ public class ConfigurationPanel
         
         final JPanel configOptionsUpper = new JPanel();
         configOptionsUpper.setLayout(new BoxLayout(configOptionsUpper, BoxLayout.Y_AXIS));
+        configOptionsUpper.add(showTriadsOnly);
         configOptionsUpper.add(showNotScalesOnly);
         configOptionsUpper.add(showUnjustOnly);
-        configOptionsUpper.add(showTriadsOnly);
         configOptionsUpper.add(alsoCheckMajorSecondAndMinorSeventh);
-        configOptionsUpper.add(checkWhiteKeyScalesOnly);
-        checkWhiteKeyScalesOnly.setEnabled(false); // does this option make sense?
-        configOptionsUpper.add(checkAgainst5LimitIntervals);
-        checkAgainst5LimitIntervals.setEnabled(false); // does this option make sense?
+        //configOptionsUpper.add(checkWhiteKeyScalesOnly); // does this option make sense?
+        configOptionsUpper.add(checkAgainst5LimitIntervals); // does this option make sense?
         final JPanel moveLeftUpperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        moveLeftUpperPanel.setBorder(BorderFactory.createTitledBorder("Report Scope"));
         moveLeftUpperPanel.add(configOptionsUpper);
         
         final JPanel configOptionsLower = new JPanel();
@@ -61,19 +61,21 @@ public class ConfigurationPanel
         configOptionsLower.add(considerDifferenceTones);
         configOptionsLower.add(checkChromaticScaleDifferenceTones);
         final JPanel moveLeftLowerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        moveLeftLowerPanel.setBorder(BorderFactory.createTitledBorder("Difference Tone Integration"));
         moveLeftLowerPanel.add(configOptionsLower);
         
         final JComponent checkedScaleNamesScrollPane = new JScrollPane(checkedScaleNames);
         checkedScaleNames.setVisibleRowCount(7);
-        checkedScaleNamesScrollPane.setBorder(BorderFactory.createTitledBorder("Diatonic Scale Type(s) to check"));
+        checkedScaleNamesScrollPane.setBorder(BorderFactory.createTitledBorder("Scale(s)"));
+        moveLeftUpperPanel.add(checkedScaleNamesScrollPane);
         
         final JComponent checkedJustIntonationTuningsScrollPane = new JScrollPane(checkedJustIntonationTunings);
         checkedJustIntonationTunings.setVisibleRowCount(5);
         checkedJustIntonationTuningsScrollPane.setBorder(BorderFactory.createTitledBorder("Just-Intonation Tuning(s) to check"));
         
         panel.add(moveLeftUpperPanel);
-        panel.add(checkedScaleNamesScrollPane);
         panel.add(moveLeftLowerPanel);
+        //panel.add(checkedScaleNamesScrollPane);
         panel.add(checkedJustIntonationTuningsScrollPane);
     }
 
@@ -123,17 +125,8 @@ public class ConfigurationPanel
     }
 
 
-    private void buildJustIntonationSelection() {
-        final JustIntonation.ChromaticScales[] justIntonations = JustIntonation.ChromaticScales.values();
-        final String[] justIntonationNames = Stream.of(justIntonations).map(ji -> ji.name()).toArray(String[]::new);
-        checkedJustIntonationTunings = new JList<>(justIntonationNames);
-        checkedJustIntonationTunings.setToolTipText("Select the just-intonation tuning(s) you want to examine");
-        checkedJustIntonationTunings.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        checkedJustIntonationTunings.setSelectedIndices(new int[] { 0 }); // LIMIT_5_SYMMETRIC_1
-    }
-
     private void buildCheckerConfigurationFields() {
-        showNotScalesOnly = new JCheckBox("Show interval and triad details", true);
+        showNotScalesOnly = new JCheckBox("Show details of diagnoses", true);
         showNotScalesOnly.setToolTipText("Beside scale diagnosis, also show 'justness' details of its intervals and triads");
         
         showUnjustOnly = new JCheckBox("Show 'unjust' details only", true);
@@ -146,29 +139,38 @@ public class ConfigurationPanel
             }
         });
         
-        checkAgainst5LimitIntervals = new JCheckBox("Check against 5-limit interval ratios", false);
+        checkAgainst5LimitIntervals = new JCheckBox("Always compare with 5-limit interval ratios", false);
         checkAgainst5LimitIntervals.setToolTipText("When false, compare any interval with the scale's first-found interval of that kind (check the scale's self-coherence)");
         
-        alsoCheckMajorSecondAndMinorSeventh = new JCheckBox("Also check major second and minor seventh", false);
+        alsoCheckMajorSecondAndMinorSeventh = new JCheckBox("Also check major-second and minor-seventh", false);
         alsoCheckMajorSecondAndMinorSeventh.setToolTipText("Also check the mostly 'unjust' major second an minor seventh");
         
         final Set<String> scaleTypeNameSet = ScaleTypes.scaleToStartNote.keySet();
         final String[] scaleTypeNames = scaleTypeNameSet.toArray(new String[scaleTypeNameSet.size()]);
         checkedScaleNames = new JList<>(scaleTypeNames);
-        checkedScaleNames.setToolTipText("Select the diatonic scale type(s) you want to examine");
+        checkedScaleNames.setToolTipText("Select the diatonic scale type(s) you want to examine. Use Ctrl- and Shift-Click to select!");
         checkedScaleNames.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        checkedScaleNames.setSelectedIndices(new int[] { 0, 5 }); // IONIAN, AEOLIAN
+        checkedScaleNames.setSelectedIndices(new int[] { 0, /*5*/ }); // IONIAN, AEOLIAN
         
         checkWhiteKeyScalesOnly = new JCheckBox("Check scales built on white piano-keys only", true);
         checkWhiteKeyScalesOnly.setToolTipText("Do not check scales that use black piano-keys (e.g. AEOLIAN scale based on C)");
         
-        showTriadsOnly = new JCheckBox("Show triad diagnoses only", false);
+        showTriadsOnly = new JCheckBox("Show triad diagnoses only, no intervals", false);
         showTriadsOnly.setToolTipText("Do not display interval diagnoses, just triad results");
         
-        considerDifferenceTones = new JCheckBox("Check difference tones of 'just' diatonic intervals being in scale", true);
+        considerDifferenceTones = new JCheckBox("Consider interval as 'unjust' when its difference tone is not in scale", true);
         considerDifferenceTones.setToolTipText("Check whether difference tones, resulting from a diatonic scale's intervals, are scale tones");
         
-        checkChromaticScaleDifferenceTones = new JCheckBox("Check difference tones of all chromatic intervals being in scale", false);
-        checkChromaticScaleDifferenceTones.setToolTipText("Check all intervals chromatically for difference-tone being in scale (except MINOR_SECOND)");
+        checkChromaticScaleDifferenceTones = new JCheckBox("Check difference tones of all intervals being in scale", false);
+        checkChromaticScaleDifferenceTones.setToolTipText("Check all intervals for its difference-tone being in scale, widening the interval chromatically");
+    }
+    
+    private void buildJustIntonationSelection() {
+        final JustIntonation.ChromaticScales[] justIntonations = JustIntonation.ChromaticScales.values();
+        final String[] justIntonationNames = Stream.of(justIntonations).map(ji -> ji.name()).toArray(String[]::new);
+        checkedJustIntonationTunings = new JList<>(justIntonationNames);
+        checkedJustIntonationTunings.setToolTipText("Select the just-intonation tuning(s) you want to examine. Use Ctrl- and Shift-Click to select!");
+        checkedJustIntonationTunings.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        checkedJustIntonationTunings.setSelectedIndices(new int[] { 0 }); // LIMIT_5_SYMMETRIC_1
     }
 }

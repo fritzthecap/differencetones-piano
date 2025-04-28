@@ -34,6 +34,8 @@ import fri.music.wavegenerator.WaveSoundChannel;
 /**
  * A panel that lets configure all options for different
  * kinds of Piano implementations, and then run them.
+ * <p/>
+ * This is more an 'instrument' API guide than an application.
  */
 public class ConfigurationPanel
 {

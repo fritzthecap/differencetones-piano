@@ -25,7 +25,7 @@ public class JustIntonationCheckerSwingDemo
     public static void main(String[] args) {
         final ConfigurationPanel configurationPanel = new ConfigurationPanel();
         
-        final JButton showDiagnosisButton = new JButton("Show Diagnosis");
+        final JButton showDiagnosisButton = new JButton("Check Purity");
         
         final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true));
