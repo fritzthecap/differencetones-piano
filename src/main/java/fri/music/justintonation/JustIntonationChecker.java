@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import fri.music.AbstractJustIntonation.Interval;
@@ -21,31 +22,28 @@ import fri.music.ToneSystem;
  * Checks if all occurrences of a certain interval (third, fourth, fifth, sixth)
  * in a diatonic scale have the same ratio, determined by a given just-intonation tuning.
  * <p/>
- * For simplicity, it always builds a chromatic scale based on C (any just-intonation
- * tuning must be calculated by its ratios from a given base-tone, so all chromatic scales
- * would will be the same).
+ * For simplicity, it always builds a chromatic scale based on C, because any just-intonation
+ * tuning must be calculated by its ratios from a given base-tone, thus all chromatic scales
+ * would will be the same, no matter if they are built on C, C#, D, etc.
  * <p/>
- * It then builds a given set of diatonic modal scales upon that chromatic scale.
- * These modal scales can start at their natural base-note and use white piano-keys only, like
- * <i>(PHRYGIAN = E F G A ..., AEOLIAN = A B C ...)</i>
- * or, optionally, on the chromatic scale's base note and use also black piano-keys, like
- * <i>(PHRYGIAN = C C# D# F ..., AEOLIAN = C D D# ...)</i>.
- * For IONIAN, both would be the same.<br/>
- * 
- * <b>TODO:</b> does the non-white-key variant make sense?<br/>
- * <b>TODO:</b> does the build of diatonic modal scales make sense? 
- *              The same issues would be found in all of them!
+ * A given set of diatonic modal scales will be built from the notes of the chromatic scale.
+ * These modal scales will start at their natural base-note and use white piano-keys only, like
+ * <i>(PHRYGIAN = E F G A ..., AEOLIAN = A B C ...)</i>.
  * <p/>
- * Then it checks if all minor-thirds are the same, i.e. have the same ratio-distance.
- * It does this for any given interval, except for minor-second and major-seventh, 
- * as these are very dissonant anyway). Thus it checks the scale's interval consistency.
+ * Then it checks whether all minor-thirds are the same, i.e. have the same ratio-distance.
+ * By default, it checks this for all intervals except minor-second and major-seventh, 
+ * as these are very dissonant anyway. In other words, it checks the consistency of
+ * the scale's harmonious intervals. Optionally the check will be performed using 5-limit
+ * intervals instead of the scale's own intervals.
  * <p/>
- * The same can be done for triads, as they are only a stack of intervals.
+ * A check can be done also for triads, as these are only a stack of intervals.
  * The intervals in a triad can be minor/major-thirds, fourth, fifth, minor/major-sixths, 
  * thus not triads but chords with five notes are actually checked for consistency,
  * e.g. C4-E4-G4-C5-E5.
  * <p/>
- * The application reports and counts all inconsistency, and optionally also consistencies.
+ * The application counts and reports all inconsistencies, optionally also consistencies.
+ * Optionally it considers an interval to be dirty when the ratio of its difference-tone
+ * can not be found in the underlying diatonic scale.
  */
 public class JustIntonationChecker
 {
@@ -337,7 +335,7 @@ public class JustIntonationChecker
     public Result check(ChromaticScale chromaticScale) {
         final List<ChromaticScaleCheckResult> chromaticCheckResults = new ArrayList<>();
         if (configuration.checkChromaticScaleDifferenceTones) {
-            checkChromaticScale(chromaticScale, chromaticCheckResults);
+            checkChromaticScaleDifferenceTones(chromaticScale, chromaticCheckResults);
         }
         
         // Build all modal scale variants
@@ -356,7 +354,10 @@ public class JustIntonationChecker
     }
 
     /** Checks all semi-tones (except MINOR_SECOND) of the chromatic scale for difference-tones being in scale. */
-    private void checkChromaticScale(ChromaticScale chromaticScale, List<ChromaticScaleCheckResult> chromaticCheckResults) {
+    private void checkChromaticScaleDifferenceTones(
+            ChromaticScale chromaticScale, 
+            List<ChromaticScaleCheckResult> chromaticCheckResults)
+    {
         // C-D, C-D#, C-E, C-F, C-F#, C-G, C-G#, C-A, C-A#, C-B
         // D-E, D-F, D-F#, ..., D-C#
         // ....
@@ -447,8 +448,8 @@ public class JustIntonationChecker
             final Map<String,List<IntervalCheckResult>> intervalCheckResults = new LinkedHashMap<>();
             final Set<IntervalCheckResult> unjustIntervalsUnique = new HashSet<>();
             
-            final List<Interval> harmonicIntervals = harmonicIntervals();
-            for (Interval harmonicInterval : harmonicIntervals) {
+            final List<Interval> harmoniousIntervals = harmoniousIntervals();
+            for (Interval harmonicInterval : harmoniousIntervals) {
                 final List<IntervalCheckResult> oneIntervalResults = checkIntervalInScale(diatonicScaleIntervals, harmonicInterval);
                 
                 final Set<IntervalCheckResult> unJust = new HashSet<>(oneIntervalResults.stream()
@@ -480,7 +481,7 @@ public class JustIntonationChecker
             
             return new DiatonicScaleCheckResult(
                     scaleName+"("+noteNames+")",
-                    harmonicIntervals,
+                    harmoniousIntervals,
                     diatonicScaleIntervals,
                     intervalCheckResults,
                     unjustIntervalsUnique,
@@ -596,45 +597,36 @@ public class JustIntonationChecker
             return results;
         }
         
-        private List<Interval> harmonicIntervals() {
+        private List<Interval> harmoniousIntervals() {
             final List<Interval> intervals = Stream.of(
                     configuration.checkAgainst5LimitIntervals
                         ? LIMIT5_COMPARISON_SCALE.intervals()
                         : chromaticIntervals
                 ).toList();
             
-            final List<Interval> harmonicIntervals = new ArrayList<>();
+            final List<Interval> harmoniousIntervals = new ArrayList<>();
             
             if (configuration.alsoCheckMajorSecondAndMinorSeventh) // useless to check dissonant seconds and seventh
-                harmonicIntervals.add(intervals.stream()
-                        .filter(interval -> isMajorSecond(interval))
-                        .findFirst().orElseThrow());
+                harmoniousIntervals.add(findInterval(intervals, interval -> isMajorSecond(interval)));
             
-            harmonicIntervals.add(intervals.stream()
-                    .filter(interval -> isMinorThird(interval))
-                    .findFirst().orElseThrow());
-            harmonicIntervals.add(intervals.stream()
-                    .filter(interval -> isMajorThird(interval))
-                    .findFirst().orElseThrow());
-            harmonicIntervals.add(intervals.stream()
-                    .filter(interval -> isFourth(interval))
-                    .findFirst().orElseThrow());
-            harmonicIntervals.add(intervals.stream()
-                    .filter(interval -> isFifth(interval))
-                    .findFirst().orElseThrow());
-            harmonicIntervals.add(intervals.stream()
-                    .filter(interval -> isMinorSixth(interval))
-                    .findFirst().orElseThrow());
-            harmonicIntervals.add(intervals.stream()
-                    .filter(interval -> isMajorSixth(interval))
-                    .findFirst().orElseThrow());
+            harmoniousIntervals.add(findInterval(intervals, interval -> isMinorThird(interval)));
+            harmoniousIntervals.add(findInterval(intervals, interval -> isMajorThird(interval)));
+            harmoniousIntervals.add(findInterval(intervals, interval -> isFourth(interval)));
+            harmoniousIntervals.add(findInterval(intervals, interval -> isFifth(interval)));
+            harmoniousIntervals.add(findInterval(intervals, interval -> isMinorSixth(interval)));
+            harmoniousIntervals.add(findInterval(intervals, interval -> isMajorSixth(interval)));
             
             if (configuration.alsoCheckMajorSecondAndMinorSeventh)
-                harmonicIntervals.add(intervals.stream()
-                        .filter(interval -> isMinorSeventh(interval))
-                        .findFirst().orElseThrow());
+                harmoniousIntervals.add(findInterval(intervals, interval -> isMinorSeventh(interval)));
             
-            return harmonicIntervals;
+            return harmoniousIntervals;
+        }
+        
+        private Interval findInterval(List<Interval> intervals, Predicate<Interval> predicate) {
+            return intervals.stream()
+                    .filter(predicate)
+                    .findFirst()
+                    .orElseThrow();
         }
         
         private TriadCheckResult checkTriad(
@@ -679,6 +671,6 @@ public class JustIntonationChecker
             final String noteNames = "("+triadNoteNames.stream().collect(Collectors.joining(","))+")";
             return new TriadCheckResult(triadName, noteNames, unjustReasons.length() <= 0, unjustReasons);
         }
-    }   // end class DiatonicScale
+    }   // end class DiatonicScaleCheck
     
 }   // end class JustIntonationChecker
