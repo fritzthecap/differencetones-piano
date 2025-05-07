@@ -6,6 +6,9 @@ package fri.music;
  */
 public interface SoundChannel
 {
+    /** Maximum value for volume or velocity. */
+    int MAXIMUM_VOLUME = 127;
+    
     /** 
      * Start to play given tone.
      * @param midiNoteNumber the number of the MIDI note to play.

@@ -6,6 +6,7 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.FloatControl.Type;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+import fri.music.SoundChannel;
 import fri.music.ToneSystem;
 
 /**
@@ -32,7 +33,7 @@ public abstract class WaveGenerator
     /** The default maximum number of sample bytes to fade-in and -out. */
     public static final int MAXIMUM_SAMPLES_TO_FADE = 1024;
     /** The maximum amplitude. Horrible sounds occur above 127! */
-    public static final int MAXIMUM_AMPLITUDE = 127;
+    public static final int MAXIMUM_AMPLITUDE = SoundChannel.MAXIMUM_VOLUME;
     
     /** State is used to control fade-in and -out. */
     private enum State

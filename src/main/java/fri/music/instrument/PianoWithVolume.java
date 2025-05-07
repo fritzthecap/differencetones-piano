@@ -21,8 +21,8 @@ import fri.music.wavegenerator.WaveSoundChannel;
  */
 public class PianoWithVolume extends PianoWithSound
 {
-    private int volume = 127 / 8;
-    private int velocity = 127 / 8;
+    private int volume = SoundChannel.MAXIMUM_VOLUME / 8;
+    private int velocity = SoundChannel.MAXIMUM_VOLUME / 8;
     
     private int savedVolume = 0;
     private int savedVelocity = 0;

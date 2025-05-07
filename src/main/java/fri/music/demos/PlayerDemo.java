@@ -38,7 +38,7 @@ public class PlayerDemo
         }
         else {
             for (String ipnName : args) {
-                final Note note = new Note(ipnName, 500);
+                final Note note = new Note(tones, ipnName, 500);
                 player.play(note);
             }
         }

@@ -8,6 +8,7 @@ import fri.music.JustIntonation;
 import fri.music.JustIntonation.ChromaticScales;
 import fri.music.Tone;
 import fri.music.ToneSystem;
+import fri.music.Tones;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.player.Note;
 import fri.music.player.Player;
@@ -107,22 +108,23 @@ public class DifferenceTonesDemo
 
     private static void playNotes(Tone[] tones, Tone firstTone, Tone secondTone, Tone[] tartiniTones) {
         final Player player = new Player(new SineWaveSoundChannel(tones));
+        final Tones tuning = new Tones(tones);
         
-        player.play(new Note(firstTone.ipnName, 1000));
-        player.play(new Note(secondTone.ipnName, 1000));
+        player.play(new Note(tuning, firstTone.ipnName, 1000));
+        player.play(new Note(tuning, secondTone.ipnName, 1000));
         
         if (tartiniTones[0] == null)
             return;
         
-        player.play(new Note(tartiniTones[0].ipnName, 2000));
+        player.play(new Note(tuning, tartiniTones[0].ipnName, 2000));
         
         final int REPETITIONS = 1;
         for (int i = 0; i < REPETITIONS; i++) {
             player.playSimultaneously(new Note[] { 
-                    new Note(firstTone.ipnName, 3000), 
-                    new Note(secondTone.ipnName, 3000) 
+                    new Note(tuning, firstTone.ipnName, 3000), 
+                    new Note(tuning, secondTone.ipnName, 3000) 
                 });
-            player.play(new Note(tartiniTones[0].ipnName, 2000));
+            player.play(new Note(tuning, tartiniTones[0].ipnName, 2000));
         }
         
         player.close();

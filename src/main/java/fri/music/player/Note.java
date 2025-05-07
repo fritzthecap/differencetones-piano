@@ -4,7 +4,7 @@ import fri.music.Tone;
 import fri.music.Tones;
 
 /**
- * A tone with duration and volume.
+ * A tone from a tuning (tone-system), with duration and volume.
  */
 public class Note extends Tone
 {
@@ -19,11 +19,6 @@ public class Note extends Tone
     public final int durationMilliseconds;
     /** The loudness of this note, 0-127. */
     public final int volume;
-    
-    /** CAUTION: this is a note from default tone-system EDO-12! */
-    public Note(String ipnName, int durationInMilliseconds) {
-        this(new Tones(), ipnName, durationInMilliseconds, -1);
-    }
     
     /** A note from given tone-system with default duration. */
     public Note(Tones toneSystem, String ipnName) {
