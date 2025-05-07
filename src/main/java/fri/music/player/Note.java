@@ -10,8 +10,10 @@ public class Note extends Tone
 {
     /** Default loudness, 0-127. */
     public static final int DEFAULT_VOLUME = 7;
+    /** Default tempo is 120 BPM. */
+    public static final int DEFAULT_TEMPO_BPM = 120;
     /** Default duration of a quarter-note on 120 BPM, in milliseconds. */
-    public static final int DEFAULT_DURATION = 500;
+    public static final int DEFAULT_BEAT_DURATION = 1000 * 60 / DEFAULT_TEMPO_BPM; //500
     
     /** The length of this note, in milliseconds. */
     public final int durationMilliseconds;
@@ -48,7 +50,7 @@ public class Note extends Tone
         this(tone, durationMilliseconds, -1);
     }
     
-    /** A note from given tone-system. */
+    /** A note from given tone. */
     public Note(Tone tone, int durationMilliseconds, int volume) {
         super(
             tone.ipnName, 
@@ -56,7 +58,7 @@ public class Note extends Tone
             tone.midiNumber, 
             tone.cent);
         
-        this.durationMilliseconds = (durationMilliseconds <= 0) ? DEFAULT_DURATION : durationMilliseconds;
+        this.durationMilliseconds = (durationMilliseconds <= 0) ? DEFAULT_BEAT_DURATION : durationMilliseconds;
         this.volume = (volume <= 0 || volume > 127) ? DEFAULT_VOLUME : volume;
     }
 }

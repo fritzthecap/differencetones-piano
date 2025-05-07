@@ -42,16 +42,27 @@ public class Player
             channel.noteOff(note.midiNumber);
     }
     
+    /**
+     * Plays given notes after each other.
+     * @param notes the notes to play in a row.
+     */
     public void playInRow(Note[] notes) {
         for (Note note : notes)
             play(note);
     }
     
+    /**
+     * Plays given intervals (or chords, or single notes) after each other.
+     * @param notes the notes to play in a row.
+     */
     public void playInRow(Note[][] notes) {
         for (Note[] chord : notes)
             playSimultaneously(chord);
     }
     
+    /**
+     * You MUST release system resources when not needed any more!
+     */
     public void close() {
         channel.allNotesOff();
     }
