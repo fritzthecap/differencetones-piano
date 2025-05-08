@@ -15,6 +15,8 @@ import fri.music.Tones;
  */
 public class MelodyFactory
 {
+    private static final double tripletFactor = 2.0 / 3.0; // 3 notes in place of 2;
+    
     private final Tones toneSystem;
     private final Integer numberOfBeatsPerBar;
     private final Integer beatType;
@@ -24,11 +26,14 @@ public class MelodyFactory
     private final int barDurationMilliseconds;
     private final int barDurationMillisecondsHalf;
     
-    private final double tripletFactor;
-    
     /** Factory with default settings. */
     public MelodyFactory() {
         this(null, null, null, null, null);
+    }
+    
+    /** Factory with given tone-system and default settings. */
+    public MelodyFactory(ToneSystem toneSystem) {
+        this(toneSystem, null, null, null, null);
     }
     
     /**
@@ -55,15 +60,13 @@ public class MelodyFactory
         this.beatDurationMilliseconds = (int) Math.round(1000.0 * 60.0 / (double) bpm);
         this.barDurationMilliseconds = (this.numberOfBeatsPerBar * beatDurationMilliseconds);
         this.barDurationMillisecondsHalf = (int) Math.round((double) barDurationMilliseconds / 2.0);
-        
-        tripletFactor = 2.0 / 3.0; // 3 notes in place of 2
     }
     
     /**
      * Translates given string-inputs to a playable melody.
      * If a note has no "/" with subsequent length, it will be regarded as quarter-note.
      * @param notesWithLengths the sequence of IPN-notes with length to scan, e.g. ["C4/4", "D4/8", "B3/8" ...].
-     * @return a sequence of notes as Java-objects.
+     * @return a sequence of <code>Note</code> Java-objects representing <code>notesWithLengths</code>.
      */
     public Note[] translate(String[] notesWithLengths) {
         final Note[] melody = new Note[notesWithLengths.length];
@@ -105,13 +108,14 @@ public class MelodyFactory
 
     private int toMillis(int noteLengthDivisor, boolean isDottedNote, boolean isTripletNote) {
         final double beatFactor = (double) beatType / (double) noteLengthDivisor;
+        // "C4/1" in a 3/4 waltz must be written as "C3/2."
         double millis = (double) beatDurationMilliseconds * beatFactor;
         
         if (isTripletNote)
             millis = millis * tripletFactor;
         
         if (isDottedNote)
-            millis = millis * 1.5;
+            millis = millis * 1.5; // dotted factor
         
         return (int) Math.round(millis);
     }

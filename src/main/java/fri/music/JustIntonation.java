@@ -273,7 +273,7 @@ public class JustIntonation extends AbstractJustIntonation
         }
     }
 
-    
+    /** Uses ChromaticScales.LIMIT_5_SYMMETRIC_1 */
     public JustIntonation() {
         this(null);
     }
