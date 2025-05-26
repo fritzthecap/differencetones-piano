@@ -188,8 +188,8 @@ public class DifferenceToneInversions extends DifferenceTones
     
     /**
      * Removes all intervals that have upper or lower tone just one semi-tone away from their difference-tone,
-     * independent of octave. Thus C4=B6-D#6 (occurs in EDO-12) would be removed, as B is next to C.
-     * @param alsoFifthRange remove also intervals whose tones that are too close to the fifth of the difference tone.
+     * independent of octave. Thus C4 = B6-D#6 (occurs in EDO-12) would be removed, as B is next to C.
+     * @param alsoFifthRange remove also intervals whose tones are too close to the fifth of the difference tone.
      */
     public void removeDissonant(boolean alsoFifthRange) {
         for (final Map.Entry<Tone,List<TonePair>> entry : differenceToneToGeneratingTones.entrySet()) {
@@ -198,11 +198,11 @@ public class DifferenceToneInversions extends DifferenceTones
             final Iterator<TonePair> iterator = entry.getValue().iterator();
             while (iterator.hasNext()) {
                 final TonePair interval = iterator.next();
-                if ((isOneSemitoneAway(differenceTone, interval.upperTone()) ||
-                        isOneSemitoneAway(differenceTone, interval.lowerTone())) ||
-                        alsoFifthRange &&
-                        (isFifthOneSemitoneAway(differenceTone, interval.upperTone()) ||
-                        isFifthOneSemitoneAway(differenceTone, interval.lowerTone())))
+                if (isOneSemitoneAway(differenceTone, interval.upperTone()) ||
+                        isOneSemitoneAway(differenceTone, interval.lowerTone()) ||
+                        (alsoFifthRange &&
+                            (isFifthOneSemitoneAway(differenceTone, interval.upperTone()) ||
+                            isFifthOneSemitoneAway(differenceTone, interval.lowerTone()))))
                     iterator.remove();
 
             }

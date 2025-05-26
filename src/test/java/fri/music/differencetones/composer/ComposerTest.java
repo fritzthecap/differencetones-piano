@@ -14,21 +14,21 @@ import fri.music.wavegenerator.SineWaveSoundChannel;
 class ComposerTest
 {
     @Test
-    void testComposerWithEqualTemperament() {
+    void withEqualTemperament() {
         final AbstractToneSystem toneSystem = new EqualTemperament();
         final double deviation = DifferenceTones.TOLERANT_DEVIATION_EDO_12;
-        testComposer(toneSystem, deviation);
+        compose(toneSystem, deviation);
     }
     
     @Test
-    void testComposerWithJustIntonation() {
+    void withJustIntonation() {
         final AbstractToneSystem toneSystem = new JustIntonation();
         final double deviation = DifferenceTones.PRECISE_DEVIATION_JI;
-        testComposer(toneSystem, deviation);
+        compose(toneSystem, deviation);
     }
     
     // TODO: add assertions
-    private void testComposer(AbstractToneSystem toneSystem, double deviation) {
+    private void compose(AbstractToneSystem toneSystem, double deviation) {
         System.out.println(toneSystem);
         final Tones tones = new Tones(toneSystem.tones());
         

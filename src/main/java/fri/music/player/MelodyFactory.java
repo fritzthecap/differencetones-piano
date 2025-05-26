@@ -9,9 +9,10 @@ import fri.music.Tones;
  * <p/>
  * A note is given as an IPN-name and its length behind a slash, 
  * e.g. "A4/4" for a quarter note on pitch of A4 (440 Hz),
- * or "C#4/8." for a dotted C#4 eighth note. 
+ * or "C#4/8." for a dotted C#4 eighth note,
+ * or "B3/8,3" for a B3 triplet eighth note.
  * In IPN, there is no "Eb" or "Bb", you must give "D#" or "A#",
- * and there is no German "H", this is written as "B".
+ * and there is no German "H", such is written as "B".
  */
 public class MelodyFactory
 {
@@ -150,9 +151,8 @@ public class MelodyFactory
         }
 
         private boolean touches(int currentMillis, int limit) {
-            return currentMillis == limit ||
-                    currentMillis == limit - 1 ||
-                    currentMillis > limit;
+            return currentMillis > limit ||
+                    matches(currentMillis, limit);
         }
     
         private boolean matches(int currentMillis, int limit) {
