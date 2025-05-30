@@ -5,22 +5,25 @@ import fri.music.Tones;
 
 /**
  * Reads in a number of notes with length, headed by time-signature and tempo, 
- * and produces a melody from it, which can be played by the <code>Player</code>.
+ * and produces a melody (array of Note) from it, playable by a <code>Player</code>.
  * <p/>
+ * <i>Input DSL:</i><br/>
  * A note is given as an IPN-name and its length behind a slash, 
  * e.g. "A4/4" for a quarter note on pitch of A4 (440 Hz),
  * or "C#4/8." for a dotted C#4 eighth note,
  * or "B3/8,3" for a B3 triplet eighth note.
- * In IPN, there is no "Eb" or "Bb", you must give "D#" or "A#",
+ * In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
  * and there is no German "H", such is written as "B".
  */
 public class MelodyFactory
 {
-    private static final double tripletFactor = 2.0 / 3.0; // 3 notes in place of 2;
+    private static final double TRIPLET_DURATION_FACTOR = 2.0 / 3.0; // 3 notes in place of 2;
+    
+    private static final double BAR_START_VOLUME_FACTOR = 1.8; // first in bar should be louder
     
     private final Tones toneSystem;
     private final Integer numberOfBeatsPerBar;
-    private final Integer beatType;
+    private final Integer beatType; // eight or quarter notes
     private final Integer volume;
 
     private final int beatDurationMilliseconds;
@@ -100,29 +103,29 @@ public class MelodyFactory
         
         final int noteLength = Integer.valueOf(noteLengthString);
         final int durationMilliseconds = toMillis(noteLength, dotted, triplet);
-                
-        final int volumeInBar = volumeInBar(barState);
+        
+        final double volumeFactor = barState.getVolumeFactor();
+        final int volumeInBar = (int) Math.round(volumeFactor * (double) volume);
+        final boolean emphasized = (volumeFactor == BAR_START_VOLUME_FACTOR);
+        
+        // finally skip barState to next note
         barState.add(durationMilliseconds);
 
-        return new Note(toneSystem, ipnName, durationMilliseconds, volumeInBar);
+        return new Note(toneSystem, ipnName, durationMilliseconds, volumeInBar, emphasized);
     }
 
     private int toMillis(int noteLengthDivisor, boolean isDottedNote, boolean isTripletNote) {
         final double beatFactor = (double) beatType / (double) noteLengthDivisor;
-        // "C4/1" in a 3/4 waltz must be written as "C3/2."
+        // "C4/1" in a 3/4 waltz must be written as "C4/2." (mind the dot)!
         double millis = (double) beatDurationMilliseconds * beatFactor;
         
         if (isTripletNote)
-            millis = millis * tripletFactor;
+            millis = millis * TRIPLET_DURATION_FACTOR;
         
         if (isDottedNote)
             millis = millis * 1.5; // dotted factor
         
         return (int) Math.round(millis);
-    }
-
-    private int volumeInBar(BarState barState) {
-        return (int) Math.round(barState.getVolumeFactor() * (double) volume);
     }
 
 
@@ -141,11 +144,11 @@ public class MelodyFactory
         /** Notes at first beat should be louder. */
         public double getVolumeFactor() {
             if (currentMillis == 0)
-                return 1.8; // being at first beat
+                return BAR_START_VOLUME_FACTOR; // being at first beat
             
             if (numberOfBeatsPerBar % 2 == 0 && numberOfBeatsPerBar % 3 != 0 && // can be reliably divided into 2 parts
                     matches(currentMillis, barDurationMillisecondsHalf))
-                return 1.4; // being at second part of the bar
+                return 1.4; // being in middle of the bar
             
             return 1.0;
         }

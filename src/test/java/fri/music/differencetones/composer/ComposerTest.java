@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import fri.music.*;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceTones;
+import fri.music.player.MelodyFactory;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.wavegenerator.SineWaveSoundChannel;
@@ -46,14 +47,9 @@ class ComposerTest
             "C4", "E4", "G4", "A#4",// C
             "G4", "D4", "G3", "G3", // G
         };
-        final Note[] melody = new Note[notes.length];
-        final int millisPerQuarterNote = 500; // quarter note
-        for (int i = 0; i < notes.length; i++)
-            melody[i] = new Note(
-                    tones, 
-                    notes[i], 
-                    millisPerQuarterNote, 
-                    (i % 4 == 0) ? 16 : (i % 2 == 0) ? 12 : 8);
+        
+        final MelodyFactory melodyFactory = new MelodyFactory(toneSystem);
+        final Note[] melody = melodyFactory.translate(notes);
         
         final AbstractComposer composer = new Composer(toneSystem, deviation);
         final Note[][] intervals = composer.compose(melody);
@@ -66,9 +62,9 @@ class ComposerTest
             System.out.println(note.ipnName+" = "+new DifferenceToneInversions.TonePair(interval[0], interval[1]));
         }
         
-//        final Player player = new Player(new SineWaveSoundChannel(tones.tones));
-//        player.playInRow(intervals);
-//        player.close();
+        final Player player = new Player(new SineWaveSoundChannel(tones.tones));
+        player.playInRow(intervals);
+        player.close();
 
 //        final String[][] expectedIntervalNotes = new String[][] {
 //            { "E6","G6" }, { "D#6","G6" }, { "D6","G6" }, { "D#6","G6" }, // C

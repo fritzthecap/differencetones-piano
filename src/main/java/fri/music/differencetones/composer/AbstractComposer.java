@@ -109,7 +109,7 @@ public abstract class AbstractComposer
         if (tonePair == null)
             throw new IllegalArgumentException("Following note at index "+resultIndex+" could not be mapped to an interval: "+note);
         
-        result[resultIndex][0] = new Note(tonePair.lowerTone(), note.durationMilliseconds, note.volume);
-        result[resultIndex][1] = new Note(tonePair.upperTone(), note.durationMilliseconds, note.volume);
+        result[resultIndex][0] = new Note(tonePair.lowerTone(), note.durationMilliseconds, note.volume, note.emphasized);
+        result[resultIndex][1] = new Note(tonePair.upperTone(), note.durationMilliseconds, note.volume, note.emphasized);
     }
 }

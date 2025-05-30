@@ -19,19 +19,19 @@ public class Composer extends AbstractComposer
     public Composer(AbstractToneSystem toneSystem, double deviationTolerance) {
         super(toneSystem, deviationTolerance);
         
-        strategies.add(new PrecedingNearPitch());
-        strategies.add(new OneNoteInCommon());
-        strategies.add(new ByPitch());
-        strategies.add(new AvoidParallel());
-        Collections.sort(strategies, (rule1, rule2) -> rule1.sortOrder() - rule2.sortOrder());
+        strategies.add(new PrecedingNearPitch()); // priority 10
+        strategies.add(new OneNoteInCommon()); // priority 20
+        strategies.add(new ByPitch()); // priority 30
+        strategies.add(new NonParallel()); // priority 40
+        Collections.sort(strategies, (rule1, rule2) -> rule1.suggestedPriority() - rule2.suggestedPriority());
     }
     
     @Override
     public Note[][] compose(Note[] melody) {
         final DifferenceToneInversions inversions = createInversions(
                 melody,
-                ToneSystem.MINOR_THIRD, //MAJOR_SECOND),
-                ToneSystem.MAJOR_SIXTH); //FIFTH);
+                ToneSystem.MINOR_THIRD, //MAJOR_SECOND
+                ToneSystem.MAJOR_SIXTH); //FIFTH
         return super.compose(melody, inversions, strategies);
     }
 }

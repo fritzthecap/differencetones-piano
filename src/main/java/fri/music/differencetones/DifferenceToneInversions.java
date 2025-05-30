@@ -13,7 +13,7 @@ import fri.music.Tone;
 import fri.music.ToneSystem;
 
 /**
- * Finds intervals that generate a certain difference tone.
+ * Finds one or more intervals that can generate a certain difference tone.
  * <p/>
  * Mind that due to a limited octave range the higher difference-tones will be
  * represented by less intervals than the lower ones.
@@ -95,7 +95,8 @@ public class DifferenceToneInversions extends DifferenceTones
         }
     }
     
-    /** Representation of the difference-tone inversion. */
+    
+    /** Representation of a difference-tone through two tones. */
     public record TonePair(Tone lowerTone, Tone upperTone)
     {
         public int semitoneDistance() {
