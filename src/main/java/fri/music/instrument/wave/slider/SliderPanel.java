@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.Dictionary;
@@ -15,16 +14,16 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
+import fri.music.instrument.swing.slider.SliderMouseEventLocator;
+import fri.music.instrument.swing.slider.SliderRightClickMouseAdapter;
 import fri.music.wavegenerator.WaveGenerator;
 
 /**
@@ -211,56 +210,22 @@ public class SliderPanel
     }
     
     
-    private class SliderMouseEventLocator
-    {
-        /** Result of construction. */
-        public final Integer sliderValue;
-        
-        private final int INSET = 12; // space left and right of slider bar, for Metal-UI
-        
-        public SliderMouseEventLocator(MouseEvent e) {
-            final JSlider slider = (JSlider) e.getSource();
-            final int sliderWidth = slider.getSize().width - (2 * INSET);
-            final int mouseX = e.getX() - INSET;
-            if (mouseX >= 0 && mouseX <= sliderWidth) {
-                final double fraction = (double) mouseX / (double) sliderWidth;
-                final int sliderRange = (slider.getMaximum() - slider.getMinimum());
-                final int valueAtMouse = (int) Math.round((double) sliderRange * fraction);
-                sliderValue = slider.getMinimum() + valueAtMouse;
-            }
-            else {
-                sliderValue = null;
-            }
-        }
-    }
-    
     private JSlider createFrequencySlider() {
         final JSlider frequencySlider = new JSlider();
         
-        frequencySlider.addMouseListener(new MouseAdapter() {
-            /** Moves the slider knob to the given event location when it was a right-mouse click.*/
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (((JComponent) e.getSource()).isEnabled() && SwingUtilities.isRightMouseButton(e)) {
-                    final Integer sliderValue = new SliderMouseEventLocator(e).sliderValue;
-                    if (sliderValue != null)
-                        frequencySlider.setValue(sliderValue);
-                }
-            }
-        });
+        frequencySlider.addMouseListener(new SliderRightClickMouseAdapter());
+        
         frequencySlider.addMouseMotionListener(new MouseMotionAdapter() {
             /** Sets the slider's tooltip text to the frequency of the note the mouse is over.*/
             @Override
             public void mouseMoved(MouseEvent e) {
-                final Integer sliderValue = new SliderMouseEventLocator(e).sliderValue;
-                if (sliderValue != null) {
-                    final int midiNoteNumber = (sliderValue + MICROTONES / 2) / MICROTONES;
-                    final Tone tone = tones.forMidiNoteNumber(midiNoteNumber);
+                final int sliderValue = new SliderMouseEventLocator(e).sliderValue;
+                final int midiNoteNumber = (sliderValue + MICROTONES / 2) / MICROTONES;
+                final Tone tone = tones.forMidiNoteNumber(midiNoteNumber);
+                if (tone != null)
                     frequencySlider.setToolTipText(tone.formattedFrequency()+" Hertz");
-                }
-                else {
+                else
                     frequencySlider.setToolTipText(null);
-                }
             }
         });
         
