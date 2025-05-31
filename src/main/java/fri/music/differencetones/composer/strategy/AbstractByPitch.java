@@ -32,20 +32,4 @@ public abstract class AbstractByPitch extends AbstractStrategy
         indexByPitch = (int) Math.round(pitchFraction * (double) lastIndex);
         bestByPitch = generatingIntervals.get(indexByPitch);
     }
-    
-//    /**
-//     * This method will never return an interval that is parallel to given previousInterval.
-//     * @return a tone-pair from intervals list that does not contain given tone, ignoring its octave.
-//     */
-//    protected final TonePair findIntervalNotContaining(Tone tone, TonePair previousInterval) {
-//        final String ipnNameWithoutOctave = tone.ipnNameWithoutOctave();
-//        final TonePair toBeNear = (previousInterval == null) ? bestByPitch : previousInterval;
-//        NearestSearchResult searchResult = new NearestSearchResult();
-//        for (final TonePair tonePair : generatingIntervals) {
-//            if (contains(tonePair, ipnNameWithoutOctave) == false &&
-//                    isParallel(tonePair, previousInterval) == false)
-//                searchResult = getNearest(searchResult, toBeNear, tonePair);
-//        }
-//        return searchResult.result();
-//    }
 }

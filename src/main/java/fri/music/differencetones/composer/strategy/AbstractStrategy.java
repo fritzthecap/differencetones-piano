@@ -50,24 +50,6 @@ public abstract class AbstractStrategy implements Strategy
         return semitones < 0;
     }
     
-    /**
-     * This method will never return an interval that is parallel to given previousInterval.
-     * @return the nearest tone-pair to previousInterval in intervals list
-     *      that also has one note but not both notes in common with previousInterval.
-     */
-    protected final TonePair findIntervalWithOneNoteInCommon(TonePair previousInterval) {
-        final Tone previousUpper = previousInterval.upperTone();
-        final Tone previousLower = previousInterval.lowerTone();
-        NearestSearchResult searchResult = new NearestSearchResult();
-        for (final TonePair tonePair : generatingIntervals) {
-            final boolean upperEqual = tonePair.upperTone().equals(previousUpper);
-            final boolean lowerEqual = tonePair.lowerTone().equals(previousLower);
-            if (upperEqual != lowerEqual) // only one of them is true
-                searchResult = getNearest(searchResult, previousInterval, tonePair);
-        }
-        return searchResult.result();
-    }
-    
     
     /**
      * Helper for search loops.
@@ -112,15 +94,31 @@ public abstract class AbstractStrategy implements Strategy
         return Math.abs(distanceUpper + distanceLower);
     }
     
-    /**
-     * @return true when given tone-pair contains given tone, ignoring its octave.
-     */
-    protected final boolean contains(TonePair tonePair, String ipnNameWithoutOctave) {
-        return tonePair.lowerTone().ipnNameWithoutOctave().equals(ipnNameWithoutOctave) ||
-               tonePair.upperTone().ipnNameWithoutOctave().equals(ipnNameWithoutOctave);
-    }
-
-
+    
+//    /**
+//     * This method will never return an interval that is parallel to given previousInterval.
+//     * @return a tone-pair from intervals list that does not contain given tone, ignoring its octave.
+//     */
+//    protected final TonePair findIntervalNotContaining(Tone tone, TonePair previousInterval) {
+//        final String ipnNameWithoutOctave = tone.ipnNameWithoutOctave();
+//        final TonePair toBeNear = (previousInterval == null) ? bestByPitch : previousInterval;
+//        NearestSearchResult searchResult = new NearestSearchResult();
+//        for (final TonePair tonePair : generatingIntervals) {
+//            if (containsIgnoringOctave(tonePair, ipnNameWithoutOctave) == false &&
+//                    isParallel(tonePair, previousInterval) == false)
+//                searchResult = getNearest(searchResult, toBeNear, tonePair);
+//        }
+//        return searchResult.result();
+//    }
+//    
+//    /**
+//     * @return true when given tone-pair contains given tone, ignoring its octave.
+//     */
+//    protected final boolean containsIgnoringOctave(TonePair tonePair, String ipnNameWithoutOctave) {
+//        return tonePair.lowerTone().ipnNameWithoutOctave().equals(ipnNameWithoutOctave) ||
+//               tonePair.upperTone().ipnNameWithoutOctave().equals(ipnNameWithoutOctave);
+//    }
+//
 //    protected final boolean isDirection(int semitoneMove,  TonePair previousInterval, TonePair intervalToCheck) {
 //        final int upperMove = semitoneMove(previousInterval.upperTone(), intervalToCheck.upperTone());
 //        final int lowerMove = semitoneMove(previousInterval.lowerTone(), intervalToCheck.lowerTone());
