@@ -1,2 +1,26 @@
 
+- Play a Tone array (written for MelodyFactory) visibly on any piano.
+    Provide a text-area where the user can choose from prepared melodies
+    or input a new melody. 
+
+ Display 
+    of Tunings with frequency and cent
+    of difference tones in different tunings
+    of difference tone inversions in different tunings
+    
 - Documentation UI, leading through different topics.
+    This should be in foreground initially, but can be made optional
+    for all introduction-dialogs through a checkbox "Never show introductions".
+    When this checkbox gets clicked, not a single introduction 
+    dialog will show anywhere anymore. Main menu offers an action to
+    reverse that setting.
+
+    Running the application opens main documentation. Then different
+    buttons provide insights:
+    "Hear Difference Tones" (FrequencyDifferenceSliders), 
+    "See Difference Tones" (DifferenceTonePiano), 
+    "Explore Beatings in Tunings" (TriadPlayingPiano),
+    "Look at Pianos" (PianoConfiguration), 
+    "Check Just Intonation" (JustIntonationChecker), 
+    "Translate a Melody into Difference Tones" (DifferenceToneInversions, Composer)
+

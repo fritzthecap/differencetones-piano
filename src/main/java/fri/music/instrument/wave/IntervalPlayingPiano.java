@@ -14,8 +14,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import fri.music.instrument.PianoWithHold;
 import fri.music.instrument.PianoWithSound;
-import fri.music.instrument.swing.SmartComboBox;
-import fri.music.instrument.swing.SmartPanel;
+import fri.music.swingutils.SmartComboBox;
+import fri.music.swingutils.SmartPanel;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**

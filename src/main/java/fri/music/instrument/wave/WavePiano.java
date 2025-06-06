@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 import fri.music.Tone;
 import fri.music.instrument.PianoWithHold;
 import fri.music.instrument.PianoWithSound;
-import fri.music.instrument.swing.SmartComboBox;
+import fri.music.swingutils.SmartComboBox;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.SineWaveGenerator;
 import fri.music.wavegenerator.WaveGenerator;

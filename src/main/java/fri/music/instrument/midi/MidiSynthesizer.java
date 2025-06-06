@@ -12,7 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import fri.music.instrument.PianoWithHold;
 import fri.music.instrument.PianoWithSound;
-import fri.music.instrument.swing.SmartComboBox;
+import fri.music.swingutils.SmartComboBox;
 
 /**
  * Different instruments for the piano keyboard.

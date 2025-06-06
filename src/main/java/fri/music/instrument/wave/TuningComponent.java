@@ -11,7 +11,7 @@ import javax.swing.JComboBox;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
-import fri.music.instrument.swing.SmartComboBox;
+import fri.music.swingutils.SmartComboBox;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
