@@ -5,25 +5,10 @@
         <title>About Harmony</title>
         
         <style>
-            @media all and (40em <= width < 60em) {
-                p.newspaper {
-                    column-count: 2;
-                }
-            }
-            @media all and (width >= 60em) {
-                p.newspaper {
-                    column-count: 3;
-                }
-            }
-            @media all and (width >= 80em) {
-                p.newspaper {
-                    column-count: 4;
-                }
-            }
-            @media all and (width >= 100em) {
-                p.newspaper {
-                    column-count: 5;
-                }
+            p.newspaper { /* dynamic newspaper layout without media query. */
+                columns: 4 20em; 
+                /* maximum 5 columns, 
+                   create a new column when each column reaches 20em width. */
             }
         </style>
     </head>
@@ -71,7 +56,8 @@
             when music became an important cultural asset and big instruments were built. 
             At that time church organs were tuned to "just intonation" (pure intonation) 
             that tried to compensate most beatings resulting from the Pythagorean Comma. 
-            As this was not sufficient, any more tunings were developed since. 
+            As this was not sufficient, many more tunings were developed since. 
+           <br/>
             Today's resolution for this harmony-problem is to prefer the "equal temperament", 
             where all 12 semitones of an octave have the same distance from each other 
             (namely 100 "cent", which is an artificial unit, one octave has 1200 cent). 
