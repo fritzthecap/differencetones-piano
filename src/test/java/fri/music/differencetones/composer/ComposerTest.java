@@ -51,7 +51,7 @@ class ComposerTest
         final MelodyFactory melodyFactory = new MelodyFactory(toneSystem);
         final Note[] melody = melodyFactory.translate(notes);
         
-        final AbstractComposer composer = new Composer(toneSystem, deviation);
+        final AbstractComposer composer = new DefaultComposer(toneSystem, deviation);
         final Note[][] intervals = composer.compose(melody);
         assertNotNull(intervals);
         assertEquals(notes.length, intervals.length);

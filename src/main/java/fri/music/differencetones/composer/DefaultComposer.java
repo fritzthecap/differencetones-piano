@@ -12,11 +12,11 @@ import fri.music.player.Note;
 /**
  * Translates a melody (sequence of notes) into its representation as difference tones.
  */
-public class Composer extends AbstractComposer
+public class DefaultComposer extends AbstractComposer
 {
     private final List<Strategy> strategies = new ArrayList<>();
 
-    public Composer(AbstractToneSystem toneSystem, double deviationTolerance) {
+    public DefaultComposer(AbstractToneSystem toneSystem, double deviationTolerance) {
         super(toneSystem, deviationTolerance);
         
         strategies.add(new PrecedingNearPitch()); // priority 10

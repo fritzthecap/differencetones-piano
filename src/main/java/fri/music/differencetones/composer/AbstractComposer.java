@@ -15,6 +15,7 @@ import fri.music.player.Note;
 
 /**
  * Strategy-based translation of a melody into difference-tone intervals.
+ * Playing the intervals should outline the melody.
  */
 public abstract class AbstractComposer
 {
