@@ -148,7 +148,7 @@ public class ConfigurationPanel
         final Set<String> scaleTypeNameSet = ScaleTypes.scaleToStartNote.keySet();
         final String[] scaleTypeNames = scaleTypeNameSet.toArray(new String[scaleTypeNameSet.size()]);
         checkedScaleNames = new JList<>(scaleTypeNames);
-        checkedScaleNames.setToolTipText("Select the diatonic scale type(s) you want to examine. Use Ctrl- and Shift-Click to select!");
+        checkedScaleNames.setToolTipText("Select 1-n diatonic scale types you want to examine. Use Ctrl- and Shift-Click to select several!");
         checkedScaleNames.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         checkedScaleNames.setSelectedIndices(new int[] { 0, /*5*/ }); // IONIAN, AEOLIAN
         
