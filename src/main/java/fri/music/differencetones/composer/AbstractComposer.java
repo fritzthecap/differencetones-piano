@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SequencedMap;
 import fri.music.AbstractToneSystem;
 import fri.music.ToneSystem;
@@ -28,15 +29,33 @@ public abstract class AbstractComposer
     }
 
     /**
-     * @param melody the melody to translate into high-note intervals.
+     * Sub-classes must decide about strategies how to compose, and,
+     * optionally, about the set of interval-possibilities to use for it.
+     * @return a sorted list of <code>Strategy</code> objects to find 
+     *      difference-tone intervals for a given melody.
+     */
+    protected abstract List<Strategy> getStrategies();
+
+    /**
+     * @param melody the melody to translate into (higher note) intervals.
      * @return the composed intervals to play given melody as difference-tones.
      */
-    public abstract Note[][] compose(Note[] melody);
-
-    protected final DifferenceToneInversions createInversions(Note[] melody) {
-        return createInversions(melody, null, null);
+    public Note[][] compose(Note[] melody) {
+        return compose(melody, getStrategies(), null);
     }
-    
+
+    /**
+     * Provides all possibilities of difference-tone intervals ("inversions")
+     * for given melody. That means, it will measure the pitch range and
+     * then build fitting difference-tone intervals for all semi-tones in that range.
+     * @param melody the melody that should be translated into a sequence of intervals
+     *      generating difference-tones.
+     * @param narrowestInterval optional, the smallest <code>ToneSystem.*</code> interval
+     *      provide in returned tone-inversions. Default is MINOR_THIRD.
+     * @param widestInterval optional, the biggest <code>ToneSystem.*</code> interval
+     *      provide in returned tone-inversions. Default is MAJOR_SIXTH.
+     * @return the DifferenceToneInversions that can represent given melody.
+     */
     protected final DifferenceToneInversions createInversions(
             Note[] melody, 
             String narrowestInterval, 
@@ -52,8 +71,17 @@ public abstract class AbstractComposer
         return inversions;
     }
     
-    /** To be called for applying given strategies on given melody. */
-    protected final Note[][] compose(Note[] melody, DifferenceToneInversions inversions, List<Strategy> strategies) {
+    /**
+     * Tries to find a good difference-tone representation of given melody.
+     * There are many ways to do that. It even depends on which <code>ToneSystem</code> (tuning)
+     * is used, so you will get different results for equal-temperament and just-intonation.
+     * @param melody the melody to translate into (higher note) intervals.
+     * @param strategies a list of ordered strategies to apply on every note of the melody,
+     *      expected to find the best interval ("inversion") for each note.
+     * @param inversions optional, the result of <code>createInversions(....)</code>.
+     * @return the composed intervals to represent given melody as difference-tones.
+     */
+    protected final Note[][] compose(Note[] melody, List<Strategy> strategies, DifferenceToneInversions inversions) {
         final Map<NoteWithIndex,TonePair> noteToInterval = buildMap(melody, inversions, strategies);
 
         final Note[][] result = prepareResultArray(melody);
@@ -65,6 +93,11 @@ public abstract class AbstractComposer
     }
     
     private final Map<NoteWithIndex,TonePair> buildMap(Note[] melody, DifferenceToneInversions inversions, List<Strategy> strategies) {
+        if (inversions == null) // call default when null
+            inversions = createInversions(melody, null, null);
+        
+        Objects.requireNonNull(strategies); // assertion for required parameter
+        
         final List<Note> melodyList = Arrays.asList(melody);
         final Note lowest  = melodyList.stream().min((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
         final Note highest = melodyList.stream().max((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();

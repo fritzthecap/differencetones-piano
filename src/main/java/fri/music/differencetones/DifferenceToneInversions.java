@@ -26,8 +26,14 @@ public class DifferenceToneInversions extends DifferenceTones
      * Builds a sufficient range of tones to model given melody with difference tones.
      * @param melody the melody to model with difference tones.
      * @param toneSystem the tuning system to be used for the melody and its difference tones.
-     * @param deviationTolerance the tolerance for finding difference-tones.
-     * @return the sufficient range of tones for given melody.
+     * @param smallestSemitoneDistance optional, the number of semi-tones representing the 
+     *      smallest difference-tone interval to provide in returned tone-inversions.
+     *      Default is MINOR_THIRD.
+     * @param biggestSemitoneDistance optional, the number of semi-tones representing the 
+     *      biggest difference-tone interval to provide in returned tone-inversions.
+     *      Default is MAJOR_SIXTH.
+     * @param deviationTolerance required, the tolerance for finding difference-tones.
+     * @return the intervals (inversions) that can represent given melody.
      */
     public static DifferenceToneInversions toneRangeFor(
             Tone[] melody, 
@@ -73,8 +79,10 @@ public class DifferenceToneInversions extends DifferenceTones
             int biggestSemitoneDistance, 
             double deviationTolerance)
     {
+        /** Smallest recommendable interval for difference-tone inversions is MINOR_THIRD. */
         public static final int DEFAULT_SMALLEST_SEMITONE_STEPS = 
                 ToneSystem.semitoneSteps(ToneSystem.MINOR_THIRD);
+        /** Biggest recommendable interval for difference-tone inversions is MAJOR_SIXTH. */
         public static final int DEFAULT_BIGGEST_SEMITONE_STEPS = 
                 ToneSystem.semitoneSteps(ToneSystem.MAJOR_SIXTH); // the MINOR_SEVENTH difference tone is very hard to hear!
         

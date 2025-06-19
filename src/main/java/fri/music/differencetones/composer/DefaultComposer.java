@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import fri.music.AbstractToneSystem;
-import fri.music.ToneSystem;
-import fri.music.differencetones.DifferenceToneInversions;
-import fri.music.differencetones.composer.strategy.*;
-import fri.music.player.Note;
+import fri.music.differencetones.composer.strategy.ByPitch;
+import fri.music.differencetones.composer.strategy.NonParallel;
+import fri.music.differencetones.composer.strategy.OneNoteInCommon;
+import fri.music.differencetones.composer.strategy.PrecedingNearPitch;
+import fri.music.differencetones.composer.strategy.Strategy;
 
 /**
- * Translates a melody (sequence of notes) into its representation as difference tones.
+ * Translates a melody (sequence of notes) into its difference-tones representation.
  */
 public class DefaultComposer extends AbstractComposer
 {
@@ -27,11 +28,7 @@ public class DefaultComposer extends AbstractComposer
     }
     
     @Override
-    public Note[][] compose(Note[] melody) {
-        final DifferenceToneInversions inversions = createInversions(
-                melody,
-                ToneSystem.MINOR_THIRD, //MAJOR_SECOND
-                ToneSystem.MAJOR_SIXTH); //FIFTH
-        return super.compose(melody, inversions, strategies);
+    protected List<Strategy> getStrategies() {
+        return strategies;
     }
 }
