@@ -7,19 +7,25 @@ import fri.music.Tones;
  * Reads in a number of notes with length, headed by time-signature and tempo, 
  * and produces a melody (array of Note) from it, playable by a <code>Player</code>.
  * <p/>
- * <i>Input DSL:</i><br/>
+ * <b>Input DSL:</b><br/>
  * A note is given as an IPN-name and its length behind a slash, 
  * e.g. "A4/4" for a quarter note on pitch of A4 (440 Hz),
  * or "C#4/8." for a dotted C#4 eighth note,
- * or "B3/8,3" for a B3 triplet eighth note.
+ * or "B3/8,3" for a B3 triplet eighth note (each note of the triplet must have a ",3").
  * In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
  * and there is no German "H", such is written as "B".
  */
 public class MelodyFactory
 {
-    private static final double TRIPLET_DURATION_FACTOR = 2.0 / 3.0; // 3 notes in place of 2;
+    /** Factor by which first note in bar should be louder than subsequent notes. */
+    private static final double BAR_START_VOLUME_FACTOR = 1.8;
     
-    private static final double BAR_START_VOLUME_FACTOR = 1.8; // first in bar should be louder
+    /** The separator between IPN-name and note length (duration). */
+    private static final char DURATION_SEPARATOR = '/';
+    /** The symbol at the end of dotted notes which have duration factor 1.5. */
+    private static final String DOTTED_SYMBOL = ".";
+    /** The separator character for triplet add other multiplet numbers. */
+    private static final char MULTIPLET_SEPARATOR = ',';
     
     private final Tones toneSystem;
     private final Integer numberOfBeatsPerBar;
@@ -42,7 +48,7 @@ public class MelodyFactory
     
     /**
      * The global settings of any melody this factory will produce.
-     * @param toneSystem optional, the tuning the notes should be built from.
+     * @param toneSystem optional, the tuning the notes should be built from, default is EqualTemperament.
      * @param numberOfBeatsPerBar optional, dividend of time signature, for 6/8 this would be 6, null-default is 4. 
      * @param beatType optional, divisor of time signature, for 6/8 this would be 8, null-default is 4.
      * @param numberOfBeatsPerMinute optional, tempo, null-default is 120 BPM.
@@ -81,28 +87,29 @@ public class MelodyFactory
     }
 
     private Note translate(String noteWithLength, BarState barState) {
-        final int slashIndex = noteWithLength.indexOf('/');
+        final int durationStartIndex = noteWithLength.indexOf(DURATION_SEPARATOR);
         
-        final String ipnName = (slashIndex > 0)
-                ? noteWithLength.substring(0, slashIndex)
+        final String ipnName = (durationStartIndex > 0)
+                ? noteWithLength.substring(0, durationStartIndex)
                 : noteWithLength; // has no length
         
-        String noteLengthString = (slashIndex > 0)
-                ? noteWithLength.substring(slashIndex + 1)
+        String noteLengthString = (durationStartIndex > 0)
+                ? noteWithLength.substring(durationStartIndex + 1)
                 : "4"; // assume quarter note
         
-        final String DOTTED_SYMBOL = ".";
+        // remove optional dot is at right end
         final boolean dotted = noteLengthString.endsWith(DOTTED_SYMBOL);
         if (dotted)
             noteLengthString = noteLengthString.substring(0, noteLengthString.length() - DOTTED_SYMBOL.length());
         
-        final String TRIPLET_SYMBOL = ",3";
-        final boolean triplet = noteLengthString.endsWith(TRIPLET_SYMBOL);
-        if (triplet)
-            noteLengthString = noteLengthString.substring(0, noteLengthString.length() - TRIPLET_SYMBOL.length());
+        // remove optional multiplet type left of dot
+        final int multipletSeparatorIndex = noteLengthString.indexOf(MULTIPLET_SEPARATOR);
+        final Integer multipletType = getMultipletFactor(noteLengthString, multipletSeparatorIndex);
+        if (multipletType != null)
+            noteLengthString = noteLengthString.substring(0, multipletSeparatorIndex);
         
         final int noteLength = Integer.valueOf(noteLengthString);
-        final int durationMilliseconds = toMillis(noteLength, dotted, triplet);
+        final int durationMilliseconds = toMillis(noteLength, dotted, multipletType);
         
         final double volumeFactor = barState.getVolumeFactor();
         final int volumeInBar = (int) Math.round(volumeFactor * (double) volume);
@@ -114,13 +121,24 @@ public class MelodyFactory
         return new Note(toneSystem, ipnName, durationMilliseconds, volumeInBar, emphasized);
     }
 
-    private int toMillis(int noteLengthDivisor, boolean isDottedNote, boolean isTripletNote) {
+    private Integer getMultipletFactor(String noteLengthString, int multipletSeparatorIndex) {
+        if (multipletSeparatorIndex <= 0)
+            return null;
+        
+        final String multipletString = noteLengthString.substring(multipletSeparatorIndex + 1);
+        if (multipletString.length() <= 0)
+            throw new IllegalArgumentException("Illegal multiplet number in '"+noteLengthString+"'");
+        
+        return Integer.valueOf(multipletString);
+    }
+
+    private int toMillis(int noteLengthDivisor, boolean isDottedNote, Integer multipletType) {
         final double beatFactor = (double) beatType / (double) noteLengthDivisor;
         // "C4/1" in a 3/4 waltz must be written as "C4/2." (mind the dot)!
         double millis = (double) beatDurationMilliseconds * beatFactor;
         
-        if (isTripletNote)
-            millis = millis * TRIPLET_DURATION_FACTOR;
+        if (multipletType != null)
+            millis = millis * 2.0 / multipletType.doubleValue();
         
         if (isDottedNote)
             millis = millis * 1.5; // dotted factor

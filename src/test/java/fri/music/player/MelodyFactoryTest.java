@@ -52,18 +52,60 @@ class MelodyFactoryTest
 
     @Test
     void tripletsDuration() {
-        final String[] notes = new String[] {
-            "G4/4", "A4/4", "B4/4,3", "A4/4,3", "G4/4,3", // triplets
+        final String[] notes = new String[] { // one 4/4 bar
+            "G4/4", "A4/4", 
+            "B4/4,3", "A4/4,3", "G4/4,3", // triplet
             "D4/1",
         };
         
         final MelodyFactory melodyFactory = new MelodyFactory();
         final Note[] melody = melodyFactory.translate(notes);
         
+        // triplet must have different duration than quarter
+        assertNotEquals(melody[0].durationMilliseconds, melody[2].durationMilliseconds);
+        
+        // all triplets must have same duration
         assertEquals(melody[2].durationMilliseconds, melody[3].durationMilliseconds);
         assertEquals(melody[3].durationMilliseconds, melody[4].durationMilliseconds);
-        assertEquals(melody[0].durationMilliseconds * 2.0 / 3.0, melody[2].durationMilliseconds, 1, // 1 = comparison precision 
-                "A triplet quarter note should be 2/3 of a quarter note!");
+        
+        // two quarter notes must have the same duration as three quarter triplets
+        assertEquals(
+                melody[0].durationMilliseconds + melody[1].durationMilliseconds,
+                melody[2].durationMilliseconds + melody[3].durationMilliseconds + melody[4].durationMilliseconds, 
+                1, // one millisecond comparison precision 
+                "Three triplet quarter notes should be of same duration as two quarter notes!");
+    }
+
+    @Test
+    void quintupletsDuration() {
+        final String[] notes = new String[] { // one 4/4 bar
+            "E4/8", "D4/8", 
+            "G4/8,5", "A4/8,5", "B4/8,5", "A4/8,5", "G4/8,5", // quintuplet
+            "D5/2",
+        };
+        
+        final MelodyFactory melodyFactory = new MelodyFactory();
+        final Note[] melody = melodyFactory.translate(notes);
+        
+        // quintuplet must have different duration than eighth
+        assertNotEquals(melody[0].durationMilliseconds, melody[2].durationMilliseconds);
+        
+        // all quintuplets must have same duration
+        assertEquals(melody[2].durationMilliseconds, melody[3].durationMilliseconds);
+        assertEquals(melody[3].durationMilliseconds, melody[4].durationMilliseconds);
+        assertEquals(melody[4].durationMilliseconds, melody[5].durationMilliseconds);
+        assertEquals(melody[5].durationMilliseconds, melody[6].durationMilliseconds);
+        
+        // an quarter triplet must have 2/3 duration of an quarter
+        assertEquals(
+                melody[0].durationMilliseconds + melody[1].durationMilliseconds,
+                melody[2].durationMilliseconds + 
+                    melody[3].durationMilliseconds + 
+                    melody[4].durationMilliseconds + 
+                    melody[5].durationMilliseconds + 
+                    melody[6].durationMilliseconds, 
+                1, // one millisecond comparison precision 
+                "Five quantuplet eighth notes should be of same duration as two quarter notes!");
     }
 
     @Test
