@@ -24,8 +24,8 @@ public class DifferenceToneInversions extends DifferenceTones
 {
     /**
      * Builds a sufficient range of tones to model given melody with difference tones.
-     * @param melody the melody to model with difference tones.
-     * @param toneSystem the tuning system to be used for the melody and its difference tones.
+     * @param melody required, the melody to model with difference tones.
+     * @param toneSystem required, the tuning system to be used for the melody and its difference tones.
      * @param smallestSemitoneDistance optional, the number of semi-tones representing the 
      *      smallest difference-tone interval to provide in returned tone-inversions.
      *      Default is MINOR_THIRD.

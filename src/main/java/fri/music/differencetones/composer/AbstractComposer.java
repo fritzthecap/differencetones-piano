@@ -10,13 +10,10 @@ import fri.music.AbstractToneSystem;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
-import fri.music.differencetones.composer.strategy.Strategy;
-import fri.music.differencetones.composer.strategy.StrategyContext;
 import fri.music.player.Note;
 
 /**
- * Strategy-based translation of a melody into difference-tone intervals.
- * Playing the intervals should outline the melody.
+ * Translation of a melody into difference-tone intervals.
  */
 public abstract class AbstractComposer
 {
@@ -24,24 +21,8 @@ public abstract class AbstractComposer
     protected final double deviationTolerance;
     
     protected AbstractComposer(AbstractToneSystem toneSystem, double deviationTolerance) {
-        this.toneSystem = toneSystem;
+        this.toneSystem = Objects.requireNonNull(toneSystem);
         this.deviationTolerance = deviationTolerance;
-    }
-
-    /**
-     * Sub-classes must decide about strategies how to compose, and,
-     * optionally, about the set of interval-possibilities to use for it.
-     * @return a sorted list of <code>Strategy</code> objects to find 
-     *      difference-tone intervals for a given melody.
-     */
-    protected abstract List<Strategy> getStrategies();
-
-    /**
-     * @param melody the melody to translate into (higher note) intervals.
-     * @return the composed intervals to play given melody as difference-tones.
-     */
-    public Note[][] compose(Note[] melody) {
-        return compose(melody, getStrategies(), null);
     }
 
     /**
@@ -72,17 +53,24 @@ public abstract class AbstractComposer
     }
     
     /**
+     * Shorthand for default behavior, calling <code>compose(melody, null)</code>.
+     * @param melody the melody to translate into (higher note) intervals.
+     * @return the composed intervals that represent given melody as difference-tones.
+     */
+    public Note[][] compose(Note[] melody) {
+        return compose(melody, null);
+    }
+
+    /**
      * Tries to find a good difference-tone representation of given melody.
      * There are many ways to do that. It even depends on which <code>ToneSystem</code> (tuning)
-     * is used, so you will get different results for equal-temperament and just-intonation.
+     * is used, so you will get different results for equal-temperament and just-intonations.
      * @param melody the melody to translate into (higher note) intervals.
-     * @param strategies a list of ordered strategies to apply on every note of the melody,
-     *      expected to find the best interval ("inversion") for each note.
      * @param inversions optional, the result of <code>createInversions(....)</code>.
-     * @return the composed intervals to represent given melody as difference-tones.
+     * @return the composed intervals that represent given melody as difference-tones.
      */
-    protected final Note[][] compose(Note[] melody, List<Strategy> strategies, DifferenceToneInversions inversions) {
-        final Map<NoteWithIndex,TonePair> noteToInterval = buildMap(melody, inversions, strategies);
+    public final Note[][] compose(Note[] melody, DifferenceToneInversions inversions) {
+        final Map<NoteWithIndex,TonePair> noteToInterval = buildMap(melody, inversions);
 
         final Note[][] result = prepareResultArray(melody);
         for (int i = 0; i < melody.length; i++) {
@@ -92,11 +80,23 @@ public abstract class AbstractComposer
         return result;
     }
     
-    private final Map<NoteWithIndex,TonePair> buildMap(Note[] melody, DifferenceToneInversions inversions, List<Strategy> strategies) {
+    /** Maps given note in given context to a difference-tone <code>TonePair</code>. */
+    protected abstract TonePair mapNote(
+            DifferenceToneInversions inversions,
+            int maximumSemitoneDistance,
+            int semitoneDistanceFromLowest,
+            Note previousNote,
+            TonePair previousInterval, 
+            Note note,
+            SequencedMap<NoteWithIndex,TonePair> result);
+
+    /**
+     * @param melody the melody to translate.
+     * @param inversions optional, the result of <code>createInversions(....)</code>.
+     */
+    private final Map<NoteWithIndex,TonePair> buildMap(Note[] melody, DifferenceToneInversions inversions) {
         if (inversions == null) // call default when null
             inversions = createInversions(melody, null, null);
-        
-        Objects.requireNonNull(strategies); // assertion for required parameter
         
         final List<Note> melodyList = Arrays.asList(melody);
         final Note lowest  = melodyList.stream().min((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
@@ -111,34 +111,23 @@ public abstract class AbstractComposer
             final int semitoneDistanceFromLowest = note.midiNumber - lowest.midiNumber;
             
             final TonePair bestInterval = mapNote(
-                    strategies,
-                    new StrategyContext(
                         inversions,
                         maximumSemitoneDistance,
                         semitoneDistanceFromLowest,
                         previousNote,
                         previousInterval, 
                         note,
-                        result)
-                );
+                        result);
             result.put(new NoteWithIndex(note, i), previousInterval = bestInterval);
         }
         return result;
     }
 
-    private TonePair mapNote(List<Strategy> strategies, StrategyContext context) {
-        for (Strategy strategy : strategies) {
-            final TonePair solution = strategy.solution(context);
-            if (solution != null)
-                return solution;
-        }
-        throw new IllegalStateException("No rule could find a solution for "+context.note());
-    }
-    
     private Note[][] prepareResultArray(Note[] melody) {
         return new Note[melody.length][2];
     }
 
+    /** Puts Note objects into result, built from given tonePair and note. */
     private void assignInterval(Note[][] result, int resultIndex, Note note, TonePair tonePair) {
         if (tonePair == null)
             throw new IllegalArgumentException("Following note at index "+resultIndex+" could not be mapped to an interval: "+note);
