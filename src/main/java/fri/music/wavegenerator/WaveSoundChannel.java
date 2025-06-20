@@ -15,10 +15,12 @@ import fri.music.Tones;
  */
 public abstract class WaveSoundChannel implements SoundChannel
 {
-    protected static final int MAXIMUM_SOUND_GENERATORS = 12; // saw LineUnavailableException when 33 WaveGenerators
+    /** Maximum tones playing simultaneously (without LineUnavailableException). */
+    private static final int MAXIMUM_SOUND_GENERATORS = 12; // saw LineUnavailableException when 33 WaveGenerators
     
     /** Key = MIDI note number, value = sound generator. */
-    protected final Map<Integer,WaveGenerator> generators = new Hashtable<>(MAXIMUM_SOUND_GENERATORS);
+    private final Map<Integer,WaveGenerator> generators = new Hashtable<>(MAXIMUM_SOUND_GENERATORS);
+    /** Tone-system containing frequencies. */
     private Tones tones;
     
     public WaveSoundChannel(Tone[] tones) {
