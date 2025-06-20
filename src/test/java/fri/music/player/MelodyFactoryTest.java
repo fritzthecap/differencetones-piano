@@ -51,7 +51,7 @@ class MelodyFactoryTest
     }
 
     @Test
-    void tripletsDuration() {
+    void tripletDuration() {
         final String[] notes = new String[] { // one 4/4 bar
             "G4/4", "A4/4", 
             "B4/4,3", "A4/4,3", "G4/4,3", // triplet
@@ -76,7 +76,25 @@ class MelodyFactoryTest
     }
 
     @Test
-    void quintupletsDuration() {
+    void customTripletDuration() {
+        final String[] notes = new String[] {
+            "G4/4", "A4/4", 
+            "B4/2,3", "A4/4,3", // triplet
+            "D4/1",
+        };
+        
+        final MelodyFactory melodyFactory = new MelodyFactory();
+        final Note[] melody = melodyFactory.translate(notes);
+        
+        assertEquals(
+                melody[0].durationMilliseconds + melody[1].durationMilliseconds,
+                melody[2].durationMilliseconds + melody[3].durationMilliseconds, 
+                1, // one millisecond comparison precision 
+                "Custom triplet should be of same duration as two quarter notes!");
+    }
+
+    @Test
+    void quintupletDuration() {
         final String[] notes = new String[] {
             "E4/4", "D4/4", 
             "G4/8,5", "A4/8,5", "B4/8,5", "A4/8,5", "G4/8,5", // quintuplet
