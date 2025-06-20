@@ -68,7 +68,6 @@ class MelodyFactoryTest
         assertEquals(melody[2].durationMilliseconds, melody[3].durationMilliseconds);
         assertEquals(melody[3].durationMilliseconds, melody[4].durationMilliseconds);
         
-        // two quarter notes must have the same duration as three quarter triplets
         assertEquals(
                 melody[0].durationMilliseconds + melody[1].durationMilliseconds,
                 melody[2].durationMilliseconds + melody[3].durationMilliseconds + melody[4].durationMilliseconds, 
@@ -78,8 +77,8 @@ class MelodyFactoryTest
 
     @Test
     void quintupletsDuration() {
-        final String[] notes = new String[] { // one 4/4 bar
-            "E4/8", "D4/8", 
+        final String[] notes = new String[] {
+            "E4/4", "D4/4", 
             "G4/8,5", "A4/8,5", "B4/8,5", "A4/8,5", "G4/8,5", // quintuplet
             "D5/2",
         };
@@ -96,7 +95,6 @@ class MelodyFactoryTest
         assertEquals(melody[4].durationMilliseconds, melody[5].durationMilliseconds);
         assertEquals(melody[5].durationMilliseconds, melody[6].durationMilliseconds);
         
-        // an quarter triplet must have 2/3 duration of an quarter
         assertEquals(
                 melody[0].durationMilliseconds + melody[1].durationMilliseconds,
                 melody[2].durationMilliseconds + 
@@ -105,7 +103,18 @@ class MelodyFactoryTest
                     melody[5].durationMilliseconds + 
                     melody[6].durationMilliseconds, 
                 1, // one millisecond comparison precision 
-                "Five quantuplet eighth notes should be of same duration as two quarter notes!");
+                "Five quintuplet eighth notes should be of same duration as two quarter notes!");
+    }
+
+    @Test
+    void wrongMultipletType() {
+        final String[] notes = new String[] {
+            "G4/8,7", // septuplet is ambiguous and thus not supported
+        };
+        assertThrows(
+            IllegalArgumentException.class, 
+            () -> new MelodyFactory().translate(notes)
+        );
     }
 
     @Test

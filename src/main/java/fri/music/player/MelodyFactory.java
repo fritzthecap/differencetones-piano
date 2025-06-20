@@ -138,12 +138,35 @@ public class MelodyFactory
         double millis = (double) beatDurationMilliseconds * beatFactor;
         
         if (multipletType != null)
-            millis = millis * 2.0 / multipletType.doubleValue();
+            millis = calculateMultipletDuration(multipletType, millis);
         
         if (isDottedNote)
-            millis = millis * 1.5; // dotted factor
+            millis *= 1.5; // dotted factor
         
         return (int) Math.round(millis);
+    }
+
+    private double calculateMultipletDuration(Integer multipletType, double millis) {
+        final double factor;
+        // duplets (2) or quadruplets (4) will occur only in 3-ticks-per-beat, 6/8 or 12/8 
+        switch (multipletType) {
+        case 2: // duplets take 3/2, 2 notes on the duration of 3 equal notes
+            if (numberOfBeatsPerBar % 3 != 0)
+                throw new IllegalArgumentException("Do not use duplets in "+numberOfBeatsPerBar+"/"+beatType+" measures!");
+            factor = 3.0 / 2.0; break;
+        case 3: // triplets take 2/3, 3 notes on the duration of 2 equal notes
+        case 6: // sixtuplets take 4/6, 6 notes on the duration of 4 equal notes
+            factor = 2.0 / 3.0; break;
+        case 4: // quadruplets take 3/4, 4 notes on the duration of 3 equal notes
+            if (numberOfBeatsPerBar % 3 != 0)
+                throw new IllegalArgumentException("Do not use quadruplets in "+numberOfBeatsPerBar+"/"+beatType+" measures!");
+            factor = 3.0 / 4.0; break;
+        case 5: // quintuplets take 4/5, 5 notes on the duration of 4 equal notes
+            factor = 4.0 / 5.0; break;
+        default:
+            throw new IllegalArgumentException("Unsupported multiplet type: "+multipletType);
+        }
+        return millis * factor;
     }
 
 
