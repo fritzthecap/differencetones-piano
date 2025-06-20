@@ -3,7 +3,6 @@ package fri.music.wavegenerator;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.FloatControl.Type;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import fri.music.SoundChannel;
@@ -138,8 +137,8 @@ public abstract class WaveGenerator
     }
 
     /**
-     * Plays given frequency at given amplitude for given duration, 
-     * but returns before the tone has been played completely.
+     * Plays given frequency at given amplitude for given duration. 
+     * May return shortly before the tone has completed playing.
      * @param frequency the Hertz value for the tone to play.
      * @param durationMillis the duration of the tone, MINIMAL_DURATION - n.
      * @param amplitude the amplitude of the tone, 0 - MAX_AMPLITUDE.
@@ -158,10 +157,10 @@ public abstract class WaveGenerator
 
     /**
      * Plays given frequency at given amplitude forever. Returns immediately,
-     * you must call stop() to finish the running tone.
+     * you must call stop() to turn off the playing tone.
      * @param frequency the Hertz value for the tone to play.
      * @param amplitude the amplitude (loudness) of the tone, 0 - MAX_AMPLITUDE.
-     * @throws IllegalStateException when start() was called before, without stop().
+     * @throws IllegalStateException when start() without stop() was called before.
      */
     public synchronized void start(double frequency, int amplitude) {
         setPlayingAndEnsureJustOne(frequency, minDuration, amplitude);
@@ -174,7 +173,7 @@ public abstract class WaveGenerator
                 while (isPlaying()) {
                     writeToAudioLine(frequency, minDuration, amplitude, state, true);
                     amplitude = getAmplitude();
-                    frequency = getFrequency(); // was possible changed meanwhile
+                    frequency = getFrequency(); // was possibly changed meanwhile
                     state = state.next(frequency);
                 }
                 writeToAudioLine(frequency, minDuration, amplitude, State.END, true); // fade-out
@@ -195,7 +194,7 @@ public abstract class WaveGenerator
         }
         if (thread != null) {
             try {
-                thread.join();
+                thread.join(); // wait for thread termination
                 thread = null;
             }
             catch (InterruptedException e) {
@@ -235,7 +234,7 @@ public abstract class WaveGenerator
         getGainControl().setValue(gain);
     }
     private FloatControl getGainControl() {
-        return (FloatControl) audioLine.getControl(Type.MASTER_GAIN);
+        return (FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN);
     }
 
     /** Releases all resources. This generator can not be used any more afterwards. */

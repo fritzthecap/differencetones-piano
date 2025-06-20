@@ -53,8 +53,8 @@ public class SineWaveGeneratorDemo
       
       System.err.println("Playing 660 Hertz");
       time = System.currentTimeMillis();
-      sineWaveGenerator.play(660, duration / 2, volume);
-      System.err.println("Ended playing "+(duration / 2)+" millis after "+(System.currentTimeMillis() - time)+" millis");
+      sineWaveGenerator.play(660, 2 * duration, volume);
+      System.err.println("Ended playing "+(2 * duration)+" millis after "+(System.currentTimeMillis() - time)+" millis");
       
       System.err.println("Playing 880 Hertz");
       time = System.currentTimeMillis();
