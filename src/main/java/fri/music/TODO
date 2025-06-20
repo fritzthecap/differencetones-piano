@@ -1,4 +1,6 @@
 
+- Extend note language with parentheses, to let notes last beyond its bar.
+
 - Play a Tone array (written for MelodyFactory) visibly on any piano.
     Provide a text-area where the user can choose from prepared melodies
     or input a new melody. 
