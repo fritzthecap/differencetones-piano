@@ -2,6 +2,7 @@ package fri.music.player;
 
 import java.util.Objects;
 import fri.music.SoundChannel;
+import fri.music.ToneSystem;
 
 /**
  * Primitive notes player. 
@@ -24,7 +25,8 @@ public class Player
     }
     
     /**
-     * Plays given notes simultaneously for the duration of the longest note in array.
+     * Plays given notes simultaneously for the duration of the 
+     * longest note in array, which also could be a rest.
      * @param chord the array of notes to play.
      */
     public void playSimultaneously(Note[] chord) {
@@ -34,8 +36,12 @@ public class Player
                 if (chord[i].durationMilliseconds > millisToWait)
                     millisToWait = chord[i].durationMilliseconds;
         
+        if (millisToWait <= 0) // could happen on tied notes
+            return;
+        
         for (Note note : chord)
-            channel.noteOn(note.midiNumber, note.volume);
+            if (note.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
+                channel.noteOn(note.midiNumber, note.volume);
 
         try {
             Thread.sleep(millisToWait);
@@ -45,7 +51,8 @@ public class Player
         }
 
         for (Note note : chord)
-            channel.noteOff(note.midiNumber);
+            if (note.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
+                channel.noteOff(note.midiNumber);
     }
     
     /**

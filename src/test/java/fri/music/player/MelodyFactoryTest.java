@@ -22,10 +22,10 @@ class MelodyFactoryTest
         
         final MelodyFactory melodyFactory = new MelodyFactory(
                 toneSystem,
-                BEATS_PER_BAR,
-                BEAT_TYPE,
                 140, // BPM
-                null); // default volume
+                null, // default volume
+                BEATS_PER_BAR,
+                BEAT_TYPE);
         final Note[] melody = melodyFactory.translate(notes);
         
         assertNotNull(melody);
@@ -86,11 +86,18 @@ class MelodyFactoryTest
         final MelodyFactory melodyFactory = new MelodyFactory();
         final Note[] melody = melodyFactory.translate(notes);
         
+        // the first two quarter notes must be of same length as the two triplet notes
         assertEquals(
                 melody[0].durationMilliseconds + melody[1].durationMilliseconds,
                 melody[2].durationMilliseconds + melody[3].durationMilliseconds, 
                 1, // one millisecond comparison precision 
                 "Custom triplet should be of same duration as two quarter notes!");
+        // the first triplet note must be twice as long as the second
+        assertEquals(
+                melody[2].durationMilliseconds,
+                2 * melody[3].durationMilliseconds, 
+                1, // one millisecond comparison precision 
+                "First triplet note should be twice as long as second triplet note!");
     }
 
     @Test
@@ -130,7 +137,7 @@ class MelodyFactoryTest
             "G4/8,7", // septuplet is ambiguous and thus not supported
         };
         assertThrows(
-            IllegalArgumentException.class, 
+            IllegalStateException.class, 
             () -> new MelodyFactory().translate(notes)
         );
     }
@@ -141,7 +148,7 @@ class MelodyFactoryTest
             "G4", "A4", "B4", "D4" // don't need the "/4" suffix on quarter notes
         };
         
-        final MelodyFactory melodyFactory = new MelodyFactory(); // default BPM tempo
+        final MelodyFactory melodyFactory = new MelodyFactory();
         final Note[] melody = melodyFactory.translate(notes);
         
         for (int i = 0; i < melody.length; i++)
@@ -149,7 +156,7 @@ class MelodyFactoryTest
     }
 
     @Test
-    void differentTunings() {
+    void c3HasDifferentFrequenciesInToneSystems() {
         final String[] notes = new String[] { "C3" }; // do not use A4, because this has the same frequency in all tunings!
         
         final ToneSystem toneSystem1 = new EqualTemperament(); // EDO-12
@@ -161,5 +168,78 @@ class MelodyFactoryTest
         final Note[] melodyLimit5 = melodyFactory2.translate(notes);
         
         assertNotEquals(melodyEdo12[0].frequency, melodyLimit5[0].frequency);
+    }
+
+    @Test
+    void barMeterChangeShouldWork() {
+        final String[] notes = new String[] {
+            "4/4 ", // not a note but bar-meter change!
+            "A4", "B4", "C5", "B4", // 0, 1, 2, 3
+            " 3/4", // bar-meter change!
+            "C5", "D5", "E5", // 4, 5, 6
+            "4/4 ", // bar-meter change!
+            "F5", "G5", "A5", "G5", // 7, 8, 9, 10
+        };
+        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        final Note[] melody = melodyFactory.translate(notes);
+        
+        assertEquals(notes.length - 3, melody.length);
+        
+        assertTrue(melody[0].volume > melody[1].volume); // first note is loudest
+        assertTrue(melody[1].volume < melody[2].volume); // 4/4 half bar has a small accent
+        assertTrue(melody[0].volume > melody[2].volume); // but less than first note
+        assertTrue(melody[2].volume > melody[3].volume);
+        assertTrue(melody[3].volume == melody[1].volume); // notes with no accent must be equal
+        assertTrue(melody[3].volume < melody[4].volume);
+        
+        assertTrue(melody[4].volume > melody[5].volume); // first note is loudest
+        assertTrue(melody[5].volume == melody[6].volume); // no half bar in 3/4, thus no accent
+        assertTrue(melody[6].volume < melody[7].volume);
+        
+        assertTrue(melody[7].volume > melody[8].volume); // first note is loudest
+        assertTrue(melody[8].volume < melody[9].volume); // 4/4 half bar has a small accent
+        assertTrue(melody[9].volume > melody[10].volume);
+    }
+
+    @Test
+    void tiesAndSlursShouldWork() {
+        final String[] notes = new String[] {
+            "A4/8", "( B4/8", " (B4/4 ) ", "B4/8)", "C5",
+            "{ B4", " C5 ", " B4}", "A4"
+        };
+        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        final Note[] resultMelody = melodyFactory.translate(notes);
+        
+        assertEquals(notes.length, resultMelody.length);
+        
+        assertNull(resultMelody[0].slurred);
+        assertNull(resultMelody[0].tied);
+        
+        assertNull(resultMelody[1].slurred);
+        assertEquals(Boolean.TRUE, resultMelody[1].tied);
+        assertEquals(1000, resultMelody[1].durationMilliseconds); // 120 BPM gives 1000 millis per quarter note
+        
+        assertNull(resultMelody[2].slurred);
+        assertEquals(Boolean.TRUE, resultMelody[2].tied);
+        assertEquals(0, resultMelody[2].durationMilliseconds); // tied follower must have no duration
+        
+        assertNull(resultMelody[3].slurred);
+        assertEquals(Boolean.FALSE, resultMelody[3].tied);
+        assertEquals(0, resultMelody[3].durationMilliseconds); // tied follower must have no duration
+        
+        assertNull(resultMelody[4].slurred);
+        assertNull(resultMelody[4].tied);
+        
+        assertEquals(Boolean.TRUE, resultMelody[5].slurred);
+        assertNull(resultMelody[5].tied);
+        
+        assertEquals(Boolean.TRUE, resultMelody[6].slurred);
+        assertNull(resultMelody[6].tied);
+        
+        assertEquals(Boolean.FALSE, resultMelody[7].slurred);
+        assertNull(resultMelody[7].tied);
+        
+        assertNull(resultMelody[8].slurred);
+        assertNull(resultMelody[8].tied);
     }
 }

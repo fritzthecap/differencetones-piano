@@ -36,7 +36,14 @@ public class Tone implements Comparable<Tone>
         this.cent = cent;
         
         final String onlyDigits = ipnName.replaceAll("[^0-9\\-]", ""); // deletes all non-digits
-        this.ipnOctave = Integer.valueOf(onlyDigits.toString());
+        int octave;
+        try {
+            octave = Integer.valueOf(onlyDigits);
+        }
+        catch (NumberFormatException e) { // happens on REST_SYMBOL
+            octave = 0;
+        }
+        this.ipnOctave = octave;
     }
     
     public String ipnNameWithoutOctave() {

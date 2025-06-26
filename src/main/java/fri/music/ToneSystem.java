@@ -16,6 +16,9 @@ public interface ToneSystem
     String[] IPN_BASE_NAMES = new String[] 
             { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 
+    /** The symbol to be used for a rest. */
+    String REST_SYMBOL = "-";
+    
     /** Twelve-tone scales length. */
     int SEMITONES_PER_OCTAVE = IPN_BASE_NAMES.length;
     
