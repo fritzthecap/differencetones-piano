@@ -217,7 +217,10 @@ class MelodyFactoryTest
         
         assertNull(resultMelody[1].slurred);
         assertEquals(Boolean.TRUE, resultMelody[1].tied);
-        assertEquals(1000, resultMelody[1].durationMilliseconds); // 120 BPM gives 1000 millis per quarter note
+        assertEquals(
+            melodyFactory.beatDurationMilliseconds * 2, // one beat is a quarter not here
+            resultMelody[1].durationMilliseconds);
+            // first note in tie should have duration of two eighth and one quarter notes
         
         assertNull(resultMelody[2].slurred);
         assertEquals(Boolean.TRUE, resultMelody[2].tied);

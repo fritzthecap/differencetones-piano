@@ -52,7 +52,8 @@ public class MelodyFactory
     
     private final Tones toneSystem;
     private final Integer volume;
-    private final int beatDurationMilliseconds;
+    /** The duration in milliseconds of one beat. This stays the same even on bar-meter changes. */
+    public final int beatDurationMilliseconds;
     
     private Integer numberOfBeatsPerBar; // bar-meter, waltz (3) or foxtrot (4) or ...
     private Integer beatType; // eighth (8) or quarter (4) or ... notes in bar
