@@ -1,6 +1,8 @@
 
 - Extend note language with parentheses, to let notes last beyond its bar.
 
+- Give DifferenceTonePiano an initial interval to play.
+
 - Play a Tone array (written for MelodyFactory) visibly on any piano.
     Provide a text-area where the user can choose from prepared melodies
     or input a new melody. 
@@ -21,8 +23,11 @@
     buttons provide insights:
     "Hear Difference Tones" (FrequencyDifferenceSliders), 
     "See Difference Tones" (DifferenceTonePiano), 
-    "Explore Beatings in Tunings" (TriadPlayingPiano),
-    "Look at Pianos" (PianoConfiguration), 
+    "Explore Beatings: Hear Intervals in Different Tunings" (IntervalPlayingPiano, TriadPlayingPiano),
+    "See Difference Tones on Piano" (DifferenceTonePiano), 
+    "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" (EqualTemperamentDemo, JustIntonationDemo, ...), 
     "Check Just Intonation" (JustIntonationChecker), 
     "Translate a Melody into Difference Tones" (DifferenceToneInversions, Composer)
+    "Look at Pianos" (PianoConfiguration), 
+    "Try out Wave Generators" (WavePianoDemo, PianoConfiguration), 
 
