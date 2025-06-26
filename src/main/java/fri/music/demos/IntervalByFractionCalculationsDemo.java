@@ -3,7 +3,7 @@ package fri.music.demos;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-public class IntervalCalculationsDemo
+public class IntervalByFractionCalculationsDemo
 {
     public static void main(String[] args) {
         System.out.println("======= Pythagorean Comma");

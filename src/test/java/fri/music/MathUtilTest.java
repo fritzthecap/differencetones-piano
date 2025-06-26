@@ -120,4 +120,23 @@ class MathUtilTest
         assertEquals(8, fraction.dividend.intValue());
         assertEquals(5, fraction.divisor.intValue());
     }
+    
+    @Test
+    void goldenRatio() {
+        final double goldenRatio = (Math.sqrt(5.0) + 1.0) / 2.0;
+        final long[] fraction1 = MathUtils.toFraction(goldenRatio);
+        System.out.println("Golden Ratio: "+fraction1[0]+"/"+fraction1[1]+" = "+goldenRatio);
+        
+        assertEquals(1.6180339887498948, goldenRatio);
+        assertEquals(377, fraction1[0]);
+        assertEquals(233, fraction1[1]);
+        
+        final double goldenRatioInversion = (1.0 / goldenRatio);
+        final long[] fraction2 = MathUtils.toFraction(goldenRatioInversion);
+        System.out.println("Its inverse:  "+fraction2[0]+"/"+fraction2[1]+" = "+goldenRatioInversion);
+        
+        assertEquals(0.6180339887498948, goldenRatioInversion);
+        assertEquals(144, fraction2[0]);
+        assertEquals(233, fraction2[1]);
+    }
 }
