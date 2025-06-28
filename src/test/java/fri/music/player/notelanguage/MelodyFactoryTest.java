@@ -1,10 +1,11 @@
-package fri.music.player;
+package fri.music.player.notelanguage;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
+import fri.music.player.Note;
 
 class MelodyFactoryTest
 {
@@ -204,10 +205,12 @@ class MelodyFactoryTest
     @Test
     void tiesAndSlursShouldWork() {
         final String[] notes = new String[] {
-            "A4/8", "( B4/8", " (B4/4 ) ", "B4/8)", "C5",
+            "A4/8", "( B4/8", " (B4/4 ) ", "B4/8)", "C5/4.",
             "{ B4", " C5 ", " B4}", "A4"
         };
-        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        final MelodyFactory melodyFactory = new MelodyFactory(120); // 120 BPM
+        assertEquals(500, melodyFactory.beatDurationMilliseconds);
+        
         final Note[] resultMelody = melodyFactory.translate(notes);
         
         assertEquals(notes.length, resultMelody.length);
@@ -218,9 +221,12 @@ class MelodyFactoryTest
         assertNull(resultMelody[1].slurred);
         assertEquals(Boolean.TRUE, resultMelody[1].tied);
         assertEquals(
-            melodyFactory.beatDurationMilliseconds * 2, // one beat is a quarter not here
+            melodyFactory.beatDurationMilliseconds * 2, // one beat is a quarter note here
             resultMelody[1].durationMilliseconds);
             // first note in tie should have duration of two eighth and one quarter notes
+        assertEquals(
+                1000, // a quarter note on 120 BPM is 1000 millis
+                resultMelody[1].durationMilliseconds);
         
         assertNull(resultMelody[2].slurred);
         assertEquals(Boolean.TRUE, resultMelody[2].tied);
@@ -244,5 +250,46 @@ class MelodyFactoryTest
         
         assertNull(resultMelody[8].slurred);
         assertNull(resultMelody[8].tied);
+    }
+
+    @Test
+    void notesWithinTiesNeedNotBeTied() {
+        final String[] notes = new String[] {
+            "A4/8", "( B4/8", "B4/4", "B4/8)", "C5/4.",
+        };
+        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        
+        final Note[] resultMelody = melodyFactory.translate(notes);
+        
+        assertNull(resultMelody[0].tied);
+        assertEquals(Boolean.TRUE, resultMelody[1].tied);
+        assertEquals(Boolean.TRUE, resultMelody[2].tied);
+        assertEquals(Boolean.FALSE, resultMelody[3].tied);
+        assertNull(resultMelody[4].tied);
+    }
+
+    @Test
+    void nestedTiesAndSlursShouldWork() {
+        final String[] notes = new String[] {
+            "{ A4/8", "( B4/8", " (B4/4 ) ", "B4/8)", "C5/4.}",
+        };
+        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        
+        final Note[] resultMelody = melodyFactory.translate(notes);
+        
+        assertNull(resultMelody[0].tied);
+        assertEquals(Boolean.TRUE, resultMelody[0].slurred);
+        
+        assertEquals(Boolean.TRUE, resultMelody[1].tied);
+        assertEquals(Boolean.TRUE, resultMelody[1].slurred);
+        
+        assertEquals(Boolean.TRUE, resultMelody[2].tied);
+        assertEquals(Boolean.TRUE, resultMelody[2].slurred);
+        
+        assertEquals(Boolean.FALSE, resultMelody[3].tied);
+        assertEquals(Boolean.TRUE, resultMelody[3].slurred);
+        
+        assertNull(resultMelody[4].tied);
+        assertEquals(Boolean.FALSE, resultMelody[4].slurred);
     }
 }

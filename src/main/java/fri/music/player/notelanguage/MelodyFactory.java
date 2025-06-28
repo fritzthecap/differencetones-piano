@@ -1,9 +1,10 @@
-package fri.music.player;
+package fri.music.player.notelanguage;
 
 import java.util.ArrayList;
 import java.util.List;
 import fri.music.ToneSystem;
 import fri.music.Tones;
+import fri.music.player.Note;
 
 /**
  * Reads in a number of notes with length, headed by time-signature and tempo, 
@@ -20,12 +21,14 @@ import fri.music.Tones;
  * and there is no German "H", such is written as "B".
  * <p/>
  * Notes connected by "tie" are notes of same pitch that are played as single note, even across several bars.
- * Ties are started by "(" and ended by ")", notes in between the start and end note MUST be enclosed in "(...)".
- * No space must be between "(" or ")" and note.
+ * Ties are started by "(" and ended by ")", notes in between the start and end note SHOULD be enclosed in
+ * parentheses, because this is how it would look like in written notes.
+ * Space between parentheses and note is allowed.
  * <p/>
  * Notes connected by "slur" are notes of different pitch that are phrased together, even across several bars.
- * Slurs are started by "{" and ended by "}", notes in between MUST NOT be enclosed in "{...}".
- * No space must be between "{" or "}" and note.
+ * Slurs are started by "{" and ended by "}", notes in between MUST NOT be enclosed in "{...}",
+ * because it is not clear how to phrase several notes that are all slurred together.
+ * Space between braces and note is allowed.
  */
 public class MelodyFactory
 {
@@ -40,15 +43,6 @@ public class MelodyFactory
     private static final String DOTTED_SYMBOL = ".";
     /** The separator character for triplet and other multiplet numbers. */
     private static final char MULTIPLET_SEPARATOR = ',';
-    
-    /** The character used to start a tie. */
-    private static final String TIE_START_SYMBOL = "(";
-    /** The character used to end a tie. */
-    private static final String TIE_END_SYMBOL = ")";
-    /** The character used to start a slur. */
-    private static final String SLUR_START_SYMBOL = "{";
-    /** The character used to end a slur. */
-    private static final String SLUR_END_SYMBOL = "}";
     
     private final Tones toneSystem;
     private final Integer volume;
@@ -66,6 +60,11 @@ public class MelodyFactory
     /** Factory with given tone-system and default settings. */
     public MelodyFactory(ToneSystem toneSystem) {
         this(toneSystem, null, null, null, null);
+    }
+    
+    /** Factory with given BPM (beats per minute) tempo. */
+    public MelodyFactory(Integer numberOfBeatsPerMinute) {
+        this(null, numberOfBeatsPerMinute, null, null, null);
     }
     
     /**
@@ -94,192 +93,87 @@ public class MelodyFactory
     }
     
     /**
-     * Main method. Translates given string-inputs to a playable melody.
+     * Translates given text to a playable melody. See <code>translate(String[])</code> for docs.
+     * @param text contains the notes of the melody, including ties and bar-meter changes.
+     */
+    public Note[] translate(String text) {
+        return translate(new InputTextScanner().toStringArray(text));
+    }
+    
+    /**
+     * Translates given strings to a playable melody.
      * If a note has no "/" with subsequent length, it will be regarded as quarter-note.
-     * @param melodyTokens the sequence of IPN-notes with length to scan, e.g. "C4/4", "D4/8", "B3/8",
-     *      also possibly containing bar-meter changes like "3/4" or "6/8" that come without a note behind the slash,
+     * @param melodyTokens the sequence of IPN-notes with length, e.g. "C4/4", "D4/8", "B3/8",
+     *      also possibly containing bar-meter changes like "3/4" or "6/8",
      *      also possibly containing parentheses that lengthen notes, like "(C5/8", "(C5/4)", "C5/8)".
      *      Spaces generally should not matter, but parentheses may not arrive without a note.
-     * @return a sequence of <code>Note</code> Java-objects representing <code>notesWithLengths</code>.
+     * @return a sequence of <code>Note</code> objects representing <code>melodyTokens</code>.
      */
     public Note[] translate(String[] melodyTokens) {
-        final List<MelodyNote> melodyNotes = new ArrayList<>(melodyTokens.length);
-        final List<Note> notes = new ArrayList<>(melodyTokens.length);
-        buildNotes(melodyTokens, melodyNotes, notes);
+        final List<MelodyToken> melodyNotes = new ArrayList<>(melodyTokens.length);
         
-        final List<Note> tiedAndSlurredNotes = connectSlurredAndTiedNotes(melodyNotes, notes);
+        final List<Note> rawNotes = buildNotes(melodyTokens, melodyNotes);
         
-        return tiedAndSlurredNotes.toArray(new Note[tiedAndSlurredNotes.size()]);
+        final List<Note> connectedNotes = connectSlurredAndTiedNotes(melodyNotes, rawNotes);
+        
+        return connectedNotes.toArray(new Note[connectedNotes.size()]);
     }
 
-    private void buildNotes(String[] melodyTokens, List<MelodyNote> melodyNotes, List<Note> notes) {
+    private List<Note> buildNotes(String[] melodyTokens, List<MelodyToken> melodyNotes) {
+        final List<Note> notes = new ArrayList<>(melodyTokens.length);
         BarState barState = new BarState(numberOfBeatsPerBar, beatDurationMilliseconds);
         
         for (int i = 0; i < melodyTokens.length; i++) {
-            final MelodyToken melodyToken = newMelodyToken(melodyTokens[i].trim());
+            final InputToken melodyToken = newInputToken(melodyTokens[i].trim());
             
-            if (melodyToken instanceof BarMeterChange) {
-                final BarMeterChange barMeterChange = (BarMeterChange) melodyToken;
+            if (melodyToken instanceof BarMeterToken) {
+                final BarMeterToken barMeterChange = (BarMeterToken) melodyToken;
                 this.numberOfBeatsPerBar = barMeterChange.numberOfBeatsPerBar;
                 this.beatType = barMeterChange.beatType;
                 
                 barState = new BarState(barMeterChange.numberOfBeatsPerBar, beatDurationMilliseconds);
             }
             else {
-                final MelodyNote melodyNote = (MelodyNote) melodyToken;
+                final MelodyToken melodyNote = (MelodyToken) melodyToken;
                 melodyNotes.add(melodyNote);
                 
                 final Note note = buildNote(melodyNote, barState);
                 notes.add(note);
             }
         }
+        return notes;
     }
 
-    
-    /** Helper that tracks the millisecond position in bar. */
-    private static class BarState
-    {
-        private final int barDurationMilliseconds;
-        private final int barDurationMillisecondsHalf;
-        private final boolean isBarHalvable;
-        
-        private int currentMillis = 0;
-        
-        BarState(int numberOfBeatsPerBar, int beatDurationMilliseconds) {
-            this.barDurationMilliseconds = (numberOfBeatsPerBar * beatDurationMilliseconds);
-            this.barDurationMillisecondsHalf = (int) Math.round((double) barDurationMilliseconds / 2.0);
-            this.isBarHalvable = 
-                    numberOfBeatsPerBar % 2 == 0 && // must be divisible by 2
-                    numberOfBeatsPerBar % 3 != 0 &&
-                    numberOfBeatsPerBar % 5 != 0 &&
-                    numberOfBeatsPerBar % 7 != 0 &&
-                    numberOfBeatsPerBar % 11 != 0;
-                    // do not accept  6/8, 10/8, 12/8, 18/8, 20/8, ... 
-                    // you never know how they are sub-divided, thus there could be a wrong accentuation
-        }
-        
-        /** Adds a note to the current bar. */
-        public void add(int durationMilliseconds) {
-            currentMillis += durationMilliseconds;
-            
-            if (touches(currentMillis, barDurationMilliseconds))
-                currentMillis = 0;
-        }
-        
-        public boolean isBarStart() {
-            return currentMillis == 0;
-        }
-        
-        public boolean isBarHalf() {
-            return isBarHalvable && // can be reliably divided into 2 parts
-                    matches(currentMillis, barDurationMillisecondsHalf);
-        }
-
-        private boolean touches(int currentMillis, int limit) {
-            return currentMillis > limit ||
-                    matches(currentMillis, limit);
-        }
-    
-        private boolean matches(int currentMillis, int limit) {
-            return currentMillis == limit ||
-                    currentMillis == limit - 1 ||
-                    currentMillis == limit + 1;
-        }
-    }
-    
-
-    private MelodyToken newMelodyToken(String melodyToken) {
+    private InputToken newInputToken(String melodyToken) {
         final NoteConnections noteConnections = new NoteConnections(melodyToken.trim());
         
-        final MelodyNote noteAndLength = splitNoteAndLength(noteConnections.melodyToken);
+        final MelodyToken noteAndLength = splitNoteAndLength(noteConnections.melodyToken);
         
         // when noteName is a number, this is a bar-meter change
-        final Integer numberOfBeatsPerBar = toInteger(noteAndLength.ipnName);
+        final Integer numberOfBeatsPerBar = toIntegerOrNull(noteAndLength.ipnName);
         if (numberOfBeatsPerBar != null) {
             // the beat-type must also be a number, else error
-            final Integer beatType = toInteger(noteAndLength.length);
+            final Integer beatType = toIntegerOrNull(noteAndLength.length);
             if (beatType != null)
-                return new BarMeterChange(numberOfBeatsPerBar, beatType);
+                return new BarMeterToken(numberOfBeatsPerBar, beatType);
             
             throw new IllegalArgumentException("Invalid token, not a note, not a bar-meter: "+melodyToken);
         }
         
-        return new MelodyNote(noteAndLength.ipnName, noteAndLength.length, noteConnections);
+        return new MelodyToken(noteAndLength.ipnName, noteAndLength.length, noteConnections);
+    }
+    
+    private Integer toIntegerOrNull(final String string) {
+        try {
+            return Integer.valueOf(string);
+        }
+        catch (NumberFormatException e) { // is legal here
+            return null;
+        }
     }
     
     
-    /**
-     * Symbols around notes like ties "(A4 (B4) C5)" or slurs "{A4 B4 C5}".
-     * A slur is for 2-n notes of different pitch. A tie is for 2-n notes
-     * with same pitch, but the parentheses must be repeated on any note within.
-     * Slurs and ties can be combined, but slur must be the outer symbol, like "{(A4".
-     */
-    private static class NoteConnections
-    {
-        private static class NoteConnection
-        {
-            public final boolean exists;
-            public final String editedToken;
-            
-            NoteConnection(String melodyToken, String symbolToDetect) {
-                final String removeResult = removeSymbolFromStartOrEnd(melodyToken, symbolToDetect);
-                
-                this.exists = (melodyToken != removeResult); // pointer comparison
-                this.editedToken = removeResult.trim();
-            }
-            
-            private String removeSymbolFromStartOrEnd(String melodyToken, String symbolToRemove) {
-                final int index = melodyToken.indexOf(symbolToRemove);
-                if (index < 0)
-                    return melodyToken;
-                
-                if (index != 0 && index != melodyToken.length() - 1)
-                    throw new IllegalArgumentException("Invalid position of "+symbolToRemove+" in "+melodyToken);
-                
-                return melodyToken.substring(0, index) + 
-                        melodyToken.substring(index + symbolToRemove.length());
-            }
-        }
-        
-        /** The processed token, containing no tie or slur symbols any more. */
-        public final String melodyToken;
-        
-        private final boolean slurStart;
-        private final boolean slurEnd;
-        private final boolean tieStart;
-        private final boolean tieEnd;
-        
-        NoteConnections(String melodyToken) {
-            NoteConnection noteConnection;
-            noteConnection = new NoteConnection(melodyToken, SLUR_START_SYMBOL);
-            this.slurStart = noteConnection.exists;
-            noteConnection = new NoteConnection(noteConnection.editedToken, SLUR_END_SYMBOL);
-            this.slurEnd = noteConnection.exists;
-            noteConnection = new NoteConnection(noteConnection.editedToken, TIE_START_SYMBOL);
-            this.tieStart = noteConnection.exists;
-            noteConnection = new NoteConnection(noteConnection.editedToken, TIE_END_SYMBOL);
-            this.tieEnd = noteConnection.exists;
-            
-            this.melodyToken = noteConnection.editedToken; // text without symbols
-        }
-        
-        public boolean isSlurStart() {
-            return slurStart == true && slurEnd == false;
-        }
-        public boolean isSlurEnd() {
-            return slurStart == false && slurEnd == true;
-        }
-        
-        public boolean isTieStart() {
-            return tieStart == true && tieEnd == false;
-        }
-        public boolean isTieEnd() {
-            return tieStart == false && tieEnd == true;
-        }
-    }
-
-    
-    private MelodyNote splitNoteAndLength(String melodyToken) {
+    private MelodyToken splitNoteAndLength(String melodyToken) {
         final int durationStartIndex = melodyToken.indexOf(DURATION_SEPARATOR);
         
         final String noteName = ((durationStartIndex > 0)
@@ -299,33 +193,24 @@ public class MelodyFactory
             noteLength = DEFAULT_NOTE_LENGTH;
         }
         
-        return new MelodyNote(noteName, noteLength, null);
+        return new MelodyToken(noteName, noteLength, null);
     }
 
-    private Integer toInteger(final String string) {
-        try {
-            return Integer.valueOf(string);
-        }
-        catch (NumberFormatException e) { // is legal here
-            return null;
-        }
-    }
     
-    
-    /** Marker interface. */
-    private interface MelodyToken
+    /** Marker interface for one note input unit. */
+    private interface InputToken
     {
     }
     
     /** Normal melody note. */
-    private static class MelodyNote implements MelodyToken
+    private static class MelodyToken implements InputToken
     {
         public final String ipnName;
         public final String length;
         public final NoteConnections noteConnections;
 
         /** Note constructor. */
-        MelodyNote(String ipnName, String length, NoteConnections noteConnections) {
+        MelodyToken(String ipnName, String length, NoteConnections noteConnections) {
             this.ipnName = ipnName;
             this.length = length;
             this.noteConnections = noteConnections;
@@ -333,21 +218,21 @@ public class MelodyFactory
     }
     
     /** Bar-meter change, e.g. going from 3/3 to 4/4 bar during tune. */
-    private static class BarMeterChange implements MelodyToken
+    private static class BarMeterToken implements InputToken
     {
         public final Integer numberOfBeatsPerBar;
         public final Integer beatType;
 
         /** Note constructor. */
-        BarMeterChange(Integer numberOfBeatsPerBar, Integer beatType) {
+        BarMeterToken(Integer numberOfBeatsPerBar, Integer beatType) {
             this.numberOfBeatsPerBar = numberOfBeatsPerBar;
             this.beatType = beatType;
         }
     }
     
     
-    private Note buildNote(MelodyNote melodyNote, BarState barState) {
-        final int duration = durationMilliseconds(melodyNote.length);
+    private Note buildNote(MelodyToken melodyToken, BarState barState) {
+        final int duration = durationMilliseconds(melodyToken.length);
         
         final double volumeFactor = getVolumeFactor(barState);
         final int volumeInBar = (int) Math.round(volumeFactor * (double) volume);
@@ -358,7 +243,7 @@ public class MelodyFactory
 
         return new Note(
                 toneSystem,
-                melodyNote.ipnName, 
+                melodyToken.ipnName, 
                 duration,
                 volumeInBar,
                 emphasized,
@@ -379,7 +264,7 @@ public class MelodyFactory
         if (multipletType != null)
             noteLengthString = noteLengthString.substring(0, multipletSeparatorIndex);
         
-        final Integer length = toInteger(noteLengthString);
+        final Integer length = toIntegerOrNull(noteLengthString);
         if (length == null)
             throw new IllegalArgumentException("Note length is not a number: "+noteLength);
         
@@ -391,7 +276,7 @@ public class MelodyFactory
             return null;
         
         final String multipletString = noteLengthString.substring(multipletSeparatorIndex + 1);
-        Integer multipletType = toInteger(multipletString);
+        Integer multipletType = toIntegerOrNull(multipletString);
         if (multipletType == null)
             throw new IllegalArgumentException("Multiplet type is not a number: "+noteLengthString);
         
@@ -465,14 +350,13 @@ public class MelodyFactory
     }
     
     
-    private List<Note> connectSlurredAndTiedNotes(List<MelodyNote> melodyNotes, List<Note> notes) {
-        final List<Note> tiedAndSluredMelody = new ArrayList<>(melodyNotes.size());
-        
+    private List<Note> connectSlurredAndTiedNotes(List<MelodyToken> melodyTokens, List<Note> rawNotes) {
+        final List<Note> connectedNotes = new ArrayList<>(melodyTokens.size());
         boolean inTie = false;
         boolean inSlur = false;
-        for (int i = 0; i < melodyNotes.size(); i++) {
-            final MelodyNote melodyNote = melodyNotes.get(i);
-            final Note note = notes.get(i);
+        for (int i = 0; i < melodyTokens.size(); i++) {
+            final MelodyToken melodyNote = melodyTokens.get(i);
+            final Note rawNote = rawNotes.get(i);
             
             final boolean slurStart = (inSlur == false && melodyNote.noteConnections.isSlurStart());
             final boolean slurEnd   = (inSlur == true  && melodyNote.noteConnections.isSlurEnd());
@@ -484,31 +368,31 @@ public class MelodyFactory
             
             final int durationMilliseconds;
             if (tieStart)
-                durationMilliseconds = sumTiedDurations(notes, i, melodyNotes);
+                durationMilliseconds = sumTiedDurations(rawNotes, i, melodyTokens);
             else if (inTie) // durations have been moved to note where tie starts
                 durationMilliseconds = 0;
             else // not in tie
-                durationMilliseconds = note.durationMilliseconds;
+                durationMilliseconds = rawNote.durationMilliseconds;
             
-            final Note tiedAndSlurredNote = new Note(note, durationMilliseconds, slurred, tied);
-            tiedAndSluredMelody.add(tiedAndSlurredNote);
+            final Note tiedAndSlurredNote = new Note(rawNote, durationMilliseconds, slurred, tied);
+            connectedNotes.add(tiedAndSlurredNote);
             
             inSlur = slurStart ? true : slurEnd ? false : inSlur;
             inTie = tieStart ? true : tieEnd ? false : inTie;
         }
-        return tiedAndSluredMelody;
+        return connectedNotes;
     }
     
-    private int sumTiedDurations(List<Note> notes, int fromIndex, List<MelodyNote> melodyNotes) {
+    private int sumTiedDurations(List<Note> rawNotes, int fromIndex, List<MelodyToken> melodyTokens) {
         int duration = 0;
         int i = fromIndex;
         NoteConnections connections;
         do {
-            connections = melodyNotes.get(i).noteConnections;
-            duration += notes.get(i).durationMilliseconds;
+            connections = melodyTokens.get(i).noteConnections;
+            duration += rawNotes.get(i).durationMilliseconds;
             i++;
         }
-        while (i < notes.size() && connections.isTieEnd() == false);
+        while (i < rawNotes.size() && connections.isTieEnd() == false);
         return duration;
     }
 }
