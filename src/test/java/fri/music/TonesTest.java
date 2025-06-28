@@ -5,9 +5,10 @@ import org.junit.jupiter.api.Test;
 
 class TonesTest
 {
+    private final Tones tones = new Tones(new EqualTemperament().tones());
+    
     @Test
     void indexOf() {
-        final Tones tones = new Tones(new EqualTemperament().tones());
         final String TEST_TONE = "C4";
         final int indexOfC4 = tones.indexOf(TEST_TONE);
         assertEquals(48, indexOfC4);
@@ -15,8 +16,13 @@ class TonesTest
     }
     
     @Test
+    void upperCaseNamesSucceedLowerCaseNamesFail() {
+        assertNotNull(tones.forIpnName("G5"));
+        assertNull(tones.forIpnName("g5"));
+    }
+    
+    @Test
     void getEnclosingTones() {
-        final Tones tones = new Tones(new EqualTemperament().tones());
         Tone[] enclosingTones;
 
         enclosingTones = tones.getEnclosingTones(ToneSystem.DEFAULT_REFERENCE_FREQUENCY);
@@ -39,7 +45,6 @@ class TonesTest
     
     @Test
     void getEnclosingTonesWhenFrequencyOutOfRange() {
-        final Tones tones = new Tones(new EqualTemperament().tones());
         Tone[] enclosingTones;
 
         enclosingTones = tones.getEnclosingTones(tones.getHighest().frequency + 4.0);
