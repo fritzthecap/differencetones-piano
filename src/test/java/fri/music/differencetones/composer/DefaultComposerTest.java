@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import fri.music.*;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceTones;
-import fri.music.player.MelodyFactory;
 import fri.music.player.Note;
 import fri.music.player.Player;
+import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.wavegenerator.SineWaveSoundChannel;
 
 class DefaultComposerTest
