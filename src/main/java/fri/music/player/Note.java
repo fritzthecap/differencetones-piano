@@ -5,7 +5,10 @@ import fri.music.ToneSystem;
 import fri.music.Tones;
 
 /**
- * A tone from a tuning (tone-system), with duration and volume.
+ * A note is a written tone.
+ * It has a frequency from a tuning (tone-system), duration and volume.
+ * If a note is the first in its bar, it will be emphasized,
+ * i.e. its volume will be louder than all subsequent notes in same bar.
  */
 public class Note extends Tone
 {

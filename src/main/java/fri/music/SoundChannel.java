@@ -23,7 +23,7 @@ public interface SoundChannel
     void noteOff(int midiNoteNumber);
 
     /**
-     * Loudness change.
+     * Loudness change (while a tone is sounding).
      * @param volume the new 0-127 value.
      */
     void volumeChange(int volume);

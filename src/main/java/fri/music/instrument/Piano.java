@@ -52,6 +52,7 @@ public class Piano
          *      The lowest tone also determines the scale (mode) that is shown by the piano.
          *      When being e.g. "E3", there will be a PHRYGIAN keyboard with E as the leftmost key.
          * @param isVertical true for a flipped bottom-to-top piano, null or false for default horizontal orientation.
+         *      Mind that setting this to true will break layout in pianos with lots of controls.
          * @param blackKeyWidthPixels width of a black key, all others will be proportional to this, default is 16.
          */
         public Configuration(int octaves, String lowestToneIpnName, Boolean isVertical, int blackKeyWidthPixels, Boolean colouredOctaves) {

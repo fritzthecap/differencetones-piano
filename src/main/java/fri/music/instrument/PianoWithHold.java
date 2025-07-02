@@ -27,6 +27,7 @@ public class PianoWithHold extends PianoWithVolume
         super(config, channel);
     }
     
+    /** @return the piano panel and all controls. */
     @Override
     public JComponent getKeyboard() {
         if (this.pianoPanel != null)
