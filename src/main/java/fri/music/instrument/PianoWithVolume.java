@@ -39,6 +39,7 @@ public class PianoWithVolume extends PianoWithSound
         super(config, channel);
     }
     
+    /** @return the piano panel and all controls like On/Off switch, volume, velocity (for MIDI-channel only). */
     @Override
     public JComponent getKeyboard() {
         if (this.pianoPanel != null)
@@ -117,21 +118,23 @@ public class PianoWithVolume extends PianoWithSound
         final JComponent keyboardPanel = super.getKeyboard();
         
         final JPanel pianoPanel = new JPanel(new BorderLayout());
-        pianoPanel.add(keyboardPanel, BorderLayout.CENTER);
-        pianoPanel.add(controlPanel, config.isVertical ? BorderLayout.WEST : BorderLayout.NORTH);
+        pianoPanel.add(keyboardPanel, getPianoPanelBorderLayoutConstraint());
+        pianoPanel.add(controlPanel, getControlPanelBorderLayoutConstraint());
         
         return this.pianoPanel = pianoPanel;
     }
     
-    /** I want controls to be below keyboard keys, due to drop-downs obscuring keyboard. */
-    protected final void moveControlPanelBelowKeyboard() {
-        final Container controlPanel = getControlPanel();
-        final Container parent = getControlPanel().getParent();
-        parent.remove(controlPanel);
-        parent.add(controlPanel, config.isVertical ? BorderLayout.EAST : BorderLayout.SOUTH);
+    /** Locates the piano-panel to CENTER. To be overridden. */
+    protected String getPianoPanelBorderLayoutConstraint() {
+        return BorderLayout.CENTER;
     }
     
-    /** @return the control panel where volume slider is in. */
+    /** Locates the control-panel NORTH (horizontal piano) or WEST (vertical piano) of keyboard. To be overridden. */
+    protected String getControlPanelBorderLayoutConstraint() {
+        return config.isVertical ? BorderLayout.WEST : BorderLayout.NORTH;
+    }
+    
+    /** @return the control panel (BoxLayout) where On/Off switch and volume slider is in. */
     protected Container getControlPanel() {
         return controlPanel;
     }

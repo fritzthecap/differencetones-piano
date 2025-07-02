@@ -10,18 +10,43 @@ import fri.music.ToneSystem;
  */
 public class Player
 {
-    private final SoundChannel channel;
+    private final SoundChannel soundChannel;
+    private boolean stopped; // = false by default
     
-    public Player(SoundChannel waveSoundChannel) {
-        this.channel = Objects.requireNonNull(waveSoundChannel);
+    public Player(SoundChannel soundChannel) {
+        this.soundChannel = Objects.requireNonNull(soundChannel);
     }
 
     /**
      * Plays given note.
      * @param note the tone to play, e.g. "C#4" for a c# in 4th octave.
      */
-    public void play(Note note) {
+    public /*synchronized*/ void play(Note note) {
         playSimultaneously(new Note[] { note });
+    }
+    
+    /**
+     * Plays given notes after each other.
+     * @param notes the notes to play in a row.
+     */
+    public /*synchronized*/ void playInRow(Note[] notes) {
+        for (Note note : notes)
+            if (stopped)
+                return;
+            else
+                play(note);
+    }
+    
+    /**
+     * Plays given intervals (or chords, or single notes) after each other.
+     * @param notes the notes to play in a row.
+     */
+    public /*synchronized*/ void playInRow(Note[][] notes) {
+        for (Note[] chord : notes)
+            if (stopped)
+                return;
+            else
+                playSimultaneously(chord);
     }
     
     /**
@@ -29,19 +54,17 @@ public class Player
      * longest note in array, which also could be a rest.
      * @param chord the array of notes to play.
      */
-    public void playSimultaneously(Note[] chord) {
+    public /*synchronized*/ void playSimultaneously(Note[] chord) {
         long millisToWait = chord[0].durationMilliseconds;
         if (chord.length > 1)
             for (int i = 1; i < chord.length; i++)
                 if (chord[i].durationMilliseconds > millisToWait)
                     millisToWait = chord[i].durationMilliseconds;
         
-        if (millisToWait <= 0) // could happen on tied notes
+        if (stopped || millisToWait <= 0) // could happen on tied notes
             return;
         
-        for (Note note : chord)
-            if (note.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
-                channel.noteOn(note.midiNumber, note.volume);
+        turnNotesOnOrOff(chord, true);
 
         try {
             Thread.sleep(millisToWait);
@@ -50,33 +73,30 @@ public class Player
             throw new RuntimeException(e);
         }
 
-        for (Note note : chord)
-            if (note.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
-                channel.noteOff(note.midiNumber);
+        turnNotesOnOrOff(chord, false);
     }
-    
-    /**
-     * Plays given notes after each other.
-     * @param notes the notes to play in a row.
-     */
-    public void playInRow(Note[] notes) {
-        for (Note note : notes)
-            play(note);
-    }
-    
-    /**
-     * Plays given intervals (or chords, or single notes) after each other.
-     * @param notes the notes to play in a row.
-     */
-    public void playInRow(Note[][] notes) {
-        for (Note[] chord : notes)
-            playSimultaneously(chord);
+
+    /** Stops any note playing. */
+    public /*synchronized*/ void stop() {
+        stopped = true;
     }
     
     /**
      * You MUST release system resources when not needed any more!
+     * Stops any playing notes. The player is not usable any more after this call.
      */
-    public void close() {
-        channel.allNotesOff();
+    public /*synchronized*/ void close() {
+        stop();
+        soundChannel.allNotesOff();
+    }
+
+
+    private void turnNotesOnOrOff(Note[] chord, boolean on) {
+        for (Note note : chord)
+            if (note.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
+                if (on)
+                    soundChannel.noteOn(note.midiNumber, note.volume);
+                else
+                    soundChannel.noteOff(note.midiNumber);
     }
 }

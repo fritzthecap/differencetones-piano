@@ -19,7 +19,7 @@ public class PlayerDemo
         final Tones tones = new Tones(tonesArray);
         final Player player = new Player(new SineWaveSoundChannel(tonesArray));
         if (args.length <= 0) { // no arguments were given on command line
-            final Note[][] chords = new Note[][] {
+            final Note[][] chords = new Note[][] { // "Oh du lieber Augustin"
                 new Note[] { new Note(tones, "G4", 600), new Note(tones, "E4", 600) },
                 new Note[] { new Note(tones, "A4", 200) },
                 new Note[] { new Note(tones, "G4", 200) },

@@ -85,11 +85,14 @@ public class IntervalPlayingPiano extends PianoWithHold
         final TuningComponent tuningComponent = newTuningComponent();
         getControlPanel().add(tuningComponent.getTuningChoice(null), 3);
         
-        moveControlPanelBelowKeyboard();
-        
         return this.pianoPanel = pianoPanel;
     }
 
+    @Override
+    protected String getControlPanelBorderLayoutConstraint() {
+        return config.isVertical ? BorderLayout.EAST : BorderLayout.SOUTH;
+    }
+    
     protected TuningComponent newTuningComponent() {
         return new TuningComponent(config.lowestToneIpnName, config.octaves, (WaveSoundChannel) getSoundChannel());
     }

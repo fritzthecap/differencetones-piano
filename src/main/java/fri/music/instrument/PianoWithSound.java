@@ -100,6 +100,8 @@ public class PianoWithSound extends Piano
             public final String ipnName;
             public final boolean isWhite;
             
+            private boolean ignoreMouse; // is false by default
+            
             public Key(boolean isWhite, int indexInWhiteOrBlackKeys) {
                 super(isWhite, indexInWhiteOrBlackKeys);
                 
@@ -117,6 +119,16 @@ public class PianoWithSound extends Piano
                 
                 if (config().showMidiNumberAsTooltip)
                     setToolTipText(""+midiNoteNumber);
+            }
+            
+            public void setIgnoreMouse(boolean ignore) {
+                this.ignoreMouse = ignore;
+            }
+            
+            @Override
+            protected void processMouseEvent(MouseEvent e) {
+                if (ignoreMouse == false)
+                    super.processMouseEvent(e);
             }
             
             /** Overridden to optionally paint note names onto all keys of the keyboard. */
@@ -216,8 +228,11 @@ public class PianoWithSound extends Piano
             }
         }
         protected void visualSelect(Keyboard.Key key, boolean pressed) {
-            key.getModel().setPressed(pressed); // must NOT trigger actionPerformed and play a tone!
+            // START keep order - this MUST NOT trigger an action! 
+            //     See AbstractButton.doClick() for necessary order of calls to trigger an action
+            key.getModel().setPressed(pressed);
             key.getModel().setArmed(pressed);
+            // END keep order
         }
         
         protected Keyboard.Key getKey(MouseEvent e) {
@@ -250,6 +265,7 @@ public class PianoWithSound extends Piano
         this.mouseHandler = newMouseHandler();
     }
     
+    /** @return the piano panel, as it was configured by Configuration in constructor. */
     @Override
     public JComponent getKeyboard() {
         if (pianoPanel != null)
@@ -290,8 +306,8 @@ public class PianoWithSound extends Piano
     
     /** @return all key of the keyboard the mouse-listener was attached to. */
     public final List<Keyboard.Key> getKeys() {
-        if (keyList != null)
-            return keyList;
+        if (this.keyList != null)
+            return this.keyList;
         
         final JComponent viewPort = (JComponent) pianoPanel.getComponent(0);
         final JComponent keyboardPanel = (JComponent) viewPort.getComponent(0);

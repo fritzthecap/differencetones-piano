@@ -1,5 +1,6 @@
 package fri.music.instrument.midi;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedHashSet;
@@ -60,9 +61,12 @@ public class MidiSynthesizer extends PianoWithHold
         getVolumeSlider().setValue(127 / 2); // MIDI volume is much lower than WaveGenerator volumes
         getVelocitySlider().setValue(127 / 2);
         
-        moveControlPanelBelowKeyboard();
-        
         return this.pianoPanel = pianoPanel;
+    }
+    
+    @Override
+    protected String getControlPanelBorderLayoutConstraint() {
+        return config.isVertical ? BorderLayout.EAST : BorderLayout.SOUTH;
     }
     
     @Override
