@@ -39,7 +39,7 @@ public class MelodyFactory
     
     /** The separator between IPN-name and note length (duration). */
     private static final char DURATION_SEPARATOR = '/';
-    /** The symbol at the end of dotted notes which have duration factor 1.5. */
+    /** The symbol at the end of dotted notes, duration factor 3/2. */
     private static final String DOTTED_SYMBOL = ".";
     /** The separator character for triplet and other multiplet numbers. */
     private static final char MULTIPLET_SEPARATOR = ',';
@@ -57,30 +57,40 @@ public class MelodyFactory
         this(null, null, null, null, null);
     }
     
-    /** Factory with given tone-system and default settings. */
+    /** Factory with given tone-system. */
     public MelodyFactory(ToneSystem toneSystem) {
-        this(toneSystem, null, null, null, null);
+        this(toneSystem, null);
     }
     
     /** Factory with given BPM (beats per minute) tempo. */
     public MelodyFactory(Integer numberOfBeatsPerMinute) {
-        this(null, numberOfBeatsPerMinute, null, null, null);
+        this(null, numberOfBeatsPerMinute);
+    }
+    
+    /** Factory with given tone-system and BPM (beats per minute) tempo. */
+    public MelodyFactory(ToneSystem toneSystem, Integer numberOfBeatsPerMinute) {
+        this(toneSystem, numberOfBeatsPerMinute, null, null);
+    }
+    
+    /** Factory with given tone-system, BPM (beats per minute) tempo and bar-meter. */
+    public MelodyFactory(ToneSystem toneSystem, Integer numberOfBeatsPerMinute, Integer numberOfBeatsPerBar, Integer beatType) {
+        this(toneSystem, numberOfBeatsPerMinute, numberOfBeatsPerBar, beatType, null);
     }
     
     /**
      * The global settings of any melody this factory will produce.
      * @param toneSystem optional, the tuning the notes should be built from, default is EqualTemperament.
      * @param numberOfBeatsPerMinute optional, tempo, null-default is 120 BPM.
-     * @param volume optional, lowest loudness, 1..127, null-default is 7.
      * @param numberOfBeatsPerBar optional, dividend of time signature, for 6/8 this would be 6, null-default is 4. 
      * @param beatType optional, divisor of time signature, for 6/8 this would be 8, null-default is 4.
+     * @param volume optional, lowest loudness, 1..127, null-default is 7.
      */
     public MelodyFactory(
             ToneSystem toneSystem,
             Integer numberOfBeatsPerMinute,
-            Integer volume,
             Integer numberOfBeatsPerBar,
-            Integer beatType)
+            Integer beatType,
+            Integer volume)
     {
         this.toneSystem = (toneSystem != null) ? new Tones(toneSystem.tones()) : new Tones();
         this.volume = (volume != null) ? volume : Note.DEFAULT_VOLUME;
@@ -95,6 +105,7 @@ public class MelodyFactory
     /**
      * Translates given text to a playable melody. See <code>translate(String[])</code> for docs.
      * @param text contains the notes of the melody, including ties and bar-meter changes.
+     * @throws IllegalArgumentException when notes are invalid.
      */
     public Note[] translate(String text) {
         return translate(new InputTextScanner().toStringArray(text));
@@ -108,6 +119,7 @@ public class MelodyFactory
      *      also possibly containing parentheses that lengthen notes, like "(C5/8", "(C5/4)", "C5/8)".
      *      Spaces generally should not matter, but parentheses may not arrive without a note.
      * @return a sequence of <code>Note</code> objects representing <code>melodyTokens</code>.
+     * @throws IllegalArgumentException when notes are invalid.
      */
     public Note[] translate(String[] melodyTokens) {
         final List<MelodyToken> melodyNotes = new ArrayList<>(melodyTokens.length);
@@ -147,9 +159,9 @@ public class MelodyFactory
     private InputToken newInputToken(String melodyToken) {
         final NoteConnections noteConnections = new NoteConnections(melodyToken.trim());
         
-        final MelodyToken noteAndLength = splitNoteAndLength(noteConnections.melodyToken);
+        final MelodyToken noteAndLength = splitByDurationSeparator(noteConnections.melodyToken);
         
-        // when noteName is a number, this is a bar-meter change
+        // when noteName is a number, then this is a bar-meter change
         final Integer numberOfBeatsPerBar = toIntegerOrNull(noteAndLength.ipnName);
         if (numberOfBeatsPerBar != null) {
             // the beat-type must also be a number, else error
@@ -157,8 +169,11 @@ public class MelodyFactory
             if (beatType != null)
                 return new BarMeterToken(numberOfBeatsPerBar, beatType);
             
-            throw new IllegalArgumentException("Invalid token, not a note, not a bar-meter: "+melodyToken);
+            throw new IllegalArgumentException("Not a note, not a bar-meter: "+melodyToken);
         }
+        
+        if (noteAndLength.ipnName.matches("[ABCDEFG]#?[0-9]+") == false)
+            throw new IllegalArgumentException("Invalid note name: '"+noteAndLength.ipnName+"'");
         
         return new MelodyToken(noteAndLength.ipnName, noteAndLength.length, noteConnections);
     }
@@ -173,7 +188,7 @@ public class MelodyFactory
     }
     
     
-    private MelodyToken splitNoteAndLength(String melodyToken) {
+    private MelodyToken splitByDurationSeparator(String melodyToken) {
         final int durationStartIndex = melodyToken.indexOf(DURATION_SEPARATOR);
         
         final String noteName = ((durationStartIndex > 0)
@@ -266,7 +281,7 @@ public class MelodyFactory
         
         final Integer length = toIntegerOrNull(noteLengthString);
         if (length == null)
-            throw new IllegalArgumentException("Note length is not a number: "+noteLength);
+            throw new IllegalArgumentException("Note length is not a number: '"+noteLength+"'");
         
         return toMillis(length, dotted, multipletType);
     }
@@ -278,7 +293,7 @@ public class MelodyFactory
         final String multipletString = noteLengthString.substring(multipletSeparatorIndex + 1);
         Integer multipletType = toIntegerOrNull(multipletString);
         if (multipletType == null)
-            throw new IllegalArgumentException("Multiplet type is not a number: "+noteLengthString);
+            throw new IllegalArgumentException("Multiplet type is not a number: '"+noteLengthString+"'");
         
         return multipletType;
     }
@@ -319,7 +334,7 @@ public class MelodyFactory
             factor = 4.0 / 5.0;
             break;
         default:
-            throw new IllegalStateException("Unsupported multiplet type: "+multipletType);
+            throw new IllegalStateException("Unsupported multiplet type: '"+multipletType+"'");
         }
         return millis * factor;
         /*

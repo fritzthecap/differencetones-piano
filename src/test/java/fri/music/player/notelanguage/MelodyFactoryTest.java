@@ -24,9 +24,9 @@ class MelodyFactoryTest
         final MelodyFactory melodyFactory = new MelodyFactory(
                 toneSystem,
                 140, // BPM
-                null, // default volume
                 BEATS_PER_BAR,
-                BEAT_TYPE);
+                BEAT_TYPE,
+                null); // default volume
         final Note[] melody = melodyFactory.translate(notes);
         
         assertNotNull(melody);
@@ -149,7 +149,7 @@ class MelodyFactoryTest
             "G4", "A4", "B4", "D4" // don't need the "/4" suffix on quarter notes
         };
         
-        final MelodyFactory melodyFactory = new MelodyFactory();
+        final MelodyFactory melodyFactory = new MelodyFactory(); // sets default beat duration
         final Note[] melody = melodyFactory.translate(notes);
         
         for (int i = 0; i < melody.length; i++)
@@ -186,6 +186,7 @@ class MelodyFactoryTest
         
         assertEquals(notes.length - 3, melody.length);
         
+        assertTrue(melody[0].emphasized); // first note in bar must be emphasized
         assertTrue(melody[0].volume > melody[1].volume); // first note is loudest
         assertTrue(melody[1].volume < melody[2].volume); // 4/4 half bar has a small accent
         assertTrue(melody[0].volume > melody[2].volume); // but less than first note
@@ -193,10 +194,12 @@ class MelodyFactoryTest
         assertTrue(melody[3].volume == melody[1].volume); // notes with no accent must be equal
         assertTrue(melody[3].volume < melody[4].volume);
         
+        assertTrue(melody[4].emphasized); // first note in bar must be emphasized
         assertTrue(melody[4].volume > melody[5].volume); // first note is loudest
         assertTrue(melody[5].volume == melody[6].volume); // no half bar in 3/4, thus no accent
         assertTrue(melody[6].volume < melody[7].volume);
         
+        assertTrue(melody[7].emphasized); // first note in bar must be emphasized
         assertTrue(melody[7].volume > melody[8].volume); // first note is loudest
         assertTrue(melody[8].volume < melody[9].volume); // 4/4 half bar has a small accent
         assertTrue(melody[9].volume > melody[10].volume);
