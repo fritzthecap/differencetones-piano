@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import fri.music.Tones;
 import fri.music.differencetones.DifferenceToneMath;
+import fri.music.swingutils.ButtonUtil;
 
 public class DifferenceSliderPanel extends SliderPanel
 {
@@ -107,7 +108,7 @@ public class DifferenceSliderPanel extends SliderPanel
     /** Shows or hides secondary and tertiary difference. */
     public void setExpanded(boolean expanded) {
         if (expandButton != null && isExpanded() != expanded)
-            expandButton.doClick();
+            ButtonUtil.doClick(expandButton);
     }
     
     @Override

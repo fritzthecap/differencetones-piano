@@ -146,7 +146,7 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
                     
                     if (index >= 0 && index < keys.size()) {
                         selectedDifferenceKey = keys.get(index);
-                        selectDifferenceTone(selectedDifferenceKey, true);
+                        selectDifferenceTone(selectedDifferenceKey, true); // select and add red border
                     }
                 }
             }

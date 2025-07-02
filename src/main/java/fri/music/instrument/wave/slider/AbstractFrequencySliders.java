@@ -22,6 +22,7 @@ import fri.music.JustIntonation;
 import fri.music.ToneSystem;
 import fri.music.Tones;
 import fri.music.instrument.wave.TuningComponent;
+import fri.music.swingutils.ButtonUtil;
 import fri.music.swingutils.SmartComboBox;
 import fri.music.wavegenerator.SineWaveGenerator;
 import fri.music.wavegenerator.WaveGenerator;
@@ -148,7 +149,7 @@ public abstract class AbstractFrequencySliders
         for (int i = 0; i < newSliderPanels.length; i++) {
             final SliderPanel newSliderPanel = newSliderPanels[i];
             if (shouldRestoreSliderState(newSliderPanel) && wasPlaying.get(i))
-                newSliderPanel.startStop.doClick();
+                ButtonUtil.doClick(newSliderPanel.startStop);
         }
 
         parent.revalidate(); // repaints UI
@@ -233,8 +234,8 @@ public abstract class AbstractFrequencySliders
             public void actionPerformed(ActionEvent e) {
                 for (SliderPanel panel : getSliderPanels()) {
                     if (panel.isPlaying()) { // is running
-                        panel.startStop.doClick(); // stop
-                        panel.startStop.doClick(); // restart with new wave form
+                        ButtonUtil.doClick(panel.startStop); // stop
+                        ButtonUtil.doClick(panel.startStop); // restart with new wave form
                     }
                 }
             }

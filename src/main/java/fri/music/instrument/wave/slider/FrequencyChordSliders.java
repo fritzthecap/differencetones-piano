@@ -17,6 +17,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
+import fri.music.swingutils.ButtonUtil;
 import fri.music.swingutils.SmartComboBox;
 import fri.music.swingutils.SmartSlider;
 
@@ -85,13 +86,13 @@ public class FrequencyChordSliders extends AbstractFrequencySliders
                     startStopAll.setForeground(Color.BLUE);
                     for (SliderPanel sliderPanel : getSliderPanels())
                         if (sliderPanel.isPlaying())
-                            sliderPanel.startStop.doClick();
+                            ButtonUtil.doClick(sliderPanel.startStop);
                 }
                 else {
                     startStopAll.setForeground(Color.RED);
                     for (SliderPanel sliderPanel : getSliderPanels())
                         if (false == sliderPanel.isPlaying())
-                            sliderPanel.startStop.doClick();
+                            ButtonUtil.doClick(sliderPanel.startStop);
                 }
             }
         });
@@ -130,8 +131,8 @@ public class FrequencyChordSliders extends AbstractFrequencySliders
                 
                 for (SliderPanel panel : getSliderPanels()) {
                     if (panel.isPlaying()) { // is running
-                        panel.startStop.doClick(); // stop
-                        panel.startStop.doClick(); // restart with new chord
+                        ButtonUtil.doClick(panel.startStop); // stop
+                        ButtonUtil.doClick(panel.startStop); // restart with new chord
                     }
                 }
             }

@@ -24,6 +24,7 @@ import fri.music.JustIntonation;
 import fri.music.MathUtils;
 import fri.music.Tone;
 import fri.music.ToneSystem;
+import fri.music.swingutils.ButtonUtil;
 
 /**
  * Displays two frequency sliders and their difference-tone.
@@ -238,14 +239,14 @@ public class FrequencyDifferenceSliders extends AbstractFrequencySliders
                 if (stop) {
                     startStopBoth.setForeground(Color.BLUE);
                     if (frequencyPanel1.isPlaying() == true)
-                        frequencyPanel1.startStop.doClick();
+                        ButtonUtil.doClick(frequencyPanel1.startStop);
                     if (frequencyPanel2.isPlaying() == true)
-                        frequencyPanel2.startStop.doClick();
+                        ButtonUtil.doClick(frequencyPanel2.startStop);
                 }
                 else if (frequencyPanel1.getValue() > 0.0 && frequencyPanel2.getValue() > 0.0) {
                     startStopBoth.setForeground(Color.RED);
-                    frequencyPanel1.startStop.doClick();
-                    frequencyPanel2.startStop.doClick();
+                    ButtonUtil.doClick(frequencyPanel1.startStop);
+                    ButtonUtil.doClick(frequencyPanel2.startStop);
                 }
             }
         });
