@@ -39,7 +39,7 @@ public class NotesOnPianoPlayer
     private JButton play;
     private Player player;
     
-    private final Object lock = new Object();
+    private final Object playerLock = new Object();
     
     public NotesOnPianoPlayer(SoundChannel channel) {
         this(null, channel);
@@ -83,8 +83,10 @@ public class NotesOnPianoPlayer
         play.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final boolean isStop = play.getText().equals("Stop");
-                startOrStopPlaying(isStop);
+                synchronized(playerLock) {
+                    final boolean isStop = (player != null);
+                    startOrStopPlayer(isStop);
+                }
             }
         });
         final JPanel playButtonPanel = new JPanel(new FlowLayout()); // else button is too big
@@ -124,17 +126,16 @@ public class NotesOnPianoPlayer
     }
 
 
-    private void startOrStopPlaying(boolean isStop) {
+    /** Make sure to always call this synchronized(playerLock)! */
+    private void startOrStopPlayer(boolean isStop) {
         play.setText(isStop ? "Play" : "Stop");
         notesText.setEnabled(isStop);
         setPianoKeysIgnoreMouse(isStop);
-        
+    
         if (isStop) {
             if (player != null) {
-                synchronized(lock) {
-                    player.close();
-                    player = null;
-                }
+                player.close();
+                player = null;
             }
         }
         else {
@@ -154,13 +155,16 @@ public class NotesOnPianoPlayer
             final Note[] notesArray = melodyFactory.translate(notesString);
             checkNotesRange(notesArray);
             
+            final SoundChannel pianoKeyConnector = new PianoKeyConnector(piano);
+            this.player = new Player(pianoKeyConnector); // is synchronized because called from startOrStop()
+            
             // to allow "Stop" while playing, all playing happens in a background thread
             final Thread playerThread = new Thread(() -> playNotes(notesArray));
             playerThread.start();
         }
         catch (Exception e) {
             JOptionPane.showMessageDialog(notesText, "Error: "+e.getMessage());
-            startOrStopPlaying(true);
+            startOrStopPlayer(true); // stop
         }
     }
     
@@ -175,28 +179,33 @@ public class NotesOnPianoPlayer
 
     /** This method runs in a background-thread, so any call to Swing must happen via SwingUtilities.invokeXXX(). */
     private void playNotes(Note[] notesArray) {
-        final SoundChannel pianoKeyConnector = new PianoKeyConnector(piano);
+        final Player myPlayer = this.player; // remember which player to use
         
-        if (player != null)
-            player.close();
-        player = new Player(pianoKeyConnector);
-        
-        for (final Note note : notesArray) { // play all notes one by one
+        boolean interrupted = false;
+        for (int i = 0; interrupted == false && i < notesArray.length; i++) { // play all notes one by one
+            final Note note = notesArray[i];
             try {
                 SwingUtilities.invokeAndWait(() -> { // waits synchronously for each note
-                    synchronized(lock) {
-                        if (player != null) // "Stop" button could set it to null at any time
-                            player.play(note); // this causes Swing UI updates and thus must run in EDT
+                    synchronized(playerLock) {
+                        if (myPlayer == this.player) // Start/Stop button could be clicked several times
+                            myPlayer.play(note); // this causes Swing UI updates and thus must run in EDT
                     }
                 });
             }
             catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            
+            synchronized(playerLock) {
+                interrupted = (myPlayer != this.player); // "Stop" button was pressed
+            }
         }
         
-        SwingUtilities.invokeLater(() -> {
-            startOrStopPlaying(true); // enables "Play" and closes player
+        SwingUtilities.invokeLater(() -> { // causes Swing UI updates and thus must run in EDT
+            synchronized(playerLock) {
+                if (myPlayer == this.player) // still not stopped, do self-stop
+                    startOrStopPlayer(true); // enable "Play" and close player
+            }
         });
     }
     
@@ -204,13 +213,11 @@ public class NotesOnPianoPlayer
     /** Connects Notes array to the piano's keys. */
     private static class PianoKeyConnector implements SoundChannel
     {
-        private final PianoWithSound piano;
         private final PianoWithSound.MouseHandler mouseHandler;
         private final List<PianoWithSound.Keyboard.Key> keys;
         private final int lowestMidiNumber;
         
         PianoKeyConnector(PianoWithSound piano) {
-            this.piano = piano;
             this.mouseHandler = piano.getMouseHandler();
             this.keys = piano.getKeys();
             this.lowestMidiNumber = keys.get(0).midiNoteNumber;
