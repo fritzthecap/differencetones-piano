@@ -1,11 +1,15 @@
 
-- Extend note language with parentheses, to let notes last beyond its bar.
+- Extend note language with repeat-bars and volta-boxes.
 
 - Give DifferenceTonePiano an initial interval to play.
 
-- Play a Tone array (written for MelodyFactory) visibly on any piano.
+- Play a Note array (written for MelodyFactory) visibly on any piano.
     Provide a text-area where the user can choose from prepared melodies
     or input a new melody. 
+
+- Write a Note array (written for MelodyFactory) through piano key presses
+    with length choice by context-menu when right mouse click,
+    provide a default length choice by combo-box for left mouse clicks.
 
 - Display 
     of Tunings with frequency and cent
