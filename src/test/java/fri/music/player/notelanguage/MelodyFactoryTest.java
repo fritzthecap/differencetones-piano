@@ -9,17 +9,18 @@ import fri.music.player.Note;
 
 class MelodyFactoryTest
 {
-    @Test
-    void translateToVolumeDurationFrequency() {
-        final ToneSystem toneSystem = new EqualTemperament();
-        final int BEATS_PER_BAR = 3;
-        final int BEAT_TYPE = 4;
-        final String[] notes = new String[] { // "Oh du lieber Augustin"
+    private final static String[] AUGUSTIN = new String[] { // "Oh du lieber Augustin"
             "G4/4.", "A4/8", "G4/8", "F4/8", 
             "E4/4", "C4/4", "C4/4", 
             "D4/4", "G3/4", "G3/4", 
             "C4/2.",
         };
+
+    @Test
+    void translateToVolumeDurationFrequency() {
+        final ToneSystem toneSystem = new EqualTemperament();
+        final int BEATS_PER_BAR = 3;
+        final int BEAT_TYPE = 4;
         
         final MelodyFactory melodyFactory = new MelodyFactory(
                 toneSystem,
@@ -27,14 +28,14 @@ class MelodyFactoryTest
                 BEATS_PER_BAR,
                 BEAT_TYPE,
                 null); // default volume
-        final Note[] melody = melodyFactory.translate(notes);
+        final Note[] melody = melodyFactory.translate(AUGUSTIN);
         
         assertNotNull(melody);
-        assertEquals(notes.length, melody.length);
+        assertEquals(AUGUSTIN.length, melody.length);
         
         for (int i = 0; i < melody.length; i++)
             assertEquals(
-                    notes[i].substring(0, notes[i].indexOf("/")), 
+                    AUGUSTIN[i].substring(0, AUGUSTIN[i].indexOf("/")), 
                     melody[i].ipnName);
         
         assertTrue(melody[0].volume > melody[1].volume, "First beat should be louder than subsequent ones!");
@@ -51,6 +52,68 @@ class MelodyFactoryTest
         assertNotEquals(melody[0].frequency, melody[1].frequency, "First and second note should not have same frequency!");
     }
 
+    @Test
+    void restShouldWork() {
+        final String[] notes = new String[] { ToneSystem.REST_SYMBOL };
+        final MelodyFactory melodyFactory = new MelodyFactory();
+        final Note[] melody = melodyFactory.translate(notes);
+        
+        assertEquals(melody[0].ipnName, ToneSystem.REST_SYMBOL);
+        assertEquals(melody[0].lengthNotation, MelodyFactory.DEFAULT_NOTE_LENGTH); // quarter note is default length
+        
+        final String REST_LENGTH = "8.";
+        final String[] notes2 = new String[] { ToneSystem.REST_SYMBOL+"/"+REST_LENGTH };
+        final Note[] melody2 = melodyFactory.translate(notes2);
+        
+        assertEquals(melody2[0].ipnName, ToneSystem.REST_SYMBOL);
+        assertEquals(melody2[0].lengthNotation, REST_LENGTH);
+    }
+    
+    @Test
+    void toStringShouldGiveTextNotation() {
+        final int BEATS_PER_MINUTE = 88;
+        final int BEATS_PER_BAR = 3;
+        final int BEAT_TYPE = 4;
+        
+        final MelodyFactory melodyFactory = new MelodyFactory(BEATS_PER_MINUTE, BEATS_PER_BAR, BEAT_TYPE);
+        final Note[] melody = melodyFactory.translate(AUGUSTIN);
+        final String textNotation = melodyFactory.toString(melody);
+        
+        final String expectedResult = 
+                ""+BEATS_PER_MINUTE + MelodyFactory.NEWLINE+
+                ""+BEATS_PER_BAR+"/"+BEAT_TYPE + MelodyFactory.NEWLINE+
+                "G4/4. A4/8 G4/8 F4/8" + MelodyFactory.NEWLINE+
+                "E4/4 C4/4 C4/4" + MelodyFactory.NEWLINE+
+                "D4/4 G3/4 G3/4" + MelodyFactory.NEWLINE+
+                "C4/2.";
+        assertEquals(expectedResult, textNotation);
+        
+        final Note[] roundTripped = melodyFactory.translate(textNotation);
+        assertArrayEquals(melody, roundTripped);
+    }
+    
+    @Test
+    void toStringShouldHaveSlursAndTies() {
+        final int BEATS_PER_MINUTE = 88;
+        final int BEATS_PER_BAR = 3;
+        final int BEAT_TYPE = 4;
+        
+        final MelodyFactory melodyFactory = new MelodyFactory(BEATS_PER_MINUTE, BEATS_PER_BAR, BEAT_TYPE);
+        
+        final String[] notes = new String[] {
+                "(G4/8", "(G4/8)", "G4/8)", "{A4/8", "G4/8", "F4/8}", 
+            };
+
+        final Note[] melody = melodyFactory.translate(notes);
+        final String textNotation = melodyFactory.toString(melody);
+        
+        final String expectedResult = 
+                ""+BEATS_PER_MINUTE + MelodyFactory.NEWLINE+
+                ""+BEATS_PER_BAR+"/"+BEAT_TYPE + MelodyFactory.NEWLINE+
+                "(G4/8 (G4/8) G4/8) {A4/8 G4/8 F4/8}";
+        assertEquals(expectedResult, textNotation);
+    }
+    
     @Test
     void tripletDuration() {
         final String[] notes = new String[] { // one 4/4 bar
@@ -157,6 +220,20 @@ class MelodyFactoryTest
     }
 
     @Test
+    void textInputShouldWork() {
+        final String notesText = "G4/16 "+ToneSystem.REST_SYMBOL+"/16 A4/16";
+        final MelodyFactory melodyFactory = new MelodyFactory();
+        final Note[] melody = melodyFactory.translate(notesText);
+        
+        assertEquals(melody[0].ipnName, "G4");
+        assertEquals(melody[0].lengthNotation, "16");
+        assertEquals(melody[1].ipnName, ToneSystem.REST_SYMBOL);
+        assertEquals(melody[1].lengthNotation, "16");
+        assertEquals(melody[2].ipnName, "A4");
+        assertEquals(melody[2].lengthNotation, "16");
+    }
+    
+    @Test
     void c3HasDifferentFrequenciesInToneSystems() {
         final String[] notes = new String[] { "C3" }; // do not use A4, because this has the same frequency in all tunings!
         
@@ -212,7 +289,7 @@ class MelodyFactoryTest
             "{ B4", " C5 ", " B4}", "A4"
         };
         final MelodyFactory melodyFactory = new MelodyFactory(120); // 120 BPM
-        assertEquals(500, melodyFactory.beatDurationMilliseconds);
+        assertEquals(500, melodyFactory.getBeatDurationMilliseconds());
         
         final Note[] resultMelody = melodyFactory.translate(notes);
         
@@ -224,7 +301,7 @@ class MelodyFactoryTest
         assertNull(resultMelody[1].slurred);
         assertEquals(Boolean.TRUE, resultMelody[1].tied);
         assertEquals(
-            melodyFactory.beatDurationMilliseconds * 2, // one beat is a quarter note here
+            melodyFactory.getBeatDurationMilliseconds() * 2, // one beat is a quarter note here
             resultMelody[1].durationMilliseconds);
             // first note in tie should have duration of two eighth and one quarter notes
         assertEquals(

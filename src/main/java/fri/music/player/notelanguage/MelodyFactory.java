@@ -32,25 +32,34 @@ import fri.music.player.Note;
  */
 public class MelodyFactory
 {
+    /** If a note has no length, it will get DEFAULT_NOTE_LENGTH. */
+    public static final String DEFAULT_NOTE_LENGTH = "4";
+    
+    /** If a melody has no bar-meter, it will get this. */
+    public static final Integer DEFAULT_NUMBER_OF_BEATS_PER_BAR = 4;
+    /** If a melody has no bar-meter, it will get this. */
+    public static final Integer DEFAULT_BEAT_TYPE = 4;
+    
+    public static final String NEWLINE = System.getProperty("line.separator");
+
     /** Factor by which first note in bar should be louder than subsequent notes. */
     private static final double BAR_START_VOLUME_FACTOR = 1.8;
     
-    private static final String DEFAULT_NOTE_LENGTH = "4";
-    
     /** The separator between IPN-name and note length (duration). */
-    private static final char DURATION_SEPARATOR = '/';
+    private static final char DURATION_SEPARATOR = Note.DURATION_SEPARATOR;
     /** The symbol at the end of dotted notes, duration factor 3/2. */
     private static final String DOTTED_SYMBOL = ".";
     /** The separator character for triplet and other multiplet numbers. */
     private static final char MULTIPLET_SEPARATOR = ',';
     
+    
     private final Tones toneSystem;
     private final Integer volume;
-    /** The duration in milliseconds of one beat. This stays the same even on bar-meter changes. */
-    public final int beatDurationMilliseconds;
     
+    private int numberOfBeatsPerMinute; // BPM
     private Integer numberOfBeatsPerBar; // bar-meter, waltz (3) or foxtrot (4) or ...
-    private Integer beatType; // eighth (8) or quarter (4) or ... notes in bar
+    private Integer beatType; // beat-notes in bar, eighth (8) or quarter (4) or ... er changes. */
+    private int beatDurationMilliseconds; // duration in milliseconds of one beat
 
     /** Factory with default settings. */
     public MelodyFactory() {
@@ -59,27 +68,36 @@ public class MelodyFactory
     
     /** Factory with given tone-system. */
     public MelodyFactory(ToneSystem toneSystem) {
-        this(toneSystem, null);
+        this(toneSystem, null, null, null);
+    }
+    
+    /** Factory with given bar-meter. */
+    public MelodyFactory(Integer numberOfBeatsPerBar, Integer beatType) {
+        this(null, numberOfBeatsPerBar, beatType);
     }
     
     /** Factory with given BPM (beats per minute) tempo. */
     public MelodyFactory(Integer numberOfBeatsPerMinute) {
-        this(null, numberOfBeatsPerMinute);
+        this(numberOfBeatsPerMinute, null, null);
     }
     
-    /** Factory with given tone-system and BPM (beats per minute) tempo. */
-    public MelodyFactory(ToneSystem toneSystem, Integer numberOfBeatsPerMinute) {
-        this(toneSystem, numberOfBeatsPerMinute, null, null);
+    /** Factory with given BPM (beats per minute) tempo. */
+    public MelodyFactory(Integer numberOfBeatsPerMinute, Integer numberOfBeatsPerBar, Integer beatType) {
+        this((ToneSystem) null, numberOfBeatsPerMinute, numberOfBeatsPerBar, beatType);
     }
     
     /** Factory with given tone-system, BPM (beats per minute) tempo and bar-meter. */
-    public MelodyFactory(ToneSystem toneSystem, Integer numberOfBeatsPerMinute, Integer numberOfBeatsPerBar, Integer beatType) {
+    public MelodyFactory(
+            ToneSystem toneSystem, 
+            Integer numberOfBeatsPerMinute, 
+            Integer numberOfBeatsPerBar, 
+            Integer beatType) {
         this(toneSystem, numberOfBeatsPerMinute, numberOfBeatsPerBar, beatType, null);
     }
     
     /**
      * The global settings of any melody this factory will produce.
-     * @param toneSystem optional, the tuning the notes should be built from, default is EqualTemperament.
+     * @param toneSystem optional, the tuning the notes should be built from, default is <code>EqualTemperament</code>.
      * @param numberOfBeatsPerMinute optional, tempo, null-default is 120 BPM.
      * @param numberOfBeatsPerBar optional, dividend of time signature, for 6/8 this would be 6, null-default is 4. 
      * @param beatType optional, divisor of time signature, for 6/8 this would be 8, null-default is 4.
@@ -95,11 +113,15 @@ public class MelodyFactory
         this.toneSystem = (toneSystem != null) ? new Tones(toneSystem.tones()) : new Tones();
         this.volume = (volume != null) ? volume : Note.DEFAULT_VOLUME;
         
-        this.numberOfBeatsPerBar = (numberOfBeatsPerBar != null) ? numberOfBeatsPerBar : 4;
-        this.beatType = (beatType != null) ? beatType : 4;
-        
-        final int bpm = (numberOfBeatsPerMinute != null) ? numberOfBeatsPerMinute : Note.DEFAULT_TEMPO_BPM;
-        this.beatDurationMilliseconds = (int) Math.round(1000.0 * 60.0 / (double) bpm);
+        this.numberOfBeatsPerMinute = (numberOfBeatsPerMinute != null) ? numberOfBeatsPerMinute : Note.DEFAULT_TEMPO_BPM;
+        this.numberOfBeatsPerBar = (numberOfBeatsPerBar != null) ? numberOfBeatsPerBar : DEFAULT_NUMBER_OF_BEATS_PER_BAR;
+        this.beatType = (beatType != null) ? beatType : DEFAULT_BEAT_TYPE;
+        calculateBeatDurationMilliseconds();
+    }
+    
+    /** @return the milliseconds one beat lasts. */
+    public Integer getBeatDurationMilliseconds() {
+        return beatDurationMilliseconds;
     }
     
     /**
@@ -130,26 +152,93 @@ public class MelodyFactory
         
         return connectedNotes.toArray(new Note[connectedNotes.size()]);
     }
+    
+    /**
+     * This does the opposite of <code>translate()</code>, but with each bar in a new line.
+     * @param notes the notes to output bar-formatted as string.
+     * @return a text where each bar of given notes will be displayed in a new line.
+     */
+    public String toString(Note[] notes) {
+        final StringBuilder result = new StringBuilder();
+        boolean inSlur = false;
+        boolean inTie = false;
+        
+        result.append("" + numberOfBeatsPerMinute + NEWLINE);
+        result.append("" + numberOfBeatsPerBar + Note.DURATION_SEPARATOR + beatType + NEWLINE);
+        
+        for (int i = 0; i < notes.length; i++) {
+            final Note note = notes[i];
+            
+            if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
+                throw new IllegalArgumentException("Note has no length notation, can not render it: "+note.ipnName);
+            
+            if (Boolean.TRUE.equals(note.slurred)) {
+                if (inSlur == false)
+                    result.append(NoteConnections.SLUR_START_SYMBOL);
+                inSlur = true;
+            }
+            
+            if (Boolean.TRUE.equals(note.tied)) {
+                result.append(NoteConnections.TIE_START_SYMBOL);
+            }
+                
+            if (note.emphasized && i > 0) // break line before fist note in bar
+                result.append(NEWLINE);
+            
+            result.append(note.toString());
+            
+            if (Boolean.TRUE.equals(note.tied)) {
+                if (inTie == true) // enclose every note within tie into parentheses
+                    result.append(NoteConnections.TIE_END_SYMBOL);
+                inTie = true;
+            }
+            else if (Boolean.FALSE.equals(note.tied)) {
+                result.append(NoteConnections.TIE_END_SYMBOL);
+                inTie = false;
+            }
+            
+            if (Boolean.FALSE.equals(note.slurred)) {
+                result.append(NoteConnections.SLUR_END_SYMBOL);
+                inSlur = false;
+            }
+            
+            if (i < notes.length - 1 && notes[i + 1].emphasized == false)
+                result.append(" "); // separate notes by space when not last in bar
+        }
+        return result.toString();
+    }
 
+
+    private void calculateBeatDurationMilliseconds() {
+        this.beatDurationMilliseconds = (int) Math.round(1000.0 * 60.0 / (double) this.numberOfBeatsPerMinute);
+    }
+    
     private List<Note> buildNotes(String[] melodyTokens, List<MelodyToken> melodyNotes) {
         final List<Note> notes = new ArrayList<>(melodyTokens.length);
         BarState barState = new BarState(numberOfBeatsPerBar, beatDurationMilliseconds);
         
         for (int i = 0; i < melodyTokens.length; i++) {
-            final InputToken melodyToken = newInputToken(melodyTokens[i].trim());
+            final InputToken inputToken = newInputToken(melodyTokens[i].trim());
             
-            if (melodyToken instanceof BarMeterToken) {
-                final BarMeterToken barMeterChange = (BarMeterToken) melodyToken;
-                this.numberOfBeatsPerBar = barMeterChange.numberOfBeatsPerBar;
-                this.beatType = barMeterChange.beatType;
+            if (inputToken instanceof BarMeterToken) {
+                final BarMeterToken barMeter = (BarMeterToken) inputToken;
+                this.numberOfBeatsPerBar = barMeter.numberOfBeatsPerBar;
+                this.beatType = barMeter.beatType;
                 
-                barState = new BarState(barMeterChange.numberOfBeatsPerBar, beatDurationMilliseconds);
+                barState = new BarState(this.numberOfBeatsPerBar, beatDurationMilliseconds);
+            }
+            else if (inputToken instanceof BeatsPerMinuteToken) {
+                final BeatsPerMinuteToken beatsPerMinute = (BeatsPerMinuteToken) inputToken;
+                this.numberOfBeatsPerMinute = beatsPerMinute.numberOfBeatsPerMinute;
+                calculateBeatDurationMilliseconds();
+                
+                barState = new BarState(this.numberOfBeatsPerBar, beatDurationMilliseconds);
             }
             else {
-                final MelodyToken melodyNote = (MelodyToken) melodyToken;
-                melodyNotes.add(melodyNote);
+                final MelodyToken melodyToken = (MelodyToken) inputToken;
+                melodyNotes.add(melodyToken);
                 
-                final Note note = buildNote(melodyNote, barState);
+                final Note note = buildNote(melodyToken, barState);
                 notes.add(note);
             }
         }
@@ -157,25 +246,27 @@ public class MelodyFactory
     }
 
     private InputToken newInputToken(String melodyToken) {
-        final NoteConnections noteConnections = new NoteConnections(melodyToken.trim());
+        final NoteConnections noteConnections = new NoteConnections(melodyToken);
         
         final MelodyToken noteAndLength = splitByDurationSeparator(noteConnections.melodyToken);
         
-        // when noteName is a number, then this is a bar-meter change
-        final Integer numberOfBeatsPerBar = toIntegerOrNull(noteAndLength.ipnName);
-        if (numberOfBeatsPerBar != null) {
-            // the beat-type must also be a number, else error
+        // check whether noteName is a number
+        final Integer leadingNumber = toIntegerOrNull(noteAndLength.ipnName);
+        if (leadingNumber != null) { // could be bar-meter or BPM
             final Integer beatType = toIntegerOrNull(noteAndLength.length);
-            if (beatType != null)
-                return new BarMeterToken(numberOfBeatsPerBar, beatType);
-            
-            throw new IllegalArgumentException("Not a note, not a bar-meter: "+melodyToken);
+            return (beatType != null)
+                    ? new BarMeterToken(leadingNumber, beatType)
+                    : new BeatsPerMinuteToken(leadingNumber);
         }
         
-        if (noteAndLength.ipnName.matches("[ABCDEFG]#?[0-9]+") == false)
+        if (noteAndLength.ipnName.equals(ToneSystem.REST_SYMBOL) == false &&
+                noteAndLength.ipnName.matches("[ABCDEFG]#?[0-9]+") == false)
             throw new IllegalArgumentException("Invalid note name: '"+noteAndLength.ipnName+"'");
         
-        return new MelodyToken(noteAndLength.ipnName, noteAndLength.length, noteConnections);
+        return new MelodyToken(
+                noteAndLength.ipnName, 
+                (noteAndLength.length != null) ? noteAndLength.length : DEFAULT_NOTE_LENGTH, 
+                noteConnections);
     }
     
     private Integer toIntegerOrNull(final String string) {
@@ -187,26 +278,21 @@ public class MelodyFactory
         }
     }
     
-    
     private MelodyToken splitByDurationSeparator(String melodyToken) {
         final int durationStartIndex = melodyToken.indexOf(DURATION_SEPARATOR);
+        final boolean hasDurationSeparator = (durationStartIndex > 0);
         
-        final String noteName = ((durationStartIndex > 0)
+        final String noteName = (hasDurationSeparator
                 ? melodyToken.substring(0, durationStartIndex)
                 : melodyToken) // has no length
             .trim();
         
         final String noteLength;
-        if (durationStartIndex > 0) {
-            final String duration = melodyToken.substring(durationStartIndex + 1).trim();
-            if (duration.length() > 0)
-                noteLength = duration;
-            else
-                noteLength = DEFAULT_NOTE_LENGTH;
-        }
-        else {
-            noteLength = DEFAULT_NOTE_LENGTH;
-        }
+        if (hasDurationSeparator && melodyToken.length() > durationStartIndex + 1)
+            // if there is a non-empty length
+            noteLength = melodyToken.substring(durationStartIndex + 1);
+        else
+            noteLength = null;
         
         return new MelodyToken(noteName, noteLength, null);
     }
@@ -224,7 +310,6 @@ public class MelodyFactory
         public final String length;
         public final NoteConnections noteConnections;
 
-        /** Note constructor. */
         MelodyToken(String ipnName, String length, NoteConnections noteConnections) {
             this.ipnName = ipnName;
             this.length = length;
@@ -232,16 +317,25 @@ public class MelodyFactory
         }
     }
     
-    /** Bar-meter change, e.g. going from 3/3 to 4/4 bar during tune. */
+    /** Bar-meter info, e.g. going from 3/3 to 4/4 bar during tune. */
     private static class BarMeterToken implements InputToken
     {
         public final Integer numberOfBeatsPerBar;
         public final Integer beatType;
 
-        /** Note constructor. */
         BarMeterToken(Integer numberOfBeatsPerBar, Integer beatType) {
             this.numberOfBeatsPerBar = numberOfBeatsPerBar;
             this.beatType = beatType;
+        }
+    }
+    
+    /** Bar-meter info, e.g. going from 3/3 to 4/4 bar during tune. */
+    private static class BeatsPerMinuteToken implements InputToken
+    {
+        public final Integer numberOfBeatsPerMinute;
+
+        BeatsPerMinuteToken(Integer numberOfBeatsPerMinute) {
+            this.numberOfBeatsPerMinute = numberOfBeatsPerMinute;
         }
     }
     
@@ -256,17 +350,21 @@ public class MelodyFactory
         // finally skip barState to next note
         barState.add(duration);
 
+        if (melodyToken.ipnName.equals(ToneSystem.REST_SYMBOL))
+            return new Note(duration, melodyToken.length);
+        
         return new Note(
                 toneSystem,
                 melodyToken.ipnName, 
                 duration,
                 volumeInBar,
                 emphasized,
-                null,
-                null);
+                (Boolean) null,
+                (Boolean) null,
+                melodyToken.length);
     }
 
-    private int durationMilliseconds(String noteLength) {
+    private int durationMilliseconds(final String noteLength) {
         String noteLengthString = noteLength;
         // remove optional dot at right end
         final boolean dotted = noteLengthString.endsWith(DOTTED_SYMBOL);
@@ -389,7 +487,7 @@ public class MelodyFactory
             else // not in tie
                 durationMilliseconds = rawNote.durationMilliseconds;
             
-            final Note tiedAndSlurredNote = new Note(rawNote, durationMilliseconds, slurred, tied);
+            final Note tiedAndSlurredNote = new Note(rawNote, durationMilliseconds, slurred, tied, rawNote.lengthNotation);
             connectedNotes.add(tiedAndSlurredNote);
             
             inSlur = slurStart ? true : slurEnd ? false : inSlur;
