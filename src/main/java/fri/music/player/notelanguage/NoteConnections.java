@@ -52,7 +52,7 @@ class NoteConnections
     
     NoteConnections(String melodyToken) {
         NoteConnection noteConnection;
-        noteConnection = new NoteConnection(melodyToken,SLUR_START_SYMBOL);
+        noteConnection = new NoteConnection(melodyToken, SLUR_START_SYMBOL);
         this.slurStart = noteConnection.exists;
         noteConnection = new NoteConnection(noteConnection.editedToken, SLUR_END_SYMBOL);
         this.slurEnd = noteConnection.exists;
