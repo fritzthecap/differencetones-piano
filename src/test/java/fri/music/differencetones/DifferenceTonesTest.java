@@ -131,8 +131,9 @@ class DifferenceTonesTest
         final ToneSystem toneSystem = new EqualTemperament();
         final DifferenceTones toneDifferences = new DifferenceTones(toneSystem.tones());
         
-        final Tone[] differenceTonesC6D7 = toneDifferences.findDifferenceTones("C6", "D7"); // ninth is too big
-        assertNull(differenceTonesC6D7[0]); // WARNING was displayed on stderr
+        assertThrows(
+            IllegalArgumentException.class, 
+            () -> toneDifferences.findDifferenceTones("C6", "D7")); // ninth is too big
         
         final Tone[] differenceTonesC6C7 = toneDifferences.findDifferenceTones("C6", "C7"); // octave
         assertNotNull(differenceTonesC6C7[0]); /// octave must be accepted

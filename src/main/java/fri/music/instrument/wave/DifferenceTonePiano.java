@@ -2,6 +2,7 @@ package fri.music.instrument.wave;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JSlider;
@@ -132,22 +133,25 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
                 if (selectedDifferenceKey != null) // remove currently selected
                     selectDifferenceTone(selectedDifferenceKey, false);
                 
-                final DifferenceTones toneDifferencess = new DifferenceTones(
+                final DifferenceTones differenceTones = new DifferenceTones(
                         soundChannel.getTones(), 
                         ((DifferenceTonePiano) piano).deviation,
                         true); // find primary difference tone only
-                final Tone[] differenceTones = toneDifferencess.findDifferenceTones(
-                        twoPlayingKeys[0].midiNoteNumber, 
-                        twoPlayingKeys[1].midiNoteNumber);
-                
-                if (differenceTones[0] != null) {
-                    final List<Keyboard.Key> keys = piano.getKeys();
-                    final int index = findKeyboardIndex(differenceTones[0].midiNumber, keys);
+                try {
+                    final Tone[] allDifferenceTones = differenceTones.findDifferenceTones(
+                            twoPlayingKeys[0].midiNoteNumber, 
+                            twoPlayingKeys[1].midiNoteNumber);
+                    final Tone primaryDifferenceTone = Objects.requireNonNull(allDifferenceTones[0]);
                     
+                    final List<Keyboard.Key> keys = piano.getKeys();
+                    final int index = findKeyboardIndex(primaryDifferenceTone.midiNumber, keys);
                     if (index >= 0 && index < keys.size()) {
                         selectedDifferenceKey = keys.get(index);
                         selectDifferenceTone(selectedDifferenceKey, true); // select and add red border
                     }
+                }
+                catch (IllegalArgumentException e) { // comes from findDifferenceTones
+                    System.err.println(e.toString());
                 }
             }
             else if (selectedDifferenceKey != null) {

@@ -1,5 +1,6 @@
 package fri.music.differencetones;
 
+import java.util.Objects;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
@@ -113,6 +114,7 @@ public class DifferenceTones extends Tones
      * @param firstToneIpnName required, the first tone of the interval, can be upper or lower.
      * @param secondToneIpnName required, the second tone of the interval, can be upper or lower.
      * @return array of resulting difference tones, can be up to three.
+     * @throws IllegalArgumenException when given interval is greater than an octave.
      */
     public Tone[] findDifferenceTones(String firstToneIpnName, String secondToneIpnName) {
         return findDifferenceTones(forIpnName(firstToneIpnName), forIpnName(secondToneIpnName));
@@ -125,6 +127,7 @@ public class DifferenceTones extends Tones
      * @param firstMidiNoteNumber required, the first tone of the interval, can be upper or lower.
      * @param secondMidiNoteNumber required, the second tone of the interval, can be upper or lower.
      * @return array of resulting difference tones, can be up to three.
+     * @throws IllegalArgumenException when given interval is greater than an octave.
      */
     public Tone[] findDifferenceTones(int firstMidiNoteNumber, int secondMidiNoteNumber) {
         return findDifferenceTones(forMidiNoteNumber(firstMidiNoteNumber), forMidiNoteNumber(secondMidiNoteNumber));
@@ -137,12 +140,13 @@ public class DifferenceTones extends Tones
      * @param firstTone required, the first tone of the interval, can be upper or lower.
      * @param secondTone required, the second tone of the interval, can be upper or lower.
      * @return array of resulting difference tones, can be up to three, each can be null when not found.
+     * @throws IllegalArgumentException when given interval is greater than an octave.
      */
     public Tone[] findDifferenceTones(Tone firstTone, Tone secondTone) {
-        if (Math.abs(secondTone.midiNumber - firstTone.midiNumber) > ToneSystem.SEMITONES_PER_OCTAVE) {
-            System.err.println("WARNING: The interval to find difference tones for must not be greater than an octave, given was "+firstTone.ipnName+" - "+secondTone.ipnName);
-            return new Tone[] { null, null, null };
-        }
+        Objects.requireNonNull(firstTone);
+        Objects.requireNonNull(secondTone);
+        if (Math.abs(secondTone.midiNumber - firstTone.midiNumber) > ToneSystem.SEMITONES_PER_OCTAVE)
+            throw new IllegalArgumentException("WARNING: The interval to find difference tones for must not be greater than an octave, given was "+firstTone.ipnName+" - "+secondTone.ipnName);
         
         // difference tones are at frequencies (y - x), (2x - y) and (3x - 2y), 
         // https://www.sfu.ca/sonic-studio-webdav/handbook/Combination_Tones.html
@@ -160,6 +164,7 @@ public class DifferenceTones extends Tones
         
         return new Tone[] { primaryDifferenceTone, secondaryDifferenceTone, tertiaryDifferenceTone };
     }
+
 
     private Tone findDifferenceTone(final double frequencyToMatch) {
        final Tone[] enclosingTones = getEnclosingTones(frequencyToMatch);
