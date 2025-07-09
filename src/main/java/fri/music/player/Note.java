@@ -144,6 +144,10 @@ public class Note extends Tone
     }
     
     
+    public boolean isRest() {
+        return ToneSystem.REST_SYMBOL.equals(ipnName);
+    }
+    
     @Override
     public String toString() {
         return ipnName + DURATION_SEPARATOR + lengthNotation;

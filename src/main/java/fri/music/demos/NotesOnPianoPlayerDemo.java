@@ -10,7 +10,8 @@ import fri.music.wavegenerator.SineWaveSoundChannel;
 public class NotesOnPianoPlayerDemo
 {
     private static final String AUGUSTIN = 
-        "3/4 \n"+
+        "96 \n"+ // BPM
+        "3/4 \n"+ // time signature
         "G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4 \n"+
         "D4/4 G3/4 G3/4 E4/4 C4/4 C4/4 \n"+
         "G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4 \n"+
@@ -30,6 +31,14 @@ public class NotesOnPianoPlayerDemo
                 //true, // vertical
                 13);
         final NotesOnPianoPlayer player = new NotesOnPianoPlayer(config, new SineWaveSoundChannel(null), AUGUSTIN);
+        
+//        final NotesOnPianoPlayer player = new NotesOnPianoPlayer(config, new SineWaveSoundChannel(null), AUGUSTIN) {
+//            @Override
+//            protected PianoWithSound newPiano(PianoWithSound.Configuration config, SoundChannel channel) {
+//                return new DifferenceTonePiano(config, (WaveSoundChannel) channel);
+//            }
+//        };
+
         final JComponent playerPanel = player.getPlayer();
         
         frame.addWindowListener(player.getWindowClosingListener());

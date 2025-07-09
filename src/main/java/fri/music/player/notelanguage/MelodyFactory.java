@@ -15,35 +15,40 @@ import fri.music.player.Note;
  * e.g. "A4/4" for a quarter note on pitch of A4 (440 Hz),
  * or "C#4/8." for a dotted C#4 eighth note,
  * or "B3/8,3" for a B3 triplet eighth note (each note of the triplet must have a ",3").
- * No space must appear inside notes and their length specification.
+ * No space must appear inside notes and their length specification,
+ * but at least one whitespace MUST be between notes.
  * A rest is written as "-".
  * In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
  * and there is no German "H", such is written as "B".
  * <p/>
  * Notes connected by "tie" are notes of same pitch that are played as single note, even across several bars.
- * Ties are started by "(" and ended by ")", notes in between the start and end note SHOULD be enclosed in
+ * Ties are started by an parenthesis "(" and ended by ")", notes in between the start and end note SHOULD be enclosed in
  * parentheses, because this is how it would look like in written notes.
  * Space between parentheses and note is allowed.
  * <p/>
  * Notes connected by "slur" are notes of different pitch that are phrased together, even across several bars.
- * Slurs are started by "{" and ended by "}", notes in between MUST NOT be enclosed in "{...}",
+ * Slurs are started by a brace "{" and ended by "}", notes in between MUST NOT be enclosed in "{...}",
  * because it is not clear how to phrase several notes that are all slurred together.
  * Space between braces and note is allowed.
+ * <p/>
+ * TODO: Chords can be written in brackets [rectangular parentheses].
+ * Space between brackets and note is allowed.
  */
 public class MelodyFactory
 {
     /** If a note has no length, it will get DEFAULT_NOTE_LENGTH. */
     public static final String DEFAULT_NOTE_LENGTH = "4";
     
-    /** If a melody has no bar-meter, it will get this. */
+    /** If a melody has no time signature, it will get this. */
     public static final Integer DEFAULT_NUMBER_OF_BEATS_PER_BAR = 4;
-    /** If a melody has no bar-meter, it will get this. */
+    /** If a melody has no time signature, it will get this. */
     public static final Integer DEFAULT_BEAT_TYPE = 4;
     
-    public static final String NEWLINE = System.getProperty("line.separator");
+    static final String NEWLINE = System.getProperty("line.separator");
 
     /** Factor by which first note in bar should be louder than subsequent notes. */
     private static final double BAR_START_VOLUME_FACTOR = 1.8;
+    private static final double BAR_HALF_VOLUME_FACTOR = 1.4;
     
     /** The separator between IPN-name and note length (duration). */
     private static final char DURATION_SEPARATOR = Note.DURATION_SEPARATOR;
@@ -56,11 +61,14 @@ public class MelodyFactory
     private final Tones toneSystem;
     private final Integer volume;
     
-    private int numberOfBeatsPerMinute; // BPM
-    private Integer numberOfBeatsPerBar; // bar-meter, waltz (3) or foxtrot (4) or ...
+    private int beatsPerMinute; // BPM
+    private Integer beatsPerBar; // time signature, waltz (3) or foxtrot (4) or ...
     private Integer beatType; // beat-notes in bar, eighth (8) or quarter (4) or ... er changes. */
     private int beatDurationMilliseconds; // duration in milliseconds of one beat
 
+    private boolean translateChangedTimeSignature;
+    private boolean translateChangedTempo;
+    
     /** Factory with default settings. */
     public MelodyFactory() {
         this(null, null, null, null, null);
@@ -71,62 +79,57 @@ public class MelodyFactory
         this(toneSystem, null, null, null);
     }
     
-    /** Factory with given bar-meter. */
-    public MelodyFactory(Integer numberOfBeatsPerBar, Integer beatType) {
-        this(null, numberOfBeatsPerBar, beatType);
+    /** Factory with given time signature. */
+    public MelodyFactory(Integer beatsPerBar, Integer beatType) {
+        this(null, beatsPerBar, beatType);
     }
     
     /** Factory with given BPM (beats per minute) tempo. */
-    public MelodyFactory(Integer numberOfBeatsPerMinute) {
-        this(numberOfBeatsPerMinute, null, null);
+    public MelodyFactory(Integer beatsPerMinute) {
+        this(beatsPerMinute, null, null);
     }
     
     /** Factory with given BPM (beats per minute) tempo. */
-    public MelodyFactory(Integer numberOfBeatsPerMinute, Integer numberOfBeatsPerBar, Integer beatType) {
-        this((ToneSystem) null, numberOfBeatsPerMinute, numberOfBeatsPerBar, beatType);
+    public MelodyFactory(Integer beatsPerMinute, Integer beatsPerBar, Integer beatType) {
+        this((ToneSystem) null, beatsPerMinute, beatsPerBar, beatType);
     }
     
-    /** Factory with given tone-system, BPM (beats per minute) tempo and bar-meter. */
+    /** Factory with given tone-system, BPM (beats per minute) tempo and time signature. */
     public MelodyFactory(
             ToneSystem toneSystem, 
-            Integer numberOfBeatsPerMinute, 
-            Integer numberOfBeatsPerBar, 
+            Integer beatsPerMinute, 
+            Integer beatsPerBar, 
             Integer beatType) {
-        this(toneSystem, numberOfBeatsPerMinute, numberOfBeatsPerBar, beatType, null);
+        this(toneSystem, beatsPerMinute, beatsPerBar, beatType, null);
     }
     
     /**
      * The global settings of any melody this factory will produce.
      * @param toneSystem optional, the tuning the notes should be built from, default is <code>EqualTemperament</code>.
-     * @param numberOfBeatsPerMinute optional, tempo, null-default is 120 BPM.
-     * @param numberOfBeatsPerBar optional, dividend of time signature, for 6/8 this would be 6, null-default is 4. 
+     * @param beatsPerMinute optional, tempo, null-default is 120 BPM.
+     * @param beatsPerBar optional, dividend of time signature, for 6/8 this would be 6, null-default is 4. 
      * @param beatType optional, divisor of time signature, for 6/8 this would be 8, null-default is 4.
      * @param volume optional, lowest loudness, 1..127, null-default is 7.
      */
     public MelodyFactory(
             ToneSystem toneSystem,
-            Integer numberOfBeatsPerMinute,
-            Integer numberOfBeatsPerBar,
+            Integer beatsPerMinute,
+            Integer beatsPerBar,
             Integer beatType,
             Integer volume)
     {
         this.toneSystem = (toneSystem != null) ? new Tones(toneSystem.tones()) : new Tones();
         this.volume = (volume != null) ? volume : Note.DEFAULT_VOLUME;
         
-        this.numberOfBeatsPerMinute = (numberOfBeatsPerMinute != null) ? numberOfBeatsPerMinute : Note.DEFAULT_TEMPO_BPM;
-        this.numberOfBeatsPerBar = (numberOfBeatsPerBar != null) ? numberOfBeatsPerBar : DEFAULT_NUMBER_OF_BEATS_PER_BAR;
+        this.beatsPerMinute = (beatsPerMinute != null) ? beatsPerMinute : Note.DEFAULT_TEMPO_BPM;
+        this.beatsPerBar = (beatsPerBar != null) ? beatsPerBar : DEFAULT_NUMBER_OF_BEATS_PER_BAR;
         this.beatType = (beatType != null) ? beatType : DEFAULT_BEAT_TYPE;
         calculateBeatDurationMilliseconds();
     }
     
-    /** @return the milliseconds one beat lasts. */
-    public Integer getBeatDurationMilliseconds() {
-        return beatDurationMilliseconds;
-    }
-    
     /**
      * Translates given text to a playable melody. See <code>translate(String[])</code> for docs.
-     * @param text contains the notes of the melody, including ties and bar-meter changes.
+     * @param text contains the notes of the melody, including ties and time signature changes.
      * @throws IllegalArgumentException when notes are invalid.
      */
     public Note[] translate(String text) {
@@ -137,7 +140,7 @@ public class MelodyFactory
      * Translates given strings to a playable melody.
      * If a note has no "/" with subsequent length, it will be regarded as quarter-note.
      * @param melodyTokens the sequence of IPN-notes with length, e.g. "C4/4", "D4/8", "B3/8",
-     *      also possibly containing bar-meter changes like "3/4" or "6/8",
+     *      also possibly containing time signature changes like "3/4" or "6/8",
      *      also possibly containing parentheses that lengthen notes, like "(C5/8", "(C5/4)", "C5/8)".
      *      Spaces generally should not matter, but parentheses may not arrive without a note.
      * @return a sequence of <code>Note</code> objects representing <code>melodyTokens</code>.
@@ -163,8 +166,8 @@ public class MelodyFactory
         boolean inSlur = false;
         boolean inTie = false;
         
-        result.append("" + numberOfBeatsPerMinute + NEWLINE);
-        result.append("" + numberOfBeatsPerBar + Note.DURATION_SEPARATOR + beatType + NEWLINE);
+        result.append("" + beatsPerMinute + NEWLINE);
+        result.append("" + beatsPerBar + Note.DURATION_SEPARATOR + beatType + NEWLINE);
         
         for (int i = 0; i < notes.length; i++) {
             final Note note = notes[i];
@@ -207,32 +210,62 @@ public class MelodyFactory
         }
         return result.toString();
     }
+    
+    
+    public int getBeatsPerMinute() {
+        return beatsPerMinute;
+    }
 
+    public int getBeatsPerBar() {
+        return beatsPerBar;
+    }
+    
+    public int getBeatType() {
+        return beatType;
+    }
+    
+    public boolean translateChangedTimeSignature() {
+        return translateChangedTimeSignature;
+    }
+    
+    public boolean translateChangedTempo() {
+        return translateChangedTempo;
+    }
+    
 
+    /** @return the milliseconds one beat lasts, for unit-tests. */
+    Integer getBeatDurationMilliseconds() {
+        return beatDurationMilliseconds;
+    }
+    
     private void calculateBeatDurationMilliseconds() {
-        this.beatDurationMilliseconds = (int) Math.round(1000.0 * 60.0 / (double) this.numberOfBeatsPerMinute);
+        this.beatDurationMilliseconds = (int) Math.round(1000.0 * 60.0 / (double) this.beatsPerMinute);
     }
     
     private List<Note> buildNotes(String[] melodyTokens, List<MelodyToken> melodyNotes) {
+        translateChangedTimeSignature = translateChangedTempo = false; // reset values from last translate call
+        
         final List<Note> notes = new ArrayList<>(melodyTokens.length);
-        BarState barState = new BarState(numberOfBeatsPerBar, beatDurationMilliseconds);
+        BarState barState = new BarState(beatsPerBar, beatDurationMilliseconds);
         
         for (int i = 0; i < melodyTokens.length; i++) {
             final InputToken inputToken = newInputToken(melodyTokens[i].trim());
             
-            if (inputToken instanceof BarMeterToken) {
-                final BarMeterToken barMeter = (BarMeterToken) inputToken;
-                this.numberOfBeatsPerBar = barMeter.numberOfBeatsPerBar;
-                this.beatType = barMeter.beatType;
+            if (inputToken instanceof TimeSignatureToken) {
+                final TimeSignatureToken timeSignature = (TimeSignatureToken) inputToken;
+                this.beatsPerBar = timeSignature.beatsPerBar;
+                this.beatType = timeSignature.beatType;
                 
-                barState = new BarState(this.numberOfBeatsPerBar, beatDurationMilliseconds);
+                barState = new BarState(this.beatsPerBar, beatDurationMilliseconds);
+                translateChangedTimeSignature = true;
             }
             else if (inputToken instanceof BeatsPerMinuteToken) {
                 final BeatsPerMinuteToken beatsPerMinute = (BeatsPerMinuteToken) inputToken;
-                this.numberOfBeatsPerMinute = beatsPerMinute.numberOfBeatsPerMinute;
+                this.beatsPerMinute = beatsPerMinute.beatsPerMinute;
                 calculateBeatDurationMilliseconds();
                 
-                barState = new BarState(this.numberOfBeatsPerBar, beatDurationMilliseconds);
+                barState = new BarState(this.beatsPerBar, beatDurationMilliseconds);
+                translateChangedTempo = true;
             }
             else {
                 final MelodyToken melodyToken = (MelodyToken) inputToken;
@@ -252,10 +285,10 @@ public class MelodyFactory
         
         // check whether noteName is a number
         final Integer leadingNumber = toIntegerOrNull(noteAndLength.ipnName);
-        if (leadingNumber != null) { // could be bar-meter or BPM
+        if (leadingNumber != null) { // could be time signature or BPM
             final Integer beatType = toIntegerOrNull(noteAndLength.length);
             return (beatType != null)
-                    ? new BarMeterToken(leadingNumber, beatType)
+                    ? new TimeSignatureToken(leadingNumber, beatType)
                     : new BeatsPerMinuteToken(leadingNumber);
         }
         
@@ -317,25 +350,25 @@ public class MelodyFactory
         }
     }
     
-    /** Bar-meter info, e.g. going from 3/3 to 4/4 bar during tune. */
-    private static class BarMeterToken implements InputToken
+    /** Time signature, e.g. 3/4 or 4/4, can change during tune. */
+    private static class TimeSignatureToken implements InputToken
     {
-        public final Integer numberOfBeatsPerBar;
-        public final Integer beatType;
+        public final Integer beatsPerBar; // the 3 in 3/4
+        public final Integer beatType; // the 4 in 3/4
 
-        BarMeterToken(Integer numberOfBeatsPerBar, Integer beatType) {
-            this.numberOfBeatsPerBar = numberOfBeatsPerBar;
+        TimeSignatureToken(Integer beatsPerBar, Integer beatType) {
+            this.beatsPerBar = beatsPerBar;
             this.beatType = beatType;
         }
     }
     
-    /** Bar-meter info, e.g. going from 3/3 to 4/4 bar during tune. */
+    /** Tempo in BPM. */
     private static class BeatsPerMinuteToken implements InputToken
     {
-        public final Integer numberOfBeatsPerMinute;
+        public final Integer beatsPerMinute;
 
-        BeatsPerMinuteToken(Integer numberOfBeatsPerMinute) {
-            this.numberOfBeatsPerMinute = numberOfBeatsPerMinute;
+        BeatsPerMinuteToken(Integer beatsPerMinute) {
+            this.beatsPerMinute = beatsPerMinute;
         }
     }
     
@@ -415,8 +448,8 @@ public class MelodyFactory
         // duplets (2) or quadruplets (4) will occur only in 3-ticks-per-beat, 6/8 or 12/8 
         switch (multipletType) {
         case 2: // duplets take 3/2 duration, 2 notes on the duration of 3 equal notes
-            if (numberOfBeatsPerBar % 3 != 0)
-                throw new IllegalStateException("Do not use duplets in "+numberOfBeatsPerBar+"/"+beatType+" measures!");
+            if (beatsPerBar % 3 != 0)
+                throw new IllegalStateException("Do not use duplets in "+beatsPerBar+"/"+beatType+" measures!");
             factor = 3.0 / 2.0; 
             break;
         case 3: // triplets take 2/3 duration, 3 notes on the duration of 2 equal notes
@@ -424,8 +457,8 @@ public class MelodyFactory
             factor = 2.0 / 3.0; 
             break;
         case 4: // quadruplets take 3/4 duration, 4 notes on the duration of 3 equal notes
-            if (numberOfBeatsPerBar % 3 != 0)
-                throw new IllegalStateException("Do not use quadruplets in "+numberOfBeatsPerBar+"/"+beatType+" measures!");
+            if (beatsPerBar % 3 != 0)
+                throw new IllegalStateException("Do not use quadruplets in "+beatsPerBar+"/"+beatType+" measures!");
             factor = 3.0 / 4.0;
             break;
         case 5: // quintuplets take 4/5 duration, 5 notes on the duration of 4 equal notes
@@ -457,7 +490,7 @@ public class MelodyFactory
             return BAR_START_VOLUME_FACTOR; // being at first beat
         
         if (barState.isBarHalf())
-            return 1.4; // being in middle of the bar
+            return BAR_HALF_VOLUME_FACTOR; // being in middle of the bar
         
         return 1.0;
     }
