@@ -12,7 +12,7 @@ public final class ButtonUtil
         button.doClick(0); // click without delay
     }
 
-    /** Sets given button visually pressed, but triggers no mouse-click. */
+    /** Sets given button visually pressed and paints it, but triggers no mouse-click. */
     public static void press(JButton button) {
         Dimension size = button.getSize();
         button.getModel().setPressed(true);
@@ -20,7 +20,7 @@ public final class ButtonUtil
         button.paintImmediately(new Rectangle(0, 0, size.width, size.height));
     }
     
-    /** Sets given button visually released, but triggers no mouse-click. */
+    /** Sets given button visually released and paints it, but triggers no mouse-click. */
     public static void release(JButton button) {
         Dimension size = button.getSize();
         button.getModel().setPressed(false);

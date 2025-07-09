@@ -99,13 +99,13 @@ class DefaultComposerTest
     }
 
     private void optionalOutputs(AbstractToneSystem toneSystem, Tones tones, Note[] melodyNotes, Note[][] intervals) {
-        final boolean DEBUG = false;
-        final boolean PLAY = false;
+        final boolean DEBUG = false; // set this to true when you want to see composed intervals on console
+        final boolean PLAY = false; // set this to true when you want to hear composed intervals in Player
         
         if (DEBUG)  {
             System.out.println(toneSystem);
             
-            dumpResult(intervals);
+            dumpAsJavaSourcecode(intervals);
             
             for (int i = 0; i < intervals.length; i++) {
                 final Note note = melodyNotes[i];
@@ -122,7 +122,7 @@ class DefaultComposerTest
     }
 
     /** Outputs given intervals as Java source code. */
-    private void dumpResult(final Note[][] intervals) {
+    private void dumpAsJavaSourcecode(final Note[][] intervals) {
         System.out.println("final String[][] expectedIntervals = new String[][] {");
         
         for (int i = 0; i < intervals.length; i++) {

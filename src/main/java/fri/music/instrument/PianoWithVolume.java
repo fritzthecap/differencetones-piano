@@ -124,12 +124,13 @@ public class PianoWithVolume extends PianoWithSound
         return this.pianoPanel = pianoPanel;
     }
     
-    /** Locates the piano-panel to CENTER. To be overridden. */
+    /** Locates the control-panel SOUTH (horizontal piano) or EAST (vertical piano). To be overridden. */
     protected String getPianoPanelBorderLayoutConstraint() {
-        return BorderLayout.CENTER;
+        //return BorderLayout.CENTER;
+        return config.isVertical ? BorderLayout.EAST : BorderLayout.SOUTH;
     }
     
-    /** Locates the control-panel NORTH (horizontal piano) or WEST (vertical piano) of keyboard. To be overridden. */
+    /** Locates the control-panel NORTH (horizontal piano) or WEST (vertical piano). To be overridden. */
     protected String getControlPanelBorderLayoutConstraint() {
         return config.isVertical ? BorderLayout.WEST : BorderLayout.NORTH;
     }

@@ -121,26 +121,29 @@ public class PianoWithSound extends Piano
                     setToolTipText(""+midiNoteNumber);
             }
             
+            /** Disable or enable (default) mouse events on piano keys. */
             public void setIgnoreMouse(boolean ignore) {
                 this.ignoreMouse = ignore;
             }
             
+            /** Overridden to implement ignoreMouse. */
             @Override
             protected void processMouseEvent(MouseEvent e) {
                 if (ignoreMouse == false)
                     super.processMouseEvent(e);
             }
             
-            /** Overridden to optionally paint note names onto all keys of the keyboard. */
+            /** Overridden to optionally paint note names onto all keys of the piano. */
             @Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                
                 if (config().showIpnNameOnKey == false)
                     return;
 
-                FontMetrics fm = getFontMetrics(g.getFont());
-                int width = fm.stringWidth(ipnName);
-                int height = (fm.getHeight() + fm.getAscent()) / 2 - fm.getDescent();
+                final FontMetrics fm = getFontMetrics(g.getFont());
+                final int width = fm.stringWidth(ipnName);
+                final int height = (fm.getHeight() + fm.getAscent()) / 2 - fm.getDescent();
                 if (getSize().width <= width || getSize().height <= height)
                     return; // too small for text
                 
@@ -228,8 +231,8 @@ public class PianoWithSound extends Piano
             }
         }
         protected void visualSelect(Keyboard.Key key, boolean pressed) {
-            // START keep order - this MUST NOT trigger an action! 
-            //     See AbstractButton.doClick() for necessary order of calls to trigger an action
+            // START keep order: this should not trigger an action! 
+            // See AbstractButton.doClick() for necessary order of calls to trigger an action
             key.getModel().setPressed(pressed);
             key.getModel().setArmed(pressed);
             // END keep order
