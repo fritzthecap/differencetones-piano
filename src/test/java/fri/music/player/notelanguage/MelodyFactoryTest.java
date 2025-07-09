@@ -101,7 +101,7 @@ class MelodyFactoryTest
         final MelodyFactory melodyFactory = new MelodyFactory(BEATS_PER_MINUTE, BEATS_PER_BAR, BEAT_TYPE);
         
         final String[] notes = new String[] {
-                "(G4/8", "(G4/8)", "G4/8)", "{A4/8", "G4/8", "F4/8}", 
+                "(G4/8", "G4/8", "G4/8)", "{A4/8", "G4/8", "F4/8}", 
             };
 
         final Note[] melody = melodyFactory.translate(notes);
@@ -249,13 +249,13 @@ class MelodyFactoryTest
     }
 
     @Test
-    void barMeterChangeShouldWork() {
+    void timeSignatureChangeShouldWork() {
         final String[] notes = new String[] {
-            "4/4 ", // not a note but bar-meter change!
+            "4/4 ", // not a note but time signature change!
             "A4", "B4", "C5", "B4", // 0, 1, 2, 3
-            " 3/4", // bar-meter change!
+            " 3/4", // time signature change!
             "C5", "D5", "E5", // 4, 5, 6
-            "4/4 ", // bar-meter change!
+            "4/4 ", // time signature change!
             "F5", "G5", "A5", "G5", // 7, 8, 9, 10
         };
         final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
