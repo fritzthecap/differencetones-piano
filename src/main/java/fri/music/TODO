@@ -1,8 +1,4 @@
 
-- Extend note language with repeat-bars and volta-boxes.
-
-- Give DifferenceTonePiano an initial interval to play.
-
 - Play a Note array (written for MelodyFactory) visibly on any piano.
     Provide a text-area where the user can choose from prepared melodies
     or input a new melody. 
@@ -10,6 +6,8 @@
 - Write a Note array (written for MelodyFactory) through piano key presses
     with length choice by context-menu when right mouse click,
     provide a default length choice by combo-box for left mouse clicks.
+
+- Give DifferenceTonePiano and others an initial interval or chord to play.
 
 - Display 
     of Tunings with frequency and cent
@@ -25,13 +23,13 @@
 
     Running the application opens main documentation. Then different
     buttons provide insights:
-    "Hear Difference Tones" (FrequencyDifferenceSliders), 
-    "See Difference Tones" (DifferenceTonePiano), 
-    "Explore Beatings: Hear Intervals in Different Tunings" (IntervalPlayingPiano, TriadPlayingPiano),
+    "See and Hear Difference Tones" (FrequencyDifferenceSliders, DifferenceTonePiano), 
+    "Explore Beatings in Intervals of Different Tunings" (IntervalPlayingPiano),
+    "Test Chords in Different Tunings" (TriadPlayingPiano, FrequencyChordSliders),
     "See Difference Tones on Piano" (DifferenceTonePiano), 
     "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" (EqualTemperamentDemo, JustIntonationDemo, ...), 
     "Check Just Intonation" (JustIntonationChecker), 
-    "Translate a Melody into Difference Tones" (DifferenceToneInversions, Composer)
+    "Translate a Melody into Difference Tones" (DifferenceToneInversions, DefaultComposer), 
     "Look at Pianos" (PianoConfiguration), 
     "Try out Wave Generators" (WavePianoDemo, PianoConfiguration), 
 
