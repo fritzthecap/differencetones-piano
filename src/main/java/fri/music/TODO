@@ -2,6 +2,7 @@
 - Write notes through piano key presses,
     supported through a length-choice via context-menu (right mouse click),
     provide a default length choice by combo-box for left mouse clicks.
+    This should be implemented in a NotesOnPianoPlayer sub-class.
     
 - Provide an "Export to ABC" button that writes notes in ABC format
     and renders the result in a non-modal text-dialog.

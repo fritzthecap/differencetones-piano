@@ -180,7 +180,7 @@ public class MelodyFactory
             if (i == 0)
                 result.append("" + note.beatInfo.beatsPerMinute());
 
-            if (note.beatInfo.timeSignature() != null)
+            if (note.beatInfo.timeSignature() != null) // initial or changed bar type
                 result.append(NEWLINE + note.beatInfo.timeSignature() + (newlineBeforeNote ? "" : NEWLINE));
             
             if (Boolean.TRUE.equals(note.connectionFlags.slurred())) {
@@ -420,14 +420,14 @@ public class MelodyFactory
                 currentTimeSignature, 
                 (firstFoundTempo != null) ? firstFoundTempo : beatsPerMinute);
         else
-            beatInfo = null;
+            beatInfo = null; // Note constructor will set a non-null default
 
         if (melodyToken.ipnName.equals(ToneSystem.REST_SYMBOL))
             return new Note(duration, emphasized, melodyToken.length, beatInfo);
         
         return new Note( // raw because no tie/slur connections yet
                 toneSystem,
-                melodyToken.ipnName, 
+                melodyToken.ipnName,
                 duration,
                 volumeInBar,
                 emphasized,

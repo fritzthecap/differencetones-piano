@@ -115,7 +115,7 @@ public class Note extends Tone
         this.durationMilliseconds = durationMilliseconds;
         this.volume = note.volume;
         this.emphasized = note.emphasized;
-        this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags(null, null);;
+        this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags(null, null);
         this.lengthNotation = lengthNotation;
         this.beatInfo = note.beatInfo;
     }
