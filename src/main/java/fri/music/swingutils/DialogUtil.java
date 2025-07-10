@@ -10,21 +10,67 @@ import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.text.JTextComponent;
 
 public class DialogUtil
 {
     /**
      * Opens a non-modal dialog showing given HTML text in a scroll-pane.
-     * @param textAsHtml the text to render in returned JTextPane.
-     * @param parent a parent Component in same Window where to locate dialog relatively.
+     * @param htmlText the text to render in returned JTextPane.
+     * @param parent required, a parent Component in same Window where to locate dialog relatively.
+     * @param size optional, the dimension when different from 600 x 460.
      */
-    public static void showModelessHtmlDialog(Component parent, String textAsHtml, Dimension size) {
+    public static void showModelessHtmlDialog(Component parent, String htmlText, Dimension size) {
+        showModelessDialog(parent, buildHtmlTextPane(htmlText), size);
+    }
+
+    /**
+     * Opens a non-modal dialog showing given plain text in a scroll-pane.
+     * @param text the text to render in returned JTextPane.
+     * @param parent required, a parent Component in same Window where to locate dialog relatively.
+     * @param size optional, the dimension when different from 600 x 460.
+     */
+    public static void showModelessTextDialog(Component parent, String text, Dimension size) {
+        showModelessDialog(parent, buildPlainTextArea(text), size);
+    }
+
+    /**
+     * Builds a TextPane containing given HTML text. Has no JScrollPane yet!
+     * @param htmlText the text to render in returned JTextPane.
+     * @return a JTextPane containing given HTML text.
+     */
+    private static JComponent buildHtmlTextPane(String htmlText) {
+        final JTextPane textPane = new JTextPane();
+        textPane.setContentType("text/html");
+        configureTextComponent(htmlText, textPane);
+        return textPane;
+    }
+
+    /**
+     * Builds a TextArea containing given plain text. Has no JScrollPane yet!
+     * @param text the text to render in returned JTextArea.
+     * @return a JTextArea containing given HTML text.
+     */
+    private static JComponent buildPlainTextArea(String text) {
+        final JTextArea textArea = new JTextArea();
+        textArea.setToolTipText("Use Ctrl-A and Ctrl-C to Copy the Whole Text");
+        configureTextComponent(text, textArea);
+        return textArea;
+    }
+
+    private static void configureTextComponent(String text, JTextComponent textComponent) {
+        textComponent.setEditable(false);
+        textComponent.setText(text);
+        textComponent.setCaretPosition(0); // scroll back to top
+    }
+
+    private static void showModelessDialog(Component parent, JComponent textComponent, Dimension size) {
         final Window window = SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
         final JDialog dialog = new JDialog(Objects.requireNonNull(window), "Notes Syntax Help");
-        final JComponent helpText = buildHtmlTextPane(textAsHtml);
-        dialog.getContentPane().add(new JScrollPane(helpText));
+        dialog.getContentPane().add(new JScrollPane(textComponent));
         
         final KeyListener escapeListener = new KeyAdapter()   {
             @Override
@@ -35,9 +81,9 @@ public class DialogUtil
                 }
             }
         };
-        helpText.addKeyListener(escapeListener);
+        textComponent.addKeyListener(escapeListener);
+        textComponent.setFocusable(true); // else no ESCAPE
         dialog.addKeyListener(escapeListener);
-        helpText.setFocusable(true); // else no ESCAPE
         dialog.setFocusable(true); // else no ESCAPE
         
         if (size == null)
@@ -47,19 +93,4 @@ public class DialogUtil
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
     }
-
-    /**
-     * Builds a TextPane containing given HTML text. Has no JScrollPane yet!
-     * @param textAsHtml the text to render in returned JTextPane.
-     * @return a JTextPane containing given HTML text.
-     */
-    public static JComponent buildHtmlTextPane(String textAsHtml) {
-        final JTextPane textPane = new JTextPane();
-        textPane.setEditable(false);
-        textPane.setContentType("text/html");
-        textPane.setText(textAsHtml);
-        textPane.setCaretPosition(0); // scroll back to top
-        return textPane;
-    }
-
 }
