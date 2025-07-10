@@ -86,8 +86,8 @@ public class PianoWithHold extends PianoWithVolume
         public void mouseReleased(MouseEvent e) {
             if (isHoldActive() == false)
                 super.mouseReleased(e);
-            else
-                mouseOverKey = null; // stops glissando and holds current tone
+            else 
+                setMouseOverKeyToNull();
         }
         
         @Override
@@ -110,7 +110,7 @@ public class PianoWithHold extends PianoWithVolume
         /** Resets this listener completely. */
         protected void reset() {
             piano.getSoundChannel().allNotesOff();
-            mouseOverKey = null;
+            setMouseOverKeyToNull();
             
             if (originalBorder != null)
                 for (Keyboard.Key key : holdPlayingNotes)

@@ -180,7 +180,7 @@ public class PianoWithSound extends Piano
     protected static class MouseHandler extends MouseAdapter
     {
         protected final PianoWithSound piano;
-        protected Keyboard.Key mouseOverKey;
+        private Keyboard.Key mouseOverKey;
         
         public MouseHandler(PianoWithSound piano) {
             this.piano = piano;
@@ -212,37 +212,31 @@ public class PianoWithSound extends Piano
             if (SwingUtilities.isLeftMouseButton(e) == false)
                 return;
             
-            final Keyboard.Key changedMouseOverKey = getChangedMouseOverKey(e);
-            if (changedMouseOverKey != null) { // mouse is still pressed and entered another key
-                noteOff(mouseOverKey);
-                visualSelect(mouseOverKey, false);
-                continueGlissando(changedMouseOverKey);
+            final Keyboard.Key key = getKey(e); // is never null
+            if (mouseOverKey != null && mouseOverKey != key) { // mouse entered another key
+                stopGlissando(key);
+                continueGlissando(key);
             }
         }
         
-        protected Keyboard.Key getChangedMouseOverKey(MouseEvent e) {
-            if (mouseOverKey != null) { // mouse is still pressed
-                final Keyboard.Key key = getKey(e);
-                if (mouseOverKey != key) // mouse entered another key
-                    return key;
-            }
-            return null;
+        private void stopGlissando(Keyboard.Key key) {
+            if (mouseOverKey != null && mouseOverKey != key)
+                noteOff(mouseOverKey);
+            setMouseOverKeyToNull();
         }
-        protected void continueGlissando(Keyboard.Key changedMouseOverKey) {
-            noteOn(changedMouseOverKey);
-            mouseOverKey = changedMouseOverKey;
+        private void continueGlissando(Keyboard.Key newMouseOverKey) {
+            noteOn(newMouseOverKey);
+            mouseOverKey = newMouseOverKey;
             // visual selection of current key, will be removed by Swing
-            visualSelect(changedMouseOverKey, true);
+            visualSelect(newMouseOverKey, true);
         }
-        protected void stopGlissando(Keyboard.Key key) {
-            if (mouseOverKey != null) {
-                if (mouseOverKey != key) {
-                    noteOff(mouseOverKey);
-                    visualSelect(mouseOverKey, false);
-                }
-                mouseOverKey = null;
-            }
+        
+        protected final void setMouseOverKeyToNull() {
+            if (mouseOverKey != null)
+                visualSelect(mouseOverKey, false);
+            mouseOverKey = null;
         }
+        
         protected void visualSelect(Keyboard.Key key, boolean pressed) {
             // START keep order: this should not trigger an action! 
             // See AbstractButton.doClick() for necessary order of calls to trigger an action
