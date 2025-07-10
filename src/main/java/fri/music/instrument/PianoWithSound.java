@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import fri.music.ScaleTypes;
 import fri.music.SoundChannel;
 import fri.music.ToneSystem;
@@ -188,6 +189,9 @@ public class PianoWithSound extends Piano
         /** Listens to key presses to start a tone. */
         @Override
         public void mousePressed(MouseEvent e) {
+            if (SwingUtilities.isLeftMouseButton(e) == false)
+                return;
+            
             final Keyboard.Key key = getKey(e);
             noteOn(key);
             mouseOverKey = key; // start glissando
@@ -195,6 +199,9 @@ public class PianoWithSound extends Piano
         /** Listens to key releases to stop a tone. */
         @Override
         public void mouseReleased(MouseEvent e) {
+            if (SwingUtilities.isLeftMouseButton(e) == false)
+                return;
+            
             final Keyboard.Key key = getKey(e);
             noteOff(key);
             stopGlissando(key);
@@ -202,9 +209,13 @@ public class PianoWithSound extends Piano
         /** Listens to mouse drag to play entered key as glissando. */
         @Override
         public void mouseEntered(MouseEvent e) {
+            if (SwingUtilities.isLeftMouseButton(e) == false)
+                return;
+            
             final Keyboard.Key changedMouseOverKey = getChangedMouseOverKey(e);
             if (changedMouseOverKey != null) { // mouse is still pressed and entered another key
                 noteOff(mouseOverKey);
+                visualSelect(mouseOverKey, false);
                 continueGlissando(changedMouseOverKey);
             }
         }
@@ -225,8 +236,10 @@ public class PianoWithSound extends Piano
         }
         protected void stopGlissando(Keyboard.Key key) {
             if (mouseOverKey != null) {
-                if (mouseOverKey != key)
+                if (mouseOverKey != key) {
                     noteOff(mouseOverKey);
+                    visualSelect(mouseOverKey, false);
+                }
                 mouseOverKey = null;
             }
         }
