@@ -12,6 +12,27 @@ import fri.music.Tones;
  */
 public class Note extends Tone
 {
+    /**
+     * @param slurred a note that is "phrased" together with predecessor or successor 
+     *      or both, having DIFFERENT pitches. Null means not slurred, 
+     *      TRUE means slur start or continued, FALSE means slur end.
+     * @param tied a note that is tied together with predecessor or successor
+     *      or both, all having SAME pitch. Null means not tied, 
+     *      TRUE means tie start or continued, FALSE means tie end.
+     *      If a tie is not started but continued, the note's durationMilliseconds will be zero.
+     */
+    public record ConnectionFlags(Boolean slurred, Boolean tied)
+    {
+    }
+    
+    /**
+     * @param timeSignature the bar signature as String, e.g. "3/4" or "4/4".
+     * @param beatsPerMinute the tempo of the tune.
+     */
+    public record BeatInfo(String timeSignature, Integer beatsPerMinute)
+    {
+    }
+    
     /** Default loudness, 0-127. */
     public static final int DEFAULT_VOLUME = 7;
     /** Default tempo is 120 BPM. */
@@ -32,20 +53,11 @@ public class Note extends Tone
     /** The symbolic notation of the length, e.g. "4,3." */
     public final String lengthNotation;
     
-    /**
-     * Connection flag:
-     * a note that is "phrased" together with predecessor or successor or both, having DIFFERENT pitches.
-     * Null means not slurred, TRUE means slur start or continued, FALSE means slur end.
-     */
-    public final Boolean slurred;
+    /** Ties and slurs. */
+    public final ConnectionFlags connectionFlags;
     
-    /**
-     * Connection flag:
-     * a note that is tied together with predecessor or successor or both, all having SAME pitch.
-     * Null means not tied, TRUE means tie start or continued, FALSE means tie end.
-     * If the tie is not started but continued, durationMilliseconds will be zero.
-     */
-    public final Boolean tied;
+    /** Time signature changes and tempo. */
+    public BeatInfo beatInfo;
     
     /** A note from given tone-system with default duration (quarter note). */
     public Note(Tones toneSystem, String ipnName) {
@@ -57,37 +69,27 @@ public class Note extends Tone
     }
     /** A note from given tone-system. */
     public Note(Tones toneSystem, String ipnName, int durationMilliseconds, int volume) {
-        this(toneSystem, ipnName, durationMilliseconds, volume, false, null, null, null);
+        this(toneSystem, ipnName, durationMilliseconds, volume, false, null, null);
     }
     /** A note from given tone-system. */
-    public Note(
-            Tones toneSystem, 
-            String ipnName, 
-            int durationMilliseconds, 
-            int volume, 
-            boolean emphasized, 
-            Boolean slurred, 
-            Boolean tied, 
-            String lengthNotation) {
-        this(
-            toneSystem.forIpnName(ipnName), 
-            durationMilliseconds, 
-            volume, 
-            emphasized, 
-            slurred, 
-            tied,
-            lengthNotation);
+    public Note(Tones toneSystem, String ipnName, int durationMilliseconds, int volume, boolean emphasized, String lengthNotation, BeatInfo beatInfo) {
+        this(toneSystem.forIpnName(ipnName), durationMilliseconds, volume, emphasized, null, lengthNotation, beatInfo);
+    }
+    
+    /** A clone of given tone with same duration and connection flags as given note. */
+    public Note(Tone tone, Note note) {
+        this(tone, note.durationMilliseconds, note.volume, note.emphasized, note.connectionFlags, note.lengthNotation, note.beatInfo);
     }
     
     /** A note from given tone. */
-    public Note(
+    private Note(
             Tone tone, 
             int durationMilliseconds, 
             int volume, 
             boolean emphasized, 
-            Boolean slurred, 
-            Boolean tied, 
-            String lengthNotation) {
+            ConnectionFlags connectionFlags, 
+            String lengthNotation,
+            BeatInfo beatInfo) {
         super(
             tone.ipnName, 
             tone.frequency, 
@@ -97,50 +99,37 @@ public class Note extends Tone
         this.durationMilliseconds = (durationMilliseconds < 0) ? DEFAULT_BEAT_DURATION : durationMilliseconds;
         this.volume = (volume <= 0 || volume > 127) ? DEFAULT_VOLUME : volume;
         this.emphasized = emphasized;
-        this.slurred = slurred;
-        this.tied = tied;
+        this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags(null, null);
         this.lengthNotation = lengthNotation;
-    }
-    
-    /** A clone of given tone with same duration and connection flags as given note. */
-    public Note(Tone tone, Note note) {
-        this(
-            tone, 
-            note.durationMilliseconds,
-            note.volume,
-            note.emphasized,
-            note.slurred,
-            note.tied,
-            note.lengthNotation);
+        this.beatInfo = (beatInfo != null) ? beatInfo : new BeatInfo(null, null);
     }
     
     /** A clone with same IPN-name and frequency but different duration and connection flags. */
-    public Note(Note note, int durationMilliseconds, Boolean slurred, Boolean tied, String lengthNotation) {
+    public Note(Note note, int durationMilliseconds, ConnectionFlags connectionFlags, String lengthNotation) {
         super(
             note.ipnName, 
             note.frequency, 
             note.midiNumber, 
             note.cent);
         
+        this.durationMilliseconds = durationMilliseconds;
         this.volume = note.volume;
         this.emphasized = note.emphasized;
-        
-        this.durationMilliseconds = durationMilliseconds;
-        this.slurred = slurred;
-        this.tied = tied;
+        this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags(null, null);;
         this.lengthNotation = lengthNotation;
+        this.beatInfo = note.beatInfo;
     }
     
     /** A rest. */
-    public Note(int durationMilliseconds, String lengthNotation) {
+    public Note(int durationMilliseconds, boolean emphasized, String lengthNotation, BeatInfo beatInfo) {
         super(ToneSystem.REST_SYMBOL, -1.0, -1, -1);
         
         this.durationMilliseconds = durationMilliseconds;
-        this.lengthNotation = lengthNotation;
         this.volume = 0;
-        this.emphasized = false;
-        this.slurred = null;
-        this.tied = null;
+        this.emphasized = emphasized;
+        this.connectionFlags = new ConnectionFlags(null, null);
+        this.lengthNotation = lengthNotation;
+        this.beatInfo = (beatInfo != null) ? beatInfo : new BeatInfo(null, null);
     }
     
     

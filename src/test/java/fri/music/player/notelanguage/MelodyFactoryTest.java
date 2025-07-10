@@ -85,7 +85,7 @@ class MelodyFactoryTest
                 "G4/4. A4/8 G4/8 F4/8" + MelodyFactory.NEWLINE+
                 "E4/4 C4/4 C4/4" + MelodyFactory.NEWLINE+
                 "D4/4 G3/4 G3/4" + MelodyFactory.NEWLINE+
-                "C4/2.";
+                "C4/2." + MelodyFactory.NEWLINE;
         assertEquals(expectedResult, textNotation);
         
         final Note[] roundTripped = melodyFactory.translate(textNotation);
@@ -110,7 +110,7 @@ class MelodyFactoryTest
         final String expectedResult = 
                 ""+BEATS_PER_MINUTE + MelodyFactory.NEWLINE+
                 ""+BEATS_PER_BAR+"/"+BEAT_TYPE + MelodyFactory.NEWLINE+
-                "(G4/8 (G4/8) G4/8) {A4/8 G4/8 F4/8}";
+                "(G4/8 (G4/8) G4/8) {A4/8 G4/8 F4/8}" + MelodyFactory.NEWLINE;
         assertEquals(expectedResult, textNotation);
     }
     
@@ -295,11 +295,11 @@ class MelodyFactoryTest
         
         assertEquals(notes.length, resultMelody.length);
         
-        assertNull(resultMelody[0].slurred);
-        assertNull(resultMelody[0].tied);
+        assertNull(resultMelody[0].connectionFlags.slurred());
+        assertNull(resultMelody[0].connectionFlags.tied());
         
-        assertNull(resultMelody[1].slurred);
-        assertEquals(Boolean.TRUE, resultMelody[1].tied);
+        assertNull(resultMelody[1].connectionFlags.slurred());
+        assertEquals(Boolean.TRUE, resultMelody[1].connectionFlags.tied());
         assertEquals(
             melodyFactory.getBeatDurationMilliseconds() * 2, // one beat is a quarter note here
             resultMelody[1].durationMilliseconds);
@@ -308,28 +308,28 @@ class MelodyFactoryTest
                 1000, // a quarter note on 120 BPM is 1000 millis
                 resultMelody[1].durationMilliseconds);
         
-        assertNull(resultMelody[2].slurred);
-        assertEquals(Boolean.TRUE, resultMelody[2].tied);
+        assertNull(resultMelody[2].connectionFlags.slurred());
+        assertEquals(Boolean.TRUE, resultMelody[2].connectionFlags.tied());
         assertEquals(0, resultMelody[2].durationMilliseconds); // tied follower must have no duration
         
-        assertNull(resultMelody[3].slurred);
-        assertEquals(Boolean.FALSE, resultMelody[3].tied);
+        assertNull(resultMelody[3].connectionFlags.slurred());
+        assertEquals(Boolean.FALSE, resultMelody[3].connectionFlags.tied());
         assertEquals(0, resultMelody[3].durationMilliseconds); // tied follower must have no duration
         
-        assertNull(resultMelody[4].slurred);
-        assertNull(resultMelody[4].tied);
+        assertNull(resultMelody[4].connectionFlags.slurred());
+        assertNull(resultMelody[4].connectionFlags.tied());
         
-        assertEquals(Boolean.TRUE, resultMelody[5].slurred);
-        assertNull(resultMelody[5].tied);
+        assertEquals(Boolean.TRUE, resultMelody[5].connectionFlags.slurred());
+        assertNull(resultMelody[5].connectionFlags.tied());
         
-        assertEquals(Boolean.TRUE, resultMelody[6].slurred);
-        assertNull(resultMelody[6].tied);
+        assertEquals(Boolean.TRUE, resultMelody[6].connectionFlags.slurred());
+        assertNull(resultMelody[6].connectionFlags.tied());
         
-        assertEquals(Boolean.FALSE, resultMelody[7].slurred);
-        assertNull(resultMelody[7].tied);
+        assertEquals(Boolean.FALSE, resultMelody[7].connectionFlags.slurred());
+        assertNull(resultMelody[7].connectionFlags.tied());
         
-        assertNull(resultMelody[8].slurred);
-        assertNull(resultMelody[8].tied);
+        assertNull(resultMelody[8].connectionFlags.slurred());
+        assertNull(resultMelody[8].connectionFlags.tied());
     }
 
     @Test
@@ -341,11 +341,11 @@ class MelodyFactoryTest
         
         final Note[] resultMelody = melodyFactory.translate(notes);
         
-        assertNull(resultMelody[0].tied);
-        assertEquals(Boolean.TRUE, resultMelody[1].tied);
-        assertEquals(Boolean.TRUE, resultMelody[2].tied);
-        assertEquals(Boolean.FALSE, resultMelody[3].tied);
-        assertNull(resultMelody[4].tied);
+        assertNull(resultMelody[0].connectionFlags.tied());
+        assertEquals(Boolean.TRUE, resultMelody[1].connectionFlags.tied());
+        assertEquals(Boolean.TRUE, resultMelody[2].connectionFlags.tied());
+        assertEquals(Boolean.FALSE, resultMelody[3].connectionFlags.tied());
+        assertNull(resultMelody[4].connectionFlags.tied());
     }
 
     @Test
@@ -357,19 +357,19 @@ class MelodyFactoryTest
         
         final Note[] resultMelody = melodyFactory.translate(notes);
         
-        assertNull(resultMelody[0].tied);
-        assertEquals(Boolean.TRUE, resultMelody[0].slurred);
+        assertNull(resultMelody[0].connectionFlags.tied());
+        assertEquals(Boolean.TRUE, resultMelody[0].connectionFlags.slurred());
         
-        assertEquals(Boolean.TRUE, resultMelody[1].tied);
-        assertEquals(Boolean.TRUE, resultMelody[1].slurred);
+        assertEquals(Boolean.TRUE, resultMelody[1].connectionFlags.tied());
+        assertEquals(Boolean.TRUE, resultMelody[1].connectionFlags.slurred());
         
-        assertEquals(Boolean.TRUE, resultMelody[2].tied);
-        assertEquals(Boolean.TRUE, resultMelody[2].slurred);
+        assertEquals(Boolean.TRUE, resultMelody[2].connectionFlags.tied());
+        assertEquals(Boolean.TRUE, resultMelody[2].connectionFlags.slurred());
         
-        assertEquals(Boolean.FALSE, resultMelody[3].tied);
-        assertEquals(Boolean.TRUE, resultMelody[3].slurred);
+        assertEquals(Boolean.FALSE, resultMelody[3].connectionFlags.tied());
+        assertEquals(Boolean.TRUE, resultMelody[3].connectionFlags.slurred());
         
-        assertNull(resultMelody[4].tied);
-        assertEquals(Boolean.FALSE, resultMelody[4].slurred);
+        assertNull(resultMelody[4].connectionFlags.tied());
+        assertEquals(Boolean.FALSE, resultMelody[4].connectionFlags.slurred());
     }
 }

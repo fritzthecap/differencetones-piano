@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import fri.music.ScaleTypes;
 import fri.music.instrument.NotesOnPianoPlayer;
 import fri.music.instrument.PianoWithSound;
+import fri.music.instrument.PianoWithVolume;
 import fri.music.wavegenerator.SineWaveSoundChannel;
 
 public class NotesOnPianoPlayerDemo
@@ -16,6 +17,19 @@ public class NotesOnPianoPlayerDemo
         "D4/4 G3/4 G3/4 E4/4 C4/4 C4/4 \n"+
         "G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4 \n"+
         "D4/4 G3/4 G3/4 C4/2.";
+    
+    private static final String TUBULAR_BELLS = 
+            """
+155
+4/4
+-/2. -/8 e5/8 
+a5/8 e5/8 b5/8 e5/8 {g5/8 a5/8} e5/8 c6/8 
+3/4
+e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8
+4/4
+a5/8 e5/8 b5/8 e5/8 {g5/8 a5/8} e5/8 c6/8 
+e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
+""";
 
     public static void main(String[] args) {
         final int octaves = 7;
@@ -30,15 +44,10 @@ public class NotesOnPianoPlayerDemo
                 lowestToneIpnName,
                 //true, // vertical
                 13);
-        final NotesOnPianoPlayer player = new NotesOnPianoPlayer(config, new SineWaveSoundChannel(null), AUGUSTIN);
+        final NotesOnPianoPlayer player = new NotesOnPianoPlayer(
+                new PianoWithVolume(config, new SineWaveSoundChannel(null)),
+                TUBULAR_BELLS);
         
-//        final NotesOnPianoPlayer player = new NotesOnPianoPlayer(config, new SineWaveSoundChannel(null), AUGUSTIN) {
-//            @Override
-//            protected PianoWithSound newPiano(PianoWithSound.Configuration config, SoundChannel channel) {
-//                return new DifferenceTonePiano(config, (WaveSoundChannel) channel);
-//            }
-//        };
-
         final JComponent playerPanel = player.getPlayer();
         
         frame.addWindowListener(player.getWindowClosingListener());

@@ -44,30 +44,34 @@ public class MelodyFactory
     /** If a melody has no time signature, it will get this. */
     public static final Integer DEFAULT_BEAT_TYPE = 4;
     
+    public static final int TEMPO_MINIMUM_BPM = 40;
+    public static final int TEMPO_MAXIMUM_BPM = 208;
+
     static final String NEWLINE = System.getProperty("line.separator");
 
     /** Factor by which first note in bar should be louder than subsequent notes. */
     private static final double BAR_START_VOLUME_FACTOR = 1.8;
     private static final double BAR_HALF_VOLUME_FACTOR = 1.4;
     
-    /** The separator between IPN-name and note length (duration). */
-    private static final char DURATION_SEPARATOR = Note.DURATION_SEPARATOR;
     /** The symbol at the end of dotted notes, duration factor 3/2. */
     private static final String DOTTED_SYMBOL = ".";
     /** The separator character for triplet and other multiplet numbers. */
     private static final char MULTIPLET_SEPARATOR = ',';
     
+    private static String timeSignature(Integer beatsPerBar, Integer beatType) {
+        return "" + beatsPerBar + Note.DURATION_SEPARATOR + beatType;        
+    }
     
     private final Tones toneSystem;
     private final Integer volume;
     
-    private int beatsPerMinute; // BPM
+    private Integer beatsPerMinute; // BPM
     private Integer beatsPerBar; // time signature, waltz (3) or foxtrot (4) or ...
     private Integer beatType; // beat-notes in bar, eighth (8) or quarter (4) or ... er changes. */
     private int beatDurationMilliseconds; // duration in milliseconds of one beat
 
-    private boolean translateChangedTimeSignature;
-    private boolean translateChangedTempo;
+    private String firstFoundTimeSignature;
+    private Integer firstFoundTempo;
     
     /** Factory with default settings. */
     public MelodyFactory() {
@@ -149,7 +153,7 @@ public class MelodyFactory
     public Note[] translate(String[] melodyTokens) {
         final List<MelodyToken> melodyNotes = new ArrayList<>(melodyTokens.length);
         
-        final List<Note> rawNotes = buildNotes(melodyTokens, melodyNotes);
+        final List<Note> rawNotes = buildRawNotes(melodyTokens, melodyNotes);
         
         final List<Note> connectedNotes = connectSlurredAndTiedNotes(melodyNotes, rawNotes);
         
@@ -166,41 +170,45 @@ public class MelodyFactory
         boolean inSlur = false;
         boolean inTie = false;
         
-        result.append("" + beatsPerMinute + NEWLINE);
-        result.append("" + beatsPerBar + Note.DURATION_SEPARATOR + beatType + NEWLINE);
-        
         for (int i = 0; i < notes.length; i++) {
             final Note note = notes[i];
-            
             if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
                 throw new IllegalArgumentException("Note has no length notation, can not render it: "+note.ipnName);
             
-            if (Boolean.TRUE.equals(note.slurred)) {
+            final boolean newlineBeforeNote = (note.emphasized && i > 0);
+            
+            if (i == 0)
+                result.append("" + note.beatInfo.beatsPerMinute());
+
+            if (note.beatInfo.timeSignature() != null)
+                result.append(NEWLINE + note.beatInfo.timeSignature() + (newlineBeforeNote ? "" : NEWLINE));
+            
+            if (Boolean.TRUE.equals(note.connectionFlags.slurred())) {
                 if (inSlur == false)
                     result.append(NoteConnections.SLUR_START_SYMBOL);
                 inSlur = true;
             }
             
-            if (Boolean.TRUE.equals(note.tied)) {
+            if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
                 result.append(NoteConnections.TIE_START_SYMBOL);
             }
                 
-            if (note.emphasized && i > 0) // break line before fist note in bar
+            if (note.emphasized && i > 0) // break line before first note in bar
                 result.append(NEWLINE);
             
             result.append(note.toString());
             
-            if (Boolean.TRUE.equals(note.tied)) {
+            if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
                 if (inTie == true) // enclose every note within tie into parentheses
                     result.append(NoteConnections.TIE_END_SYMBOL);
                 inTie = true;
             }
-            else if (Boolean.FALSE.equals(note.tied)) {
+            else if (Boolean.FALSE.equals(note.connectionFlags.tied())) {
                 result.append(NoteConnections.TIE_END_SYMBOL);
                 inTie = false;
             }
             
-            if (Boolean.FALSE.equals(note.slurred)) {
+            if (Boolean.FALSE.equals(note.connectionFlags.slurred())) {
                 result.append(NoteConnections.SLUR_END_SYMBOL);
                 inSlur = false;
             }
@@ -208,33 +216,25 @@ public class MelodyFactory
             if (i < notes.length - 1 && notes[i + 1].emphasized == false)
                 result.append(" "); // separate notes by space when not last in bar
         }
+        
+        result.append(NEWLINE);
         return result.toString();
     }
     
     
-    public int getBeatsPerMinute() {
-        return beatsPerMinute;
+    /** @return beatsPerMinute from latest <code>translate()</code> call, or null if there was none. */
+    public Integer getFirstFoundTempo() {
+        return firstFoundTempo;
     }
 
-    public int getBeatsPerBar() {
-        return beatsPerBar;
-    }
-    
-    public int getBeatType() {
-        return beatType;
-    }
-    
-    public boolean translateChangedTimeSignature() {
-        return translateChangedTimeSignature;
-    }
-    
-    public boolean translateChangedTempo() {
-        return translateChangedTempo;
+    /** @return beatsPerBar/beatType from latest <code>translate()</code> call, or null if there was none. */
+    public String getFirstFoundTimeSignature() {
+        return firstFoundTimeSignature;
     }
     
 
     /** @return the milliseconds one beat lasts, for unit-tests. */
-    Integer getBeatDurationMilliseconds() {
+    int getBeatDurationMilliseconds() {
         return beatDurationMilliseconds;
     }
     
@@ -242,11 +242,16 @@ public class MelodyFactory
         this.beatDurationMilliseconds = (int) Math.round(1000.0 * 60.0 / (double) this.beatsPerMinute);
     }
     
-    private List<Note> buildNotes(String[] melodyTokens, List<MelodyToken> melodyNotes) {
-        translateChangedTimeSignature = translateChangedTempo = false; // reset values from last translate call
+    private List<Note> buildRawNotes(String[] melodyTokens, List<MelodyToken> melodyNotes) {
+        // reset values from last translate call
+        firstFoundTimeSignature = null;
+        firstFoundTempo = null;
         
         final List<Note> notes = new ArrayList<>(melodyTokens.length);
         BarState barState = new BarState(beatsPerBar, beatDurationMilliseconds);
+        
+        String previousTimeSignature = timeSignature(beatsPerBar, beatType);
+        String currentTimeSignature = previousTimeSignature;
         
         for (int i = 0; i < melodyTokens.length; i++) {
             final InputToken inputToken = newInputToken(melodyTokens[i].trim());
@@ -257,21 +262,33 @@ public class MelodyFactory
                 this.beatType = timeSignature.beatType;
                 
                 barState = new BarState(this.beatsPerBar, beatDurationMilliseconds);
-                translateChangedTimeSignature = true;
+                
+                currentTimeSignature = timeSignature.getTimeSignature();
+                
+                if (firstFoundTimeSignature == null)
+                    firstFoundTimeSignature = currentTimeSignature;
             }
             else if (inputToken instanceof BeatsPerMinuteToken) {
+                if (notes.size() > 0 || firstFoundTempo != null)
+                    throw new IllegalStateException("Tempo may appear just once on top of notes: "+melodyTokens[i]);
+                
                 final BeatsPerMinuteToken beatsPerMinute = (BeatsPerMinuteToken) inputToken;
                 this.beatsPerMinute = beatsPerMinute.beatsPerMinute;
                 calculateBeatDurationMilliseconds();
                 
                 barState = new BarState(this.beatsPerBar, beatDurationMilliseconds);
-                translateChangedTempo = true;
+                
+                firstFoundTempo = this.beatsPerMinute;
             }
             else {
                 final MelodyToken melodyToken = (MelodyToken) inputToken;
                 melodyNotes.add(melodyToken);
                 
-                final Note note = buildNote(melodyToken, barState);
+                final boolean beatInfoRequired = // on first note, or when time signature changes
+                        (notes.size() <= 0 || previousTimeSignature.equals(currentTimeSignature) == false);
+                previousTimeSignature = currentTimeSignature;
+                
+                final Note note = buildRawNote(melodyToken, barState, currentTimeSignature, beatInfoRequired);
                 notes.add(note);
             }
         }
@@ -296,10 +313,9 @@ public class MelodyFactory
                 noteAndLength.ipnName.matches("[ABCDEFG]#?[0-9]+") == false)
             throw new IllegalArgumentException("Invalid note name: '"+noteAndLength.ipnName+"'");
         
-        return new MelodyToken(
-                noteAndLength.ipnName, 
-                (noteAndLength.length != null) ? noteAndLength.length : DEFAULT_NOTE_LENGTH, 
-                noteConnections);
+        final String length = (noteAndLength.length != null) ? noteAndLength.length : DEFAULT_NOTE_LENGTH;
+        
+        return new MelodyToken(noteAndLength.ipnName, length, noteConnections);
     }
     
     private Integer toIntegerOrNull(final String string) {
@@ -312,7 +328,7 @@ public class MelodyFactory
     }
     
     private MelodyToken splitByDurationSeparator(String melodyToken) {
-        final int durationStartIndex = melodyToken.indexOf(DURATION_SEPARATOR);
+        final int durationStartIndex = melodyToken.indexOf(Note.DURATION_SEPARATOR);
         final boolean hasDurationSeparator = (durationStartIndex > 0);
         
         final String noteName = (hasDurationSeparator
@@ -324,10 +340,12 @@ public class MelodyFactory
         if (hasDurationSeparator && melodyToken.length() > durationStartIndex + 1)
             // if there is a non-empty length
             noteLength = melodyToken.substring(durationStartIndex + 1);
-        else
+        else if (hasDurationSeparator == false)
             noteLength = null;
+        else // has duration separator but no length, error!
+            throw new IllegalArgumentException("Length is missing in '"+melodyToken+"'");
         
-        return new MelodyToken(noteName, noteLength, null);
+        return new MelodyToken(noteName.toUpperCase(), noteLength, null);
     }
 
     
@@ -357,8 +375,18 @@ public class MelodyFactory
         public final Integer beatType; // the 4 in 3/4
 
         TimeSignatureToken(Integer beatsPerBar, Integer beatType) {
+            if (beatsPerBar == null || beatsPerBar < 1 || beatsPerBar > 16)
+                throw new IllegalArgumentException("Illegal beats per bar: "+beatsPerBar);
+            
+            if (beatType == null || beatType < 1 || beatType > 8)
+                throw new IllegalArgumentException("Illegal beat type: "+beatType);
+            
             this.beatsPerBar = beatsPerBar;
             this.beatType = beatType;
+        }
+        
+        public String getTimeSignature() {
+            return timeSignature(beatsPerBar, beatType);
         }
     }
     
@@ -368,12 +396,15 @@ public class MelodyFactory
         public final Integer beatsPerMinute;
 
         BeatsPerMinuteToken(Integer beatsPerMinute) {
+            if (beatsPerMinute == null || beatsPerMinute < TEMPO_MINIMUM_BPM || beatsPerMinute > TEMPO_MAXIMUM_BPM)
+                throw new IllegalArgumentException("Illegal tempo (BPM): "+beatsPerMinute);
+            
             this.beatsPerMinute = beatsPerMinute;
         }
     }
     
     
-    private Note buildNote(MelodyToken melodyToken, BarState barState) {
+    private Note buildRawNote(MelodyToken melodyToken, BarState barState, String currentTimeSignature, boolean beatInfoRequired) {
         final int duration = durationMilliseconds(melodyToken.length);
         
         final double volumeFactor = getVolumeFactor(barState);
@@ -382,19 +413,26 @@ public class MelodyFactory
         
         // finally skip barState to next note
         barState.add(duration);
+        
+        final Note.BeatInfo beatInfo;
+        if (beatInfoRequired)
+            beatInfo = new Note.BeatInfo(
+                currentTimeSignature, 
+                (firstFoundTempo != null) ? firstFoundTempo : beatsPerMinute);
+        else
+            beatInfo = null;
 
         if (melodyToken.ipnName.equals(ToneSystem.REST_SYMBOL))
-            return new Note(duration, melodyToken.length);
+            return new Note(duration, emphasized, melodyToken.length, beatInfo);
         
-        return new Note(
+        return new Note( // raw because no tie/slur connections yet
                 toneSystem,
                 melodyToken.ipnName, 
                 duration,
                 volumeInBar,
                 emphasized,
-                (Boolean) null,
-                (Boolean) null,
-                melodyToken.length);
+                melodyToken.length,
+                beatInfo);
     }
 
     private int durationMilliseconds(final String noteLength) {
@@ -414,9 +452,23 @@ public class MelodyFactory
         if (length == null)
             throw new IllegalArgumentException("Note length is not a number: '"+noteLength+"'");
         
+        if (isValidNoteLength(length) == false)
+            throw new IllegalArgumentException("Illegal note length: '"+length+"'");
+        
         return toMillis(length, dotted, multipletType);
     }
     
+    private boolean isValidNoteLength(Integer number) {
+        if (number > 64)
+            return false;
+        
+        for (int i = 1; i <= 64; i *= 2)
+            if (number == i)
+                return true;
+        
+        return false;
+    }
+
     private Integer getMultipletType(String noteLengthString, int multipletSeparatorIndex) {
         if (multipletSeparatorIndex <= 0)
             return null;
@@ -520,7 +572,11 @@ public class MelodyFactory
             else // not in tie
                 durationMilliseconds = rawNote.durationMilliseconds;
             
-            final Note tiedAndSlurredNote = new Note(rawNote, durationMilliseconds, slurred, tied, rawNote.lengthNotation);
+            final Note tiedAndSlurredNote = new Note(
+                    rawNote, 
+                    durationMilliseconds, 
+                    new Note.ConnectionFlags(slurred, tied), 
+                    rawNote.lengthNotation);
             connectedNotes.add(tiedAndSlurredNote);
             
             inSlur = slurStart ? true : slurEnd ? false : inSlur;
