@@ -11,15 +11,16 @@ import fri.music.wavegenerator.SineWaveSoundChannel;
 public class NotesOnPianoPlayerDemo
 {
     private static final String AUGUSTIN = 
-        "96 \n"+ // BPM
-        "3/4 \n"+ // time signature
-        "G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4 \n"+
-        "D4/4 G3/4 G3/4 E4/4 C4/4 C4/4 \n"+
-        "G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4 \n"+
-        "D4/4 G3/4 G3/4 C4/2.";
+        """
+3/4
+G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
+D4/4 G3/4 G3/4 E4/4 C4/4 C4/4
+G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
+D4/4 G3/4 G3/4 C4/2.
+""";
     
     private static final String TUBULAR_BELLS = 
-            """
+        """
 155
 4/4
 -/2. -/8 e5/8 
@@ -45,8 +46,8 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
                 //true, // vertical
                 13);
         final NotesOnPianoPlayer player = new NotesOnPianoPlayer(
-                new PianoWithVolume(config, new SineWaveSoundChannel(null)),
-                TUBULAR_BELLS);
+                new PianoWithVolume(config, new SineWaveSoundChannel(null)) /*,
+                TUBULAR_BELLS*/);
         
         final JComponent playerPanel = player.getPlayer();
         

@@ -15,26 +15,31 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
+/**
+ * Shows text in non-modal dialogs.
+ */
 public class DialogUtil
 {
     /**
      * Opens a non-modal dialog showing given HTML text in a scroll-pane.
+     * @param title the text to show in the dialog's title bar.
      * @param htmlText the text to render in returned JTextPane.
      * @param parent required, a parent Component in same Window where to locate dialog relatively.
      * @param size optional, the dimension when different from 600 x 460.
      */
-    public static void showModelessHtmlDialog(Component parent, String htmlText, Dimension size) {
-        showModelessDialog(parent, buildHtmlTextPane(htmlText), size);
+    public static void showModelessHtmlDialog(String title, Component parent, String htmlText, Dimension size) {
+        showModelessDialog(title, parent, buildHtmlTextPane(htmlText), size);
     }
 
     /**
      * Opens a non-modal dialog showing given plain text in a scroll-pane.
+     * @param title the text to show in the dialog's title bar.
      * @param text the text to render in returned JTextPane.
      * @param parent required, a parent Component in same Window where to locate dialog relatively.
      * @param size optional, the dimension when different from 600 x 460.
      */
-    public static void showModelessTextDialog(Component parent, String text, Dimension size) {
-        showModelessDialog(parent, buildPlainTextArea(text), size);
+    public static void showModelessTextDialog(String title, Component parent, String text, Dimension size) {
+        showModelessDialog(title, parent, buildPlainTextArea(text), size);
     }
 
     /**
@@ -67,9 +72,9 @@ public class DialogUtil
         textComponent.setCaretPosition(0); // scroll back to top
     }
 
-    private static void showModelessDialog(Component parent, JComponent textComponent, Dimension size) {
+    private static void showModelessDialog(String title, Component parent, JComponent textComponent, Dimension size) {
         final Window window = SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
-        final JDialog dialog = new JDialog(Objects.requireNonNull(window), "Notes Syntax Help");
+        final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
         dialog.getContentPane().add(new JScrollPane(textComponent));
         
         final KeyListener escapeListener = new KeyAdapter()   {

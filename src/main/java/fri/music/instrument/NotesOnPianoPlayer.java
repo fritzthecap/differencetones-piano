@@ -1,6 +1,7 @@
 package fri.music.instrument;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -15,7 +16,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -24,6 +24,8 @@ import javax.swing.JTextArea;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import fri.music.SoundChannel;
 import fri.music.player.Note;
 import fri.music.player.Player;
@@ -42,9 +44,10 @@ public class NotesOnPianoPlayer
     private final PianoWithSound piano;
     private String melody;
     
-    private JComponent playerPanel;
+    private JComponent playerPanel; // the component
     
     private JButton play;
+    private JButton formatBars;
     private JTextArea notesText;
     private JTextArea errors;
     private JSpinner tempoSpinner;
@@ -75,7 +78,7 @@ public class NotesOnPianoPlayer
             return this.playerPanel; // just one view, due to mouseHandler that stores UI-state
         
         final JComponent playerPanel = piano.getKeyboard(); // using the piano's panel
-        final JPanel notesPanel = buildNotesArea();
+        final JPanel notesPanel = buildNotesPanel();
         playerPanel.add(notesPanel, BorderLayout.CENTER); // to CENTER, so that user can resize area
         
         return this.playerPanel = playerPanel;
@@ -85,10 +88,9 @@ public class NotesOnPianoPlayer
     public WindowListener getWindowClosingListener() {
         return piano.getWindowClosingListener();
     }
-
     
     
-    /** Factory method for MelodyFactory. */
+    /** Factory-method to get a MelodyFactory with current parameters from UI. */
     protected MelodyFactory newMelodyFactory() {
         final String timeSignature = (String) timeSignatureChoice.getSelectedItem();
         final int separatorIndex = timeSignature.indexOf(Note.DURATION_SEPARATOR);
@@ -100,19 +102,30 @@ public class NotesOnPianoPlayer
                 Integer.valueOf(beatsPerBar),
                 Integer.valueOf(beatType));
     }
-    
 
-    private JPanel buildNotesArea() {
-        final JComponent textAreaSplitPane = buildNotesTextArea();
+    // UI build methods
+    
+    private JPanel buildNotesPanel() {
+        final JComponent notesTextAndErrors = buildNotesTextArea();
         final JPanel notesControlPanel = buildNotesControlPanel();
         
-        final JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add(textAreaSplitPane, BorderLayout.CENTER);
-        mainPanel.add(notesControlPanel, piano.config.isVertical ? BorderLayout.NORTH : BorderLayout.WEST);
+        final JPanel notesPanel = new JPanel(new BorderLayout());
+        notesPanel.add(notesTextAndErrors, BorderLayout.CENTER);
+        notesPanel.add(notesControlPanel, piano.config.isVertical ? BorderLayout.NORTH : BorderLayout.WEST);
         
-        putMelodyIntoTextArea();
+        // put initial melody into text-area
+        if (melody != null && melody.length() > 0) {
+            final int lines = (int) melody.chars().filter(c -> c == '\n').count();
+            notesText.setRows(Math.max(2, Math.min(12, lines + 1))); // min 2, max 12 lines
+            notesText.setText(melody);
+            
+            //readNotesFromTextAreaCatchExceptions(); // adjusts tempo and time-signature choosers
+        }
+        else {
+            notesText.setRows(2);
+        }
         
-        return mainPanel;
+        return notesPanel;
     }
     
     private JComponent buildNotesTextArea() {
@@ -121,9 +134,25 @@ public class NotesOnPianoPlayer
         TextAreaUtil.addUndoManagement(notesText);
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
         notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes"));
+        // on every text change, try to translate into notes and render errors
+        notesText.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                readNotesFromTextAreaCatchExceptions();
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                readNotesFromTextAreaCatchExceptions();
+            }
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                readNotesFromTextAreaCatchExceptions();
+            }
+        });
         
         this.errors = new JTextArea();
         errors.setEditable(false);
+        errors.setForeground(Color.RED);
         final JScrollPane errorsScrollPane = new JScrollPane(errors);
         errorsScrollPane.setBorder(BorderFactory.createTitledBorder("Errors"));
         
@@ -131,7 +160,11 @@ public class NotesOnPianoPlayer
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogUtil.showModelessHtmlDialog(playerPanel, SYNTAX_HELP, new Dimension(660, 460));
+                DialogUtil.showModelessHtmlDialog(
+                        "Notes Edit Help", 
+                        playerPanel, 
+                        SYNTAX_HELP, 
+                        new Dimension(660, 460));
             }
         });
         
@@ -147,6 +180,7 @@ public class NotesOnPianoPlayer
     
     private JPanel buildNotesControlPanel() {
         this.play = new JButton("Play");
+        play.setEnabled(false); // assume no notes present
         play.setToolTipText("Play Notes Written in Text Area on Piano");
         play.addActionListener(new ActionListener() {
             @Override
@@ -159,7 +193,7 @@ public class NotesOnPianoPlayer
         });
         
         final String[] timeSignatures = new String[] {
-            "4/4", "3/4", "2/4", "12/8", "9/8", "6/8", "5/4", "7/4",
+            "4/4", "3/4", "12/8", "6/8", "2/4", "9/8", "5/4", "7/4",
         };
         this.timeSignatureChoice = new SmartComboBox(timeSignatures);
         timeSignatureChoice.setToolTipText("Time Signature");
@@ -180,18 +214,15 @@ public class NotesOnPianoPlayer
         tempoLayoutPanel.add(tempoSpinner, piano.config.isVertical ? BorderLayout.WEST : BorderLayout.NORTH);
         tempoLayoutPanel.setBorder(BorderFactory.createTitledBorder("Tempo"));
         
-        final JButton formatBars = new JButton("Format");
+        this.formatBars = new JButton("Format");
+        formatBars.setEnabled(false); // assume no notes present
         formatBars.setToolTipText("Put each Bar into a Separate Line");
         formatBars.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (player == null) {
-                    final Note[] notes = readNotesFromTextAreaCatchExceptions();
-                    if (notes != null) {
-                        final String formattedNotesText = newMelodyFactory().toString(notes);
-                        notesText.setText(formattedNotesText);
-                    }
-                }
+                final Note[] notes = readNotesFromTextAreaCatchExceptions();
+                if (notes != null)
+                    notesText.setText(newMelodyFactory().toString(notes));
             }
         });
         
@@ -209,98 +240,104 @@ public class NotesOnPianoPlayer
         return notesControlPanel;
     }
     
-    private void putMelodyIntoTextArea() {
-        if (melody != null && melody.length() > 0) {
-            final int lines = (int) melody.chars().filter(c -> c == '\n').count();
-            notesText.setRows(Math.max(2, Math.min(12, lines + 1))); // min 2, max 12 lines
-            notesText.setText(melody);
-            
-            readNotesFromTextAreaCatchExceptions(); // adjusts tempo and time-signature choosers
-        }
-        else {
-            notesText.setRows(2);
-        }
-    }
-    
+    // callback methods
     
     /** Make sure to always call this synchronized(playerLock)! */
     private void startOrStopPlayer(boolean isStop) {
         play.setText(isStop ? "Play" : "Stop");
+        
+        // enable or disable UI
+        formatBars.setEnabled(isStop);
         notesText.setEnabled(isStop);
-        enablePianoMouseEvents(isStop);
+        
+        for (PianoWithSound.Keyboard.Key key : piano.getKeys())
+            key.setIgnoreMouse(isStop == false);
+            // setEnabled() did not reject mouse-events, and prevented key-down rendering
     
         if (isStop) {
             if (player != null) {
                 player.close();
                 player = null;
             }
+            readNotesFromTextAreaCatchExceptions(); // adjust time-signature and tempo choosers
         }
         else {
             checkAndPlayNotes();
+            
+            // thread is running, disable time-signature and tempo choosers
+            timeSignatureChoice.setEnabled(isStop);
+            tempoSpinner.setEnabled(isStop);
         }
-    }
-    
-    private void enablePianoMouseEvents(boolean enable) {
-        for (PianoWithSound.Keyboard.Key key : piano.getKeys())
-            key.setIgnoreMouse(enable == false);
     }
     
     /** This method is synchronized(playerLock) because called from startOrStopPlayer() only. */
     private void checkAndPlayNotes() {
-        errors.setText(""); // clear errors
-        try {
-            final Note[] notesArray = readNotesFromTextArea();
+        final Note[] notesArray = readNotesFromTextArea(); // won't throw exceptions
+        // this was called from "Play" that is enabled only when no errors exist
+        
+        final SoundChannel pianoKeyConnector = new PianoKeyConnector(piano);
+        this.player = new Player(pianoKeyConnector); // is synchronized because called from startOrStop()
+        
+        // to allow "Stop" while playing, all playing happens in a background thread
+        final Thread playerThread = new Thread(() -> playNotes(notesArray));
+        playerThread.start();
+    }
+    
+    private Note[] readNotesFromTextArea() throws IllegalArgumentException {
+        final String notesString = notesText.getText();
+        
+        final boolean enable;
+        final Note[] notes;
+        if (notesString.trim().isEmpty() == false) {
+            final MelodyFactory melodyFactory = newMelodyFactory();
+            notes = melodyFactory.translate(notesString); // throws exceptions!
+            checkNotesRange(notes); // throws exceptions!
             
-            final SoundChannel pianoKeyConnector = new PianoKeyConnector(piano);
-            this.player = new Player(pianoKeyConnector); // is synchronized because called from startOrStop()
+            enable = true; // no exception was thrown until here, so enable actions
             
-            // to allow "Stop" while playing, all playing happens in a background thread
-            final Thread playerThread = new Thread(() -> playNotes(notesArray));
-            playerThread.start();
+            // optional BPM and first time-signature were extracted
+            final String firstFoundTimeSignature = melodyFactory.getFirstFoundTimeSignature();
+            if (firstFoundTimeSignature != null) {
+                timeSignatureChoice.setSelectedItem(firstFoundTimeSignature);
+                timeSignatureChoice.setEnabled(false); // will be managed in text-area now
+            }
+            else {
+                timeSignatureChoice.setEnabled(true);
+            }
+            
+            final Integer firstFoundBeatsPerMinute = melodyFactory.getFirstFoundTempo();
+            if (firstFoundBeatsPerMinute != null) {
+                tempoSpinner.setValue(firstFoundBeatsPerMinute);
+                tempoSpinner.setEnabled(false); // will be managed in text-area now
+            }
+            else {
+                tempoSpinner.setEnabled(true);
+            }
         }
-        catch (Exception e) {
-            JOptionPane.showMessageDialog(notesText, "Error: "+e.getMessage());
-            errors.setText(e.getMessage());
-            startOrStopPlayer(true); // true = stop
+        else {
+            notes = new Note[0];
+            enable = false; // no actions can be performed when empty
+            timeSignatureChoice.setEnabled(true); // let user choose tempo and bar-type
+            tempoSpinner.setEnabled(true);
         }
+        
+        errors.setText(""); // no exception was thrown, so clear errors
+        play.setEnabled(enable);
+        formatBars.setEnabled(enable);
+        
+        return notes;
     }
     
     private Note[] readNotesFromTextAreaCatchExceptions() {
         try {
             return readNotesFromTextArea();
         }
-        catch (IllegalArgumentException e) {
+        catch (Exception e) {
             errors.setText(e.getMessage());
+            play.setEnabled(false);
+            formatBars.setEnabled(false);
         }
         return null;
-    }
-    
-    private Note[] readNotesFromTextArea() throws IllegalArgumentException {
-        final String notesString = notesText.getText();
-        final MelodyFactory melodyFactory = newMelodyFactory();
-        final Note[] notes = melodyFactory.translate(notesString); // extracts BPM and time signature
-        
-        final String firstFoundTimeSignature = melodyFactory.getFirstFoundTimeSignature();
-        if (firstFoundTimeSignature != null) {
-            timeSignatureChoice.setSelectedItem(firstFoundTimeSignature);
-            timeSignatureChoice.setEnabled(false); // will be managed in text-area now
-        }
-        else {
-            timeSignatureChoice.setEnabled(true);
-        }
-        
-        final Integer firstFoundBeatsPerMinute = melodyFactory.getFirstFoundTempo();
-        if (firstFoundBeatsPerMinute != null) {
-            tempoSpinner.setValue(firstFoundBeatsPerMinute);
-            tempoSpinner.setEnabled(false); // will be managed in text-area now
-        }
-        else {
-            tempoSpinner.setEnabled(true);
-        }
-        
-        checkNotesRange(notes);
-        
-        return notes;
     }
     
     private void checkNotesRange(Note[] notesArray) {
@@ -440,18 +477,27 @@ public class NotesOnPianoPlayer
 <html>
 <head></head>
 <body>
+<h2>Editor Keys</h2>
+<ul>
+<li><b>Ctrl-X</b> for "Cut" selection</li>
+<li><b>Ctrl-C</b> for "Copy" selection</li>
+<li><b>Ctrl-V</b> for "Paste" at caret position</li>
+<li><b>Ctrl-Z</b> for "Undo" last action</li>
+<li><b>Ctrl-Y</b> for "Redo" last "Undo"</li>
+</ul>
+
 <h2>Notes Syntax</h2>
 <p>
 Every note is given as an IPN-name (international pitch notation)
 and its length behind a slash, for example: 
 </p>
 <ul>
-<li>"A4/4" for a quarter note on pitch of A4 (440 Hz),</li>
-<li>or "C#4/2." for a dotted C#4 half note,</li>
-<li>or "E5/8,3" for a E5 triplet eighth note 
-    (each of the triplets must have the ",3" postfix),</li>
-<li>or "(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars,</li>
-<li>or "-/2" for a half rest note.</li>
+<li>"A4/4" for a quarter note on pitch of A4 (440 Hz)</li>
+<li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
+<li>"E5/8,3" for a E5 triplet eighth note 
+    (each of the triplets must have the ",3" postfix!)</li>
+<li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
+<li>"-/2" for a half rest note.</li>
 </ul>
 <p>
 No space must appear inside notes and their length specification,
@@ -467,19 +513,19 @@ on top of the notes only, it can not change in-between.
 </p><p>
 Do not care about bars, the player will automatically calculate bar bounds
 using the given time signature(s).
-You can use the "Format Bars" button to put every bar into a separate text line.
+You can use the "Format" button to put every bar into a separate text line.
 </p><p>
 Notes connected by a "tie" are notes of same pitch that are played as single note, 
 even across several bars.
-Ties are started by an parenthesis "(" and ended by ")", notes in between 
-the start and end note SHOULD be enclosed in
+Ties are started by an parenthesis "(" and ended by ")",
+notes in between the start and end note SHOULD be enclosed in
 parentheses, because this is how it would look like in written notes.
 Space between parentheses and note is allowed.
 </p><p>
 Notes connected by a "slur" are notes of different pitch that are phrased together, 
 even across several bars.
-Slurs are started by a brace "{" and ended by "}", notes 
-in between MUST NOT be enclosed in "{...}",
+Slurs are started by a brace "{" and ended by "}",
+notes in between MUST NOT be enclosed in "{...}",
 because it is not clear how to phrase several notes that are all slurred together.
 Space between braces and note is allowed.
 </p><p>
