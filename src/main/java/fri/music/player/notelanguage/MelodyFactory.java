@@ -9,30 +9,51 @@ import fri.music.player.Note;
 /**
  * Reads in a number of notes with length, headed by time-signature and tempo, 
  * and produces a melody (array of Note) from it, playable by a <code>Player</code>.
+ * Just single notes are possible, no chords.
  * <p/>
  * <b>Input DSL:</b><br/>
- * A note is given as an IPN-name and its length behind a slash, 
- * e.g. "A4/4" for a quarter note on pitch of A4 (440 Hz),
- * or "C#4/8." for a dotted C#4 eighth note,
- * or "B3/8,3" for a B3 triplet eighth note (each note of the triplet must have a ",3").
- * No space must appear inside notes and their length specification,
- * but at least one whitespace MUST be between notes.
- * A rest is written as "-".
- * In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
- * and there is no German "H", such is written as "B".
- * <p/>
- * Notes connected by "tie" are notes of same pitch that are played as single note, even across several bars.
- * Ties are started by an parenthesis "(" and ended by ")", notes in between the start and end note SHOULD be enclosed in
- * parentheses, because this is how it would look like in written notes.
- * Space between parentheses and note is allowed.
- * <p/>
- * Notes connected by "slur" are notes of different pitch that are phrased together, even across several bars.
- * Slurs are started by a brace "{" and ended by "}", notes in between MUST NOT be enclosed in "{...}",
- * because it is not clear how to phrase several notes that are all slurred together.
- * Space between braces and note is allowed.
- * <p/>
- * TODO: Chords can be written in brackets [rectangular parentheses].
- * Space between brackets and note is allowed.
+<p>
+Every note is given as an IPN-name (international pitch notation)
+and its length behind a slash, for example: 
+</p>
+<ul>
+<li>"A4/4" for a quarter note on pitch of A4 (440 Hz)</li>
+<li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
+<li>"E5/8,3" for a E5 triplet eighth note 
+    (each of the triplets must have the ",3" postfix!)</li>
+<li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
+<li>"-/2" for a half rest note.</li>
+</ul>
+<p>
+No space must appear inside notes and their length specification,
+but at least one whitespace MUST be between different notes.
+In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
+and there is no German "H", such is written as "B".
+But you can use both lower or upper case letters in IPN-names.
+</p><p>
+The time signature can appear on top of the notes, or everywhere in-between,
+written as "4/4" or "3/4" or similar.
+The tempo can appear as simple BPM number (beats per minute)
+on top of the notes only, it can not change in-between.
+</p><p>
+Do not care about bars, the player will automatically calculate bar bounds
+using the given time signature(s).
+You can use the "Format" button to put every bar into a separate text line.
+</p><p>
+Notes connected by a "tie" are notes of same pitch that are played as single note, 
+even across several bars.
+Ties are started by an parenthesis "(" and ended by ")", 
+notes in between the start and end note SHOULD be enclosed in
+parentheses, because this is how it would look like in written notes.
+Space between parentheses and note is allowed.
+</p><p>
+Notes connected by a "slur" are notes of different pitch that are phrased together, 
+even across several bars.
+Slurs are started by a brace "{" and ended by "}", 
+notes in between MUST NOT be enclosed in "{...}",
+because it is not clear how to phrase several notes that are all slurred together.
+Space between braces and note is allowed.
+</p>
  */
 public class MelodyFactory
 {
@@ -58,9 +79,6 @@ public class MelodyFactory
     /** The separator character for triplet and other multiplet numbers. */
     private static final char MULTIPLET_SEPARATOR = ',';
     
-    private static String timeSignature(Integer beatsPerBar, Integer beatType) {
-        return "" + beatsPerBar + Note.DURATION_SEPARATOR + beatType;        
-    }
     
     private final Tones toneSystem;
     private final Integer volume;
@@ -128,6 +146,11 @@ public class MelodyFactory
         this.beatsPerMinute = (beatsPerMinute != null) ? beatsPerMinute : Note.DEFAULT_TEMPO_BPM;
         this.beatsPerBar = (beatsPerBar != null) ? beatsPerBar : DEFAULT_NUMBER_OF_BEATS_PER_BAR;
         this.beatType = (beatType != null) ? beatType : DEFAULT_BEAT_TYPE;
+        
+        checkValidBeatsPerBar(this.beatsPerBar);
+        checkValidNoteLength(this.beatType, "Illegal beat type:");
+        checkValidBeatsPerMinute(this.beatsPerMinute);
+        
         calculateBeatDurationMilliseconds();
     }
     
@@ -173,7 +196,7 @@ public class MelodyFactory
         for (int i = 0; i < notes.length; i++) {
             final Note note = notes[i];
             if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
-                throw new IllegalArgumentException("Note has no length notation, can not render it: "+note.ipnName);
+                throw new IllegalArgumentException("Note has no length: "+note.ipnName);
             
             final boolean newlineBeforeNote = (note.emphasized && i > 0);
             
@@ -242,7 +265,41 @@ public class MelodyFactory
         this.beatDurationMilliseconds = (int) Math.round(1000.0 * 60.0 / (double) this.beatsPerMinute);
     }
     
-    private List<Note> buildRawNotes(String[] melodyTokens, List<MelodyToken> melodyNotes) {
+    
+    private String timeSignature(Integer beatsPerBar, Integer beatType) {
+        return "" + beatsPerBar + Note.DURATION_SEPARATOR + beatType;        
+    }
+    
+    private void checkValidIpnName(String ipnName) {
+        if (ipnName.equals(ToneSystem.REST_SYMBOL) == false &&
+                ipnName.matches("[ABCDEFG]#?[0-9]+") == false)
+            throw new IllegalArgumentException("Invalid note name: '"+ipnName+"' (use '-' for a rest)");
+    }
+
+    private void checkValidBeatsPerMinute(Integer beatsPerMinute) {
+        if (beatsPerMinute == null || beatsPerMinute < TEMPO_MINIMUM_BPM || beatsPerMinute > TEMPO_MAXIMUM_BPM)
+            throw new IllegalArgumentException("Illegal tempo (BPM): "+beatsPerMinute);
+    }
+    
+    private void checkValidBeatsPerBar(Integer beatsPerBar) throws IllegalArgumentException {
+        if (beatsPerBar == null || beatsPerBar < 1 || beatsPerBar > 16)
+            throw new IllegalArgumentException("Illegal beats per bar: "+beatsPerBar);
+    }
+
+    /** To be used for both beatType and noteLength. */
+    private void checkValidNoteLength(Integer beatType, String errorMessage) {
+        boolean result = false;
+        if (beatType != null)
+            for (int i = 1; result == false && i <= 64; i *= 2) // 1, 2, 4, 8, 16, ...
+                if (beatType.intValue() == i)
+                    result = true;
+        
+        if (result == false)
+            throw new IllegalArgumentException(errorMessage+" "+beatType);
+    }
+    
+    
+    private List<Note> buildRawNotes(String[] melodyTokens, List<MelodyToken> resultingNoteTokens) {
         // reset values from last translate call
         firstFoundTimeSignature = null;
         firstFoundTempo = null;
@@ -252,23 +309,12 @@ public class MelodyFactory
         
         String previousTimeSignature = timeSignature(beatsPerBar, beatType);
         String currentTimeSignature = previousTimeSignature;
+        boolean previousTokenWasNote = true;
         
         for (int i = 0; i < melodyTokens.length; i++) {
             final InputToken inputToken = newInputToken(melodyTokens[i].trim());
             
-            if (inputToken instanceof TimeSignatureToken) {
-                final TimeSignatureToken timeSignature = (TimeSignatureToken) inputToken;
-                this.beatsPerBar = timeSignature.beatsPerBar;
-                this.beatType = timeSignature.beatType;
-                
-                barState = new BarState(this.beatsPerBar, beatDurationMilliseconds);
-                
-                currentTimeSignature = timeSignature.getTimeSignature();
-                
-                if (firstFoundTimeSignature == null)
-                    firstFoundTimeSignature = currentTimeSignature;
-            }
-            else if (inputToken instanceof BeatsPerMinuteToken) {
+            if (inputToken instanceof BeatsPerMinuteToken) {
                 if (notes.size() > 0 || firstFoundTempo != null)
                     throw new IllegalStateException("Tempo may appear just once on top of notes: "+melodyTokens[i]);
                 
@@ -279,10 +325,32 @@ public class MelodyFactory
                 barState = new BarState(this.beatsPerBar, beatDurationMilliseconds);
                 
                 firstFoundTempo = this.beatsPerMinute;
+                
+                previousTokenWasNote = false;
+            }
+            else if (inputToken instanceof TimeSignatureToken) {
+                if (previousTokenWasNote == false && (notes.size() > 0 || firstFoundTimeSignature != null))
+                    throw new IllegalStateException("Duplicate time signature: "+melodyTokens[i]);
+                
+                if (barState.isBarStart() == false)
+                    throw new IllegalArgumentException("Time signature change is allowed on bar start only: "+melodyTokens[i]);
+                    
+                final TimeSignatureToken timeSignature = (TimeSignatureToken) inputToken;
+                this.beatsPerBar = timeSignature.beatsPerBar;
+                this.beatType = timeSignature.beatType;
+                
+                barState = new BarState(this.beatsPerBar, beatDurationMilliseconds);
+                
+                currentTimeSignature = timeSignature(this.beatsPerBar, this.beatType);
+                
+                if (firstFoundTimeSignature == null)
+                    firstFoundTimeSignature = currentTimeSignature;
+                
+                previousTokenWasNote = false;
             }
             else {
                 final MelodyToken melodyToken = (MelodyToken) inputToken;
-                melodyNotes.add(melodyToken);
+                resultingNoteTokens.add(melodyToken); // needed later for calculating the duration of ties
                 
                 final boolean beatInfoRequired = // on first note, or when time signature changes
                         (notes.size() <= 0 || previousTimeSignature.equals(currentTimeSignature) == false);
@@ -290,11 +358,14 @@ public class MelodyFactory
                 
                 final Note note = buildRawNote(melodyToken, barState, currentTimeSignature, beatInfoRequired);
                 notes.add(note);
+                
+                previousTokenWasNote = true;
             }
         }
         return notes;
     }
 
+    
     private InputToken newInputToken(String melodyToken) {
         final NoteConnections noteConnections = new NoteConnections(melodyToken);
         
@@ -309,15 +380,13 @@ public class MelodyFactory
                     : new BeatsPerMinuteToken(leadingNumber);
         }
         
-        if (noteAndLength.ipnName.equals(ToneSystem.REST_SYMBOL) == false &&
-                noteAndLength.ipnName.matches("[ABCDEFG]#?[0-9]+") == false)
-            throw new IllegalArgumentException("Invalid note name: '"+noteAndLength.ipnName+"'");
+        checkValidIpnName(noteAndLength.ipnName);
         
         final String length = (noteAndLength.length != null) ? noteAndLength.length : DEFAULT_NOTE_LENGTH;
         
         return new MelodyToken(noteAndLength.ipnName, length, noteConnections);
     }
-    
+
     private Integer toIntegerOrNull(final String string) {
         try {
             return Integer.valueOf(string);
@@ -343,7 +412,7 @@ public class MelodyFactory
         else if (hasDurationSeparator == false)
             noteLength = null;
         else // has duration separator but no length, error!
-            throw new IllegalArgumentException("Length is missing in '"+melodyToken+"'");
+            throw new IllegalArgumentException("Length is missing: '"+melodyToken+"'");
         
         return new MelodyToken(noteName.toUpperCase(), noteLength, null);
     }
@@ -355,7 +424,7 @@ public class MelodyFactory
     }
     
     /** Normal melody note. */
-    private static class MelodyToken implements InputToken
+    private class MelodyToken implements InputToken
     {
         public final String ipnName;
         public final String length;
@@ -369,36 +438,27 @@ public class MelodyFactory
     }
     
     /** Time signature, e.g. 3/4 or 4/4, can change during tune. */
-    private static class TimeSignatureToken implements InputToken
+    private class TimeSignatureToken implements InputToken
     {
         public final Integer beatsPerBar; // the 3 in 3/4
         public final Integer beatType; // the 4 in 3/4
 
         TimeSignatureToken(Integer beatsPerBar, Integer beatType) {
-            if (beatsPerBar == null || beatsPerBar < 1 || beatsPerBar > 16)
-                throw new IllegalArgumentException("Illegal beats per bar: "+beatsPerBar);
-            
-            if (beatType == null || beatType < 1 || beatType > 8)
-                throw new IllegalArgumentException("Illegal beat type: "+beatType);
+            checkValidBeatsPerBar(beatsPerBar);
+            checkValidNoteLength(beatType, "Illegal beat type:");
             
             this.beatsPerBar = beatsPerBar;
             this.beatType = beatType;
         }
-        
-        public String getTimeSignature() {
-            return timeSignature(beatsPerBar, beatType);
-        }
     }
     
     /** Tempo in BPM. */
-    private static class BeatsPerMinuteToken implements InputToken
+    private class BeatsPerMinuteToken implements InputToken
     {
         public final Integer beatsPerMinute;
 
         BeatsPerMinuteToken(Integer beatsPerMinute) {
-            if (beatsPerMinute == null || beatsPerMinute < TEMPO_MINIMUM_BPM || beatsPerMinute > TEMPO_MAXIMUM_BPM)
-                throw new IllegalArgumentException("Illegal tempo (BPM): "+beatsPerMinute);
-            
+            checkValidBeatsPerMinute(beatsPerMinute);
             this.beatsPerMinute = beatsPerMinute;
         }
     }
@@ -425,7 +485,7 @@ public class MelodyFactory
         if (melodyToken.ipnName.equals(ToneSystem.REST_SYMBOL))
             return new Note(duration, emphasized, melodyToken.length, beatInfo);
         
-        return new Note( // raw because no tie/slur connections yet
+        return new Note( // is a raw note because no tie/slur connections yet
                 toneSystem,
                 melodyToken.ipnName,
                 duration,
@@ -452,23 +512,11 @@ public class MelodyFactory
         if (length == null)
             throw new IllegalArgumentException("Note length is not a number: '"+noteLength+"'");
         
-        if (isValidNoteLength(length) == false)
-            throw new IllegalArgumentException("Illegal note length: '"+length+"'");
+        checkValidNoteLength(length, "Illegal note length:");
         
         return toMillis(length, dotted, multipletType);
     }
     
-    private boolean isValidNoteLength(Integer number) {
-        if (number > 64)
-            return false;
-        
-        for (int i = 1; i <= 64; i *= 2)
-            if (number == i)
-                return true;
-        
-        return false;
-    }
-
     private Integer getMultipletType(String noteLengthString, int multipletSeparatorIndex) {
         if (multipletSeparatorIndex <= 0)
             return null;
@@ -501,7 +549,7 @@ public class MelodyFactory
         switch (multipletType) {
         case 2: // duplets take 3/2 duration, 2 notes on the duration of 3 equal notes
             if (beatsPerBar % 3 != 0)
-                throw new IllegalStateException("Do not use duplets in "+beatsPerBar+"/"+beatType+" measures!");
+                throw new IllegalArgumentException("Do not use duplets in "+beatsPerBar+"/"+beatType+" measures!");
             factor = 3.0 / 2.0; 
             break;
         case 3: // triplets take 2/3 duration, 3 notes on the duration of 2 equal notes
@@ -510,20 +558,20 @@ public class MelodyFactory
             break;
         case 4: // quadruplets take 3/4 duration, 4 notes on the duration of 3 equal notes
             if (beatsPerBar % 3 != 0)
-                throw new IllegalStateException("Do not use quadruplets in "+beatsPerBar+"/"+beatType+" measures!");
+                throw new IllegalArgumentException("Do not use quadruplets in "+beatsPerBar+"/"+beatType+" measures!");
             factor = 3.0 / 4.0;
             break;
         case 5: // quintuplets take 4/5 duration, 5 notes on the duration of 4 equal notes
             factor = 4.0 / 5.0;
             break;
         default:
-            throw new IllegalStateException("Unsupported multiplet type: '"+multipletType+"'");
+            throw new IllegalArgumentException("Unsupported multiplet type: '"+multipletType+"'");
         }
         return millis * factor;
         /*
          * Following spec from https://abcwiki.org/abc:syntax
          * contradicts https://en.wikipedia.org/wiki/Tuplet#Rhythm where "(5" is described as 5 over 4,
-         *     
+         * 
            If the time signature is compound (6/8, 9/8, 12/8) then n is three, otherwise n is two.
             "(2" = 2 notes in the time of 3
             "(3" = 3 notes in the time of 2
