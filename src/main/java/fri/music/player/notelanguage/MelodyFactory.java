@@ -68,6 +68,9 @@ public class MelodyFactory
     
     public static final int TEMPO_MINIMUM_BPM = 40;
     public static final int TEMPO_MAXIMUM_BPM = 208;
+    
+    /** Notes can be 1/1, 1/2, 1/4, 1/. 1/16, 1/32, 1/64, not smaller. */
+    public static final int SHORTEST_NOTELENGTH_DIVISOR = 64;
 
     static final String NEWLINE = System.getProperty("line.separator");
 
@@ -79,6 +82,37 @@ public class MelodyFactory
     private static final String DOTTED_SYMBOL = ".";
     /** The separator character for triplet and other multiplet numbers. */
     private static final char MULTIPLET_SEPARATOR = ',';
+    
+    /** @return the amount of milliseconds one beat would last. */
+    public static int beatDurationMillis(int beatsPerMinute) {
+        return (int) Math.round(1000.0 * 60.0 / (double) beatsPerMinute);
+    }
+    
+    /** @return the amount of milliseconds a note with given noteLengthDivisor would last. */
+    public static double noteLengthMillis(int noteLengthDivisor, int beatType, int beatDurationMillis) {
+        final double beatFactor = (double) beatType / (double) noteLengthDivisor;
+        return (double) beatDurationMillis * beatFactor;
+        // "C4/1" in a 3/4 waltz must be written as "C4/2."! (mind the dot)
+    }
+    
+    /** @return the divisor for a note with given duration in milliseconds. */
+    public static String noteLengthDivisor(int durationMillis, int beatType, int beatDurationMillis) {
+        if (durationMillis <= 0)
+            durationMillis = 1; // System.currentMillis() sometimes returns the same value for two calls
+        
+        final double beatFactor = (double) beatType / (double) durationMillis;
+        final int noteLengthDivisor = (int) Math.round((double) beatDurationMillis * beatFactor);
+        
+        int minimum = Integer.MAX_VALUE, difference = Integer.MAX_VALUE, nearest = 0;
+        for (int i = 1; i <= SHORTEST_NOTELENGTH_DIVISOR && difference <= minimum; i *= 2) {
+            difference = Math.abs(noteLengthDivisor - i);
+            if (difference < minimum) {
+                minimum = difference;
+                nearest = i;
+            }
+        }
+        return ""+nearest;
+    }
     
     
     private final Tones toneSystem;
@@ -268,7 +302,7 @@ public class MelodyFactory
     }
     
     private void calculateBeatDurationMilliseconds() {
-        this.beatDurationMilliseconds = (int) Math.round(1000.0 * 60.0 / (double) this.beatsPerMinute);
+        this.beatDurationMilliseconds = beatDurationMillis(this.beatsPerMinute);
     }
     
     
@@ -296,7 +330,7 @@ public class MelodyFactory
     private void checkValidNoteLength(Integer beatType, String errorMessage) {
         boolean result = false;
         if (beatType != null)
-            for (int i = 1; result == false && i <= 64; i *= 2) // 1, 2, 4, 8, 16, ...
+            for (int i = 1; result == false && i <= SHORTEST_NOTELENGTH_DIVISOR; i *= 2) // 1, 2, 4, 8, 16, ...
                 if (beatType.intValue() == i)
                     result = true;
         
@@ -540,9 +574,7 @@ public class MelodyFactory
     }
 
     private int toMillis(int noteLengthDivisor, boolean isDottedNote, Integer multipletType) {
-        final double beatFactor = (double) beatType / (double) noteLengthDivisor;
-        // "C4/1" in a 3/4 waltz must be written as "C4/2."! (mind the dot)
-        double millis = (double) beatDurationMilliseconds * beatFactor;
+        double millis = noteLengthMillis(noteLengthDivisor, beatType, beatDurationMilliseconds);
         
         if (multipletType != null)
             millis = calculateMultipletDuration(multipletType, millis);

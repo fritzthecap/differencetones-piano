@@ -129,6 +129,56 @@ class MelodyFactoryTest
         
         assertEquals(expectedResult, text);
     }
+    
+    @Test
+    void noteLengthMillis() {
+        final int beatsPerMinute = 120;
+        final int beatDurationMillis = MelodyFactory.beatDurationMillis(beatsPerMinute);
+        assertEquals(500, beatDurationMillis); 
+        
+        // calculate 1/16 when BPM = 120 and beat-type is quarter note (like in 4/4 time signature)
+        final int sixteenthNoteMillis = (int) Math.round(MelodyFactory.noteLengthMillis(16, 4, beatDurationMillis));
+        assertEquals(125, sixteenthNoteMillis);
+        
+        // calculate 1/1 
+        final int wholeNoteMillis = (int) Math.round(MelodyFactory.noteLengthMillis(1, 4, beatDurationMillis));
+        assertEquals(2000, wholeNoteMillis); 
+    }
+    
+    @Test
+    void noteLengthDivisor() {
+        final int beatsPerMinute = 120;
+        final int beatDurationMillis = MelodyFactory.beatDurationMillis(beatsPerMinute);
+        assertEquals(500, beatDurationMillis); 
+        
+        // calculate 1/16 when BPM = 120 and beat-type is quarter note (like in 4/4 time signature)
+        final String sixteenth = MelodyFactory.noteLengthDivisor(160, 4, beatDurationMillis);
+        assertEquals("16", sixteenth);
+        
+        // calculate 1/8
+        final String eighth = MelodyFactory.noteLengthDivisor(210, 4, beatDurationMillis);
+        assertEquals("8", eighth); 
+        
+        // calculate 1/4
+        final String quarter = MelodyFactory.noteLengthDivisor(570, 4, beatDurationMillis);
+        assertEquals("4", quarter); 
+        
+        // calculate 1/2
+        final String half = MelodyFactory.noteLengthDivisor(912, 4, beatDurationMillis);
+        assertEquals("2", half); 
+        
+        // calculate 1/1
+        final String whole = MelodyFactory.noteLengthDivisor(1800, 4, beatDurationMillis);
+        assertEquals("1", whole); 
+        final String wholeLong = MelodyFactory.noteLengthDivisor(4000, 4, beatDurationMillis);
+        assertEquals("1", wholeLong); // any length longer than a bar will be reduced to a whole note
+        
+        final String smallest = MelodyFactory.noteLengthDivisor(1, 4, beatDurationMillis);
+        assertEquals("64", smallest);
+        final String zero = MelodyFactory.noteLengthDivisor(0, 4, beatDurationMillis);
+        assertEquals("64", zero);
+    }
+
     @Test
     void tripletDuration() {
         final String[] notes = new String[] { // one 4/4 bar

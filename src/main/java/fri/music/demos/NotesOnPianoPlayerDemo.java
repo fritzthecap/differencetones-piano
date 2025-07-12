@@ -46,8 +46,8 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
                 //true, // vertical
                 13);
         final NotesOnPianoPlayer player = new NotesOnPianoPlayer(
-                new PianoWithVolume(config, new SineWaveSoundChannel(null)) /*,
-                TUBULAR_BELLS*/);
+                new PianoWithVolume(config, new SineWaveSoundChannel(null)),
+                TUBULAR_BELLS);
         
         final JComponent playerPanel = player.getPlayer();
         
