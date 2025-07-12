@@ -1,5 +1,6 @@
 package fri.music.player;
 
+import java.util.Objects;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
@@ -73,16 +74,30 @@ public class Note extends Tone
     }
     /** A note from given tone-system. */
     public Note(Tones toneSystem, String ipnName, int durationMilliseconds, int volume, boolean emphasized, String lengthNotation, BeatInfo beatInfo) {
-        this(toneSystem.forIpnName(ipnName), durationMilliseconds, volume, emphasized, null, lengthNotation, beatInfo);
+        this(
+            toneSystem.forIpnName(ipnName),
+            durationMilliseconds,
+            volume,
+            emphasized,
+            null, // connectionFlags
+            lengthNotation,
+            beatInfo);
     }
     
     /** A clone of given tone with same duration and connection flags as given note. */
     public Note(Tone tone, Note note) {
-        this(tone, note.durationMilliseconds, note.volume, note.emphasized, note.connectionFlags, note.lengthNotation, note.beatInfo);
+        this(
+            tone, 
+            note.durationMilliseconds,
+            note.volume,
+            note.emphasized,
+            note.connectionFlags,
+            note.lengthNotation,
+            note.beatInfo);
     }
     
     /** A note from given tone. */
-    private Note(
+    public Note(
             Tone tone, 
             int durationMilliseconds, 
             int volume, 
@@ -91,7 +106,7 @@ public class Note extends Tone
             String lengthNotation,
             BeatInfo beatInfo) {
         super(
-            tone.ipnName, 
+            Objects.requireNonNull(tone).ipnName,
             tone.frequency, 
             tone.midiNumber, 
             tone.cent);

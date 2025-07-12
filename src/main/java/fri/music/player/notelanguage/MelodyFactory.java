@@ -2,6 +2,7 @@ package fri.music.player.notelanguage;
 
 import java.util.ArrayList;
 import java.util.List;
+import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
 import fri.music.player.Note;
@@ -195,6 +196,7 @@ public class MelodyFactory
         
         for (int i = 0; i < notes.length; i++) {
             final Note note = notes[i];
+            // optional tempo and time-signature is attached to note
             
             if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
                 throw new IllegalArgumentException("Note has no length: "+note.ipnName);
@@ -206,7 +208,7 @@ public class MelodyFactory
 
             if ((i > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar-type
                 result.append(
-                    (endsWithNewline(result) ? "" : NEWLINE) +
+                    (i <= 0 || endsWithNewline(result) ? "" : NEWLINE) +
                     note.beatInfo.timeSignature() +
                     (addNewlineBeforeNote ? "" : NEWLINE));
             
@@ -489,12 +491,16 @@ public class MelodyFactory
         if (melodyToken.ipnName.equals(ToneSystem.REST_SYMBOL))
             return new Note(duration, emphasized, melodyToken.length, beatInfo);
         
+        final Tone tone = toneSystem.forIpnName(melodyToken.ipnName);
+        if (tone == null)
+            throw new IllegalArgumentException("IPN note name out of range: "+melodyToken.ipnName);
+        
         return new Note( // is a raw note because no tie/slur connections yet
-                toneSystem,
-                melodyToken.ipnName,
+                tone,
                 duration,
                 volumeInBar,
                 emphasized,
+                null, // connectionFlags will be added later
                 melodyToken.length,
                 beatInfo);
     }
@@ -651,10 +657,15 @@ public class MelodyFactory
     }
     
     private boolean endsWithNewline(StringBuilder sb) {
-        int checkPosition = sb.length() - NEWLINE.length();
+        final int newlineLength = NEWLINE.length();
+        if (sb.length() < newlineLength)
+            return false;
+        
+        int checkPosition = sb.length() - newlineLength;
         for (int i = 0; i < NEWLINE.length(); i++, checkPosition++)
             if (sb.charAt(checkPosition) != NEWLINE.charAt(i))
                 return false;
+        
         return true;
     }
 }
