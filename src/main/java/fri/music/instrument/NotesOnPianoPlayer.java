@@ -19,13 +19,14 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import fri.music.SoundChannel;
 import fri.music.player.Note;
 import fri.music.player.Player;
@@ -49,7 +50,7 @@ public class NotesOnPianoPlayer
     private JButton play;
     private JButton formatBars;
     private JTextArea notesText;
-    private JTextArea errors;
+    private JTextComponent error;
     private JSpinner tempoSpinner;
     private JComboBox<String> timeSignatureChoice;
     
@@ -143,11 +144,10 @@ public class NotesOnPianoPlayer
             }
         });
         
-        this.errors = new JTextArea();
-        errors.setEditable(false);
-        errors.setForeground(Color.RED);
-        final JScrollPane errorsScrollPane = new JScrollPane(errors);
-        errorsScrollPane.setBorder(BorderFactory.createTitledBorder("Errors"));
+        this.error = new JTextField();
+        error.setBorder(BorderFactory.createTitledBorder("Error"));
+        error.setEditable(false);
+        error.setForeground(Color.RED);
         
         final JButton help = new JButton("Help");
         help.addActionListener(new ActionListener() {
@@ -160,19 +160,18 @@ public class NotesOnPianoPlayer
                         new Dimension(660, 460));
             }
         });
-        final JPanel helpButtonPanel = new JPanel();
-        helpButtonPanel.add(help);
+        final JPanel helpLayoutPanel = new JPanel();
+        helpLayoutPanel.add(help);
         
         final JPanel errorsAndHelpPanel = new JPanel(new BorderLayout());
-        //errorsAndHelpPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        errorsAndHelpPanel.add(helpButtonPanel, BorderLayout.NORTH);
-        errorsAndHelpPanel.add(errorsScrollPane, BorderLayout.CENTER);
+        errorsAndHelpPanel.add(helpLayoutPanel, BorderLayout.WEST);
+        errorsAndHelpPanel.add(error, BorderLayout.CENTER);
         
-        final JSplitPane textAreaSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, notesTextScrollPane, errorsAndHelpPanel);
-        textAreaSplitPane.setResizeWeight(0.86);
-        textAreaSplitPane.setDividerLocation(0.86);
+        final JPanel textAreaAndError = new JPanel(new BorderLayout());
+        textAreaAndError.add(notesTextScrollPane, BorderLayout.CENTER);
+        textAreaAndError.add(errorsAndHelpPanel, BorderLayout.SOUTH);
         
-        return textAreaSplitPane;
+        return textAreaAndError;
     }
     
     private JPanel buildNotesControlPanel() {
@@ -250,6 +249,8 @@ public class NotesOnPianoPlayer
         return notesControlPanel;
     }
     
+    
+    
     // callback methods
     
     /** Make sure to always call this synchronized(playerLock)! */
@@ -270,6 +271,7 @@ public class NotesOnPianoPlayer
                 player = null;
             }
             readNotesFromTextAreaCatchExceptions(); // adjust time-signature and tempo choosers
+            notesText.requestFocus();
         }
         else {
             checkAndPlayNotes();
@@ -295,9 +297,9 @@ public class NotesOnPianoPlayer
     
     private Note[] readNotesFromTextArea() throws IllegalArgumentException {
         final String notesString = notesText.getText();
-        
         final boolean enable;
         final Note[] notes;
+        
         if (notesString.trim().isEmpty() == false) {
             final MelodyFactory melodyFactory = newMelodyFactory();
             notes = melodyFactory.translate(notesString); // throws exceptions!
@@ -305,7 +307,7 @@ public class NotesOnPianoPlayer
             
             enable = true; // no exception was thrown until here, so enable actions
             
-            // optional BPM and first time-signature were extracted
+            // optional BPM and time-signature were extracted from top
             final String timeSignatureOnTop = melodyFactory.getTimeSignatureOnTop();
             if (timeSignatureOnTop != null) {
                 timeSignatureChoice.setSelectedItem(timeSignatureOnTop);
@@ -331,26 +333,33 @@ public class NotesOnPianoPlayer
             tempoSpinner.setEnabled(true);
         }
         
-        errors.setText(""); // no exception was thrown, so clear errors
+        error.setText(""); // no exception was thrown, so clear errors
         play.setEnabled(enable);
         formatBars.setEnabled(enable);
         
         return notes;
     }
     
+    /** This is called on any text input. */
     private Note[] readNotesFromTextAreaCatchExceptions() {
         try {
             return readNotesFromTextArea();
         }
         catch (Exception e) {
-            errors.setText(e.getMessage());
+            error.setText(e.getMessage());
             play.setEnabled(false);
             formatBars.setEnabled(false);
+            
+            if (e instanceof IllegalArgumentException == false)
+                e.printStackTrace();
         }
         return null;
     }
     
     private void checkNotesRange(Note[] notesArray) {
+        if (notesArray.length <= 0)
+            throw new IllegalArgumentException("No notes were given!");
+        
         final List<PianoWithSound.Keyboard.Key> keys = piano.getKeys();
         final int lowestMidiNumber  = keys.get(0).midiNoteNumber;
         final int highestMidiNumber = keys.get(keys.size() - 1).midiNoteNumber;
@@ -361,9 +370,10 @@ public class NotesOnPianoPlayer
     }
 
     /**
+     * Called when playing notes on piano.
      * Converts given 1-dimensional notes from text-area to 2-dimensional chords-array.
      * To be overridden for other conversions than just one note per chord.
-     * @param notesArray the notes from text-area to convert to 2-dimensional array.
+     * @param notesArray the notes from text-area to convert to a 2-dimensional chords array.
      */
     protected Note[][] convertNotesToChords(Note[] notesArray) {
         final Note[][] chordsArray = new Note[notesArray.length][];
@@ -388,7 +398,9 @@ public class NotesOnPianoPlayer
         final Player myPlayer = this.player; // remember which player to use
         
         boolean interrupted = false;
-        for (int i = 0; interrupted == false && i < chordsArray.length; i++) { // play all notes one by one
+        RuntimeException exception = null;
+        
+        for (int i = 0; interrupted == false && exception == null && i < chordsArray.length; i++) { // play all notes one by one
             final Note[] chord = chordsArray[i];
             try {
                 SwingUtilities.invokeAndWait(() -> { // waits synchronously for each note
@@ -399,7 +411,7 @@ public class NotesOnPianoPlayer
                 });
             }
             catch (Exception e) {
-                throw new RuntimeException(e);
+                exception = new RuntimeException(e);
             }
             
             synchronized(playerLock) {
@@ -413,6 +425,9 @@ public class NotesOnPianoPlayer
                     startOrStopPlayer(true); // enable "Play" and close player
             }
         });
+        
+        if (exception != null) // throw only after correct termination
+            throw exception;
     }
     
 

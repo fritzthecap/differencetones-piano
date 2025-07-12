@@ -45,7 +45,7 @@ public class PianoWithVolume extends PianoWithSound
         if (this.pianoPanel != null)
             return this.pianoPanel; // just one view, due to mouseHandler that stores UI-state
         
-        final JRadioButton onOff = new JRadioButton("On/Off");
+        final JRadioButton onOff = new JRadioButton(config.isVertical ? "" : "On/Off"); // no label when vertical
         onOff.setToolTipText("Turns sound on and off");
         onOff.setSelected(true);
         onOff.addActionListener(new ActionListener() {
