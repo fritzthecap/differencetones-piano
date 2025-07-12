@@ -1,13 +1,10 @@
 
-- Write notes through piano key presses,
-    supported through a length-choice via context-menu (right mouse click),
-    provide a default length choice by combo-box for left mouse clicks.
-    This should be implemented in a NotesOnPianoPlayer sub-class.
+- Add Cut/Copy/Paste/Clear/Undo/Redo actions in a context-menu to editor.
     
 - Provide an "Export to ABC" button that writes notes in ABC format
     and renders the result in a non-modal text-dialog.
     
- - Implement DifferenceTonesOnPianoPlayer that extends NotesOnPianoPlayer
+- Implement DifferenceTonesOnPianoPlayer that extends NotesOnPianoPlayer
     and translates the melody from text-area to difference-tone intervals
     before playing.
 
