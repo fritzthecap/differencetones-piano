@@ -88,8 +88,8 @@ public class MelodyFactory
     private Integer beatType; // beat-notes in bar, eighth (8) or quarter (4) or ... er changes. */
     private int beatDurationMilliseconds; // duration in milliseconds of one beat
 
-    private String firstFoundTimeSignature;
-    private Integer firstFoundTempo;
+    private String timeSignatureOnTop;
+    private Integer tempoOnTop;
     
     /** Factory with default settings. */
     public MelodyFactory() {
@@ -195,6 +195,7 @@ public class MelodyFactory
         
         for (int i = 0; i < notes.length; i++) {
             final Note note = notes[i];
+            
             if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
                 throw new IllegalArgumentException("Note has no length: "+note.ipnName);
             
@@ -203,8 +204,14 @@ public class MelodyFactory
             if (i == 0 && writeTempo)
                 result.append("" + note.beatInfo.beatsPerMinute() + NEWLINE);
 
-            if ((i > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar type
-                result.append(note.beatInfo.timeSignature() + (addNewlineBeforeNote ? "" : NEWLINE));
+            if ((i > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar-type
+                result.append(
+                    (endsWithNewline(result) ? "" : NEWLINE) +
+                    note.beatInfo.timeSignature() +
+                    (addNewlineBeforeNote ? "" : NEWLINE));
+            
+            if (addNewlineBeforeNote) // break line before first note in bar
+                result.append(NEWLINE);
             
             if (Boolean.TRUE.equals(note.connectionFlags.slurred())) {
                 if (inSlur == false)
@@ -216,9 +223,6 @@ public class MelodyFactory
                 result.append(NoteConnections.TIE_START_SYMBOL);
             }
                 
-            if (note.emphasized && i > 0) // break line before first note in bar
-                result.append(NEWLINE);
-            
             result.append(note.toString());
             
             if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
@@ -245,14 +249,14 @@ public class MelodyFactory
     }
     
     
-    /** @return beatsPerMinute from latest <code>translate()</code> call, or null if there was none. */
-    public Integer getFirstFoundTempo() {
-        return firstFoundTempo;
+    /** @return beatsPerMinute on-top from latest <code>translate()</code> call, or null if there was none. */
+    public Integer getTempoOnTop() {
+        return tempoOnTop;
     }
 
-    /** @return beatsPerBar/beatType from latest <code>translate()</code> call, or null if there was none. */
-    public String getFirstFoundTimeSignature() {
-        return firstFoundTimeSignature;
+    /** @return "beatsPerBar/beatType" on-top from latest <code>translate()</code> call, or null if there was none. */
+    public String getTimeSignatureOnTop() {
+        return timeSignatureOnTop;
     }
     
 
@@ -301,8 +305,8 @@ public class MelodyFactory
     
     private List<Note> buildRawNotes(String[] melodyTokens, List<MelodyToken> resultingNoteTokens) {
         // reset values from last translate call
-        firstFoundTimeSignature = null;
-        firstFoundTempo = null;
+        timeSignatureOnTop = null;
+        tempoOnTop = null;
         
         final List<Note> notes = new ArrayList<>(melodyTokens.length);
         BarState barState = new BarState(beatsPerBar, beatDurationMilliseconds);
@@ -315,7 +319,7 @@ public class MelodyFactory
             final InputToken inputToken = newInputToken(melodyTokens[i].trim());
             
             if (inputToken instanceof BeatsPerMinuteToken) {
-                if (notes.size() > 0 || firstFoundTempo != null)
+                if (notes.size() > 0 || tempoOnTop != null)
                     throw new IllegalStateException("Tempo may appear just once on top of notes: "+melodyTokens[i]);
                 
                 final BeatsPerMinuteToken beatsPerMinute = (BeatsPerMinuteToken) inputToken;
@@ -324,12 +328,12 @@ public class MelodyFactory
                 
                 barState = new BarState(this.beatsPerBar, beatDurationMilliseconds);
                 
-                firstFoundTempo = this.beatsPerMinute;
+                tempoOnTop = this.beatsPerMinute;
                 
                 previousTokenWasNote = false;
             }
             else if (inputToken instanceof TimeSignatureToken) {
-                if (previousTokenWasNote == false && (notes.size() > 0 || firstFoundTimeSignature != null))
+                if (previousTokenWasNote == false && (notes.size() > 0 || timeSignatureOnTop != null))
                     throw new IllegalStateException("Duplicate time signature: "+melodyTokens[i]);
                 
                 if (barState.isBarStart() == false)
@@ -343,8 +347,8 @@ public class MelodyFactory
                 
                 currentTimeSignature = timeSignature(this.beatsPerBar, this.beatType);
                 
-                if (firstFoundTimeSignature == null)
-                    firstFoundTimeSignature = currentTimeSignature;
+                if (timeSignatureOnTop == null && notes.size() <= 0)
+                    timeSignatureOnTop = currentTimeSignature;
                 
                 previousTokenWasNote = false;
             }
@@ -478,7 +482,7 @@ public class MelodyFactory
         if (beatInfoRequired)
             beatInfo = new Note.BeatInfo(
                 currentTimeSignature, 
-                (firstFoundTempo != null) ? firstFoundTempo : beatsPerMinute);
+                (tempoOnTop != null) ? tempoOnTop : beatsPerMinute);
         else
             beatInfo = null; // Note constructor will set a non-null default
 
@@ -644,5 +648,13 @@ public class MelodyFactory
         }
         while (i < rawNotes.size() && connections.isTieEnd() == false);
         return duration;
+    }
+    
+    private boolean endsWithNewline(StringBuilder sb) {
+        int checkPosition = sb.length() - NEWLINE.length();
+        for (int i = 0; i < NEWLINE.length(); i++, checkPosition++)
+            if (sb.charAt(checkPosition) != NEWLINE.charAt(i))
+                return false;
+        return true;
     }
 }

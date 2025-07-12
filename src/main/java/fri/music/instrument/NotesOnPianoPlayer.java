@@ -81,6 +81,11 @@ public class NotesOnPianoPlayer
         final JPanel notesPanel = buildNotesPanel();
         playerPanel.add(notesPanel, BorderLayout.CENTER); // to CENTER, so that user can resize area
         
+        if (melody != null && melody.length() > 0) // put initial melody into text-area
+            notesText.setText(melody);
+        else
+            readNotesFromTextAreaCatchExceptions(); // enable or disable buttons
+        
         return this.playerPanel = playerPanel;
     }
     
@@ -112,19 +117,7 @@ public class NotesOnPianoPlayer
         final JPanel notesPanel = new JPanel(new BorderLayout());
         notesPanel.add(notesTextAndErrors, BorderLayout.CENTER);
         notesPanel.add(notesControlPanel, piano.config.isVertical ? BorderLayout.NORTH : BorderLayout.WEST);
-        
-        // put initial melody into text-area
-        if (melody != null && melody.length() > 0) {
-            final int lines = (int) melody.chars().filter(c -> c == '\n').count();
-            notesText.setRows(Math.max(2, Math.min(12, lines + 1))); // min 2, max 12 lines
-            notesText.setText(melody);
-            
-            //readNotesFromTextAreaCatchExceptions(); // adjusts tempo and time-signature choosers
-        }
-        else {
-            notesText.setRows(2);
-        }
-        
+
         return notesPanel;
     }
     
@@ -167,21 +160,24 @@ public class NotesOnPianoPlayer
                         new Dimension(660, 460));
             }
         });
+        final JPanel helpButtonPanel = new JPanel();
+        helpButtonPanel.add(help);
         
         final JPanel errorsAndHelpPanel = new JPanel(new BorderLayout());
-        errorsAndHelpPanel.add(help, BorderLayout.NORTH);
+        //errorsAndHelpPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        errorsAndHelpPanel.add(helpButtonPanel, BorderLayout.NORTH);
         errorsAndHelpPanel.add(errorsScrollPane, BorderLayout.CENTER);
         
         final JSplitPane textAreaSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, notesTextScrollPane, errorsAndHelpPanel);
         textAreaSplitPane.setResizeWeight(0.86);
         textAreaSplitPane.setDividerLocation(0.86);
+        
         return textAreaSplitPane;
     }
     
     private JPanel buildNotesControlPanel() {
         this.play = new JButton("Play");
-        play.setEnabled(false); // assume no notes present
-        play.setToolTipText("Play Notes Written in Text Area on Piano");
+        play.setToolTipText("Play Notes in Textarea on Piano");
         play.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -215,7 +211,6 @@ public class NotesOnPianoPlayer
         tempoLayoutPanel.setBorder(BorderFactory.createTitledBorder("Tempo"));
         
         this.formatBars = new JButton("Format");
-        formatBars.setEnabled(false); // assume no notes present
         formatBars.setToolTipText("Put each Bar into a Separate Line");
         formatBars.addActionListener(new ActionListener() {
             @Override
@@ -227,22 +222,31 @@ public class NotesOnPianoPlayer
                             tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
                             timeSignatureChoice.isEnabled() == false);
                     notesText.setText(formatted);
-                    notesText.setCaretPosition(0);
+                    notesText.setCaretPosition(0); // scroll back to top
                 }
             }
         });
         
         final JPanel notesControlPanel = new JPanel(); // else button is too big
+        notesControlPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                BorderFactory.createEmptyBorder(6, 6, 6, 6)));
         notesControlPanel.setLayout(new BoxLayout(notesControlPanel, piano.config.isVertical ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
+        
         play.setAlignmentX(Component.CENTER_ALIGNMENT);
         notesControlPanel.add(play);
-        notesControlPanel.add(Box.createRigidArea(new Dimension(1, 10))); // space to other control fields
-        timeLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        notesControlPanel.add(timeLayoutPanel);
-        tempoLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        notesControlPanel.add(tempoLayoutPanel);
+        notesControlPanel.add(Box.createRigidArea(new Dimension(1, 8))); // space to next button
+        
         formatBars.setAlignmentX(Component.CENTER_ALIGNMENT);
         notesControlPanel.add(formatBars);
+        notesControlPanel.add(Box.createRigidArea(new Dimension(1, 6))); // space to other control fields
+        
+        timeLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        notesControlPanel.add(timeLayoutPanel);
+        
+        tempoLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        notesControlPanel.add(tempoLayoutPanel);
+        
         return notesControlPanel;
     }
     
@@ -302,18 +306,18 @@ public class NotesOnPianoPlayer
             enable = true; // no exception was thrown until here, so enable actions
             
             // optional BPM and first time-signature were extracted
-            final String firstFoundTimeSignature = melodyFactory.getFirstFoundTimeSignature();
-            if (firstFoundTimeSignature != null) {
-                timeSignatureChoice.setSelectedItem(firstFoundTimeSignature);
+            final String timeSignatureOnTop = melodyFactory.getTimeSignatureOnTop();
+            if (timeSignatureOnTop != null) {
+                timeSignatureChoice.setSelectedItem(timeSignatureOnTop);
                 timeSignatureChoice.setEnabled(false); // will be managed in text-area now
             }
             else {
                 timeSignatureChoice.setEnabled(true);
             }
             
-            final Integer firstFoundBeatsPerMinute = melodyFactory.getFirstFoundTempo();
-            if (firstFoundBeatsPerMinute != null) {
-                tempoSpinner.setValue(firstFoundBeatsPerMinute);
+            final Integer tempoOnTop = melodyFactory.getTempoOnTop();
+            if (tempoOnTop != null) {
+                tempoSpinner.setValue(tempoOnTop);
                 tempoSpinner.setEnabled(false); // will be managed in text-area now
             }
             else {
