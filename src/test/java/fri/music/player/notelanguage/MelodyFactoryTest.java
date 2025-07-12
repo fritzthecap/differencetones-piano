@@ -93,16 +93,14 @@ class MelodyFactoryTest
     }
     
     @Test
-    void toStringShouldHaveSlursAndTies() {
+    void slursAndTiesShouldBeFormattedCorrectly() {
         final int BEATS_PER_MINUTE = 88;
         final int BEATS_PER_BAR = 3;
         final int BEAT_TYPE = 4;
         
         final MelodyFactory melodyFactory = new MelodyFactory(BEATS_PER_MINUTE, BEATS_PER_BAR, BEAT_TYPE);
         
-        final String[] notes = new String[] {
-                "(G4/8", "G4/8", "G4/8)", "{A4/8", "G4/8", "F4/8}", 
-            };
+        final String[] notes = new String[] { "(G4/8", "G4/8", "G4/8)", "{A4/8", "G4/8", "F4/8}" };
 
         final Note[] melody = melodyFactory.translate(notes);
         final String textNotation = melodyFactory.toString(melody, true, true);
@@ -114,6 +112,23 @@ class MelodyFactoryTest
         assertEquals(expectedResult, textNotation);
     }
     
+    @Test
+    void tiesAcrossBarsShouldBeFormattedCorrectly() {
+        final String tieAcrossBars = "E5/2. B5/8 {E5/8 (A5/1} (A5/1) A5/1)";
+        
+        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        
+        final Note[] notes = melodyFactory.translate(tieAcrossBars);
+        final String text = melodyFactory.toString(notes, false, false);
+        
+        final String expectedResult = 
+                "E5/2. B5/8 {E5/8" + MelodyFactory.NEWLINE +
+                "(A5/1}" + MelodyFactory.NEWLINE +
+                "(A5/1)" + MelodyFactory.NEWLINE +
+                "A5/1)" + MelodyFactory.NEWLINE;
+        
+        assertEquals(expectedResult, text);
+    }
     @Test
     void tripletDuration() {
         final String[] notes = new String[] { // one 4/4 bar
