@@ -188,7 +188,7 @@ public class MelodyFactory
      * @param notes the notes to output bar-formatted as string.
      * @return a text where each bar of given notes will be displayed in a new line.
      */
-    public String toString(Note[] notes) {
+    public String toString(Note[] notes, boolean writeTempo, boolean writeTimeSignature) {
         final StringBuilder result = new StringBuilder();
         boolean inSlur = false;
         boolean inTie = false;
@@ -198,13 +198,13 @@ public class MelodyFactory
             if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
                 throw new IllegalArgumentException("Note has no length: "+note.ipnName);
             
-            final boolean newlineBeforeNote = (note.emphasized && i > 0);
+            final boolean addNewlineBeforeNote = (note.emphasized && i > 0);
             
-            if (i == 0)
-                result.append("" + note.beatInfo.beatsPerMinute());
+            if (i == 0 && writeTempo)
+                result.append("" + note.beatInfo.beatsPerMinute() + NEWLINE);
 
-            if (note.beatInfo.timeSignature() != null) // initial or changed bar type
-                result.append(NEWLINE + note.beatInfo.timeSignature() + (newlineBeforeNote ? "" : NEWLINE));
+            if ((i > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar type
+                result.append(note.beatInfo.timeSignature() + (addNewlineBeforeNote ? "" : NEWLINE));
             
             if (Boolean.TRUE.equals(note.connectionFlags.slurred())) {
                 if (inSlur == false)
@@ -273,7 +273,7 @@ public class MelodyFactory
     private void checkValidIpnName(String ipnName) {
         if (ipnName.equals(ToneSystem.REST_SYMBOL) == false &&
                 ipnName.matches("[ABCDEFG]#?[0-9]+") == false)
-            throw new IllegalArgumentException("Invalid note name: '"+ipnName+"' (use '-' for a rest)");
+            throw new IllegalArgumentException("Invalid note name: '"+ipnName+"'");
     }
 
     private void checkValidBeatsPerMinute(Integer beatsPerMinute) {

@@ -77,7 +77,7 @@ class MelodyFactoryTest
         
         final MelodyFactory melodyFactory = new MelodyFactory(BEATS_PER_MINUTE, BEATS_PER_BAR, BEAT_TYPE);
         final Note[] melody = melodyFactory.translate(AUGUSTIN);
-        final String textNotation = melodyFactory.toString(melody);
+        final String textNotation = melodyFactory.toString(melody, true, true);
         
         final String expectedResult = 
                 ""+BEATS_PER_MINUTE + MelodyFactory.NEWLINE+
@@ -105,7 +105,7 @@ class MelodyFactoryTest
             };
 
         final Note[] melody = melodyFactory.translate(notes);
-        final String textNotation = melodyFactory.toString(melody);
+        final String textNotation = melodyFactory.toString(melody, true, true);
         
         final String expectedResult = 
                 ""+BEATS_PER_MINUTE + MelodyFactory.NEWLINE+
@@ -201,7 +201,7 @@ class MelodyFactoryTest
             "G4/8,7", // septuplet is ambiguous and thus not supported
         };
         assertThrows(
-            IllegalStateException.class, 
+            IllegalArgumentException.class, 
             () -> new MelodyFactory().translate(notes)
         );
     }

@@ -221,8 +221,14 @@ public class NotesOnPianoPlayer
             @Override
             public void actionPerformed(ActionEvent e) {
                 final Note[] notes = readNotesFromTextAreaCatchExceptions();
-                if (notes != null)
-                    notesText.setText(newMelodyFactory().toString(notes));
+                if (notes != null) {
+                    final String formatted = newMelodyFactory().toString(
+                            notes, 
+                            tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
+                            timeSignatureChoice.isEnabled() == false);
+                    notesText.setText(formatted);
+                    notesText.setCaretPosition(0);
+                }
             }
         });
         
