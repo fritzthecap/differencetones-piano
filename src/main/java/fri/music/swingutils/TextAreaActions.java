@@ -85,8 +85,6 @@ public class TextAreaActions extends MouseAdapter
         contextMenu.addSeparator();
         contextMenu.add(clear);
         
-        textComponent.addMouseListener(this);
-        
         // we need to listen to any key for enabling actions
         textComponent.addKeyListener(new KeyAdapter() {
             @Override
