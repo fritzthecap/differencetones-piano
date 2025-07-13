@@ -43,7 +43,6 @@ import fri.music.swingutils.TextAreaActions;
 public class NotesPiano
 {
     private final PianoWithSound piano;
-    private String melody;
     
     private JComponent playerPanel; // the component
     
@@ -57,28 +56,19 @@ public class NotesPiano
     private Player player;
     private final Object playerLock = new Object();
     
-    
     private final NotesWritingMouseListener notesWritingListener = new NotesWritingMouseListener(this);
-    
     
     /** @param piano required, the piano on which to play notes. */
     public NotesPiano(PianoWithSound piano) {
-        this(piano, null);
-    }
-    /**
-     * @param piano required, the piano on which to play notes.
-     * @param initialMelody optional, an initial tune to put into notes text-area.
-     */
-    public NotesPiano(PianoWithSound piano, String initialMelody) {
         this.piano = Objects.requireNonNull(piano);
-        this.melody = initialMelody;
     }
     
     /**
      * Call this to get the UI.
+     * @param melody optional, an initial tune to put into notes text-area.
      * @return a panel containing the piano and a notes text area.
      */
-    public JComponent getPlayer() {
+    public JComponent getPlayer(String melody) {
         if (this.playerPanel != null)
             return this.playerPanel; // just one view, due to mouseHandler that stores UI-state
         

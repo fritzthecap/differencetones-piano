@@ -3,6 +3,7 @@ package fri.music.demos;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import fri.music.ScaleTypes;
+import fri.music.SoundChannel;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
 import fri.music.instrument.notespiano.NotesPiano;
@@ -45,11 +46,9 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
                 lowestToneIpnName,
                 //true, // vertical
                 13);
-        final NotesPiano player = new NotesPiano(
-                new PianoWithVolume(config, new SineWaveSoundChannel(null)),
-                TUBULAR_BELLS);
-        
-        final JComponent playerPanel = player.getPlayer();
+        final SoundChannel tunableSoundChannel = new SineWaveSoundChannel(null);
+        final NotesPiano player = new NotesPiano(new PianoWithVolume(config, tunableSoundChannel));
+        final JComponent playerPanel = player.getPlayer(TUBULAR_BELLS);
         
         frame.addWindowListener(player.getWindowClosingListener());
         frame.add(playerPanel);

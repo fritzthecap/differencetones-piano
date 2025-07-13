@@ -1,7 +1,11 @@
 
-- Implement DifferenceTonesOnPianoPlayer that extends NotesOnPianoPlayer
+- Implement DifferenceTonesOnPianoPlayer that extends NotesPiano
     and translates the melody from text-area to difference-tone intervals
-    before playing.
+    before playing. Use the convertNotesToChords() override for this.
+
+- Must be able to change tuning of NotesPiano (TuningComponent).
+
+- Must be able to load and save melodies from/to files in NotesPiano.
 
 - Provide an "Export to ABC" button that writes notes in ABC format
     and renders the result in a non-modal text-dialog.
