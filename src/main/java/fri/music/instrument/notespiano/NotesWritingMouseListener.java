@@ -18,7 +18,7 @@ class NotesWritingMouseListener extends MouseAdapter
     private final NotesPiano notesPiano;
     private final JPopupMenu popup;
     
-    private boolean active = true;
+    private boolean active;
     private PianoWithSound.Keyboard.Key key;
     private long startMillis;
     
