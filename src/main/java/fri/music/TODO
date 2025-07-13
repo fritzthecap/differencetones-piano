@@ -1,13 +1,11 @@
 
-- Add Cut/Copy/Paste/Clear/Undo/Redo actions in a context-menu to editor.
-    
-- Provide an "Export to ABC" button that writes notes in ABC format
-    and renders the result in a non-modal text-dialog.
-    
 - Implement DifferenceTonesOnPianoPlayer that extends NotesOnPianoPlayer
     and translates the melody from text-area to difference-tone intervals
     before playing.
 
+- Provide an "Export to ABC" button that writes notes in ABC format
+    and renders the result in a non-modal text-dialog.
+    
 - Give DifferenceTonePiano and others an initial interval or chord to play.
 
 - Display 
