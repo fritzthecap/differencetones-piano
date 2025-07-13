@@ -318,7 +318,7 @@ public class MelodyFactory
 
     private void checkValidBeatsPerMinute(Integer beatsPerMinute) {
         if (beatsPerMinute == null || beatsPerMinute < TEMPO_MINIMUM_BPM || beatsPerMinute > TEMPO_MAXIMUM_BPM)
-            throw new IllegalArgumentException("Illegal tempo (BPM): "+beatsPerMinute);
+            throw new IllegalArgumentException("Illegal tempo "+beatsPerMinute+" (BPM), must be "+TEMPO_MINIMUM_BPM+" - "+TEMPO_MAXIMUM_BPM+".");
     }
     
     private void checkValidBeatsPerBar(Integer beatsPerBar) throws IllegalArgumentException {
@@ -335,7 +335,7 @@ public class MelodyFactory
                     result = true;
         
         if (result == false)
-            throw new IllegalArgumentException(errorMessage+" "+beatType);
+            throw new IllegalArgumentException(errorMessage+" "+beatType+", must be one of 1,2,4,8,16,32,64");
     }
     
     

@@ -13,6 +13,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -34,7 +35,7 @@ import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.SmartComboBox;
 import fri.music.swingutils.SmartPanel;
-import fri.music.swingutils.TextAreaUtil;
+import fri.music.swingutils.TextAreaActions;
 
 /**
  * A notes area that can play user-editable notes on a given piano.
@@ -142,10 +143,8 @@ public class NotesPiano
     
     private JComponent buildNotesTextArea() {
         this.notesText = new JTextArea();
+        notesText.addMouseListener(new TextAreaActions(notesText));
         notesText.setToolTipText("Write Notes to be Played on Piano");
-        TextAreaUtil.addUndoManagement(notesText);
-        final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
-        notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes"));
         // on every text change, try to translate into notes and render errors
         notesText.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -161,6 +160,8 @@ public class NotesPiano
                 readNotesFromTextAreaCatchExceptions();
             }
         });
+        final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
+        notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes"));
         
         this.error = new JTextField();
         error.setBorder(BorderFactory.createTitledBorder("Error"));
@@ -205,6 +206,23 @@ public class NotesPiano
             }
         });
         
+        this.formatBars = new JButton("Format");
+        formatBars.setToolTipText("Put each Bar into a Separate Line");
+        formatBars.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final Note[] notes = readNotesFromTextAreaCatchExceptions();
+                if (notes != null) {
+                    final String formatted = newMelodyFactory().toString(
+                            notes, 
+                            tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
+                            timeSignatureChoice.isEnabled() == false);
+                    notesText.setText(formatted);
+                    notesText.requestFocus();
+                }
+            }
+        });
+        
         final String[] timeSignatures = new String[] {
             "4/4", "3/4", "12/8", "6/8", "2/4", "9/8", "5/4", "7/4",
         };
@@ -227,20 +245,12 @@ public class NotesPiano
         tempoLayoutPanel.add(tempoSpinner, piano.config.isVertical ? BorderLayout.WEST : BorderLayout.NORTH);
         tempoLayoutPanel.setBorder(BorderFactory.createTitledBorder("Tempo"));
         
-        this.formatBars = new JButton("Format");
-        formatBars.setToolTipText("Put each Bar into a Separate Line");
-        formatBars.addActionListener(new ActionListener() {
+        final JCheckBox writeToNotesCheckbox = new JCheckBox("Write Notes", false);
+        writeToNotesCheckbox.setToolTipText("Write Notes from Piano to Textarea");
+        writeToNotesCheckbox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final Note[] notes = readNotesFromTextAreaCatchExceptions();
-                if (notes != null) {
-                    final String formatted = newMelodyFactory().toString(
-                            notes, 
-                            tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
-                            timeSignatureChoice.isEnabled() == false);
-                    notesText.setText(formatted);
-                    notesText.requestFocus();
-                }
+                notesWritingListener.setActive(((JCheckBox) e.getSource()).isSelected());
             }
         });
         
@@ -263,6 +273,11 @@ public class NotesPiano
         
         tempoLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         notesControlPanel.add(tempoLayoutPanel);
+        notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
+        
+        writeToNotesCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //writeToNotesCheckbox.setAlignmentX(piano.config.isVertical ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT);
+        notesControlPanel.add(writeToNotesCheckbox);
         
         return notesControlPanel;
     }

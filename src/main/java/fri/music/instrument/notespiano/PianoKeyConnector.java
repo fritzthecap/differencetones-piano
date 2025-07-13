@@ -10,6 +10,9 @@ import fri.music.swingutils.ButtonUtil;
 /**
  * Used as <code>SoundChannel</code> for <code>Player</code>, 
  * connects notes to the piano's keys.
+ * That way <code>NotesPiano</code> never accesses the piano's
+ * <code>SoundChannel</code> directly, instead it always plays
+ * tones using the piano keyboard.
  */
 class PianoKeyConnector implements SoundChannel
 {
@@ -48,7 +51,7 @@ class PianoKeyConnector implements SoundChannel
     
     private void pressOrReleaseKey(PianoWithSound.Keyboard.Key key, boolean press) {
         if (press) {
-            ButtonUtil.press(key);
+            ButtonUtil.press(key); // this was the only working way to visibly show key-presses
             mouseHandler.mousePressed(createMouseEvent(key, MouseEvent.MOUSE_PRESSED));
         }
         else { // release

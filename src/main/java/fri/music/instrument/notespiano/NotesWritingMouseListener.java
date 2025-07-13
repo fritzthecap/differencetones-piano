@@ -44,10 +44,12 @@ class NotesWritingMouseListener extends MouseAdapter
         }
     }
     
-    /** Turns off an on this mouse listener. */
+    /** Turns off and on this mouse listener. Initially it is active. */
     public void setActive(boolean active) {
         this.active = active;
     }
+    
+    // mouse listener methods
     
     @Override
     public void mousePressed(MouseEvent e) {
@@ -68,6 +70,13 @@ class NotesWritingMouseListener extends MouseAdapter
         if (showPopupMenu(e) == false)
             calculateAndWriteNote();
     }
+    
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        if (active && key != getKey(e))
+            key = null; // ignore mouse drags
+    }
+    
     
     /**
      * Recommended way to display a context-menu <b>platform-independently</b>
@@ -91,17 +100,11 @@ class NotesWritingMouseListener extends MouseAdapter
     }
 
     private String writeNoteToTextarea(String noteLength) {
-        final String noteWithLength = key.ipnName + Note.DURATION_SEPARATOR + noteLength + " ";
+        final String noteWithLength = " " + key.ipnName + Note.DURATION_SEPARATOR + noteLength + " ";
         notesPiano.writeSingleNote(noteWithLength);
         return noteWithLength;
     }
 
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        if (active && key != getKey(e))
-            key = null; // ignore mouse drags
-    }
-    
     private PianoWithSound.Keyboard.Key getKey(MouseEvent e) {
         return (PianoWithSound.Keyboard.Key) e.getSource();
     }
