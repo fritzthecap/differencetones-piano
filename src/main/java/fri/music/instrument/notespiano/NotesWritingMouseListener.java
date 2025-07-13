@@ -39,6 +39,7 @@ class NotesWritingMouseListener extends MouseAdapter
         };
         for (int i = 1; i <= MelodyFactory.SHORTEST_NOTELENGTH_DIVISOR; i *= 2) { // 1, 2, 4, 8, 16, 32, 64
             final JMenuItem item = new JMenuItem(""+i);
+            item.setToolTipText("1/"+i+" Note");
             item.addActionListener(menuListener);
             popup.add(item);
         }

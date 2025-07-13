@@ -276,7 +276,6 @@ public class NotesPiano
         notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
         
         writeToNotesCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
-        //writeToNotesCheckbox.setAlignmentX(piano.config.isVertical ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT);
         notesControlPanel.add(writeToNotesCheckbox);
         
         return notesControlPanel;
@@ -494,21 +493,14 @@ public class NotesPiano
 <html>
 <head></head>
 <body>
-<h2>Editor Keys</h2>
-<ul>
-<li><b>Ctrl-X</b> for "Cut" selection</li>
-<li><b>Ctrl-C</b> for "Copy" selection</li>
-<li><b>Ctrl-V</b> for "Paste" at caret position</li>
-<li><b>Ctrl-Z</b> for "Undo" last action</li>
-<li><b>Ctrl-Y</b> for "Redo" last "Undo"</li>
-</ul>
 <h2>Write by Piano</h2>
 <p>
-You can use the piano to write notes.
+When you turn on the "Write Notes" checkbox, 
+you can use the piano to write notes.
 Left click on any key writes to the text-area at cursor position 
 with a note length that is calculated
 from the time the mouse button was down.
-Right mouse click opens a context menu that lets choose
+Right mouse click opens a context-menu that lets choose
 the wanted length of the clicked note.
 </p>
 <h2>Notes Syntax</h2>
@@ -517,12 +509,12 @@ Every note is given as an IPN-name (international pitch notation)
 and its length behind a slash, for example: 
 </p>
 <ul>
-<li>"A4/4" for a quarter note on pitch of A4 (440 Hz)</li>
+<li>"A4/8" for a eighth note on A4 (4th octave) with pitch 440 Hz</li>
 <li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
-<li>"E5/8,3" for a E5 triplet eighth note 
+<li>"E5/16,3" for a E5 triplet sixteenth note 
     (each of the triplets must have the ",3" postfix!)</li>
-<li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
-<li>"-/2" for a half rest note.</li>
+<li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three bars</li>
+<li>"-/4" for a quarter rest note.</li>
 </ul>
 <p>
 No space must appear inside notes and their length specification,
@@ -546,6 +538,7 @@ Ties are started by an parenthesis "(" and ended by ")",
 notes in between the start and end note SHOULD be enclosed in
 parentheses, because this is how it would look like in written notes.
 Space between parentheses and note is allowed.
+You can not tie rests.
 </p><p>
 Notes connected by a "slur" are notes of different pitch that are phrased together, 
 even across several bars.
@@ -553,8 +546,20 @@ Slurs are started by a brace "{" and ended by "}",
 notes in between MUST NOT be enclosed in "{...}",
 because it is not clear how to phrase several notes that are all slurred together.
 Space between braces and note is allowed.
-</p><p>
+You can not slur rests.
 </p>
+<h2>Editor Actions</h2>
+<p>
+With right mouse click you can open a context-menu that provides
+visible representations for following actions on text-area:
+</p>
+<ul>
+<li><b>Ctrl-x</b> for "Cut" selection</li>
+<li><b>Ctrl-c</b> for "Copy" selection</li>
+<li><b>Ctrl-v</b> for "Paste" at caret position</li>
+<li><b>Ctrl-z</b> for "Undo" last action</li>
+<li><b>Ctrl-y</b> for "Redo" last "Undo"</li>
+</ul>
 </body>
 </html>
 """;
