@@ -122,7 +122,7 @@ public class PianoWithSound extends Piano
                     setToolTipText(""+midiNoteNumber);
             }
             
-            /** Disable or enable (default) mouse events on piano keys. */
+            /** Disable or enable (default) mouse events on piano keys, this affects ALL listeners! */
             public void setIgnoreMouse(boolean ignore) {
                 this.ignoreMouse = ignore;
             }
@@ -177,7 +177,7 @@ public class PianoWithSound extends Piano
     
     
     /** Mouse handler that plays sound on mouse click, and manages glissandos. */
-    protected static class MouseHandler extends MouseAdapter
+    public static class MouseHandler extends MouseAdapter
     {
         protected final PianoWithSound piano;
         private Keyboard.Key mouseOverKey;
@@ -299,7 +299,7 @@ public class PianoWithSound extends Piano
         return new MouseHandler(this);
     }
     /** The handler from factory. To be overridden for other mouse handlers. */
-    protected MouseHandler getMouseHandler() {
+    public MouseHandler getMouseHandler() {
         return mouseHandler;
     }
 

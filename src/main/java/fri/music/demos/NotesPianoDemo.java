@@ -3,12 +3,12 @@ package fri.music.demos;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import fri.music.ScaleTypes;
-import fri.music.instrument.NotesOnPianoPlayer;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
+import fri.music.instrument.notespiano.NotesPiano;
 import fri.music.wavegenerator.SineWaveSoundChannel;
 
-public class NotesOnPianoPlayerDemo
+public class NotesPianoDemo
 {
     private static final String AUGUSTIN = 
         """
@@ -45,7 +45,7 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
                 lowestToneIpnName,
                 //true, // vertical
                 13);
-        final NotesOnPianoPlayer player = new NotesOnPianoPlayer(
+        final NotesPiano player = new NotesPiano(
                 new PianoWithVolume(config, new SineWaveSoundChannel(null)),
                 TUBULAR_BELLS);
         

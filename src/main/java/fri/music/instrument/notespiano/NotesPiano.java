@@ -1,4 +1,4 @@
-package fri.music.instrument;
+package fri.music.instrument.notespiano;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -6,8 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowListener;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
@@ -31,10 +27,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import fri.music.SoundChannel;
+import fri.music.instrument.PianoWithSound;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
-import fri.music.swingutils.ButtonUtil;
 import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.SmartComboBox;
 import fri.music.swingutils.SmartPanel;
@@ -43,7 +39,7 @@ import fri.music.swingutils.TextAreaUtil;
 /**
  * A notes area that can play user-editable notes on a given piano.
  */
-public class NotesOnPianoPlayer
+public class NotesPiano
 {
     private final PianoWithSound piano;
     private String melody;
@@ -61,110 +57,18 @@ public class NotesOnPianoPlayer
     private final Object playerLock = new Object();
     
     
-    /** Writes notes from piano to text-area. */
-    private class NotesWritingMouseListener extends MouseAdapter
-    {
-        private boolean active = true;
-        private PianoWithSound.Keyboard.Key key;
-        private long startMillis;
-        private JPopupMenu popup = new JPopupMenu();
-        
-        {
-            final ActionListener menuListener = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (key == null)
-                        return;
-                    final JMenuItem item = (JMenuItem) e.getSource();
-                    final String noteLength = item.getActionCommand();
-                    final String noteString = writeNote(noteLength);
-                    final Note[] note = newMelodyFactory().translate(noteString);
-                    new Player(new PianoKeyConnector(piano)).play(note[0]);
-                }
-            };
-            for (int i = 1; i <= MelodyFactory.SHORTEST_NOTELENGTH_DIVISOR; i *= 2) {
-                final JMenuItem item = new JMenuItem(""+i);
-                item.addActionListener(menuListener);
-                popup.add(item);
-            }
-        }
-        
-        public void setActive(boolean active) {
-            this.active = active;
-        }
-        
-        @Override
-        public void mousePressed(MouseEvent e) {
-            if (active == false)
-                return;
-            
-            key = getKey(e);
-            
-            if (e.isPopupTrigger())
-                popupLengthMenu(e);
-            else
-                startMillis = System.currentTimeMillis();
-        }
-        
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (active == false || key == null) // was a mouse drag
-                return;
-            
-            if (e.isPopupTrigger())
-                popupLengthMenu(e);
-            else
-                writeNoteFromStartMillis();
-        }
-        
-        private void popupLengthMenu(MouseEvent e) {
-            popup.show(getKey(e), e.getX(), e.getY());
-        }
-
-        private void writeNoteFromStartMillis() {
-            final long endMillis = System.currentTimeMillis();
-            final double SHRINK_FACTOR = 0.8; // this makes it easier to achieve 1/16 notes
-            final long durationMillis = Math.round(SHRINK_FACTOR * (double) (endMillis - startMillis));
-            // calculate noteLengthDivisor from durationMillis
-            final Integer beatsPerMinute = (Integer) tempoSpinner.getValue();
-            final int beatDurationMillis = MelodyFactory.beatDurationMillis(beatsPerMinute);
-            final Integer[] timeSignature = timeSignatureParts((String) timeSignatureChoice.getSelectedItem());
-            final Integer beatType = timeSignature[1];
-            final String noteLength = MelodyFactory.noteLengthDivisor((int) durationMillis, beatType, beatDurationMillis);
-            
-            writeNote(noteLength);
-        }
-
-        private String writeNote(String noteLength) {
-            final String note = key.ipnName + Note.DURATION_SEPARATOR + noteLength + " ";
-            notesText.insert(note, notesText.getCaretPosition());
-            notesText.requestFocus();
-            return note;
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            if (active && key != getKey(e))
-                key = null; // ignore mouse drags
-        }
-        
-        private PianoWithSound.Keyboard.Key getKey(MouseEvent e) {
-            return (PianoWithSound.Keyboard.Key) e.getSource();
-        }
-    };
-
-    private final NotesWritingMouseListener notesWritingListener = new NotesWritingMouseListener();
+    private final NotesWritingMouseListener notesWritingListener = new NotesWritingMouseListener(this);
     
     
     /** @param piano required, the piano on which to play notes. */
-    public NotesOnPianoPlayer(PianoWithSound piano) {
+    public NotesPiano(PianoWithSound piano) {
         this(piano, null);
     }
     /**
      * @param piano required, the piano on which to play notes.
      * @param initialMelody optional, an initial tune to put into notes text-area.
      */
-    public NotesOnPianoPlayer(PianoWithSound piano, String initialMelody) {
+    public NotesPiano(PianoWithSound piano, String initialMelody) {
         this.piano = Objects.requireNonNull(piano);
         this.melody = initialMelody;
     }
@@ -197,6 +101,29 @@ public class NotesOnPianoPlayer
     /** @return the listener of created piano. */
     public WindowListener getWindowClosingListener() {
         return piano.getWindowClosingListener();
+    }
+    
+    
+    // methods for NotesWritingMouseListener
+    
+    String noteLengthForMillis(int durationMillis) {
+        Integer beatsPerMinute = (Integer) tempoSpinner.getValue();
+        final int beatDurationMillis = MelodyFactory.beatDurationMillis(beatsPerMinute);
+        
+        final Integer[] timeSignature = timeSignatureParts((String) timeSignatureChoice.getSelectedItem());
+        final Integer beatType = timeSignature[1];
+        
+        return MelodyFactory.noteLengthDivisor(durationMillis, beatType, beatDurationMillis);
+    }
+    
+    void writeSingleNote(String noteWithLength) {
+        notesText.insert(noteWithLength, notesText.getCaretPosition());
+        notesText.requestFocus();
+    }
+
+    void playSingleNote(String noteWithLength) {
+        final Note[] note = newMelodyFactory().translate(new String[] { noteWithLength });
+        new Player(new PianoKeyConnector(piano)).play(note[0]);
     }
     
     
@@ -312,7 +239,6 @@ public class NotesOnPianoPlayer
                             tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
                             timeSignatureChoice.isEnabled() == false);
                     notesText.setText(formatted);
-                    //notesText.setCaretPosition(0); // scroll back to top
                     notesText.requestFocus();
                 }
             }
@@ -377,12 +303,10 @@ public class NotesOnPianoPlayer
         // enable or disable UI
         formatBars.setEnabled(isStop);
         notesText.setEnabled(isStop);
-        
-        notesWritingListener.setActive(isStop);
-        
+
+        // block mouse events for any listener
         for (PianoWithSound.Keyboard.Key key : piano.getKeys())
-            key.setIgnoreMouse(isStop == false);
-            // setEnabled() did not reject mouse-events, and prevented key-down rendering
+            key.setIgnoreMouse(isStop == false); // setEnabled() did not reject mouse-events and prevented key-down rendering
     
         if (isStop) {
             if (player != null) {
@@ -548,72 +472,6 @@ public class NotesOnPianoPlayer
         if (exception != null) // throw only after correct termination
             throw exception;
     }
-    
-
-    /**
-     * Used as <code>SoundChannel</code> for <code>Player</code>, 
-     * connects notes to the piano's keys.
-     */
-    private static class PianoKeyConnector implements SoundChannel
-    {
-        private final PianoWithSound.MouseHandler mouseHandler;
-        private final List<PianoWithSound.Keyboard.Key> keys;
-        private final int lowestMidiNumber;
-        
-        PianoKeyConnector(PianoWithSound piano) {
-            this.mouseHandler = piano.getMouseHandler();
-            this.keys = piano.getKeys();
-            this.lowestMidiNumber = keys.get(0).midiNoteNumber;
-        }
-        
-        @Override
-        public void noteOn(int midiNoteNumber, int velocity) {
-            final PianoWithSound.Keyboard.Key key = findKey(midiNoteNumber);
-            //velocityChange(velocity);
-            pressOrReleaseKey(key, true);
-        }
-        @Override
-        public void noteOff(int midiNoteNumber) {
-            final PianoWithSound.Keyboard.Key key = findKey(midiNoteNumber);
-            pressOrReleaseKey(key, false);
-        }
-        
-        @Override
-        public void volumeChange(int volume) {
-        }
-        @Override
-        public void allNotesOff() {
-        }
-        
-        private PianoWithSound.Keyboard.Key findKey(int midiNoteNumber) {
-            return keys.get(midiNoteNumber - lowestMidiNumber);
-        }
-        
-        private void pressOrReleaseKey(PianoWithSound.Keyboard.Key key, boolean press) {
-            if (press) {
-                ButtonUtil.press(key);
-                mouseHandler.mousePressed(createMouseEvent(key, MouseEvent.MOUSE_PRESSED));
-            }
-            else { // release
-                ButtonUtil.release(key);
-                mouseHandler.mouseReleased(createMouseEvent(key, MouseEvent.MOUSE_RELEASED));
-                //mouseHandler.mouseClicked(createMouseEvent(key, MouseEvent.MOUSE_CLICKED));
-            }
-        }
-        
-        private MouseEvent createMouseEvent(Component eventSource, int mouseEventId) {
-            return new MouseEvent(
-                    eventSource, // where the event occurred
-                    mouseEventId, // MouseEvent.MOUSE_XXX
-                    System.currentTimeMillis(), // when
-                    0, // modifiers
-                    2, 2, /// x, y coordinates
-                    1, // click count
-                    false, // popup trigger
-                    MouseEvent.BUTTON1); // which button of mouse: left
-        }
-    }   // end class PianoKeyConnector
-    
     
 
     /** Help taken from JavaDoc of MelodyFactory class. */

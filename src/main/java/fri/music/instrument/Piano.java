@@ -161,7 +161,7 @@ public class Piano
     
     
     
-    protected final Piano.Configuration config;
+    public final Piano.Configuration config;
     
     /** A horizontal piano view with 7 octaves, based on "C1". */
     public Piano() {
