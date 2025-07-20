@@ -25,7 +25,7 @@ public class DifferenceToneInversions extends DifferenceTones
     /**
      * Builds a sufficient range of tones to model given melody with difference tones.
      * @param melody required, the melody to model with difference tones.
-     * @param toneSystem required, the tuning system to be used for the melody and its difference tones.
+     * @param toneStock required, the tones from the tone-system to be used for the melody and its difference tones.
      * @param smallestSemitoneDistance optional, the number of semi-tones representing the 
      *      smallest difference-tone interval to provide in returned tone-inversions.
      *      Default is MINOR_THIRD.
@@ -37,7 +37,7 @@ public class DifferenceToneInversions extends DifferenceTones
      */
     public static DifferenceToneInversions toneRangeFor(
             Tone[] melody, 
-            AbstractToneSystem toneSystem, 
+            Tone[] toneStock, 
             int smallestSemitoneDistance,
             int biggestSemitoneDistance,
             double deviationTolerance)
@@ -53,11 +53,11 @@ public class DifferenceToneInversions extends DifferenceTones
         
         // up to 1.3 -> 4 octaves, up to 2.3 -> 5, up to 3.3 -> 6, ...
         final int additionalOctavesTo4 = Math.min(0, (int) Math.ceil(melodyOctaves - 1.3));
-        final Tone[] tones = toneSystem.tones(toneSystem.tones(), lowest.ipnName, 4 + additionalOctavesTo4);
+        toneStock = AbstractToneSystem.tones(toneStock, lowest.ipnName, 4 + additionalOctavesTo4);
         
         return new DifferenceToneInversions(
             new DifferenceToneInversions.Configuration(
-                tones, 
+                toneStock, 
                 (smallestSemitoneDistance > 0) ? smallestSemitoneDistance : Configuration.DEFAULT_SMALLEST_SEMITONE_STEPS,
                 (biggestSemitoneDistance > 0) ? biggestSemitoneDistance : Configuration.DEFAULT_BIGGEST_SEMITONE_STEPS,
                 deviationTolerance
@@ -133,7 +133,7 @@ public class DifferenceToneInversions extends DifferenceTones
         // in just-intonation, any tone-pair can give another difference tone, nearly no prediction-rules are possible
         // build index of intervals from given tones
         // C-D, C-D#, C-E ... C-A#; C#-#D C#-E, ...
-        for (int lowerIndex = 2; // there won't be a difference tone below second semi-tone
+        for (int lowerIndex = 2; // there won't be a difference tone below third semi-tone
                 lowerIndex < tones.length - config.smallestSemitoneDistance; // stop one before last
                 lowerIndex++) 
         {

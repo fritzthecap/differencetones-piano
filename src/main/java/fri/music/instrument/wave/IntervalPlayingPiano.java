@@ -39,6 +39,9 @@ public class IntervalPlayingPiano extends PianoWithHold
             "Octave");
     
     private JComponent pianoPanel;
+    private TuningComponent tuningComponent;
+    private JComboBox<String> intervalChoice;
+    private JCheckBox intervalActive;
     private int selectedSemitoneSteps = 0;
     
     public IntervalPlayingPiano(PianoWithSound.Configuration config, WaveSoundChannel channel) {
@@ -53,7 +56,7 @@ public class IntervalPlayingPiano extends PianoWithHold
         final JComponent pianoPanel = super.getKeyboard();
         
         final String[] chooserNames = intervalChooserItems();
-        final JComboBox<String> intervalChoice = new SmartComboBox(chooserNames);
+        this.intervalChoice = new SmartComboBox(chooserNames);
         intervalChoice.setBorder(BorderFactory.createTitledBorder(intervalChooserLabel()));
         intervalChoice.setToolTipText(intervalChooserTooltip());
         intervalChoice.addActionListener(new ActionListener() {
@@ -62,7 +65,8 @@ public class IntervalPlayingPiano extends PianoWithHold
                 restartPlayingNotes((String) intervalChoice.getSelectedItem());
             }
         });
-        final JCheckBox intervalActive = new JCheckBox();
+        
+        this.intervalActive = new JCheckBox();
         intervalActive.setSelected(true);
         intervalActive.addActionListener(new ActionListener() {
             @Override
@@ -75,6 +79,7 @@ public class IntervalPlayingPiano extends PianoWithHold
                 restartPlayingNotes(chosenInterval);
             }
         });
+        
         final JPanel intervalPanel = new SmartPanel();
         intervalPanel.setLayout(new BorderLayout());
         intervalPanel.add(intervalChoice, BorderLayout.CENTER);
@@ -82,17 +87,24 @@ public class IntervalPlayingPiano extends PianoWithHold
         
         getControlPanel().add(intervalPanel, 2);
         
-        final TuningComponent tuningComponent = newTuningComponent();
+        this.tuningComponent = newTuningComponent();
         getControlPanel().add(tuningComponent.getTuningChoice(null), 3);
         
         return this.pianoPanel = pianoPanel;
     }
-
-    @Override
-    protected String getControlPanelBorderLayoutConstraint() {
-        return config.isVertical ? BorderLayout.EAST : BorderLayout.SOUTH;
+    
+    /** @return the tone-system chooser. */
+    public JComboBox<String> getTuningChoice() {
+        return tuningComponent.getTuningChoice(null);
     }
     
+    /** Some sub-classes may prefer to not support choosing intervals. */
+    public void setIntervalChooserEnabled(boolean enable) {
+        intervalChoice.setEnabled(enable);
+        intervalActive.setEnabled(enable);
+    }
+
+    /** Factory method called from getKeyboard(). To be overridden. */
     protected TuningComponent newTuningComponent() {
         return new TuningComponent(config.lowestToneIpnName, config.octaves, (WaveSoundChannel) getSoundChannel());
     }
@@ -223,7 +235,8 @@ public class IntervalPlayingPiano extends PianoWithHold
         }
 
         private int selectedSemitones() {
-            return ((IntervalPlayingPiano) piano).selectedSemitoneSteps;
+            final IntervalPlayingPiano myPiano = (IntervalPlayingPiano) piano;
+            return myPiano.intervalChoice.isEnabled() ? myPiano.selectedSemitoneSteps : 0;
         }
     }   // end MouseHandler
 }

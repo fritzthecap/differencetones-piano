@@ -2,7 +2,7 @@ package fri.music.differencetones.composer;
 
 import java.util.ArrayList;
 import java.util.List;
-import fri.music.AbstractToneSystem;
+import fri.music.Tone;
 import fri.music.differencetones.composer.strategy.ByPitch;
 import fri.music.differencetones.composer.strategy.NonParallel;
 import fri.music.differencetones.composer.strategy.OneNoteInCommon;
@@ -16,8 +16,8 @@ public class DefaultComposer extends AbstractStrategicComposer
 {
     private final List<Strategy> strategies = new ArrayList<>();
 
-    public DefaultComposer(AbstractToneSystem toneSystem, double deviationTolerance) {
-        super(toneSystem, deviationTolerance);
+    public DefaultComposer(Tone[] tones, double deviationTolerance) {
+        super(tones, deviationTolerance);
     }
     
     @Override

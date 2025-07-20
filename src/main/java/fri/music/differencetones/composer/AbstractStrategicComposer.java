@@ -3,7 +3,7 @@ package fri.music.differencetones.composer;
 import java.util.Collections;
 import java.util.List;
 import java.util.SequencedMap;
-import fri.music.AbstractToneSystem;
+import fri.music.Tone;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.differencetones.composer.strategy.Strategy;
@@ -15,8 +15,8 @@ import fri.music.player.Note;
  */
 public abstract class AbstractStrategicComposer extends AbstractComposer
 {
-    protected AbstractStrategicComposer(AbstractToneSystem toneSystem, double deviationTolerance) {
-        super(toneSystem, deviationTolerance);
+    protected AbstractStrategicComposer(Tone[] tones, double deviationTolerance) {
+        super(tones, deviationTolerance);
     }
 
     /**

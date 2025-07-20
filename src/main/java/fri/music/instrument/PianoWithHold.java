@@ -19,6 +19,7 @@ import fri.music.SoundChannel;
 public class PianoWithHold extends PianoWithVolume
 {
     private JComponent pianoPanel;
+    private JCheckBox holdCheckbox;
     
     public PianoWithHold(SoundChannel channel) {
         this(null, channel);
@@ -35,7 +36,7 @@ public class PianoWithHold extends PianoWithVolume
         
         final JComponent pianoPanel = super.getKeyboard();
         
-        final JCheckBox holdCheckbox = new JCheckBox("Hold");
+        this.holdCheckbox = new JCheckBox("Hold");
         holdCheckbox.setToolTipText("Hold struck tones until struck again");
         holdCheckbox.addActionListener(new ActionListener() {
             @Override
@@ -47,6 +48,12 @@ public class PianoWithHold extends PianoWithVolume
         
         return this.pianoPanel = pianoPanel;
     }
+    
+    /** Some sub-classes may prefer to not support "Hold". */
+    public void setHoldCheckboxEnabled(boolean enable) {
+        holdCheckbox.setEnabled(enable);
+    }
+    
     
     /** Overwritten to use HoldMouseHandler, implementing "Hold" checkbox. */
     @Override
@@ -120,7 +127,8 @@ public class PianoWithHold extends PianoWithVolume
         }
 
         protected final boolean isHoldActive() {
-            return isHoldActive;
+            final PianoWithHold pianoWithHold = (PianoWithHold) piano;
+            return isHoldActive && pianoWithHold.holdCheckbox.isEnabled();
         }
         
         protected void setRedBorder(Keyboard.Key key, boolean select) {

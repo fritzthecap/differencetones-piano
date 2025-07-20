@@ -77,7 +77,7 @@ public abstract class AbstractToneSystem implements ToneSystem
     /** {@inheritDoc} */
     @Override
     public Tone[] tones() {
-        return tones(getOrCreateCachedTones(), baseToneIpnName(), octaves);
+        return AbstractToneSystem.tones(getOrCreateCachedTones(), baseToneIpnName(), octaves);
     }
     
     protected final Tone[] getOrCreateCachedTones() {
@@ -123,7 +123,7 @@ public abstract class AbstractToneSystem implements ToneSystem
      *      When zero, just the lowest tone is returned.
      * @return all tones from given IPN-name up to given octaves + 1.
      */
-    public final Tone[] tones(Tone[] tones, String lowestIpnName, int octaves) {
+    public static Tone[] tones(Tone[] tones, String lowestIpnName, int octaves) {
         if (octaves < 0)
             throw new IllegalArgumentException("Number of octaves can not be negative: "+octaves);
         

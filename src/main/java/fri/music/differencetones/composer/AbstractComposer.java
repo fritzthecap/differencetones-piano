@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SequencedMap;
-import fri.music.AbstractToneSystem;
+import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
@@ -17,11 +17,11 @@ import fri.music.player.Note;
  */
 public abstract class AbstractComposer
 {
-    protected final AbstractToneSystem toneSystem;
+    protected final Tone[] tones;
     protected final double deviationTolerance;
     
-    protected AbstractComposer(AbstractToneSystem toneSystem, double deviationTolerance) {
-        this.toneSystem = Objects.requireNonNull(toneSystem);
+    protected AbstractComposer(Tone[] tones, double deviationTolerance) {
+        this.tones = Objects.requireNonNull(tones);
         this.deviationTolerance = deviationTolerance;
     }
 
@@ -44,7 +44,7 @@ public abstract class AbstractComposer
     {
         final DifferenceToneInversions inversions = DifferenceToneInversions.toneRangeFor(
                 melody, 
-                toneSystem, 
+                tones, 
                 (narrowestInterval != null) ? ToneSystem.semitoneSteps(narrowestInterval) : -1,
                 (widestInterval != null)    ? ToneSystem.semitoneSteps(widestInterval)    : -1,
                 deviationTolerance);

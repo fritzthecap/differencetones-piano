@@ -22,6 +22,7 @@ import fri.music.wavegenerator.WaveSoundChannel;
 public class DifferenceTonePiano extends IntervalPlayingPiano
 {
     private JComponent pianoPanel;
+    private JSlider deviationSlider;
     private double deviation;
     
     public DifferenceTonePiano(PianoWithSound.Configuration config, WaveSoundChannel soundChannel) {
@@ -35,16 +36,16 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
 
         final JComponent pianoPanel = super.getKeyboard();
         
-        final int defaultDeviationPercent = (int) // 74 works for major second in EDO-12
-                Math.round(DifferenceTones.TOLERANT_DEVIATION_EDO_12 * 2.0 * 100.0);
+        final int defaultDeviationPercent = doubleToDeviationPercent(DifferenceTones.TOLERANT_DEVIATION_EDO_12);
         this.deviation = deviationPercentToDouble(defaultDeviationPercent);
         
-        final JSlider deviationSlider = buildDeviationSlider(defaultDeviationPercent);
-        getControlPanel().add(deviationSlider, 4);
+        this.deviationSlider = buildDeviationSlider(defaultDeviationPercent);
+        getControlPanel().add(deviationSlider, 4); // add after "Tuning" choice
         
         return this.pianoPanel = pianoPanel;
     }
     
+    /** Overridden to alter the tuning while intervals may be playing. */
     @Override
     protected TuningComponent newTuningComponent() {
         final TuningComponent.Listener tuningChangeListener = new TuningComponent.Listener() {
@@ -53,12 +54,27 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
                 ((DifferenceToneMouseHandler) getMouseHandler()).reviseDifferenceTone();
             }
         };
-        return new TuningComponent(config.lowestToneIpnName, config.octaves, (WaveSoundChannel) getSoundChannel(), tuningChangeListener);
+        return new TuningComponent(
+                config.lowestToneIpnName, 
+                config.octaves, 
+                getWaveSoundChannel(), 
+                tuningChangeListener);
     }
     
-    private WaveSoundChannel getWaveSoundChannel() {
+    /** @return the used WaveSoundChannel, holding tones of a tone-system. */
+    public WaveSoundChannel getWaveSoundChannel() {
         return (WaveSoundChannel) getSoundChannel();
     }
+    
+    public void setDeviationSliderEnabled(boolean enable) {
+        deviationSlider.setEnabled(enable);
+    }
+    
+    /** @return the current deviation value from slider. */
+    public double getDeviation() {
+        return deviation;
+    }
+    
 
     private JSlider buildDeviationSlider(int defaultDeviationPercent) {
         final String title = "Deviation Tolerance Percent: ";
@@ -86,6 +102,12 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
         return ((double) percent / 2.0) / 100.0;
     }
     
+    private int doubleToDeviationPercent(double deviation) {
+        return (int) Math.round(deviation * 2.0 * 100.0);
+    }
+    
+    
+    /** Overridden to return a DifferenceToneMouseHandler. */
     @Override
     protected MouseHandler newMouseHandler() {
         return new DifferenceToneMouseHandler(this, getWaveSoundChannel());
@@ -102,6 +124,7 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
             this.soundChannel = soundChannel;
         }
         
+        /** Changes pressed and held keys "on the fly" when tuning changes. */
         public void reviseDifferenceTone() {
             handleDifferenceKey();
         }
@@ -135,7 +158,7 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
                 
                 final DifferenceTones differenceTones = new DifferenceTones(
                         soundChannel.getTones(), 
-                        ((DifferenceTonePiano) piano).deviation,
+                        ((DifferenceTonePiano) piano).getDeviation(),
                         true); // find primary difference tone only
                 try {
                     final Tone[] allDifferenceTones = differenceTones.findDifferenceTones(

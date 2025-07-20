@@ -175,7 +175,7 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
     
     @Override
     public Tone[] tones() {
-        return tones(getOrCreateCachedTones(), modalScaleStartIpnName, octaves);
+        return AbstractToneSystem.tones(getOrCreateCachedTones(), modalScaleStartIpnName, octaves);
     }
     
     

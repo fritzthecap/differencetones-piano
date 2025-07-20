@@ -356,7 +356,7 @@ public class MelodyFactory
             
             if (inputToken instanceof BeatsPerMinuteToken) {
                 if (notes.size() > 0 || tempoOnTop != null)
-                    throw new IllegalStateException("Tempo may appear just once on top of notes: "+melodyTokens[i]);
+                    throw new IllegalArgumentException("Tempo may appear just once on top of notes: "+melodyTokens[i]);
                 
                 final BeatsPerMinuteToken beatsPerMinute = (BeatsPerMinuteToken) inputToken;
                 this.beatsPerMinute = beatsPerMinute.beatsPerMinute;
@@ -370,7 +370,7 @@ public class MelodyFactory
             }
             else if (inputToken instanceof TimeSignatureToken) {
                 if (previousTokenWasNote == false && (notes.size() > 0 || timeSignatureOnTop != null))
-                    throw new IllegalStateException("Duplicate time signature: "+melodyTokens[i]);
+                    throw new IllegalArgumentException("Duplicate time signature: "+melodyTokens[i]);
                 
                 if (barState.isBarStart() == false)
                     throw new IllegalArgumentException("Time signature change is allowed on bar start only: "+melodyTokens[i]);
