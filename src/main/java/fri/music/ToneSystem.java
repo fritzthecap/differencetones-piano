@@ -1,7 +1,9 @@
 package fri.music;
 
 /**
- * Common usage of equal-temperament or just-intonation tones.
+ * Common usage of equal-temperament or just-intonation 12 tone systems.
+ * A concrete instance should have at least a lowest base-tone and a 
+ * limited set of octaves given in constructor, and optionally the frequency of A4.
  * IPN = international pitch notation.
  */
 public interface ToneSystem
