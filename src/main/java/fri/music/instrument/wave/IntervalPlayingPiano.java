@@ -67,6 +67,7 @@ public class IntervalPlayingPiano extends PianoWithHold
         });
         
         this.intervalActive = new JCheckBox();
+        intervalActive.setToolTipText("Deactivates or Activates Chosen Interval");
         intervalActive.setSelected(true);
         intervalActive.addActionListener(new ActionListener() {
             @Override
@@ -139,6 +140,7 @@ public class IntervalPlayingPiano extends PianoWithHold
     
     protected static class AdditionalTonesPlayingMouseHandler extends HoldMouseHandler
     {
+        /** Holds an actually played piano-key as map-key, and the generated interval-tone as map-value. */
         protected final Map<Keyboard.Key,Object> keyToAdditional = new LinkedHashMap<>();
         
         public AdditionalTonesPlayingMouseHandler(PianoWithSound piano) {

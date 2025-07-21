@@ -217,15 +217,7 @@ public class NotesPiano
         formatBars.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final Note[] notes = readNotesFromTextAreaCatchExceptions(true);
-                if (notes != null) {
-                    final String formatted = newMelodyFactory().toString(
-                            notes, 
-                            tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
-                            timeSignatureChoice.isEnabled() == false);
-                    notesText.setText(formatted);
-                    notesText.requestFocus();
-                }
+                formatNotes();
             }
         });
         
@@ -233,7 +225,7 @@ public class NotesPiano
             "4/4", "3/4", "12/8", "6/8", "2/4", "9/8", "5/4", "7/4",
         };
         this.timeSignatureChoice = new SmartComboBox(timeSignatures);
-        timeSignatureChoice.setToolTipText("Time Signature");
+        timeSignatureChoice.setToolTipText("Time Signature, or Bar Type");
         timeSignatureChoice.setEditable(true);
         timeSignatureChoice.setPreferredSize(new Dimension(60, 24)); // else much too wide when editable
         final JPanel timeLayoutPanel = new SmartPanel(new BorderLayout());
@@ -373,77 +365,22 @@ public class NotesPiano
         }
     }
 
+    private void formatNotes() {
+        final Note[] notes = readNotesFromTextAreaCatchExceptions(true);
+        if (notes != null) {
+            final String formatted = newMelodyFactory().toString(
+                    notes, 
+                    tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
+                    timeSignatureChoice.isEnabled() == false);
+            notesText.setText(formatted);
+            notesText.requestFocus();
+        }
+    }
+
     
     // player methods
     
-    private Integer[] timeSignatureParts(String timeSignature) {
-        final int separatorIndex = timeSignature.indexOf(Note.DURATION_SEPARATOR);
-        final String beatsPerBar = timeSignature.substring(0, separatorIndex);
-        final String beatType = timeSignature.substring(separatorIndex + 1);
-        return new Integer[] {
-                Integer.valueOf(beatsPerBar),
-                Integer.valueOf(beatType) };
-    }
-    
-    /** Get a new MelodyFactory with current parameters from UI. */
-    private MelodyFactory newMelodyFactory() {
-        final Integer[] timeSignature = timeSignatureParts((String) timeSignatureChoice.getSelectedItem());
-        return new MelodyFactory(
-                null,
-                (Integer) tempoSpinner.getValue(),
-                timeSignature[0],
-                timeSignature[1]);
-    }
-
-    /** Make sure to always call this synchronized(playerLock)! */
-    private void startOrStopPlayer(boolean isStop) {
-        play.setText(isStop ? "Play" : "Stop");
-        play.setBackground(isStop ? Color.GREEN : Color.decode("0xff9999")); // bright red
-        
-        enableUiOnPlaying(isStop);
-
-        // block mouse events for any listener
-        for (PianoWithSound.Keyboard.Key key : piano.getKeys())
-            key.setIgnoreMouse(isStop == false); // setEnabled() did not reject mouse-events and prevented key-down rendering
-    
-        if (isStop) {
-            if (player != null) {
-                player.close();
-                player = null;
-            }
-            readNotesFromTextAreaCatchExceptions(false); // enables time-signature and tempo choosers, do not clear errors
-            notesText.requestFocus();
-        }
-        else { // is start
-            checkAndPlayNotes();
-            
-            // thread is running, disable controls that may have been enabled by readNotesFromTextArea()
-            timeSignatureChoice.setEnabled(false);
-            tempoSpinner.setEnabled(false);
-            formatBars.setEnabled(false);
-        }
-    }
-    
-    /** Called when starting or stopping the player thread. */
-    protected void enableUiOnPlaying(boolean isStop) {
-        notesText.setEnabled(isStop);
-        writeToNotesCheckbox.setEnabled(isStop);
-    }
-    
-    /** This method is synchronized(playerLock) because called from startOrStopPlayer() only. */
-    private void checkAndPlayNotes() {
-        final Note[] notesArray = readNotesFromTextArea(false);
-        // this was called from "Play" that is enabled only when no errors exist
-        
-        final SoundChannel pianoKeyConnector = new PianoKeyConnector(piano);
-        this.player = new Player(pianoKeyConnector); // is synchronized because called from startOrStop()
-        
-        // to allow "Stop" while playing, all playing happens in a background thread
-        final Thread playerThread = new Thread(() -> playNotes(notesArray));
-        playerThread.start();
-    }
-    
-    private Note[] readNotesFromTextArea(boolean clearErrors) throws IllegalArgumentException {
+    private Note[] readNotesFromTextArea() throws IllegalArgumentException {
         final String notesString = notesText.getText();
         final boolean enable;
         final Note[] notes;
@@ -481,9 +418,6 @@ public class NotesPiano
             tempoSpinner.setEnabled(true);
         }
         
-        if (clearErrors)
-            getErrorArea().setText(""); // no exception was thrown, so clear errors
-
         play.setEnabled(enable);
         formatBars.setEnabled(enable);
         
@@ -493,7 +427,10 @@ public class NotesPiano
     /** This is called on any text input. */
     private Note[] readNotesFromTextAreaCatchExceptions(boolean clearErrors) {
         try {
-            return readNotesFromTextArea(clearErrors);
+            final Note[] notes = readNotesFromTextArea();
+            if (clearErrors)
+                getErrorArea().setText(""); // no exception was thrown, so clear errors
+            return notes;
         }
         catch (Exception e) {
             getErrorArea().setText(e.getMessage());
@@ -504,6 +441,73 @@ public class NotesPiano
                 e.printStackTrace();
         }
         return null;
+    }
+    
+    /** Get a new MelodyFactory with current parameters from UI. */
+    private MelodyFactory newMelodyFactory() {
+        final Integer[] timeSignature = timeSignatureParts((String) timeSignatureChoice.getSelectedItem());
+        return new MelodyFactory(
+                null,
+                (Integer) tempoSpinner.getValue(),
+                timeSignature[0],
+                timeSignature[1]);
+    }
+
+    private Integer[] timeSignatureParts(String timeSignature) {
+        final int separatorIndex = timeSignature.indexOf(Note.DURATION_SEPARATOR);
+        final String beatsPerBar = timeSignature.substring(0, separatorIndex);
+        final String beatType = timeSignature.substring(separatorIndex + 1);
+        return new Integer[] {
+                Integer.valueOf(beatsPerBar),
+                Integer.valueOf(beatType) };
+    }
+    
+    /** Make sure to always call this synchronized(playerLock)! */
+    private void startOrStopPlayer(boolean isStop) {
+        play.setText(isStop ? "Play" : "Stop");
+        play.setBackground(isStop ? Color.GREEN : Color.decode("0xff9999")); // bright red
+        
+        enableUiOnPlaying(isStop);
+    
+        if (isStop) {
+            if (player != null) {
+                player.close();
+                player = null;
+            }
+            readNotesFromTextAreaCatchExceptions(false); // enables time-signature and tempo choosers, do not clear errors
+            notesText.requestFocus();
+        }
+        else { // is start
+            checkAndPlayNotes();
+            
+            // thread is running, disable controls that may have been enabled by readNotesFromTextArea()
+            timeSignatureChoice.setEnabled(false);
+            tempoSpinner.setEnabled(false);
+            formatBars.setEnabled(false);
+        }
+    }
+    
+    /** Called when starting or stopping the player thread. */
+    protected void enableUiOnPlaying(boolean isStop) {
+        notesText.setEnabled(isStop);
+        writeToNotesCheckbox.setEnabled(isStop);
+        
+        // block mouse events for any listener
+        for (PianoWithSound.Keyboard.Key key : piano.getKeys())
+            key.setIgnoreMouse(isStop == false);
+            // setEnabled() did not reject mouse-events, and prevented key-down rendering
+    }
+    
+    /** This method is synchronized(playerLock) because called from startOrStopPlayer() only. */
+    private void checkAndPlayNotes() {
+        final Note[] notesArray = readNotesFromTextAreaCatchExceptions(true);
+        
+        final SoundChannel pianoKeyConnector = new PianoKeyConnector(piano);
+        this.player = new Player(pianoKeyConnector); // is synchronized because called from startOrStop()
+        
+        // to allow "Stop" while playing, all playing happens in a background thread
+        final Thread playerThread = new Thread(() -> playNotes(notesArray));
+        playerThread.start();
     }
     
     private void checkNotesRange(Note[] notesArray) {

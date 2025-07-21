@@ -15,15 +15,16 @@ import fri.music.player.Note;
  * This can be switched off via a checkbox.
  * Different tunings can be chosen, but not during play.
  */
-public class NotesDifferenceTonesPiano extends NotesPiano
+public class NotesDifferenceTonePiano extends NotesPiano
 {
     private JComponent playerPanel; // the component
     private JCheckBox convertToDifferenceTones;
 
-    public NotesDifferenceTonesPiano(DifferenceTonePiano piano) {
+    public NotesDifferenceTonePiano(DifferenceTonePiano piano) {
         super(piano);
     }
     
+    /** Adds a "Difference Tones" checkbox on control-panel. */
     @Override
     public JComponent getPlayer(String melody) {
         if (this.playerPanel != null)
@@ -32,7 +33,7 @@ public class NotesDifferenceTonesPiano extends NotesPiano
         final JComponent playerPanel = super.getPlayer(melody);
         
         this.convertToDifferenceTones = new JCheckBox("Difference Tones", true);
-        convertToDifferenceTones.setToolTipText("Play Difference Tones for Written Notes");
+        convertToDifferenceTones.setToolTipText("Play Written Notes as Difference Tones");
         final ActionListener actionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -50,6 +51,7 @@ public class NotesDifferenceTonesPiano extends NotesPiano
         return this.playerPanel = playerPanel;
     }
     
+    /** Overridden to disable several <code>DifferenceTonePiano</code> controls on playing. */
     @Override
     protected void enableUiOnPlaying(boolean isStop) {
         super.enableUiOnPlaying(isStop);
@@ -61,6 +63,7 @@ public class NotesDifferenceTonesPiano extends NotesPiano
         convertToDifferenceTones.setEnabled(isStop);
     }
     
+    /** Overridden to optionally generate difference-tone intervals when playing. */
     @Override
     protected Note[][] convertNotesToChords(Note[] notesArray) {
         if (convertToDifferenceTones.isSelected()) {
@@ -71,7 +74,7 @@ public class NotesDifferenceTonesPiano extends NotesPiano
             try {
                 return composer.compose(notesArray);
             }
-            catch (Exception e) { // some tunings can not generate certain tones
+            catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain tones
                 getErrorArea().setText(e.getMessage()+". Used tuning: "+differenceTonePiano.getTuningChoice().getSelectedItem());
                 return new Note[0][];
             }

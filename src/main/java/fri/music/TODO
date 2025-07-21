@@ -1,11 +1,15 @@
 
-- For NotesDifferenceTonesPiano, implement a single-step button
+- Bug: DifferenceTonePiano in NotesDifferenceTonePiano doesn't
+    display the difference tones as red-bordered piano keys.
+    
+- For NotesDifferenceTonePiano, implement a single-step button
     so that one can observe the pressed piano keys note by note.
     
 - Must be able to load and save melodies from/to files in NotesPiano.
 
 - Provide an "Export to ABC" button that writes notes in ABC format
     and renders the result in a non-modal text-dialog.
+    For NotesDifferenceTonesPiano, this would generate intervals.
     
 - Give DifferenceTonePiano and others an initial interval or chord to play.
 
