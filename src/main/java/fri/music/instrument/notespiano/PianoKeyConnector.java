@@ -45,6 +45,7 @@ class PianoKeyConnector implements SoundChannel
     public void allNotesOff() {
     }
     
+    
     private PianoWithSound.Keyboard.Key findKey(int midiNoteNumber) {
         return keys.get(midiNoteNumber - lowestMidiNumber);
     }
@@ -57,7 +58,6 @@ class PianoKeyConnector implements SoundChannel
         else { // release
             ButtonUtil.release(key);
             mouseHandler.mouseReleased(createMouseEvent(key, MouseEvent.MOUSE_RELEASED));
-            //mouseHandler.mouseClicked(createMouseEvent(key, MouseEvent.MOUSE_CLICKED));
         }
     }
     
@@ -72,4 +72,4 @@ class PianoKeyConnector implements SoundChannel
                 false, // popup trigger
                 MouseEvent.BUTTON1); // which button of mouse: left
     }
-}   // end class PianoKeyConnector
+}

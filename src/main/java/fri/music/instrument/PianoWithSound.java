@@ -314,7 +314,7 @@ public class PianoWithSound extends Piano
         return soundChannel;
     }
     
-    /** @return all key of the keyboard the mouse-listener was attached to. */
+    /** @return all keys of the keyboard, sorted by lowest first. */
     public final List<Keyboard.Key> getKeys() {
         if (this.keyList != null)
             return this.keyList;

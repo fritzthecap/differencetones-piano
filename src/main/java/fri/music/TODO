@@ -1,11 +1,14 @@
 
 - Bug: DifferenceTonePiano in NotesDifferenceTonePiano doesn't
-    display the difference tones as red-bordered piano keys.
+    display any difference tone as red-bordered piano key.
+    The AdditionalTonesPlayingMouseHandler in IntervalPlayingPiano
+    seems to not be a good solution for this.
     
 - For NotesDifferenceTonePiano, implement a single-step button
     so that one can observe the pressed piano keys note by note.
     
-- Must be able to load and save melodies from/to files in NotesPiano.
+- Must be able to load and save melodies (from/to files, or predefined strings) 
+    in NotesPiano.
 
 - Provide an "Export to ABC" button that writes notes in ABC format
     and renders the result in a non-modal text-dialog.
