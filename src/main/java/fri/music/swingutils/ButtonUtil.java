@@ -1,7 +1,5 @@
 package fri.music.swingutils;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import javax.swing.JButton;
 
 /** Utilities for Swing JButton. */
@@ -14,18 +12,16 @@ public final class ButtonUtil
 
     /** Sets given button visually pressed and paints it, but triggers no mouse-click. */
     public static void press(JButton button) {
-        Dimension size = button.getSize();
         button.getModel().setPressed(true);
         button.getModel().setArmed(true);
-        button.paintImmediately(new Rectangle(0, 0, size.width, size.height));
+        button.paintImmediately(button.getVisibleRect());
     }
     
     /** Sets given button visually released and paints it, but triggers no mouse-click. */
     public static void release(JButton button) {
-        Dimension size = button.getSize();
         button.getModel().setPressed(false);
         button.getModel().setArmed(false);
-        button.paintImmediately(new Rectangle(0, 0, size.width, size.height));
+        button.paintImmediately(button.getVisibleRect());
     }
 
     private ButtonUtil() {} // do not instantiate

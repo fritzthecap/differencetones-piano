@@ -6,10 +6,10 @@ import fri.music.ScaleTypes;
 import fri.music.SoundChannel;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
-import fri.music.instrument.notespiano.NotesPiano;
+import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.wavegenerator.SineWaveSoundChannel;
 
-public class NotesPianoDemo
+public class NotesPianoPlayerDemo
 {
     static final String AUGUSTIN = 
         """
@@ -59,7 +59,7 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
         final String lowestToneIpnName = "C2";
         
         final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame("NotesOnPiano ("+scale+" "+octaves+" Octaves)");
+        final JFrame frame = new JFrame("NotesPianoPlayer ("+scale+" "+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(
@@ -68,7 +68,7 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
                 //true, // vertical
                 13);
         final SoundChannel soundChannel = new SineWaveSoundChannel(null);
-        final NotesPiano player = new NotesPiano(new PianoWithVolume(config, soundChannel));
+        final NotesPianoPlayer player = new NotesPianoPlayer(new PianoWithVolume(config, soundChannel));
         final JComponent playerPanel = player.getPlayer(TUBULAR_BELLS);
         
         frame.addWindowListener(player.getWindowClosingListener());

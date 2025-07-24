@@ -13,7 +13,7 @@ public class WavePianoDemo
         final String lowestToneIpnName = "C3"; //"B1";
         
         final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame("Wave Piano ("+scale+", "+octaves+" Octaves)");
+        final JFrame frame = new JFrame("WavePiano ("+scale+", "+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, 16);

@@ -22,7 +22,7 @@ import fri.music.SoundChannel;
 import fri.music.ToneSystem;
 import fri.music.instrument.midi.MidiSynthesizer;
 import fri.music.instrument.midi.SynthesizerFactory;
-import fri.music.instrument.wave.DifferenceTonePiano;
+import fri.music.instrument.wave.DifferenceToneForIntervalPiano;
 import fri.music.instrument.wave.IntervalPlayingPiano;
 import fri.music.instrument.wave.TriadPlayingPiano;
 import fri.music.swingutils.SmartComboBox;
@@ -244,7 +244,7 @@ public class ConfigurationPanel
         waveChoice.setBorder(BorderFactory.createTitledBorder("Wave Type"));
         
         final PianoClassChoiceItem[] pianoClasses = new PianoClassChoiceItem[] {
-                new PianoClassChoiceItem(DifferenceTonePiano.class),
+                new PianoClassChoiceItem(DifferenceToneForIntervalPiano.class),
                 new PianoClassChoiceItem(TriadPlayingPiano.class),
                 new PianoClassChoiceItem(IntervalPlayingPiano.class),
                 new PianoClassChoiceItem(PianoWithHold.class),

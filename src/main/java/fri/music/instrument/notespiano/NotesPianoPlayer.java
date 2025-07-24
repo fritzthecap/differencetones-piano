@@ -41,7 +41,7 @@ import fri.music.swingutils.TextAreaActions;
 /**
  * A notes area that can play user-editable notes on a given piano.
  */
-public class NotesPiano
+public class NotesPianoPlayer
 {
     /** The piano obtained from construction, immutable. */
     protected final PianoWithSound piano;
@@ -64,7 +64,7 @@ public class NotesPiano
     private final NotesWritingMouseListener notesWritingListener = new NotesWritingMouseListener(this);
     
     /** @param piano required, the piano on which to play notes. */
-    public NotesPiano(PianoWithSound piano) {
+    public NotesPianoPlayer(PianoWithSound piano) {
         this.piano = Objects.requireNonNull(piano);
     }
     

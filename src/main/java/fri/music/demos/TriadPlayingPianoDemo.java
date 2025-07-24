@@ -14,7 +14,7 @@ public class TriadPlayingPianoDemo
         final String lowestToneIpnName = "C3";
         
         final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame("TriadPlaying Piano ("+scale+", "+octaves+" Octaves)");
+        final JFrame frame = new JFrame("TriadPlayingPiano ("+scale+", "+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, 22);

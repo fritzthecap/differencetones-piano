@@ -79,13 +79,12 @@ public class TriadPlayingPiano extends IntervalPlayingPiano
         }
         @Override
         protected Object additionalFromKeyboard(Keyboard.Key key) {
-            final List<Keyboard.Key> keys = piano.getKeys(); // sorted by MIDI-number
-            final int keyIndex = findKeyboardIndex(key.midiNoteNumber, keys);
+            final int keyIndex = piano.findKeyboardIndex(key.midiNoteNumber);
             final List<Keyboard.Key> additionalKeys = new ArrayList<>();
             for (int semitoneSteps : selectedSemitones()) {
-                final int additionalKeyIndex = keyIndex + semitoneSteps;
-                if (additionalKeyIndex < keys.size())
-                    additionalKeys.add(keys.get(additionalKeyIndex));
+                final Keyboard.Key additionalKey = keyIfExists(keyIndex + semitoneSteps);
+                if (additionalKey != null)
+                    additionalKeys.add(additionalKey);
             }
             return additionalKeys;
         }

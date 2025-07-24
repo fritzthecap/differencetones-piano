@@ -261,7 +261,7 @@ public abstract class AbstractFrequencySliders
                 tones().getOctaves(), 
                 null,
                 listener);
-        return tuning.getTuningChoice(toneSystem);
+        return tuning.getChoice(toneSystem);
     }
 
     private JComponent layoutMainPanel(

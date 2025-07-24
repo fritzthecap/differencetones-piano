@@ -1,9 +1,4 @@
 
-- Bug: DifferenceTonePiano in NotesDifferenceTonePiano doesn't
-    display any difference tone as red-bordered piano key.
-    The AdditionalTonesPlayingMouseHandler in IntervalPlayingPiano
-    seems to not be a good solution for this.
-    
 - For NotesDifferenceTonePiano, implement a single-step button
     so that one can observe the pressed piano keys note by note.
     

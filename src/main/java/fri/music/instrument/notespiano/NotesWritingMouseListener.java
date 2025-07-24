@@ -15,14 +15,14 @@ import fri.music.player.notelanguage.MelodyFactory;
  */
 class NotesWritingMouseListener extends MouseAdapter
 {
-    private final NotesPiano notesPiano;
+    private final NotesPianoPlayer notesPiano;
     private final JPopupMenu popup;
     
     private boolean active;
     private PianoWithSound.Keyboard.Key key;
     private long startMillis;
     
-    NotesWritingMouseListener(NotesPiano notesPiano) {
+    NotesWritingMouseListener(NotesPianoPlayer notesPiano) {
         this.notesPiano = notesPiano;
         
         this.popup = new JPopupMenu();

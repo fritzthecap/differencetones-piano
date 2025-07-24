@@ -87,19 +87,19 @@ public class DifferenceToneInversions extends DifferenceTones
                 ToneSystem.semitoneSteps(ToneSystem.MAJOR_SIXTH); // the MINOR_SEVENTH difference tone is very hard to hear!
         
         public Configuration(Tone[] tones) {
-            this(tones, DEFAULT_DEVIATION_TOLERANCE);
+            this(tones, DEFAULT_DEVIATION);
         }
         public Configuration(Tone[] tones, double deviationTolerance) {
             this(tones, 
                 DEFAULT_SMALLEST_SEMITONE_STEPS, 
                 DEFAULT_BIGGEST_SEMITONE_STEPS, 
-                (deviationTolerance < 0.0) ? DEFAULT_DEVIATION_TOLERANCE : deviationTolerance);
+                (deviationTolerance < 0.0) ? DEFAULT_DEVIATION : deviationTolerance);
         }
         public Configuration(Tone[] tones, int smallestSemitoneDistance, int biggestSemitoneDistance) {
             this(tones, 
                 (smallestSemitoneDistance <= 0) ? DEFAULT_SMALLEST_SEMITONE_STEPS : smallestSemitoneDistance, 
                 (biggestSemitoneDistance  <= 0) ? DEFAULT_BIGGEST_SEMITONE_STEPS : biggestSemitoneDistance,
-                DEFAULT_DEVIATION_TOLERANCE);
+                DEFAULT_DEVIATION);
         }
     }
     

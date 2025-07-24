@@ -63,13 +63,13 @@ import fri.music.Tones;
 public class DifferenceTones extends Tones
 {
     /** The minimal deviation that lets find almost all EqualTemperament difference tones. */
-    public static final double TOLERANT_DEVIATION_EDO_12 = 0.37; // 74 %
+    public static final double TOLERANT_DEVIATION_EDO_12 = 0.365; // 73 %
     /** The deviation that lets find JustIntonation difference tones exactly, but no TRITONE!. */
     public static final double PRECISE_DEVIATION_JI = 0.09; // 18 %
     /** The minimal deviation that lets also find JustIntonation TRITONE difference tones. */
-    public static final double TOLERANT_DEVIATION_JI = 0.41; // 82 %
+    public static final double TOLERANT_DEVIATION_JI = 0.38; // 76 %
     /** The default deviation. */
-    public static final double DEFAULT_DEVIATION_TOLERANCE = 0.35; // 70 %
+    public static final double DEFAULT_DEVIATION = TOLERANT_DEVIATION_JI;
     
     public final double deviationTolerance;
     private final boolean primaryDifferenceToneOnly;
@@ -78,7 +78,7 @@ public class DifferenceTones extends Tones
         this(null);
     }
     public DifferenceTones(Tone[] toneSystem) {
-        this(toneSystem, DEFAULT_DEVIATION_TOLERANCE);
+        this(toneSystem, DEFAULT_DEVIATION);
     }
     /**
      * @param toneSystem the tones to find difference tones within.

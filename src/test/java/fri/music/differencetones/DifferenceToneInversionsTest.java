@@ -50,12 +50,12 @@ class DifferenceToneInversionsTest
         final ToneSystem toneSystem = new EqualTemperament(); // C0 - C10
         final DifferenceToneInversions.Configuration config = new DifferenceToneInversions.Configuration(
                 toneSystem.tones(),
-                DifferenceTones.DEFAULT_DEVIATION_TOLERANCE); // is sufficiently precise for EDO-12
+                DifferenceTones.TOLERANT_DEVIATION_EDO_12);
         final DifferenceToneInversions differenceToneInversions = new DifferenceToneInversions(config);
         final List<TonePair> intervals = differenceToneInversions.getIntervalsGenerating("C4");
         
         assertNotNull(intervals);
-        assertEquals(6, intervals.size());
+        assertEquals(7, intervals.size());
         
         assertEquals("F6", intervals.get(0).lowerTone().ipnName); // MINOR_THIRD
         assertEquals("G#6", intervals.get(0).upperTone().ipnName);
@@ -74,6 +74,9 @@ class DifferenceToneInversionsTest
         
         assertEquals("A4", intervals.get(5).lowerTone().ipnName); // MINOR_SIXTH
         assertEquals("F5", intervals.get(5).upperTone().ipnName);
+        
+        assertEquals("G4", intervals.get(6).lowerTone().ipnName); // MAJOR_SIXTH
+        assertEquals("E5", intervals.get(6).upperTone().ipnName);
     }
     
     @Test

@@ -89,14 +89,14 @@ public class IntervalPlayingPiano extends PianoWithHold
         getControlPanel().add(intervalPanel, 2);
         
         this.tuningComponent = newTuningComponent();
-        getControlPanel().add(tuningComponent.getTuningChoice(null), 3);
+        getControlPanel().add(tuningComponent.getChoice(null), 3);
         
         return this.pianoPanel = pianoPanel;
     }
     
     /** @return the tone-system chooser. */
     public JComboBox<String> getTuningChoice() {
-        return tuningComponent.getTuningChoice(null);
+        return tuningComponent.getChoice(null);
     }
     
     /** Some sub-classes may prefer to not support choosing intervals. */
@@ -175,19 +175,21 @@ public class IntervalPlayingPiano extends PianoWithHold
             }
         }
 
+        
         protected boolean noAdditionalRequired() {
             return selectedSemitones() <= 0;
         }
+        
         protected Object additionalFromKeyboard(Keyboard.Key key) {
+            final int keyIndex = piano.findKeyboardIndex(key.midiNoteNumber);
+            return keyIfExists(keyIndex + selectedSemitones());
+        }
+        
+        protected Keyboard.Key keyIfExists(int keyIndex) {
             final List<Keyboard.Key> keys = piano.getKeys(); // sorted by MIDI-number
-            final int keyIndex = findKeyboardIndex(key.midiNoteNumber, keys);
-            final int additionalKeyIndex = keyIndex + selectedSemitones();
-            return (additionalKeyIndex < keys.size()) ? keys.get(additionalKeyIndex) : null;
+            return (keyIndex >= 0 && keyIndex < keys.size()) ? keys.get(keyIndex) : null;
         }
-        protected final int findKeyboardIndex(int midiNoteNumber, List<Keyboard.Key> keys) {
-            final int lowestMidiNumber = keys.get(0).midiNoteNumber;
-            return midiNoteNumber - lowestMidiNumber;
-        }
+        
         protected void playAdditional(Object additional) {
             final Keyboard.Key key = (Keyboard.Key) additional;
             super.noteOn(key); // recursive call
@@ -220,11 +222,13 @@ public class IntervalPlayingPiano extends PianoWithHold
                 super.noteOff(key);
             }
         }
+        
         protected void turnOff(Object toTurnOff) {
             final Keyboard.Key key = (Keyboard.Key) toTurnOff;
             turnOffKey(key);
             visualSelect(key, false);
         }
+        
         protected final Keyboard.Key findLeadKeyForAdditional(Keyboard.Key additional) {
             return keyToAdditional.entrySet().stream()
                     .filter(entry -> isAdditional(additional, entry.getValue()))
@@ -232,6 +236,7 @@ public class IntervalPlayingPiano extends PianoWithHold
                     .findFirst()
                     .orElse(null);
         }
+        
         protected boolean isAdditional(Keyboard.Key key, Object mapValue) {
             return key == mapValue;
         }

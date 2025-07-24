@@ -335,6 +335,15 @@ public class PianoWithSound extends Piano
         return this.keyList = keyList;
     }
     
+    /**
+     * @param midiNoteNumber the MIDI number of the searched keyboard key.
+     * @return the index of the key that has given MIDI number, can be negative when out of range.
+     */
+    public int findKeyboardIndex(int midiNoteNumber) {
+        final int lowestMidiNumber = getKeys().get(0).midiNoteNumber;
+        return midiNoteNumber - lowestMidiNumber;
+    }
+
     /** @return a WindowListener that calls <code>destroyKeyboard()</code> on window-closing event. */
     public WindowListener getWindowClosingListener() {
         return new WindowAdapter() {

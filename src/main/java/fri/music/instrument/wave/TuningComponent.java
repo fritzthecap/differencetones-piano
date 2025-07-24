@@ -56,7 +56,7 @@ public class TuningComponent
      *      and sets the chosen tuning into the optional sound-channel
      *      and notifies the optional listener.
      */
-    public JComboBox<String> getTuningChoice(ToneSystem initialTuning) {
+    public JComboBox<String> getChoice(ToneSystem initialTuning) {
         if (this.tuningChoice != null)
             return this.tuningChoice;
 

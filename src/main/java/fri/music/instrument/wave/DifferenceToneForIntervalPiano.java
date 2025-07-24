@@ -1,16 +1,10 @@
 package fri.music.instrument.wave;
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JSlider;
-import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
@@ -19,13 +13,12 @@ import fri.music.wavegenerator.WaveSoundChannel;
 /**
  * Piano that displays difference-tones for two high notes sounding together.
  */
-public class DifferenceTonePiano extends IntervalPlayingPiano
+public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
 {
     private JComponent pianoPanel;
-    private JSlider deviationSlider;
-    private double deviation;
+    private DeviationComponent deviationComponent;
     
-    public DifferenceTonePiano(PianoWithSound.Configuration config, WaveSoundChannel soundChannel) {
+    public DifferenceToneForIntervalPiano(PianoWithSound.Configuration config, WaveSoundChannel soundChannel) {
         super(config, soundChannel);
     }
     
@@ -36,11 +29,15 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
 
         final JComponent pianoPanel = super.getKeyboard();
         
-        final int defaultDeviationPercent = doubleToDeviationPercent(DifferenceTones.TOLERANT_DEVIATION_EDO_12);
-        this.deviation = deviationPercentToDouble(defaultDeviationPercent);
-        
-        this.deviationSlider = buildDeviationSlider(defaultDeviationPercent);
+        this.deviationComponent = new DeviationComponent(DifferenceTones.DEFAULT_DEVIATION, config.isVertical);
+        final JSlider deviationSlider = deviationComponent.getSlider();
         getControlPanel().add(deviationSlider, 4); // add after "Tuning" choice
+        deviationSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                ((DifferenceToneMouseHandler) getMouseHandler()).reviseDifferenceTone();
+            }
+        });
         
         return this.pianoPanel = pianoPanel;
     }
@@ -61,52 +58,15 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
                 tuningChangeListener);
     }
     
-    /** @return the used WaveSoundChannel, holding tones of a tone-system. */
     public WaveSoundChannel getWaveSoundChannel() {
         return (WaveSoundChannel) getSoundChannel();
     }
-    
-    public void setDeviationSliderEnabled(boolean enable) {
-        deviationSlider.setEnabled(enable);
-    }
-    
-    /** @return the current deviation value from slider. */
+
     public double getDeviation() {
-        return deviation;
+        return deviationComponent.getDeviation();
     }
     
 
-    private JSlider buildDeviationSlider(int defaultDeviationPercent) {
-        final String title = "Deviation Tolerance Percent: ";
-        final String tooltip = "Allowed deviation for finding difference-tones, 100 being the middle between two tones";
-        
-        final JSlider deviationSlider = new JSlider(0, 90, defaultDeviationPercent); // min, max, current
-        deviationSlider.setBorder(BorderFactory.createTitledBorder(title+defaultDeviationPercent));
-        deviationSlider.setToolTipText(tooltip);
-        deviationSlider.setOrientation(config.isVertical ? SwingConstants.VERTICAL : SwingConstants.HORIZONTAL);
-        deviationSlider.setPaintLabels(true);
-        deviationSlider.setMajorTickSpacing(10);
-        deviationSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                final int deviationPercent = deviationSlider.getValue();
-                DifferenceTonePiano.this.deviation = deviationPercentToDouble(deviationPercent);
-                ((TitledBorder) deviationSlider.getBorder()).setTitle(title+deviationPercent);
-                ((DifferenceToneMouseHandler) getMouseHandler()).reviseDifferenceTone();
-            }
-        });
-        return deviationSlider;
-    }
-    
-    private double deviationPercentToDouble(int percent) {
-        return ((double) percent / 2.0) / 100.0;
-    }
-    
-    private int doubleToDeviationPercent(double deviation) {
-        return (int) Math.round(deviation * 2.0 * 100.0);
-    }
-    
-    
     /** Overridden to return a DifferenceToneMouseHandler. */
     @Override
     protected MouseHandler newMouseHandler() {
@@ -156,29 +116,17 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
                 if (selectedDifferenceKey != null) // remove currently selected
                     selectDifferenceTone(selectedDifferenceKey, false);
                 
-                final DifferenceTones differenceTones = new DifferenceTones(
+                final Keyboard.Key differenceToneKey = DifferenceToneUtil.getDifferenceToneKey(
                         soundChannel.getTones(), 
-                        ((DifferenceTonePiano) piano).getDeviation(),
-                        true); // find primary difference tone only
-                try {
-                    final Tone[] allDifferenceTones = differenceTones.findDifferenceTones(
-                            twoPlayingKeys[0].midiNoteNumber, 
-                            twoPlayingKeys[1].midiNoteNumber);
-                    
-                    if (allDifferenceTones[0] != null) { // difference-tone is in piano keyboard range
-                        final Tone primaryDifferenceTone = allDifferenceTones[0];
-                        
-                        final List<Keyboard.Key> keys = piano.getKeys();
-                        final int index = findKeyboardIndex(primaryDifferenceTone.midiNumber, keys);
-                        if (index >= 0 && index < keys.size()) {
-                            selectedDifferenceKey = keys.get(index);
-                            selectDifferenceTone(selectedDifferenceKey, true); // select and add red border
-                        }
+                        ((DifferenceToneForIntervalPiano) piano).getDeviation(),
+                        piano,
+                        twoPlayingKeys[0].midiNoteNumber,
+                        twoPlayingKeys[1].midiNoteNumber);
+                
+                    if (differenceToneKey != null) {
+                        selectedDifferenceKey = differenceToneKey;
+                        selectDifferenceTone(selectedDifferenceKey, true); // select and add red border
                     }
-                }
-                catch (IllegalArgumentException e) { // comes from findDifferenceTones
-                    System.err.println(e.toString());
-                }
             }
             else if (selectedDifferenceKey != null) {
                 if (holdPlayingNotes.contains(selectedDifferenceKey) == false) // selectedDifferenceKey is not on "Hold"

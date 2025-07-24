@@ -1,13 +1,11 @@
 package fri.music.instrument.notespiano;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
-import fri.music.instrument.wave.DifferenceTonePiano;
+import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.player.Note;
 
 /**
@@ -15,12 +13,12 @@ import fri.music.player.Note;
  * This can be switched off via a checkbox.
  * Different tunings can be chosen, but not during play.
  */
-public class NotesDifferenceTonePiano extends NotesPiano
+public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
 {
     private JComponent playerPanel; // the component
     private JCheckBox convertToDifferenceTones;
 
-    public NotesDifferenceTonePiano(DifferenceTonePiano piano) {
+    public NotesWithDifferenceTonePianoPlayer(DifferenceToneForNotesPiano piano) {
         super(piano);
     }
     
@@ -34,16 +32,6 @@ public class NotesDifferenceTonePiano extends NotesPiano
         
         this.convertToDifferenceTones = new JCheckBox("Difference Tones", true);
         convertToDifferenceTones.setToolTipText("Play Written Notes as Difference Tones");
-        final ActionListener actionListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final boolean enable = (convertToDifferenceTones.isSelected() == false);
-                getDifferenceTonePiano().setHoldCheckboxEnabled(enable);
-                getDifferenceTonePiano().setIntervalChooserEnabled(enable);
-            }
-        };
-        convertToDifferenceTones.addActionListener(actionListener);
-        actionListener.actionPerformed(null); // trigger enabling
         
         convertToDifferenceTones.setAlignmentX(Component.CENTER_ALIGNMENT);
         getNotesControlPanel().add(convertToDifferenceTones, 1); // add below "Play" button
@@ -56,9 +44,8 @@ public class NotesDifferenceTonePiano extends NotesPiano
     protected void enableUiOnPlaying(boolean isStop) {
         super.enableUiOnPlaying(isStop);
         
-        final DifferenceTonePiano differenceTonePiano = getDifferenceTonePiano();
-        differenceTonePiano.getTuningChoice().setEnabled(isStop);
-        differenceTonePiano.setDeviationSliderEnabled(isStop);
+        final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceTonePiano();
+        differenceTonePiano.setTuningControlsEnabled(isStop);
         
         convertToDifferenceTones.setEnabled(isStop);
     }
@@ -67,7 +54,7 @@ public class NotesDifferenceTonePiano extends NotesPiano
     @Override
     protected Note[][] convertNotesToChords(Note[] notesArray) {
         if (convertToDifferenceTones.isSelected()) {
-            final DifferenceTonePiano differenceTonePiano = getDifferenceTonePiano();
+            final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceTonePiano();
             final AbstractComposer composer = new DefaultComposer(
                     differenceTonePiano.getWaveSoundChannel().getTones(),
                     differenceTonePiano.getDeviation());
@@ -75,14 +62,14 @@ public class NotesDifferenceTonePiano extends NotesPiano
                 return composer.compose(notesArray);
             }
             catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain tones
-                getErrorArea().setText(e.getMessage()+". Used tuning: "+differenceTonePiano.getTuningChoice().getSelectedItem());
+                getErrorArea().setText(e.getMessage()+". Used tuning: "+differenceTonePiano.getSelectedTuning());
                 return new Note[0][];
             }
         }
         return super.convertNotesToChords(notesArray);
     }
 
-    private DifferenceTonePiano getDifferenceTonePiano() {
-        return (DifferenceTonePiano) piano;
+    private DifferenceToneForNotesPiano getDifferenceTonePiano() {
+        return (DifferenceToneForNotesPiano) piano;
     }
 }
