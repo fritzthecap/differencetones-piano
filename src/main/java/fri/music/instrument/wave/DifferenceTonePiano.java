@@ -164,13 +164,16 @@ public class DifferenceTonePiano extends IntervalPlayingPiano
                     final Tone[] allDifferenceTones = differenceTones.findDifferenceTones(
                             twoPlayingKeys[0].midiNoteNumber, 
                             twoPlayingKeys[1].midiNoteNumber);
-                    final Tone primaryDifferenceTone = Objects.requireNonNull(allDifferenceTones[0]);
                     
-                    final List<Keyboard.Key> keys = piano.getKeys();
-                    final int index = findKeyboardIndex(primaryDifferenceTone.midiNumber, keys);
-                    if (index >= 0 && index < keys.size()) {
-                        selectedDifferenceKey = keys.get(index);
-                        selectDifferenceTone(selectedDifferenceKey, true); // select and add red border
+                    if (allDifferenceTones[0] != null) { // difference-tone is in piano keyboard range
+                        final Tone primaryDifferenceTone = allDifferenceTones[0];
+                        
+                        final List<Keyboard.Key> keys = piano.getKeys();
+                        final int index = findKeyboardIndex(primaryDifferenceTone.midiNumber, keys);
+                        if (index >= 0 && index < keys.size()) {
+                            selectedDifferenceKey = keys.get(index);
+                            selectDifferenceTone(selectedDifferenceKey, true); // select and add red border
+                        }
                     }
                 }
                 catch (IllegalArgumentException e) { // comes from findDifferenceTones

@@ -238,10 +238,16 @@ public class PianoWithSound extends Piano
         }
         
         protected void visualSelect(Keyboard.Key key, boolean pressed) {
-            // START keep order: this should not trigger an action! 
+            // START keep order: this should not trigger an action!
             // See AbstractButton.doClick() for necessary order of calls to trigger an action
-            key.getModel().setPressed(pressed);
-            key.getModel().setArmed(pressed);
+            if (pressed) {
+                key.getModel().setPressed(pressed);
+                key.getModel().setArmed(pressed);
+            }
+            else {
+                key.getModel().setArmed(pressed);
+                key.getModel().setPressed(pressed);
+            }
             // END keep order
         }
         

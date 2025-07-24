@@ -63,13 +63,13 @@ public class NotesDifferenceTonePiano extends NotesPiano
         convertToDifferenceTones.setEnabled(isStop);
     }
     
-    /** Overridden to optionally generate difference-tone intervals when playing. */
+    /** Overridden to alternatively generate difference-tone intervals when playing. */
     @Override
     protected Note[][] convertNotesToChords(Note[] notesArray) {
         if (convertToDifferenceTones.isSelected()) {
             final DifferenceTonePiano differenceTonePiano = getDifferenceTonePiano();
             final AbstractComposer composer = new DefaultComposer(
-                    differenceTonePiano.getWaveSoundChannel().getTones(), 
+                    differenceTonePiano.getWaveSoundChannel().getTones(),
                     differenceTonePiano.getDeviation());
             try {
                 return composer.compose(notesArray);
