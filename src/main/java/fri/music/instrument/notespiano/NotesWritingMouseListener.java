@@ -12,6 +12,7 @@ import fri.music.player.notelanguage.MelodyFactory;
 
 /**
  * Writes notes from piano keyboard to text-area.
+ * Call <code>setActive(true)</code> to make it work.
  */
 class NotesWritingMouseListener extends MouseAdapter
 {
@@ -29,23 +30,19 @@ class NotesWritingMouseListener extends MouseAdapter
         final ActionListener menuListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (key == null)
-                    return;
-
-                final String noteLength = ((JMenuItem) e.getSource()).getActionCommand();
-                final String noteString = writeNoteToTextarea(noteLength);
-                notesPiano.playSingleNote(noteString);
+                noteLengthSelected(((JMenuItem) e.getSource()).getActionCommand());
             }
         };
         for (int i = 1; i <= MelodyFactory.SHORTEST_NOTELENGTH_DIVISOR; i *= 2) { // 1, 2, 4, 8, 16, 32, 64
-            final JMenuItem item = new JMenuItem(""+i);
-            item.setToolTipText("1/"+i+" Note");
-            item.addActionListener(menuListener);
-            popup.add(item);
+            final String actionCommand = Integer.toString(i);
+            final JMenuItem menuItem = new JMenuItem(actionCommand);
+            menuItem.setToolTipText("1/"+actionCommand+" Note");
+            menuItem.addActionListener(menuListener);
+            popup.add(menuItem);
         }
     }
     
-    /** Turns off and on this mouse listener. Initially it is active. */
+    /** Turns off and on this mouse listener. Initially it is NOT active. */
     public void setActive(boolean active) {
         this.active = active;
     }
@@ -59,7 +56,7 @@ class NotesWritingMouseListener extends MouseAdapter
         
         key = getKey(e);
         
-        if (showPopupMenu(e) == false)
+        if (showPopupMenu(e) == false) // not right mouse button
             startMillis = System.currentTimeMillis();
     }
     
@@ -68,7 +65,7 @@ class NotesWritingMouseListener extends MouseAdapter
         if (active == false || key == null || popup.isShowing()) // was a mouse drag
             return;
         
-        if (showPopupMenu(e) == false)
+        if (showPopupMenu(e) == false) // not right mouse button
             calculateAndWriteNote();
     }
     
@@ -78,6 +75,15 @@ class NotesWritingMouseListener extends MouseAdapter
             key = null; // ignore mouse drags
     }
     
+    
+    /** Context menu callback. */
+    private void noteLengthSelected(String noteLength) {
+        if (key == null)
+            return; // some wrong state
+
+        final String noteString = writeNoteToTextarea(noteLength);
+        notesPiano.playSingleNote(noteString);
+    }
     
     /**
      * Recommended way to display a context-menu <b>platform-independently</b>
