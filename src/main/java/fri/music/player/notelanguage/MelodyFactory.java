@@ -66,6 +66,9 @@ public class MelodyFactory
     /** If a melody has no time signature, it will get this. */
     public static final Integer DEFAULT_BEAT_TYPE = 4;
     
+    /** Maximum beats per bar is a dicussed topic. */
+    public static final Integer MAXIMUM_BEATS_PER_BAR = 16; //32;
+    
     public static final int TEMPO_MINIMUM_BPM = 40;
     public static final int TEMPO_MAXIMUM_BPM = 208;
     
@@ -285,12 +288,12 @@ public class MelodyFactory
     }
     
     
-    /** @return beatsPerMinute on-top from latest <code>translate()</code> call, or null if there was none. */
+    /** @return beatsPerMinute on text-area top from latest <code>translate()</code> call, or null if there was none. */
     public Integer getTempoOnTop() {
         return tempoOnTop;
     }
 
-    /** @return "beatsPerBar/beatType" on-top from latest <code>translate()</code> call, or null if there was none. */
+    /** @return "beatsPerBar/beatType" on text-area top from latest <code>translate()</code> call, or null if there was none. */
     public String getTimeSignatureOnTop() {
         return timeSignatureOnTop;
     }
@@ -322,7 +325,7 @@ public class MelodyFactory
     }
     
     private void checkValidBeatsPerBar(Integer beatsPerBar) throws IllegalArgumentException {
-        if (beatsPerBar == null || beatsPerBar < 1 || beatsPerBar > 16)
+        if (beatsPerBar == null || beatsPerBar < 1 || beatsPerBar > MAXIMUM_BEATS_PER_BAR)
             throw new IllegalArgumentException("Illegal beats per bar: "+beatsPerBar);
     }
 
