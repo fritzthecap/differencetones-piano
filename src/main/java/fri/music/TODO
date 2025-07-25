@@ -1,15 +1,25 @@
 
-- For NotesDifferenceTonePiano, implement a single-step button
-    so that one can observe the pressed piano keys note by note.
-    
+- The NotesOnPianoPlayer needs a better Start/Stop control button group.
+    "Start" should enable initially disabled "Backward" and "Forward" buttons and turn itself into "Stop".
+    "Stop" should rewind the melody and disable "Backward" and "Forward".
+    Pressing "Backward" or "Forward" should step to next or previous note and stop there.
+    For the single step mode, the just performed notes need to be selected in textarea.
+    With a single-step button, one can observe the pressed piano keys note by note.
+ 
+- Somehow visualize intervals for difference tones,
+    e.g. all intervals that generate "C4" should be displayed as piano keys.
+    See DifferenceToneInversions. 
+    As preliminary work a piano would be needed that lets press
+    a number of keyboard keys via constructor.  
+
 - Must be able to load and save melodies (from/to files, or predefined strings) 
     in NotesPiano.
 
 - Provide an "Export to ABC" button that writes notes in ABC format
     and renders the result in a non-modal text-dialog.
-    For NotesDifferenceTonesPiano, this would generate intervals.
-    
-- Give DifferenceTonePiano and others an initial interval or chord to play.
+    For NotesWithDifferenceTonePianoPlayer, this would generate intervals.
+
+- Give DifferenceToneForIntervalPiano and others an initial interval or chord to play.
 
 - Display 
     of Tunings with frequency and cent
@@ -25,13 +35,13 @@
 
     Running the application opens main documentation. Then different
     buttons provide insights:
-    "See and Hear Difference Tones" (FrequencyDifferenceSliders, DifferenceTonePiano), 
+    "See and Hear Difference Tones" (FrequencyDifferenceSliders, DifferenceToneForIntervalPiano), 
     "Explore Beatings in Intervals of Different Tunings" (IntervalPlayingPiano),
     "Test Chords in Different Tunings" (TriadPlayingPiano, FrequencyChordSliders),
     "See Difference Tones on Piano" (DifferenceTonePiano), 
     "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" (EqualTemperamentDemo, JustIntonationDemo, ...), 
     "Check Just Intonation" (JustIntonationChecker), 
-    "Translate a Melody into Difference Tones" (DifferenceToneInversions, DefaultComposer), 
+    "Translate a Melody into Difference Tones" (DifferenceToneInversions, DefaultComposer, NotesWithDifferenceTonePianoPlayer), 
     "Look at Pianos" (PianoConfiguration), 
     "Try out Wave Generators" (WavePianoDemo, PianoConfiguration), 
 
