@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JComboBox;
 import fri.music.instrument.PianoWithSound;
 import fri.music.wavegenerator.WaveSoundChannel;
 
@@ -20,7 +21,7 @@ import fri.music.wavegenerator.WaveSoundChannel;
  */
 public class TriadPlayingPiano extends IntervalPlayingPiano
 {
-    /** Key = chord name, value = the 2 semitone step numbers to the missing chord tones. */
+    /** Key = chord name, value = 2 semi-tone step numbers from base-tone to both chord-tones. */
     private static final Map<String,int[]> triadToSemitones = new LinkedHashMap<>();
     static {
         triadToSemitones.put("", new int[0]); // no triad
@@ -40,6 +41,11 @@ public class TriadPlayingPiano extends IntervalPlayingPiano
         super(config, channel);
     }
     
+    @Override
+    protected void configureIntervalChoice(JComboBox<String> intervalChoice) {
+        intervalChoice.setSelectedItem("Major Chord"); // triggers actionPeformed()
+    }
+
     @Override
     protected String intervalChooserLabel() {
         return "Autoplay Triad";

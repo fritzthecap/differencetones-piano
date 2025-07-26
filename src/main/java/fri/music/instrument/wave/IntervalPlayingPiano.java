@@ -12,6 +12,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import fri.music.ToneSystem;
 import fri.music.instrument.PianoWithHold;
 import fri.music.instrument.PianoWithSound;
 import fri.music.swingutils.SmartComboBox;
@@ -23,6 +24,7 @@ import fri.music.wavegenerator.WaveSoundChannel;
  */
 public class IntervalPlayingPiano extends PianoWithHold
 {
+    /** Interval names in interval-choice, sorted by width, index is number of semitone-steps. */
     protected static final List<String> intervalNames = Arrays.asList(
             "", // no interval
             "Minor Second",
@@ -59,12 +61,14 @@ public class IntervalPlayingPiano extends PianoWithHold
         this.intervalChoice = new SmartComboBox(chooserNames);
         intervalChoice.setBorder(BorderFactory.createTitledBorder(intervalChooserLabel()));
         intervalChoice.setToolTipText(intervalChooserTooltip());
-        intervalChoice.addActionListener(new ActionListener() {
+        final ActionListener intervalActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 restartPlayingNotes((String) intervalChoice.getSelectedItem());
             }
-        });
+        };
+        intervalChoice.addActionListener(intervalActionListener);
+        configureIntervalChoice(intervalChoice);
         
         this.intervalActive = new JCheckBox();
         intervalActive.setToolTipText("Deactivates or Activates Chosen Interval");
@@ -103,6 +107,12 @@ public class IntervalPlayingPiano extends PianoWithHold
     public void setIntervalChooserEnabled(boolean enable) {
         intervalChoice.setEnabled(enable);
         intervalActive.setEnabled(enable);
+    }
+
+    /** Called from getKeyboard(), sets the initially selected interval item. */
+    protected void configureIntervalChoice(JComboBox<String> intervalChoice) {
+        final String initialSelection = intervalNames.get(ToneSystem.semitoneSteps(ToneSystem.MAJOR_THIRD));
+        intervalChoice.setSelectedItem(initialSelection); // triggers actionPeformed()
     }
 
     /** Factory method called from getKeyboard(). To be overridden. */
