@@ -38,11 +38,11 @@ class PlayController
         try {
             final Note[] notes = readNotesFromTextArea();
             if (clearErrors)
-                view.error.setText(""); // no exception was thrown, so clear errors
+                view.getErrorArea().setText(""); // no exception was thrown, so clear errors
             return notes;
         }
         catch (Exception e) {
-            view.error.setText(e.getMessage());
+            view.getErrorArea().setText(e.getMessage());
             view.play.setEnabled(false);
             view.formatBars.setEnabled(false);
             
