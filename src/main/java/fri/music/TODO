@@ -1,30 +1,36 @@
 
 - The NotesOnPianoPlayer needs a better Start/Stop control button group.
-    "Start" should enable initially disabled "Backward" and "Forward" buttons and turn itself into "Stop".
-    "Stop" should rewind the melody and disable "Backward" and "Forward".
-    Pressing "Backward" or "Forward" should step to next or previous note and stop there.
-    For the single step mode, the just performed notes need to be selected in textarea.
-    With a single-step button, one can observe the pressed piano keys note by note.
+    With a single-step mode, one can observe the pressed piano keys note by note.
+    For the single step mode, the just performed note should be selected in textarea.
+    The 5 buttons will be:
+    "Start" should turn itself into "Stop" and play the melody beginning at the recently played note.
+    "Stop" should stop the melody and remember (store) the currently playing note.
+    "Step Backward" or "Step Forward" should step to previous or next note, play it and stop there.
+    When playing and one of "Step Backward" or "Step Forward" is pressed, the playing should be stopped.
+    Being stopped, at start position, "Step Backward" should be disabled, "Step Forward" enabled.
+    Being stopped, at end position, "Step Backward" should be enabled, "Step Forward" disabled.
+    "Rewind" should stop and go to start, it is disabled when being at start.
+    "Fast Forward" should stop and go to end, it is disabled when being at end.
  
 - Somehow visualize intervals for difference tones,
     e.g. all intervals that generate "C4" should be displayed as piano keys.
     See DifferenceToneInversions. 
-    As preliminary work a piano would be needed that lets press
+    As preliminary work, a piano would be needed that lets press
     a number of keyboard keys via constructor.  
 
-- Must be able to load and save melodies (from/to files, or predefined strings) 
+- Must be able to load and save melodies (from/to files, or predefined String resources) 
     in NotesPiano.
 
 - Provide an "Export to ABC" button that writes notes in ABC format
     and renders the result in a non-modal text-dialog.
-    For NotesWithDifferenceTonePianoPlayer, this would generate intervals.
+    For NotesWithDifferenceTonePianoPlayer, this would also generate 
+    the according difference-tone intervals ("inversions")
+    in a separate note-line above.
 
-- Give DifferenceToneForIntervalPiano and others an initial interval or chord to play.
-
-- Display 
-    of Tunings with frequency and cent
-    of difference tones in different tunings
-    of difference tone inversions in different tunings
+- Configuration and display UI for:
+    Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
+    Difference tones in different tunings (DifferenceToneDemo)
+    Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
     
 - Documentation UI, leading through different topics.
     This should be in foreground initially, but can be made optional
