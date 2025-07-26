@@ -48,7 +48,7 @@ public class NotesPianoPlayer
     private JPanel notesControlPanel;
     
     // package-visibles for PlayController
-    JButton play;
+    PlayControlButtons playButtons;
     JButton formatBars;
     JTextArea notesText;
     JSpinner tempoSpinner;
@@ -74,10 +74,10 @@ public class NotesPianoPlayer
         if (this.playerPanel != null)
             return this.playerPanel; // just one view, due to mouseHandler that stores UI-state
         
+        this.playController = newPlayController(this);
+        
         final JComponent playerPanel = piano.getKeyboard(); // using the piano's panel
         playerPanel.add(buildNotesPanel(), BorderLayout.CENTER); // to CENTER, so that user can resize area
-        
-        this.playController = newPlayController(this);
         
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
             notesText.setText(melody); // triggers check via DocumentListener
@@ -139,7 +139,7 @@ public class NotesPianoPlayer
     
     /** Called when starting or stopping the player thread. */
     protected void enableUiOnPlaying(boolean isStop) {
-        notesText.setEnabled(isStop);
+        notesText.setEditable(isStop);
         writeToNotesCheckbox.setEnabled(isStop);
         
         // block mouse events for any listener
@@ -249,15 +249,8 @@ public class NotesPianoPlayer
     }
     
     private JPanel buildNotesControlPanel() {
-        this.play = new JButton("Play");
-        play.setBackground(Color.GREEN);
-        play.setToolTipText("Play Notes in Textarea on Piano");
-        play.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playController.playButtonPressed();
-            }
-        });
+        this.playButtons = new PlayControlButtons();
+        playButtons.setListener(playController);
         
         this.formatBars = new JButton("Format");
         formatBars.setToolTipText("Put each Bar into a Separate Line");
@@ -305,8 +298,8 @@ public class NotesPianoPlayer
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)));
         notesControlPanel.setLayout(new BoxLayout(notesControlPanel, piano.config.isVertical ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
         
-        play.setAlignmentX(Component.CENTER_ALIGNMENT);
-        notesControlPanel.add(play);
+        playButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
+        notesControlPanel.add(playButtons);
         notesControlPanel.add(Box.createRigidArea(new Dimension(1, 8))); // space to next button
         
         formatBars.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -1,6 +1,5 @@
 package fri.music.instrument.notespiano;
 
-import java.awt.Color;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import fri.music.SoundChannel;
@@ -12,24 +11,54 @@ import fri.music.player.notelanguage.MelodyFactory;
 /**
  * Manages the "Start" button with its player-thread.
  */
-class PlayController
+class PlayController implements PlayControlButtons.Listener
 {
     private final NotesPianoPlayer view;
     private final Object playerLock = new Object();
     private Player player;
+    private Note[][] sounds; // playing notes, possibly polyphonic
+    private int currentSoundIndex;
     
     PlayController(NotesPianoPlayer view) {
         this.view = view;
     }
     
-    /** "Start" button callback. */
-    void playButtonPressed() {
+    // interface PlayControlButtons.Listener
+    
+    @Override
+    public void fastBackwardPressed() {
+        synchronized(playerLock) {
+            startOrStopPlayer(true);
+        }
+    }
+    @Override
+    public void backwardPressed() {
+        synchronized(playerLock) {
+            startOrStopPlayer(true);
+        }
+    }
+    @Override
+    public void playPressed() {
         synchronized(playerLock) {
             final boolean isStop = (player != null);
             startOrStopPlayer(isStop);
         }
     }
-
+    @Override
+    public void forwardPressed() {
+        synchronized(playerLock) {
+            startOrStopPlayer(true);
+        }
+    }
+    @Override
+    public void fastForwardPressed() {
+        synchronized(playerLock) {
+            startOrStopPlayer(true);
+        }
+    }
+    
+    // methods called by view
+    
     /** 
      * Enable time-signature and tempo-chooser, optionally clear errors.
      * This is called on any text input.
@@ -43,7 +72,7 @@ class PlayController
         }
         catch (Exception e) {
             view.getErrorArea().setText(e.getMessage());
-            view.play.setEnabled(false);
+            view.playButtons.setEnabled(false);
             view.formatBars.setEnabled(false);
             
             if (e instanceof IllegalArgumentException == false)
@@ -62,11 +91,11 @@ class PlayController
                 timeSignature[1]);
     }
 
+    // privates
     
     /** Make sure to always call this synchronized(playerLock)! */
     private void startOrStopPlayer(boolean isStop) {
-        view.play.setText(isStop ? "Play" : "Stop");
-        view.play.setBackground(isStop ? Color.GREEN : Color.decode("0xff9999")); // bright red
+        view.playButtons.setPlaying(isStop == false);
         
         view.enableUiOnPlaying(isStop);
     
@@ -140,7 +169,7 @@ class PlayController
             }
         }
         
-        view.play.setEnabled(enable);
+        view.playButtons.setEnabled(enable);
         view.formatBars.setEnabled(enable);
         
         return notes;
@@ -160,28 +189,31 @@ class PlayController
     }
 
     /** 
-     * Plays given chords as sound and strikes according piano keys.
+     * Plays given sounds and strikes according piano keys.
      * This method runs in a background-thread (to be interruptable), 
      * so any call to Swing must happen via SwingUtilities.invokeXXX().
-     * @param chordsArray the intervals or chords to play on piano.
+     * @param sounds the intervals or chords to play on piano.
      */
-    private void playNotes(Note[][] chordsArray) {
+    private void playNotes(Note[][] sounds) {
+        this.sounds = sounds;
+        
         final Player myPlayer = this.player; // remember which player to use
         
         boolean interrupted = false;
         RuntimeException exception = null;
         
-        for (int i = 0; interrupted == false && exception == null && i < chordsArray.length; i++) { // play all notes
-            final Note[] chord = chordsArray[i];
+        for (int i = 0; interrupted == false && exception == null && i < sounds.length; i++) { // play all notes
+            this.currentSoundIndex = i;
+            final Note[] currentSound = sounds[i];
             try {
                 SwingUtilities.invokeAndWait(() -> { // waits synchronously for each note
                     synchronized(playerLock) {
                         if (myPlayer == this.player) // Start/Stop button could be clicked several times!
-                            myPlayer.playSimultaneously(chord); // this causes Swing UI updates and thus must run in EDT
+                            myPlayer.playSimultaneously(currentSound); // this causes Swing UI updates and thus must run in EDT
                     }
                 });
             }
-            catch (Exception e) {
+            catch (Exception e) { // unlikely invokeAndWait() problems
                 exception = new RuntimeException(e);
             }
             
@@ -192,8 +224,8 @@ class PlayController
         
         SwingUtilities.invokeLater(() -> { // causes Swing UI updates and thus must run in EDT
             synchronized(playerLock) {
-                if (myPlayer == this.player) // still not stopped, do self-stop
-                    startOrStopPlayer(true); // enable "Play" and close player, false = do not clear any error
+                if (myPlayer == this.player) // not stopped by user, do self-stop
+                    startOrStopPlayer(true);
             }
         });
         
