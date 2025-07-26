@@ -1,11 +1,11 @@
-package fri.music.instrument.notespiano;
+package fri.music.instrument.notespiano.wave;
 
 import java.awt.Component;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
-import fri.music.instrument.wave.DifferenceToneForNotesPiano;
+import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.player.Note;
 
 /**
