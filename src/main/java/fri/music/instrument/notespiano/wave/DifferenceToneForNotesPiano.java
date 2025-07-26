@@ -1,4 +1,4 @@
-package fri.music.instrument.wave;
+package fri.music.instrument.notespiano.wave;
 
 import java.awt.Color;
 import java.util.Iterator;
@@ -10,10 +10,15 @@ import javax.swing.border.Border;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
+import fri.music.instrument.wave.DeviationComponent;
+import fri.music.instrument.wave.DifferenceToneUtil;
+import fri.music.instrument.wave.TuningComponent;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
- * Piano that displays difference-tones for two high notes sounding together.
+ * Piano that displays the difference-tone with a red border
+ * when two (high) notes are played together.
+ * This is not possible with a mouse, so you need notes to drive this.
  */
 public class DifferenceToneForNotesPiano extends PianoWithVolume
 {
