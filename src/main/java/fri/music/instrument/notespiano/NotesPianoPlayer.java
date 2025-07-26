@@ -40,7 +40,7 @@ import fri.music.swingutils.TextAreaActions;
  */
 public class NotesPianoPlayer
 {
-    /** The piano obtained from construction, immutable. */
+    /** The piano obtained from constructor, immutable. */
     protected final PianoWithSound piano;
     
     private JComponent playerPanel; // the component
@@ -51,14 +51,14 @@ public class NotesPianoPlayer
     JButton play;
     JButton formatBars;
     JTextArea notesText;
-    JTextComponent error;
     JSpinner tempoSpinner;
     JComboBox<String> timeSignatureChoice;
     JCheckBox writeToNotesCheckbox;
+    private JTextComponent error;
     
     private PlayController playController;
     
-    private final NotesWritingMouseListener notesWritingListener = new NotesWritingMouseListener(this);
+    private final NotesWritingMouseListener notesWritingPianoListener = new NotesWritingMouseListener(this);
     
     /** @param piano required, the piano on which to play notes. */
     public NotesPianoPlayer(PianoWithSound piano) {
@@ -89,7 +89,7 @@ public class NotesPianoPlayer
         
         // listen to piano mouse clicks and write notes into text-area
         for (PianoWithSound.Keyboard.Key key : piano.getKeys())
-            key.addMouseListener(notesWritingListener);
+            key.addMouseListener(notesWritingPianoListener);
         
         return this.playerPanel = playerPanel;
     }
@@ -100,7 +100,10 @@ public class NotesPianoPlayer
     }
     
     
-    /** @return a new PlayController, factory-method, called just once from <code>getPlayer()</code>. */
+    /** 
+     * Factory-method, called just once from <code>getPlayer()</code>.
+     * @return a new PlayController.
+     */
     protected PlayController newPlayController(NotesPianoPlayer notesPianoPlayer) {
         return new PlayController(this);
     }
@@ -116,7 +119,47 @@ public class NotesPianoPlayer
     }
     
     
-    // methods for NotesWritingMouseListener
+    // methods called by PlayController
+    
+    /**
+     * Called before playing notes on piano.
+     * Converts given 1-dimensional notes from text-area to 2-dimensional chords-array.
+     * To be overridden for other conversions than just one note per chord.
+     * @param notesArray the notes from text-area to convert to a 2-dimensional chords array.
+     * @return a 2-dimensional chords array built from given notes.
+     */
+    protected Note[][] convertNotesToChords(Note[] notesArray) {
+        final Note[][] chordsArray = new Note[notesArray.length][];
+        for (int i = 0; i < notesArray.length; i++) {
+            chordsArray[i] = new Note[1];
+            chordsArray[i][0] = notesArray[i];
+        }
+        return chordsArray;
+    }
+    
+    /** Called when starting or stopping the player thread. */
+    protected void enableUiOnPlaying(boolean isStop) {
+        notesText.setEnabled(isStop);
+        writeToNotesCheckbox.setEnabled(isStop);
+        
+        // block mouse events for any listener
+        for (PianoWithSound.Keyboard.Key key : piano.getKeys())
+            key.setIgnoreMouse(isStop == false);
+            // setEnabled() did not reject mouse-events, and prevented key-down rendering
+    }
+    
+    Integer[] timeSignatureParts() {
+        final String timeSignature = (String) timeSignatureChoice.getSelectedItem();
+        final int separatorIndex = timeSignature.indexOf(Note.DURATION_SEPARATOR);
+        final String beatsPerBar = timeSignature.substring(0, separatorIndex);
+        final String beatType = timeSignature.substring(separatorIndex + 1);
+        return new Integer[] {
+                Integer.valueOf(beatsPerBar),
+                Integer.valueOf(beatType) };
+    }
+    
+    
+    // methods called by NotesWritingMouseListener
     
     String noteLengthForMillis(int durationMillis) {
         Integer beatsPerMinute = (Integer) tempoSpinner.getValue();
@@ -252,7 +295,7 @@ public class NotesPianoPlayer
         writeToNotesCheckbox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                notesWritingListener.setActive(((JCheckBox) e.getSource()).isSelected());
+                notesWritingPianoListener.setActive(((JCheckBox) e.getSource()).isSelected());
             }
         });
         
@@ -283,45 +326,6 @@ public class NotesPianoPlayer
         return notesControlPanel;
     }
     
-    
-    // callback methods
-    
-    /**
-     * Called before playing notes on piano.
-     * Converts given 1-dimensional notes from text-area to 2-dimensional chords-array.
-     * To be overridden for other conversions than just one note per chord.
-     * @param notesArray the notes from text-area to convert to a 2-dimensional chords array.
-     * @return a 2-dimensional chords array built from given notes.
-     */
-    protected Note[][] convertNotesToChords(Note[] notesArray) {
-        final Note[][] chordsArray = new Note[notesArray.length][];
-        for (int i = 0; i < notesArray.length; i++) {
-            chordsArray[i] = new Note[1];
-            chordsArray[i][0] = notesArray[i];
-        }
-        return chordsArray;
-    }
-    
-    /** Called when starting or stopping the player thread. */
-    protected void enableUiOnPlaying(boolean isStop) {
-        notesText.setEnabled(isStop);
-        writeToNotesCheckbox.setEnabled(isStop);
-        
-        // block mouse events for any listener
-        for (PianoWithSound.Keyboard.Key key : piano.getKeys())
-            key.setIgnoreMouse(isStop == false);
-            // setEnabled() did not reject mouse-events, and prevented key-down rendering
-    }
-    
-    Integer[] timeSignatureParts() {
-        final String timeSignature = (String) timeSignatureChoice.getSelectedItem();
-        final int separatorIndex = timeSignature.indexOf(Note.DURATION_SEPARATOR);
-        final String beatsPerBar = timeSignature.substring(0, separatorIndex);
-        final String beatType = timeSignature.substring(separatorIndex + 1);
-        return new Integer[] {
-                Integer.valueOf(beatsPerBar),
-                Integer.valueOf(beatType) };
-    }
     
     private void insertTextAtNearestSpace(String noteWithLength) {
         final int caretPosition = notesText.getCaretPosition();
