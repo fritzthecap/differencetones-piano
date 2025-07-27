@@ -9,8 +9,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+/**
+ * The player controls for playing, rewinding and single-step playing.
+ */
 class PlayControlButtons extends JPanel
 {
+    /** Who wants to receive control button clicks implements this interface. */
     public interface Listener
     {
         void fastBackwardPressed();
@@ -23,11 +27,11 @@ class PlayControlButtons extends JPanel
     private static final String PLAY = "\u23F5";
     private static final String STOP = "\u23F9";
     
-    public final JButton fastBackward;
-    public final JButton backward;
-    public final JButton play;
-    public final JButton forward;
-    public final JButton fastForward;
+    private final JButton fastBackward;
+    private final JButton backward;
+    private final JButton play;
+    private final JButton forward;
+    private final JButton fastForward;
     
     private Listener listener;
     
@@ -66,15 +70,16 @@ class PlayControlButtons extends JPanel
     private JButton newButton(String text, String tooltip) {
         final JButton button = new JButton(text);
         button.setToolTipText(tooltip);
+        // make font bigger for UNICODE letters
         button.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
-        button.setMargin(new Insets(4, 4, 4, 4));
-        button.setFocusPainted(false);
-        
+        button.setMargin(new Insets(4, 4, 4, 4)); // else text will be "..."
+        button.setFocusPainted(false); // no thin rectangle on focus
+        // make buttonas small as possible
         final Dimension size = new Dimension(30, 30);
         button.setPreferredSize(size);
         button.setMaximumSize(size);
         button.setMinimumSize(size);
-        
+        // install listener callbacks
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -91,17 +96,6 @@ class PlayControlButtons extends JPanel
                         listener.fastForwardPressed();
             }
         });
-        
         return button;
-    }
-    
-    
-    public static void main(String[] args) {
-        javax.swing.JFrame f = new javax.swing.JFrame();
-        f.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-        f.getContentPane().add(new PlayControlButtons());
-        f.setSize(new Dimension(600, 200));
-        f.setLocationRelativeTo(null);
-        f.setVisible(true);
     }
 }
