@@ -1,22 +1,13 @@
-
-- The NotesOnPianoPlayer needs a better Start/Stop control button group.
-    With a single-step mode, one can observe the pressed piano keys note by note.
-    For the single step mode, the just performed note should be selected in textarea.
-    The 5 buttons will be:
-    "Start" should turn itself into "Stop" and play the melody beginning at the recently played note.
-    "Stop" should stop the melody and remember (store) the currently playing note.
-    "Step Backward" or "Step Forward" should step to previous or next note, play it and stop there.
-    When playing and one of "Step Backward" or "Step Forward" is pressed, the playing should be stopped.
-    Being stopped, at start position, "Step Backward" should be disabled, "Step Forward" enabled.
-    Being stopped, at end position, "Step Backward" should be enabled, "Step Forward" disabled.
-    "Rewind" should stop and go to start, it is disabled when being at start.
-    "Fast Forward" should stop and go to end, it is disabled when being at end.
  
 - Somehow visualize intervals for difference tones,
-    e.g. all intervals that generate "C4" should be displayed as piano keys.
+    e.g. all intervals that generate "C3" should be displayed and 
+    optionally be played as piano keys on one interval item.
     See DifferenceToneInversions. 
-    As preliminary work, a piano would be needed that lets press
-    a number of keyboard keys via constructor.  
+    A piano with TuningComponent and DeviationComponent must be present,
+    also choosers for narrowest and widest interval.
+    Pressing a piano key would display a list of up to 8 difference-tone inversion intervals.
+    Clicking onto one of the interval-items would play the interval and mark the resulting
+    difference-tone with a red-border. DifferenceToneForNotesPiano should be reusable for this.
 
 - Must be able to load and save melodies (from/to files, or predefined String resources) 
     in NotesPiano.
