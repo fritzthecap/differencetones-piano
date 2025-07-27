@@ -55,6 +55,7 @@ class PlayControlButtons extends JPanel
     public void setEnabled(boolean enabled) {
         fastBackward.setEnabled(enabled);
         backward.setEnabled(enabled);
+        reverse.setEnabled(enabled);
         play.setEnabled(enabled);
         forward.setEnabled(enabled);
         fastForward.setEnabled(enabled);
