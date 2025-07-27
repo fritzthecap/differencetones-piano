@@ -11,6 +11,11 @@ import fri.music.wavegenerator.SineWaveSoundChannel;
 
 public class NotesPianoPlayerDemo
 {
+    static final String C_MAJOR_SCALE = 
+        """
+C4/4 D4/4 E4/4 F4/4 G4/4 A4/4 B4/4 C5/4
+""";
+        
     static final String AUGUSTIN = 
         """
 3/4
@@ -69,7 +74,7 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
                 13);
         final SoundChannel soundChannel = new SineWaveSoundChannel(null);
         final NotesPianoPlayer player = new NotesPianoPlayer(new PianoWithVolume(config, soundChannel));
-        final JComponent playerPanel = player.getPlayer(TUBULAR_BELLS);
+        final JComponent playerPanel = player.getPlayer(C_MAJOR_SCALE);
         
         frame.addWindowListener(player.getWindowClosingListener());
         frame.add(playerPanel);
