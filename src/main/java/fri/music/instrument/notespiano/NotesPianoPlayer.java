@@ -84,7 +84,7 @@ public class NotesPianoPlayer
             notesText.setCaretPosition(melody.length());
         }
         else { // enable or disable all buttons
-            playController.readNotesFromTextAreaCatchExceptions();
+            readNotesFromTextAreaCatchExceptions();
         }
         
         // listen to piano mouse clicks and write notes into text-area
@@ -118,7 +118,16 @@ public class NotesPianoPlayer
         return error;
     }
     
-    
+    /** Get a new MelodyFactory with current parameters from UI. */
+    protected MelodyFactory newMelodyFactory() {
+        final Integer[] timeSignature = timeSignatureParts();
+        return new MelodyFactory(
+                null,
+                (Integer) tempoSpinner.getValue(),
+                timeSignature[0],
+                timeSignature[1]);
+    }
+
     // methods called by PlayController
     
     /**
@@ -148,17 +157,6 @@ public class NotesPianoPlayer
             // setEnabled() did not reject mouse-events, and prevented key-down rendering
     }
     
-    Integer[] timeSignatureParts() {
-        final String timeSignature = (String) timeSignatureChoice.getSelectedItem();
-        final int separatorIndex = timeSignature.indexOf(Note.DURATION_SEPARATOR);
-        final String beatsPerBar = timeSignature.substring(0, separatorIndex);
-        final String beatType = timeSignature.substring(separatorIndex + 1);
-        return new Integer[] {
-                Integer.valueOf(beatsPerBar),
-                Integer.valueOf(beatType) };
-    }
-    
-    
     // methods called by NotesWritingMouseListener
     
     String noteLengthForMillis(int durationMillis) {
@@ -178,12 +176,33 @@ public class NotesPianoPlayer
     }
     
     void playSingleNote(String noteWithLength) {
-        final Note[] note = playController.newMelodyFactory().translate(new String[] { noteWithLength });
+        final Note[] note = newMelodyFactory().translate(new String[] { noteWithLength });
         new Player(new PianoKeyConnector(piano)).play(note[0]);
     }
     
-    
     // UI build methods
+    
+    /**
+     * Enable time-signature and tempo-chooser, optionally clear errors.
+     * This is called on any text input, and also when starting or stopping melody.
+     * @return null when error, else the notes-array from text area.
+     */
+    private Note[] readNotesFromTextAreaCatchExceptions() {
+        try {
+            final Note[] notes = playController.readNotesFromTextArea(true);
+            getErrorArea().setText(""); // no exception was thrown, so clear errors
+            return notes;
+        }
+        catch (Exception e) {
+            getErrorArea().setText(e.getMessage());
+            playButtons.setEnabled(false);
+            formatBars.setEnabled(false);
+            
+            if (e instanceof IllegalArgumentException == false)
+                e.printStackTrace();
+        }
+        return null;
+    }
     
     private JPanel buildNotesPanel() {
         final JComponent notesTextAndErrors = buildNotesTextArea();
@@ -204,15 +223,15 @@ public class NotesPianoPlayer
         notesText.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void removeUpdate(DocumentEvent e) {
-                playController.readNotesFromTextAreaCatchExceptions();
+                readNotesFromTextAreaCatchExceptions();
             }
             @Override
             public void insertUpdate(DocumentEvent e) {
-                playController.readNotesFromTextAreaCatchExceptions();
+                readNotesFromTextAreaCatchExceptions();
             }
             @Override
             public void changedUpdate(DocumentEvent e) {
-                playController.readNotesFromTextAreaCatchExceptions();
+                readNotesFromTextAreaCatchExceptions();
             }
         });
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
@@ -230,7 +249,7 @@ public class NotesPianoPlayer
                 DialogUtil.showModelessHtmlDialog(
                         "Notes Edit Help", 
                         playerPanel, 
-                        SYNTAX_HELP, 
+                        NOTES_EDIT_HELP, 
                         new Dimension(660, 460));
             }
         });
@@ -319,6 +338,17 @@ public class NotesPianoPlayer
         return notesControlPanel;
     }
     
+    // callback and helper methods
+    
+    private Integer[] timeSignatureParts() {
+        final String timeSignature = (String) timeSignatureChoice.getSelectedItem();
+        final int separatorIndex = timeSignature.indexOf(Note.DURATION_SEPARATOR);
+        final String beatsPerBar = timeSignature.substring(0, separatorIndex);
+        final String beatType = timeSignature.substring(separatorIndex + 1);
+        return new Integer[] {
+                Integer.valueOf(beatsPerBar),
+                Integer.valueOf(beatType) };
+    }
     
     private void insertTextAtNearestSpace(String noteWithLength) {
         final int caretPosition = notesText.getCaretPosition();
@@ -397,9 +427,9 @@ public class NotesPianoPlayer
     }
 
     private void formatNotes() {
-        final Note[] notes = playController.readNotesFromTextAreaCatchExceptions();
+        final Note[] notes = readNotesFromTextAreaCatchExceptions();
         if (notes != null) {
-            final String formatted = playController.newMelodyFactory().toString(
+            final String formatted = newMelodyFactory().toString(
                     notes, 
                     tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
                     timeSignatureChoice.isEnabled() == false);
@@ -410,7 +440,7 @@ public class NotesPianoPlayer
     
 
     /** Help taken from JavaDoc of MelodyFactory class. */
-    private static final String SYNTAX_HELP = """
+    private static final String NOTES_EDIT_HELP = """
 <html>
 <head></head>
 <body>

@@ -9,13 +9,15 @@ import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
 
 /**
- * Manages the "Start" button with its player-thread.
+ * Manages the player control buttons and the player-thread.
  */
 class PlayController implements PlayControlButtons.Listener
 {
     private final NotesPianoPlayer view;
+    
     private final Object playerLock = new Object();
     private Player player;
+    
     private Note[][] sounds; // playing notes, possibly polyphonic
     private int currentSoundIndex;
     
@@ -30,8 +32,7 @@ class PlayController implements PlayControlButtons.Listener
         synchronized(playerLock) {
             if (player != null)
                 startOrStopPlayer(false);
-            else
-                currentSoundIndex = -1; // forward will increment
+            fastBackward();
         }
     }
     
@@ -49,8 +50,8 @@ class PlayController implements PlayControlButtons.Listener
     public void playPressed() {
         synchronized(playerLock) {
             final boolean isStart = (player == null);
-            if (isStart == true)
-                skipCurrentSoundIndex(true);
+            if (isStart)
+                skipCurrentSoundIndex(true); // else it would repeat current note
             startOrStopPlayer(isStart);
         }
     }
@@ -70,48 +71,16 @@ class PlayController implements PlayControlButtons.Listener
         synchronized(playerLock) {
             if (player != null)
                 startOrStopPlayer(false);
-            else if (sounds != null)
-                currentSoundIndex = sounds.length; // backward will decrement
+            fastForward();
         }
     }
     
     // methods called by view
     
-    /** Get a new MelodyFactory with current parameters from UI. */
-    MelodyFactory newMelodyFactory() {
-        final Integer[] timeSignature = view.timeSignatureParts();
-        return new MelodyFactory(
-                null,
-                (Integer) view.tempoSpinner.getValue(),
-                timeSignature[0],
-                timeSignature[1]);
-    }
-
-    /** 
-     * Enable time-signature and tempo-chooser, optionally clear errors.
-     * This is called on any text input, and also when starting or stopping melody.
-     * @return null when error, else the notes-array from text area.
-     */
-    Note[] readNotesFromTextAreaCatchExceptions() {
-        try {
-            final Note[] notes = readNotesFromTextArea();
-            view.getErrorArea().setText(""); // no exception was thrown, so clear errors
-            return notes;
-        }
-        catch (Exception e) {
-            view.getErrorArea().setText(e.getMessage());
-            view.playButtons.setEnabled(false);
-            view.formatBars.setEnabled(false);
-            
-            if (e instanceof IllegalArgumentException == false)
-                e.printStackTrace();
-        }
-        return null;
-    }
-    
-    // privates
-    
-    private Note[] readNotesFromTextArea() throws IllegalArgumentException { // exceptions coming from MelodyFactory
+    Note[] readNotesFromTextArea(boolean clearCurrentSounds) throws IllegalArgumentException {
+        if (clearCurrentSounds)
+            sounds = null;
+        
         final String notesString = view.notesText.getText();
         final boolean enable;
         final Note[] notes;
@@ -123,7 +92,7 @@ class PlayController implements PlayControlButtons.Listener
             view.tempoSpinner.setEnabled(true);
         }
         else { // parse notes
-            final MelodyFactory melodyFactory = newMelodyFactory();
+            final MelodyFactory melodyFactory = view.newMelodyFactory();
             notes = melodyFactory.translate(notesString); // throws exceptions
             checkNotesRange(notes); // throws exceptions
             
@@ -155,6 +124,8 @@ class PlayController implements PlayControlButtons.Listener
         return notes;
     }
     
+    // helpers
+    
     private void checkNotesRange(Note[] notesArray) {
         if (notesArray.length <= 0)
             throw new IllegalArgumentException("No notes were given!");
@@ -167,7 +138,6 @@ class PlayController implements PlayControlButtons.Listener
                 if (lowestMidiNumber > note.midiNumber || highestMidiNumber < note.midiNumber)
                     throw new IllegalArgumentException("Note is not in keyboard range: "+note.ipnName);
     }
-
     
     /** Make sure to always call this synchronized(playerLock)! */
     private void startOrStopPlayer(boolean isStart) {
@@ -176,7 +146,7 @@ class PlayController implements PlayControlButtons.Listener
         view.enableUiOnPlaying(isStart == false);
     
         if (isStart) {
-            final Note[] notesArray = readNotesFromTextArea();
+            final Note[] notesArray = readNotesFromTextArea(false);
             final Note[][] sounds = view.convertNotesToChords(notesArray); // optional override
             startPlayer(sounds, true); // thread is running now
         }
@@ -185,7 +155,7 @@ class PlayController implements PlayControlButtons.Listener
                 player.close();
                 player = null;
             }
-            readNotesFromTextArea(); // enable note controls
+            readNotesFromTextArea(false); // enable note controls
             view.notesText.requestFocus();
         }
     }
@@ -210,6 +180,7 @@ class PlayController implements PlayControlButtons.Listener
      * This method runs in a background-thread (to be interruptable), 
      * so any call to Swing must happen via SwingUtilities.invokeXXX().
      * @param sounds the intervals or chords to play on piano.
+     * @param setSoundsAndIndex hen false, this is a single-step play, else it plays more.
      */
     private void playNotes(Note[][] sounds, boolean setSoundsAndIndex) {
         if (setSoundsAndIndex)
@@ -219,11 +190,11 @@ class PlayController implements PlayControlButtons.Listener
         
         boolean interrupted = false;
         RuntimeException exception = null;
-        int startIndex = setSoundsAndIndex ? this.currentSoundIndex : 0; // 0 = single note play
+        int startIndex = setSoundsAndIndex ? Math.max(currentSoundIndex, 0) : 0; // 0 = single note play
         
         for (int i = startIndex; interrupted == false && exception == null && i < sounds.length; i++) { // play all notes
             if (setSoundsAndIndex)
-                this.currentSoundIndex = i;
+                currentSoundIndex = i;
             
             final Note[] currentSound = sounds[i];
             try {
@@ -243,8 +214,8 @@ class PlayController implements PlayControlButtons.Listener
             }
         }
         
-        if (interrupted)
-            this.currentSoundIndex--;
+        if (interrupted) // was stopped but already incremented, correct that increment
+            currentSoundIndex--;
 
         SwingUtilities.invokeLater(() -> { // causes Swing UI updates and thus must run in EDT
             synchronized(playerLock) {
@@ -262,38 +233,49 @@ class PlayController implements PlayControlButtons.Listener
     }
     
     
+    private void fastBackward() {
+        if (sounds != null)
+            currentSoundIndex = -1; // forward will increment
+    }
+    
+    private void fastForward() {
+        if (sounds != null)
+            currentSoundIndex = sounds.length; // backward will decrement
+    }
+    
     private void skip(boolean forward) {
-        if (sounds == null) {
-            final Note[] notesArray = readNotesFromTextArea();
-            sounds = view.convertNotesToChords(notesArray); 
-            currentSoundIndex = -1;
+        if (sounds == null) { // no "Play" was pressed before "Skip to Next"
+            final Note[] notesArray = readNotesFromTextArea(false);
+            sounds = view.convertNotesToChords(notesArray);
+            if (currentSoundIndex == 0) // if initial state
+                currentSoundIndex = -1; // will be changed below
         }
 
-        int startIndex = currentSoundIndex;
+        int startIndex = Math.max(0, currentSoundIndex);
         do { // search for a non-rest note
             skipCurrentSoundIndex(forward);
         }
         while (startIndex != currentSoundIndex && sounds[currentSoundIndex][0].isRest());
         
-        if (sounds[currentSoundIndex][0].isRest() == false)
-            startPlayer(new Note[][] { sounds[currentSoundIndex] }, false);
+        if (sounds[currentSoundIndex][0].isRest() == false) {
+            synchronized(playerLock) {
+                startPlayer(new Note[][] { sounds[currentSoundIndex] }, false);
+            }
+        }
     }
 
     private void skipCurrentSoundIndex(boolean increment) {
-        if (sounds == null) {
-            currentSoundIndex = 0;
-            return;
-        }
-        
-        if (increment) {
-            currentSoundIndex++;
-            if (currentSoundIndex >= sounds.length)
-                currentSoundIndex = 0;
-        }
-        else {
-            currentSoundIndex--;
-            if (currentSoundIndex < 0)
-                currentSoundIndex = sounds.length - 1;
+        if (sounds != null) {
+            if (increment) {
+                currentSoundIndex++;
+                if (currentSoundIndex >= sounds.length)
+                    currentSoundIndex = 0;
+            }
+            else {
+                currentSoundIndex--;
+                if (currentSoundIndex < 0)
+                    currentSoundIndex = sounds.length - 1;
+            }
         }
     }
 }
