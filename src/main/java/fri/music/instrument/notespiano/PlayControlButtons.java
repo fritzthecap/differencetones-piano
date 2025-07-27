@@ -19,16 +19,19 @@ class PlayControlButtons extends JPanel
     {
         void fastBackwardPressed();
         void backwardPressed();
+        void reversePressed();
         void playPressed();
         void fastForwardPressed();
         void forwardPressed();
     }
     
-    private static final String PLAY = "\u23F5";
-    private static final String STOP = "\u23F9";
+    private static final String REVERSE = "\u23F4";
+    private static final String PLAY    = "\u23F5";
+    private static final String STOP    = "\u23F9";
     
     private final JButton fastBackward;
     private final JButton backward;
+    private final JButton reverse;
     private final JButton play;
     private final JButton forward;
     private final JButton fastForward;
@@ -41,7 +44,8 @@ class PlayControlButtons extends JPanel
         
         add(fastBackward = newButton("\u23EE", "Rewind to Start"));
         add(backward     = newButton("\u23EA", "Play Previous Note"));
-        add(play         = newButton("\u23F5", "Play Notes in Textarea on Piano"));
+        add(reverse      = newButton(REVERSE, "Play Notes in Textarea in Reverse Order"));
+        add(play         = newButton(PLAY, "Play Notes in Textarea on Piano"));
         add(forward      = newButton("\u23E9", "Play Next Note"));
         add(fastForward  = newButton("\u23ED", "Go to End"));
     }
@@ -62,8 +66,11 @@ class PlayControlButtons extends JPanel
     }
 
     /** Called by controller, sets the correct icon on "Play" button. */
-    void setPlaying(boolean playing) {
-        play.setText(playing ? STOP : PLAY);
+    void setPlaying(boolean playing, boolean isReverse) {
+        if (isReverse)
+            reverse.setText(playing ? STOP : REVERSE);
+        else
+            play.setText(playing ? STOP : PLAY);
     }
 
     
@@ -72,10 +79,10 @@ class PlayControlButtons extends JPanel
         button.setToolTipText(tooltip);
         // make font bigger for UNICODE letters
         button.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
-        button.setMargin(new Insets(4, 4, 4, 4)); // else text will be "..."
+        button.setMargin(new Insets(1, 1, 1, 1)); // else text will be "..."
         button.setFocusPainted(false); // no thin rectangle on focus
         // make buttonas small as possible
-        final Dimension size = new Dimension(30, 30);
+        final Dimension size = new Dimension(25, 25);
         button.setPreferredSize(size);
         button.setMaximumSize(size);
         button.setMinimumSize(size);
@@ -88,6 +95,8 @@ class PlayControlButtons extends JPanel
                         listener.fastBackwardPressed();
                     else if (e.getSource() == backward)
                         listener.backwardPressed();
+                    else if (e.getSource() == reverse)
+                        listener.reversePressed();
                     else if (e.getSource() == play)
                         listener.playPressed();
                     else if (e.getSource() == forward)
@@ -97,5 +106,14 @@ class PlayControlButtons extends JPanel
             }
         });
         return button;
+    }
+
+    public static void main(String[] args) {
+        javax.swing.JFrame f = new javax.swing.JFrame();
+        f.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        f.getContentPane().add(new PlayControlButtons());
+        f.setSize(new Dimension(600, 200));
+        f.setLocationRelativeTo(null);
+        f.setVisible(true);
     }
 }
