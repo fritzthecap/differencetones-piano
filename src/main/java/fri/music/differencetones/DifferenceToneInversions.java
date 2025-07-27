@@ -71,7 +71,7 @@ public class DifferenceToneInversions extends DifferenceTones
      * @param tones the tone-system the difference-tones should be generated from.
      * @param smallestSemitoneDistance the smallest number of semi-tones the interval-tones may be apart.
      * @param biggestSemitoneDistance the biggest number (inclusive) of semi-tones the interval-tones may be apart.
-     * @param deviationTolerance allowed range is 0.0 - 0.45, the maximum deviation when searching for difference tones.
+     * @param deviationTolerance the maximum deviation when searching for difference tones, between 0.0 and 0.45.
      */
     public record Configuration(
             Tone[] tones, 
@@ -123,6 +123,12 @@ public class DifferenceToneInversions extends DifferenceTones
     private final Configuration config;
     private final Map<Tone,List<TonePair>> differenceToneToGeneratingTones = new LinkedHashMap<>();
     
+    /**
+     * Constructs data for finding difference-tone inversions.
+     * Mind that <code>>removeDissonant()</code> is <b>not</b> done automatically on construction,
+     * you need to call this explicitly! (To avoid e.g. dirty MAJOR_THIRD in EDO-12.)
+     * @param config the configuration to use when searching difference-tone inversions.
+     */
     public DifferenceToneInversions(Configuration config) {
         super(config.tones, config.deviationTolerance, true); // true: need to find only primary difference tones
         this.config = config;
@@ -130,7 +136,7 @@ public class DifferenceToneInversions extends DifferenceTones
     }
     
     private void initialize() {
-        // in just-intonation, any tone-pair can give another difference tone, nearly no prediction-rules are possible
+        // in just-intonation, any tone-pair can give another difference tone, nearly no predictions are possible
         // build index of intervals from given tones
         // C-D, C-D#, C-E ... C-A#; C#-#D C#-E, ...
         for (int lowerIndex = 2; // there won't be a difference tone below third semi-tone
@@ -197,10 +203,10 @@ public class DifferenceToneInversions extends DifferenceTones
     
     /**
      * Removes all intervals that have upper or lower tone just one semi-tone away from their difference-tone,
-     * independent of octave. Thus C4 = B6-D#6 (occurs in EDO-12) would be removed, as B is next to C.
-     * @param alsoFifthRange remove also intervals whose tones are too close to the fifth of the difference tone.
+     * independent of octave. Thus C4 = B6-D#6 (dirty MAJOR_THIRD in EDO-12) would be removed, as B is next to C.
+     * @param alsoInFifthRange remove also intervals whose tones are too close to the fifth of the difference tone.
      */
-    public void removeDissonant(boolean alsoFifthRange) {
+    public void removeDissonant(boolean alsoInFifthRange) {
         for (final Map.Entry<Tone,List<TonePair>> entry : differenceToneToGeneratingTones.entrySet()) {
             final Tone differenceTone = entry.getKey();
             
@@ -209,7 +215,7 @@ public class DifferenceToneInversions extends DifferenceTones
                 final TonePair interval = iterator.next();
                 if (isOneSemitoneAway(differenceTone, interval.upperTone()) ||
                         isOneSemitoneAway(differenceTone, interval.lowerTone()) ||
-                        (alsoFifthRange &&
+                        (alsoInFifthRange &&
                             (isFifthOneSemitoneAway(differenceTone, interval.upperTone()) ||
                             isFifthOneSemitoneAway(differenceTone, interval.lowerTone()))))
                     iterator.remove();

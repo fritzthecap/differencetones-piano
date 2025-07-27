@@ -159,6 +159,30 @@ public class NotesPianoPlayer
             // setEnabled() did not reject mouse-events, and prevented key-down rendering
     }
     
+    // methods needed in sub-classes
+    
+    /**
+     * Enable time-signature and tempo-chooser, optionally clear errors.
+     * This is called on any text input, and also when starting or stopping melody.
+     * @return null when error, else the notes-array from text area.
+     */
+    protected final Note[] readNotesFromTextAreaCatchExceptions() {
+        try {
+            final Note[] notes = playController.readNotesFromTextArea(true);
+            getErrorArea().setText(""); // no exception was thrown, so clear errors
+            return notes;
+        }
+        catch (Exception e) {
+            getErrorArea().setText(e.getMessage());
+            playButtons.setEnabled(false);
+            formatBars.setEnabled(false);
+            
+            if (e instanceof IllegalArgumentException == false)
+                e.printStackTrace();
+        }
+        return null;
+    }
+    
     // methods called by NotesWritingMouseListener
     
     String noteLengthForMillis(int durationMillis) {
@@ -183,28 +207,6 @@ public class NotesPianoPlayer
     }
     
     // UI build methods
-    
-    /**
-     * Enable time-signature and tempo-chooser, optionally clear errors.
-     * This is called on any text input, and also when starting or stopping melody.
-     * @return null when error, else the notes-array from text area.
-     */
-    private Note[] readNotesFromTextAreaCatchExceptions() {
-        try {
-            final Note[] notes = playController.readNotesFromTextArea(true);
-            getErrorArea().setText(""); // no exception was thrown, so clear errors
-            return notes;
-        }
-        catch (Exception e) {
-            getErrorArea().setText(e.getMessage());
-            playButtons.setEnabled(false);
-            formatBars.setEnabled(false);
-            
-            if (e instanceof IllegalArgumentException == false)
-                e.printStackTrace();
-        }
-        return null;
-    }
     
     private JPanel buildNotesPanel() {
         final JComponent notesTextAndErrors = buildNotesTextArea();
@@ -273,7 +275,7 @@ public class NotesPianoPlayer
         this.playButtons = new PlayControlButtons();
         playButtons.setListener(playController);
         
-        this.formatBars = new JButton("Format");
+        this.formatBars = new JButton("Format Notes");
         formatBars.setToolTipText("Put each Bar into a Separate Line");
         formatBars.addActionListener(new ActionListener() {
             @Override
@@ -334,12 +336,12 @@ public class NotesPianoPlayer
         notesControlPanel.add(formatBars);
         notesControlPanel.add(Box.createRigidArea(new Dimension(1, 6))); // space to other control fields
         
-        timeLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        notesControlPanel.add(timeLayoutPanel);
-        
         tempoLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         notesControlPanel.add(tempoLayoutPanel);
         notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
+        
+        timeLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        notesControlPanel.add(timeLayoutPanel);
         
         writeToNotesCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
         notesControlPanel.add(writeToNotesCheckbox);
