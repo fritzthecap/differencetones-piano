@@ -29,7 +29,7 @@ class PlayController implements PlayControlButtons.Listener
     public void fastBackwardPressed() {
         synchronized(playerLock) {
             if (player != null)
-                startOrStopPlayer(true);
+                startOrStopPlayer(false);
             else
                 currentSoundIndex = -1; // forward will increment
         }
@@ -39,7 +39,7 @@ class PlayController implements PlayControlButtons.Listener
     public void backwardPressed() {
         synchronized(playerLock) {
             if (player != null)
-                startOrStopPlayer(true);
+                startOrStopPlayer(false);
             else
                 skip(false);
         }
@@ -48,10 +48,10 @@ class PlayController implements PlayControlButtons.Listener
     @Override
     public void playPressed() {
         synchronized(playerLock) {
-            final boolean isStop = (player != null);
-            if (isStop == false)
+            final boolean isStart = (player == null);
+            if (isStart == true)
                 skipCurrentSoundIndex(true);
-            startOrStopPlayer(isStop);
+            startOrStopPlayer(isStart);
         }
     }
     
@@ -59,7 +59,7 @@ class PlayController implements PlayControlButtons.Listener
     public void forwardPressed() {
         synchronized(playerLock) {
             if (player != null)
-                startOrStopPlayer(true);
+                startOrStopPlayer(false);
             else
                 skip(true);
         }
@@ -69,7 +69,7 @@ class PlayController implements PlayControlButtons.Listener
     public void fastForwardPressed() {
         synchronized(playerLock) {
             if (player != null)
-                startOrStopPlayer(true);
+                startOrStopPlayer(false);
             else if (sounds != null)
                 currentSoundIndex = sounds.length; // backward will decrement
         }
@@ -170,23 +170,23 @@ class PlayController implements PlayControlButtons.Listener
 
     
     /** Make sure to always call this synchronized(playerLock)! */
-    private void startOrStopPlayer(boolean isStop) {
-        view.playButtons.setPlaying(isStop == false);
+    private void startOrStopPlayer(boolean isStart) {
+        view.playButtons.setPlaying(isStart == true);
         
-        view.enableUiOnPlaying(isStop);
+        view.enableUiOnPlaying(isStart == false);
     
-        if (isStop) {
+        if (isStart) {
+            final Note[] notesArray = readNotesFromTextArea();
+            final Note[][] sounds = view.convertNotesToChords(notesArray); // optional override
+            startPlayer(sounds, true); // thread is running now
+        }
+        else { // is stop
             if (player != null) {
                 player.close();
                 player = null;
             }
             readNotesFromTextArea(); // enable note controls
             view.notesText.requestFocus();
-        }
-        else { // is start
-            final Note[] notesArray = readNotesFromTextArea();
-            final Note[][] sounds = view.convertNotesToChords(notesArray); // optional override
-            startPlayer(sounds, true); // thread is running now
         }
     }
     
@@ -249,7 +249,7 @@ class PlayController implements PlayControlButtons.Listener
         SwingUtilities.invokeLater(() -> { // causes Swing UI updates and thus must run in EDT
             synchronized(playerLock) {
                 if (myPlayer == this.player) { // not stopped by user, do self-stop
-                    startOrStopPlayer(true); // stop true
+                    startOrStopPlayer(false); // stop true
                     
                     if (setSoundsAndIndex) // rewind
                         this.currentSoundIndex = -1;
@@ -280,8 +280,10 @@ class PlayController implements PlayControlButtons.Listener
     }
 
     private void skipCurrentSoundIndex(boolean increment) {
-        if (sounds == null)
+        if (sounds == null) {
+            currentSoundIndex = 0;
             return;
+        }
         
         if (increment) {
             currentSoundIndex++;
