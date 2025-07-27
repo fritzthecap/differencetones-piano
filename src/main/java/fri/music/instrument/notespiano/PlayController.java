@@ -210,6 +210,8 @@ class PlayController implements PlayControlButtons.Listener
         if (setSoundsAndIndex) {
             this.sounds = sounds;
             this.playingReverse = reverse;
+            if (reverse && currentSoundIndex <= 0) // happens when initially pressing "Reverse"
+                currentSoundIndex = sounds.length - 1;
         }
         
         final Player myPlayer = this.player; // remember which player to use
