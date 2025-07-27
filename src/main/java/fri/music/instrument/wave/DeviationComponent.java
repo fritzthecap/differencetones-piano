@@ -28,7 +28,7 @@ public class DeviationComponent
     
     private JSlider buildDeviationSlider(int defaultDeviationPercent, boolean isVertical) {
         final String title = "Deviation Tolerance Percent: ";
-        final String tooltip = "Allowed deviation for finding difference-tones, 100 being the middle between two tones";
+        final String tooltip = "Allowed deviation for finding difference-tones, 100 being the middle between two semitones";
         
         final JSlider deviationSlider = new JSlider(0, 90, defaultDeviationPercent); // min, max, current
         deviationSlider.setBorder(BorderFactory.createTitledBorder(title+defaultDeviationPercent));

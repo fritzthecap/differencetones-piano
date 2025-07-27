@@ -25,7 +25,7 @@ import fri.music.wavegenerator.WaveSoundChannel;
 public class IntervalPlayingPiano extends PianoWithHold
 {
     /** Interval names in interval-choice, sorted by width, index is number of semitone-steps. */
-    protected static final List<String> intervalNames = Arrays.asList(
+    private static final List<String> intervalNames = Arrays.asList(
             "", // no interval
             "Minor Second",
             "Major Second",

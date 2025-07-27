@@ -45,13 +45,18 @@ public class DifferenceToneInversionsDemo
          */
         display(
                 new JustIntonation(BASE_TONE, octaves, ChromaticScales.HARMONIC_SERIES), 
-                DifferenceTones.PRECISE_DEVIATION_JI);
+                DifferenceTones.TOLERANT_DEVIATION_JI);
     }
     
     private static void display(ToneSystem toneSystem, double deviationTolerance) {
+        final int SMALLEST_SEMITONE_STEPS = ToneSystem.semitoneSteps(ToneSystem.MAJOR_SECOND);
+        final int BIGGEST_SEMITONE_STEPS  = ToneSystem.semitoneSteps(ToneSystem.MAJOR_SIXTH); // the MINOR_SEVENTH difference tone is very hard to hear!
+
         final DifferenceToneInversions differenceToneInversions = new DifferenceToneInversions(
                 new DifferenceToneInversions.Configuration(
                     toneSystem.tones(),
+                    SMALLEST_SEMITONE_STEPS,
+                    BIGGEST_SEMITONE_STEPS,
                     deviationTolerance)
             );
         differenceToneInversions.removeDissonant(false);

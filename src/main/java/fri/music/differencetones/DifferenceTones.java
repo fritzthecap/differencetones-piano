@@ -70,6 +70,8 @@ public class DifferenceTones extends Tones
     public static final double TOLERANT_DEVIATION_JI = 0.38; // 76 %
     /** The default deviation. */
     public static final double DEFAULT_DEVIATION = TOLERANT_DEVIATION_JI;
+    /** The maximum deviation. */
+    public static final double MAXIMUM_DEVIATION = 0.45;
     
     public final double deviationTolerance;
     private final boolean primaryDifferenceToneOnly;
@@ -100,8 +102,8 @@ public class DifferenceTones extends Tones
     public DifferenceTones(Tone[] toneSystem, double deviationTolerance, boolean primaryDifferenceToneOnly) {
         super(toneSystem);
         
-        if (deviationTolerance > 0.45 || deviationTolerance < 0.0)
-            throw new IllegalArgumentException("deviationTolerance must be between 0 and 0.45, given was "+deviationTolerance);
+        if (deviationTolerance > MAXIMUM_DEVIATION || deviationTolerance < 0.0)
+            throw new IllegalArgumentException("deviationTolerance must be between 0 and "+MAXIMUM_DEVIATION+", given was "+deviationTolerance);
         
         this.deviationTolerance = deviationTolerance;
         this.primaryDifferenceToneOnly = primaryDifferenceToneOnly;

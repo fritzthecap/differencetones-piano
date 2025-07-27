@@ -23,7 +23,7 @@ public class NotesWithDifferenceTonePianoPlayerDemo
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(
                 octaves, 
                 lowestToneIpnName,
-                //true, // vertical
+                //true, // vertical: IMPOSSIBLE here due to wide tuning-choice
                 13);
         final WaveSoundChannel soundChannel = new SineWaveSoundChannel(null);
         final NotesPianoPlayer player = new NotesWithDifferenceTonePianoPlayer(new DifferenceToneForNotesPiano(config, soundChannel));
