@@ -28,46 +28,74 @@ class PlayController implements PlayControlButtons.Listener
     @Override
     public void fastBackwardPressed() {
         synchronized(playerLock) {
-            startOrStopPlayer(true);
+            if (player != null)
+                startOrStopPlayer(true);
+            else
+                currentSoundIndex = -1; // forward will increment
         }
     }
+    
     @Override
     public void backwardPressed() {
         synchronized(playerLock) {
-            startOrStopPlayer(true);
+            if (player != null)
+                startOrStopPlayer(true);
+            else
+                skip(false);
         }
     }
+    
     @Override
     public void playPressed() {
         synchronized(playerLock) {
             final boolean isStop = (player != null);
+            if (isStop == false)
+                skipCurrentSoundIndex(true);
             startOrStopPlayer(isStop);
         }
     }
+    
     @Override
     public void forwardPressed() {
         synchronized(playerLock) {
-            startOrStopPlayer(true);
+            if (player != null)
+                startOrStopPlayer(true);
+            else
+                skip(true);
         }
     }
+    
     @Override
     public void fastForwardPressed() {
         synchronized(playerLock) {
-            startOrStopPlayer(true);
+            if (player != null)
+                startOrStopPlayer(true);
+            else if (sounds != null)
+                currentSoundIndex = sounds.length; // backward will decrement
         }
     }
     
     // methods called by view
     
+    /** Get a new MelodyFactory with current parameters from UI. */
+    MelodyFactory newMelodyFactory() {
+        final Integer[] timeSignature = view.timeSignatureParts();
+        return new MelodyFactory(
+                null,
+                (Integer) view.tempoSpinner.getValue(),
+                timeSignature[0],
+                timeSignature[1]);
+    }
+
     /** 
      * Enable time-signature and tempo-chooser, optionally clear errors.
-     * This is called on any text input.
+     * This is called on any text input, and also when starting or stopping melody.
+     * @return null when error, else the notes-array from text area.
      */
-    Note[] readNotesFromTextAreaCatchExceptions(boolean clearErrors) {
+    Note[] readNotesFromTextAreaCatchExceptions() {
         try {
             final Note[] notes = readNotesFromTextArea();
-            if (clearErrors)
-                view.getErrorArea().setText(""); // no exception was thrown, so clear errors
+            view.getErrorArea().setText(""); // no exception was thrown, so clear errors
             return notes;
         }
         catch (Exception e) {
@@ -81,55 +109,7 @@ class PlayController implements PlayControlButtons.Listener
         return null;
     }
     
-    /** Get a new MelodyFactory with current parameters from UI. */
-    MelodyFactory newMelodyFactory() {
-        final Integer[] timeSignature = view.timeSignatureParts();
-        return new MelodyFactory(
-                null,
-                (Integer) view.tempoSpinner.getValue(),
-                timeSignature[0],
-                timeSignature[1]);
-    }
-
     // privates
-    
-    /** Make sure to always call this synchronized(playerLock)! */
-    private void startOrStopPlayer(boolean isStop) {
-        view.playButtons.setPlaying(isStop == false);
-        
-        view.enableUiOnPlaying(isStop);
-    
-        if (isStop) {
-            if (player != null) {
-                player.close();
-                player = null;
-            }
-            readNotesFromTextAreaCatchExceptions(false);
-            view.notesText.requestFocus();
-        }
-        else { // is start
-            final Note[] notesArray = readNotesFromTextAreaCatchExceptions(true);
-            
-            // disable controls that may have been enabled by readNotesFromTextArea()
-            view.timeSignatureChoice.setEnabled(false);
-            view.tempoSpinner.setEnabled(false);
-            view.formatBars.setEnabled(false);
-            
-            startPlayer(notesArray); // thread is running now
-        }
-    }
-    
-    /** This method is synchronized(playerLock) because called from startOrStopPlayer() only. */
-    private void startPlayer(Note[] notesArray) {
-        final Note[][] chords = view.convertNotesToChords(notesArray); // optional override
-        
-        final SoundChannel pianoKeyConnector = new PianoKeyConnector(view.piano);
-        this.player = new Player(pianoKeyConnector); // is synchronized because called from startOrStop()
-
-        // to allow "Stop" while playing, all playing happens in a background thread
-        final Thread playerThread = new Thread(() -> playNotes(chords));
-        playerThread.start();
-    }
     
     private Note[] readNotesFromTextArea() throws IllegalArgumentException { // exceptions coming from MelodyFactory
         final String notesString = view.notesText.getText();
@@ -188,22 +168,63 @@ class PlayController implements PlayControlButtons.Listener
                     throw new IllegalArgumentException("Note is not in keyboard range: "+note.ipnName);
     }
 
+    
+    /** Make sure to always call this synchronized(playerLock)! */
+    private void startOrStopPlayer(boolean isStop) {
+        view.playButtons.setPlaying(isStop == false);
+        
+        view.enableUiOnPlaying(isStop);
+    
+        if (isStop) {
+            if (player != null) {
+                player.close();
+                player = null;
+            }
+            readNotesFromTextArea(); // enable note controls
+            view.notesText.requestFocus();
+        }
+        else { // is start
+            final Note[] notesArray = readNotesFromTextArea();
+            final Note[][] sounds = view.convertNotesToChords(notesArray); // optional override
+            startPlayer(sounds, true); // thread is running now
+        }
+    }
+    
+    /** Make sure to always call this synchronized(playerLock)! */
+    private void startPlayer(Note[][] sounds, boolean setSoundsAndIndex) {
+        // disable controls that may have been enabled by readNotesFromTextArea()
+        view.timeSignatureChoice.setEnabled(false);
+        view.tempoSpinner.setEnabled(false);
+        view.formatBars.setEnabled(false);
+        
+        final SoundChannel pianoKeyConnector = new PianoKeyConnector(view.piano);
+        this.player = new Player(pianoKeyConnector); // is synchronized because called from startOrStop()
+
+        // to allow "Stop" while playing, all playing happens in a background thread
+        final Thread playerThread = new Thread(() -> playNotes(sounds, setSoundsAndIndex));
+        playerThread.start();
+    }
+    
     /** 
      * Plays given sounds and strikes according piano keys.
      * This method runs in a background-thread (to be interruptable), 
      * so any call to Swing must happen via SwingUtilities.invokeXXX().
      * @param sounds the intervals or chords to play on piano.
      */
-    private void playNotes(Note[][] sounds) {
-        this.sounds = sounds;
+    private void playNotes(Note[][] sounds, boolean setSoundsAndIndex) {
+        if (setSoundsAndIndex)
+            this.sounds = sounds;
         
         final Player myPlayer = this.player; // remember which player to use
         
         boolean interrupted = false;
         RuntimeException exception = null;
+        int startIndex = setSoundsAndIndex ? this.currentSoundIndex : 0; // 0 = single note play
         
-        for (int i = 0; interrupted == false && exception == null && i < sounds.length; i++) { // play all notes
-            this.currentSoundIndex = i;
+        for (int i = startIndex; interrupted == false && exception == null && i < sounds.length; i++) { // play all notes
+            if (setSoundsAndIndex)
+                this.currentSoundIndex = i;
+            
             final Note[] currentSound = sounds[i];
             try {
                 SwingUtilities.invokeAndWait(() -> { // waits synchronously for each note
@@ -222,14 +243,55 @@ class PlayController implements PlayControlButtons.Listener
             }
         }
         
+        if (interrupted)
+            this.currentSoundIndex--;
+
         SwingUtilities.invokeLater(() -> { // causes Swing UI updates and thus must run in EDT
             synchronized(playerLock) {
-                if (myPlayer == this.player) // not stopped by user, do self-stop
-                    startOrStopPlayer(true);
+                if (myPlayer == this.player) { // not stopped by user, do self-stop
+                    startOrStopPlayer(true); // stop true
+                    
+                    if (setSoundsAndIndex) // rewind
+                        this.currentSoundIndex = -1;
+                }
             }
         });
         
         if (exception != null) // throw only after correct termination
             throw exception;
+    }
+    
+    
+    private void skip(boolean forward) {
+        if (sounds == null) {
+            final Note[] notesArray = readNotesFromTextArea();
+            sounds = view.convertNotesToChords(notesArray); 
+            currentSoundIndex = -1;
+        }
+
+        int startIndex = currentSoundIndex;
+        do { // search for a non-rest note
+            skipCurrentSoundIndex(forward);
+        }
+        while (startIndex != currentSoundIndex && sounds[currentSoundIndex][0].isRest());
+        
+        if (sounds[currentSoundIndex][0].isRest() == false)
+            startPlayer(new Note[][] { sounds[currentSoundIndex] }, false);
+    }
+
+    private void skipCurrentSoundIndex(boolean increment) {
+        if (sounds == null)
+            return;
+        
+        if (increment) {
+            currentSoundIndex++;
+            if (currentSoundIndex >= sounds.length)
+                currentSoundIndex = 0;
+        }
+        else {
+            currentSoundIndex--;
+            if (currentSoundIndex < 0)
+                currentSoundIndex = sounds.length - 1;
+        }
     }
 }

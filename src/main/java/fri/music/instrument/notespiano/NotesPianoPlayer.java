@@ -84,7 +84,7 @@ public class NotesPianoPlayer
             notesText.setCaretPosition(melody.length());
         }
         else { // enable or disable all buttons
-            playController.readNotesFromTextAreaCatchExceptions(true);
+            playController.readNotesFromTextAreaCatchExceptions();
         }
         
         // listen to piano mouse clicks and write notes into text-area
@@ -204,15 +204,15 @@ public class NotesPianoPlayer
         notesText.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void removeUpdate(DocumentEvent e) {
-                playController.readNotesFromTextAreaCatchExceptions(true);
+                playController.readNotesFromTextAreaCatchExceptions();
             }
             @Override
             public void insertUpdate(DocumentEvent e) {
-                playController.readNotesFromTextAreaCatchExceptions(true);
+                playController.readNotesFromTextAreaCatchExceptions();
             }
             @Override
             public void changedUpdate(DocumentEvent e) {
-                playController.readNotesFromTextAreaCatchExceptions(true);
+                playController.readNotesFromTextAreaCatchExceptions();
             }
         });
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
@@ -397,7 +397,7 @@ public class NotesPianoPlayer
     }
 
     private void formatNotes() {
-        final Note[] notes = playController.readNotesFromTextAreaCatchExceptions(true);
+        final Note[] notes = playController.readNotesFromTextAreaCatchExceptions();
         if (notes != null) {
             final String formatted = playController.newMelodyFactory().toString(
                     notes, 
