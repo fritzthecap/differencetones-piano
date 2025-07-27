@@ -22,6 +22,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -298,6 +300,13 @@ public class NotesPianoPlayer
                 4); // step width
         this.tempoSpinner = new JSpinner(tempoModel);
         tempoSpinner.setToolTipText("Beats Per Minute");
+        tempoSpinner.addChangeListener(new ChangeListener() {
+            /** Tempo change should reload PlayController (like editing notes text does). */
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                readNotesFromTextAreaCatchExceptions();
+            }
+        });
         final JPanel tempoLayoutPanel = new SmartPanel(new BorderLayout()); // without this panel, field would be sized vertically
         tempoLayoutPanel.add(tempoSpinner, piano.config.isVertical ? BorderLayout.WEST : BorderLayout.NORTH);
         tempoLayoutPanel.setBorder(BorderFactory.createTitledBorder("Tempo"));

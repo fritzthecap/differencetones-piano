@@ -1,6 +1,7 @@
 package fri.music.instrument.notespiano;
 
 import java.util.List;
+import java.util.Objects;
 import javax.swing.SwingUtilities;
 import fri.music.SoundChannel;
 import fri.music.instrument.PianoWithSound;
@@ -62,7 +63,7 @@ class PlayController implements PlayControlButtons.Listener
     
     Note[] readNotesFromTextArea(boolean clearCurrentSounds) throws IllegalArgumentException {
         if (clearCurrentSounds)
-            sounds = null;
+            sounds = null; // currentSoundIndex stays on its value, to further support single-steps
         
         final String notesString = view.notesText.getText();
         final boolean enable;
@@ -204,24 +205,23 @@ class PlayController implements PlayControlButtons.Listener
      * This method runs in a background-thread (to be interruptable), 
      * so any call to Swing must happen via SwingUtilities.invokeXXX().
      * @param sounds the intervals or chords to play on piano.
-     * @param setSoundsAndIndex hen false, this is a single-step play, else it plays more.
+     * @param continualPlaying when false, this is a single-step play, else it plays more.
      */
-    private void playNotes(Note[][] sounds, boolean setSoundsAndIndex, boolean reverse) {
-        if (setSoundsAndIndex) {
-            this.sounds = sounds;
+    private void playNotes(Note[][] sounds, boolean continualPlaying, boolean reverse) {
+        if (continualPlaying) {
+            this.sounds = Objects.requireNonNull(sounds);
             this.playingReverse = reverse;
-            if (reverse && currentSoundIndex <= 0) // happens when initially pressing "Reverse"
-                currentSoundIndex = sounds.length - 1;
+            ensureExistingStartingIndex();
         }
         
         final Player myPlayer = this.player; // remember which player to use
         
         boolean interrupted = false;
         RuntimeException exception = null;
-        int startIndex = setSoundsAndIndex ? Math.max(currentSoundIndex, 0) : 0; // 0 = single note play
+        final int startIndex = continualPlaying ? currentSoundIndex : 0; // 0 = single note play
         
         for (int i = startIndex; interrupted == false && exception == null && i >= 0 && i < sounds.length; ) { // play all notes
-            if (setSoundsAndIndex)
+            if (continualPlaying)
                 currentSoundIndex = i;
             
             final Note[] currentSound = sounds[i];
@@ -258,7 +258,7 @@ class PlayController implements PlayControlButtons.Listener
                 if (myPlayer == this.player) { // not stopped by user, do self-stop
                     startOrStopPlayer(false, playingReverse);
                     
-                    if (setSoundsAndIndex) // rewind
+                    if (continualPlaying) // rewind
                         this.currentSoundIndex = -1;
                 }
             }
@@ -267,12 +267,29 @@ class PlayController implements PlayControlButtons.Listener
         if (exception != null) // throw only after correct termination
             throw exception;
     }
+
+    
+    private void ensureExistingStartingIndex() {
+        final int firstIndex = 0;
+        final int lastIndex = sounds.length - 1;
+        
+        if (playingReverse == true && 
+                (currentSoundIndex <= firstIndex || // happens when initially pressing "Reverse"
+                 currentSoundIndex > lastIndex))
+            currentSoundIndex = lastIndex;
+        
+        if (playingReverse == false && 
+                (currentSoundIndex >= lastIndex ||
+                currentSoundIndex < firstIndex))
+            currentSoundIndex = firstIndex;
+    }
     
     
     private void skip(boolean forward) {
         if (sounds == null) { // no "Play" was pressed before "Skip to Next"
             final Note[] notesArray = readNotesFromTextArea(false);
             sounds = view.convertNotesToChords(notesArray);
+            
             if (currentSoundIndex == 0) // if initial state
                 currentSoundIndex = -1; // will be changed below
         }
