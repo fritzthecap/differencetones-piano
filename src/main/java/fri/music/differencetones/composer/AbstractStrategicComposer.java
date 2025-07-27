@@ -15,8 +15,13 @@ import fri.music.player.Note;
  */
 public abstract class AbstractStrategicComposer extends AbstractComposer
 {
-    protected AbstractStrategicComposer(Tone[] tones, double deviationTolerance) {
-        super(tones, deviationTolerance);
+    protected AbstractStrategicComposer(
+            Tone[] tones, 
+            String narrowestInterval, 
+            String widestInterval, 
+            double deviationTolerance)
+    {
+        super(tones, narrowestInterval, widestInterval, deviationTolerance);
     }
 
     /**

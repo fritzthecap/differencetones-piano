@@ -19,9 +19,18 @@ public abstract class AbstractComposer
 {
     protected final Tone[] tones;
     protected final double deviationTolerance;
+    protected final String narrowestInterval; 
+    protected final String widestInterval; 
     
-    protected AbstractComposer(Tone[] tones, double deviationTolerance) {
+    protected AbstractComposer(
+            Tone[] tones, 
+            String narrowestInterval, 
+            String widestInterval, 
+            double deviationTolerance)
+    {
         this.tones = Objects.requireNonNull(tones);
+        this.narrowestInterval = narrowestInterval;
+        this.widestInterval = widestInterval;
         this.deviationTolerance = deviationTolerance;
     }
 
@@ -96,7 +105,7 @@ public abstract class AbstractComposer
      */
     private final Map<NoteWithIndex,TonePair> buildMap(Note[] melody, DifferenceToneInversions inversions) {
         if (inversions == null) // call default when null
-            inversions = createInversions(melody, null, null);
+            inversions = createInversions(melody, narrowestInterval, widestInterval);
         
         final List<Note> melodyList = Arrays.asList(melody);
         final Note lowest  = melodyList.stream().min((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();

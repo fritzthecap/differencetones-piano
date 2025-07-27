@@ -16,8 +16,22 @@ public class DefaultComposer extends AbstractStrategicComposer
 {
     private final List<Strategy> strategies = new ArrayList<>();
 
-    public DefaultComposer(Tone[] tones, double deviationTolerance) {
-        super(tones, deviationTolerance);
+    /**
+     * @param tones required, the tone-system to use.
+     * @param narrowestInterval optional, the smallest allowed difference-tone inversion interval.
+     * @param widestInterval optional, the biggest allowed difference-tone inversion interval.
+     * @param deviationTolerance optional, the allowed deviation of a difference-tone from the real tone,
+     *      0.4 would mean the difference-tone is allowed to be 0.4 of a semi-tone
+     *      away from a real tone of the given tone-system. Mind that 0.45 is the maximum allowed.
+     *      Pass -1.0 to get a default deviation.
+     */
+    public DefaultComposer(
+            Tone[] tones, 
+            String narrowestInterval, 
+            String widestInterval, 
+            double deviationTolerance)
+    {
+        super(tones, narrowestInterval, widestInterval, deviationTolerance);
     }
     
     @Override
