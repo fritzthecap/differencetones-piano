@@ -13,6 +13,7 @@ import fri.music.instrument.PianoWithVolume;
 import fri.music.instrument.wave.DeviationComponent;
 import fri.music.instrument.wave.DifferenceToneUtil;
 import fri.music.instrument.wave.TuningComponent;
+import fri.music.swingutils.ButtonUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -151,6 +152,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
             if (originalBorder == null) // save original border for reset
                 originalBorder = key.getBorder();
             key.setBorder(select ? redBorder : originalBorder);
+            ButtonUtil.visualSelect(key, select);
         }
     }
 }

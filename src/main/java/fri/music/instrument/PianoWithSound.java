@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import fri.music.ScaleTypes;
 import fri.music.SoundChannel;
 import fri.music.ToneSystem;
+import fri.music.swingutils.ButtonUtil;
 
 /**
  * Piano keyboard user-interface with 12 white and black keys.
@@ -238,17 +239,7 @@ public class PianoWithSound extends Piano
         }
         
         protected void visualSelect(Keyboard.Key key, boolean pressed) {
-            // START keep order: this should not trigger an action!
-            // See AbstractButton.doClick() for necessary order of calls to trigger an action
-            if (pressed) {
-                key.getModel().setPressed(pressed);
-                key.getModel().setArmed(pressed);
-            }
-            else {
-                key.getModel().setArmed(pressed);
-                key.getModel().setPressed(pressed);
-            }
-            // END keep order
+            ButtonUtil.visualSelect(key, pressed);
         }
         
         protected Keyboard.Key getKey(MouseEvent e) {
