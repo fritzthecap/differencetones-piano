@@ -18,7 +18,9 @@ import fri.music.wavegenerator.WaveSoundChannel;
 /**
  * Piano that displays the difference-tone with a red border
  * when two (high) notes are played together.
- * This is not possible with a mouse, so you need notes to drive this.
+ * This is not possible with mouse-buttons, so you need notes
+ * in a <code>Player</code> with <code>PianoKeyConnector</code>
+ * to drive this piano.
  */
 public class DifferenceToneForNotesPiano extends PianoWithVolume
 {

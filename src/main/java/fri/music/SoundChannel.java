@@ -10,7 +10,7 @@ public interface SoundChannel
     int MAXIMUM_VOLUME = 127;
     
     /** 
-     * Start to play given tone.
+     * Start to play given tone and return immediately.
      * @param midiNoteNumber the number of the MIDI note to play.
      * @param velocity MIDI strike force, 0-127.
      */

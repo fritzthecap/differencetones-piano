@@ -5,8 +5,8 @@ import fri.music.SoundChannel;
 import fri.music.ToneSystem;
 
 /**
- * Primitive notes player. 
- * All methods wait for the note to finish playing.
+ * Primitive synchronous notes player. 
+ * All methods return only when the note finished playing.
  */
 public class Player
 {
@@ -61,7 +61,7 @@ public class Player
                 if (chord[i].durationMilliseconds > millisToWait)
                     millisToWait = chord[i].durationMilliseconds;
         
-        if (stopped || millisToWait <= 0) // could happen on tied notes
+        if (stopped || millisToWait <= 0) // zero could happen on tied notes
             return;
         
         turnNotesOnOrOff(chord, true);
