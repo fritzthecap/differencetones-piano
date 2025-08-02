@@ -3,11 +3,8 @@ package fri.music.instrument.notespiano.wave;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import fri.music.ToneSystem;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
@@ -20,29 +17,15 @@ import fri.music.player.Note;
  */
 public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
 {
-    private static final String[] narrowestIntervalNames = new String[] {
-            ToneSystem.MAJOR_SECOND,
-            ToneSystem.MINOR_THIRD,
-            ToneSystem.MAJOR_THIRD,
-            ToneSystem.FOURTH
-        };
-    private static final String[] widestIntervalNames = new String[] {
-            ToneSystem.FIFTH,
-            ToneSystem.MINOR_SIXTH,
-            ToneSystem.MAJOR_SIXTH,
-            ToneSystem.MINOR_SEVENTH
-        };
-
     private JComponent playerPanel; // the component
     private JCheckBox convertToDifferenceTones;
-    private JComboBox<String> narrowestIntervalChoice;
-    private JComboBox<String> widestIntervalChoice;
+    private IntervalRangeComponent intervalRange;
     
     public NotesWithDifferenceTonePianoPlayer(DifferenceToneForNotesPiano piano) {
         super(piano);
     }
     
-    /** Adds a "Difference Tones" checkbox on control-panel. */
+    /** Adds a "Difference Tones" checkbox and others on control-panel. */
     @Override
     public JComponent getPlayer(String melody) {
         if (this.playerPanel != null)
@@ -61,46 +44,35 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         };
         convertToDifferenceTones.addActionListener(resetPlayerListener);
         
-        this.narrowestIntervalChoice = new JComboBox<String>(narrowestIntervalNames);
-        narrowestIntervalChoice.setBorder(BorderFactory.createTitledBorder("Narrowest Interval"));
-        narrowestIntervalChoice.setToolTipText("Narrowest Allowed Interval for Generating Difference Tones");
-        narrowestIntervalChoice.setSelectedItem(ToneSystem.MINOR_THIRD); // make good default
-        narrowestIntervalChoice.addActionListener(resetPlayerListener);
-        
-        this.widestIntervalChoice = new JComboBox<String>(widestIntervalNames);
-        widestIntervalChoice.setBorder(BorderFactory.createTitledBorder("Widest Interval"));
-        widestIntervalChoice.setToolTipText("Widest Allowed Interval for Generating Difference Tones");
-        widestIntervalChoice.setSelectedItem(ToneSystem.MAJOR_SIXTH);
-        widestIntervalChoice.addActionListener(resetPlayerListener);
+        this.intervalRange = new IntervalRangeComponent(resetPlayerListener, resetPlayerListener);
         
         convertToDifferenceTones.setAlignmentX(Component.CENTER_ALIGNMENT);
         getNotesControlPanel().add(convertToDifferenceTones, 1); // add below "Play" button
-        narrowestIntervalChoice.setAlignmentX(Component.CENTER_ALIGNMENT);
-        getNotesControlPanel().add(narrowestIntervalChoice, 2);
-        widestIntervalChoice.setAlignmentX(Component.CENTER_ALIGNMENT);
-        getNotesControlPanel().add(widestIntervalChoice, 3);
+        intervalRange.getNarrowestChoice().setAlignmentX(Component.CENTER_ALIGNMENT);
+        getNotesControlPanel().add(intervalRange.getNarrowestChoice(), 2);
+        intervalRange.getWidestChoice().setAlignmentX(Component.CENTER_ALIGNMENT);
+        getNotesControlPanel().add(intervalRange.getWidestChoice(), 3);
         
         convertToDifferenceTones.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 final boolean playDifferenceTones = ((JCheckBox) e.getSource()).isSelected();
-                narrowestIntervalChoice.setEnabled(playDifferenceTones);
-                widestIntervalChoice.setEnabled(playDifferenceTones);
+                intervalRange.getNarrowestChoice().setEnabled(playDifferenceTones);
+                intervalRange.getWidestChoice().setEnabled(playDifferenceTones);
             }
         });
         
         return this.playerPanel = playerPanel;
     }
     
-    /** Overridden to disable several <code>DifferenceTonePiano</code> controls on playing. */
+    /** Overridden to disable several <code>DifferenceToneForNotesPiano</code> controls on playing. */
     @Override
     protected void enableUiOnPlaying(boolean isStop) {
         super.enableUiOnPlaying(isStop);
         
-        final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceTonePiano();
-        differenceTonePiano.setTuningControlsEnabled(isStop);
-        
+        getDifferenceTonePiano().setTuningControlsEnabled(isStop);
         convertToDifferenceTones.setEnabled(isStop);
+        intervalRange.setEnabled(isStop);
     }
     
     /** Overridden to alternatively generate difference-tone intervals when playing. */
@@ -110,8 +82,8 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
             final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceTonePiano();
             final AbstractComposer composer = new DefaultComposer(
                     differenceTonePiano.getWaveSoundChannel().getTones(),
-                    narrowestAllowedInterval(),
-                    widestAllowedInterval(),
+                    intervalRange.narrowestAllowedInterval(),
+                    intervalRange.widestAllowedInterval(),
                     differenceTonePiano.getDeviation());
             try {
                 return composer.compose(notesArray);
@@ -122,14 +94,6 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
             }
         }
         return super.convertNotesToChords(notesArray);
-    }
-
-    private String narrowestAllowedInterval() {
-        return (String) narrowestIntervalChoice.getSelectedItem();
-    }
-
-    private String widestAllowedInterval() {
-        return (String) widestIntervalChoice.getSelectedItem();
     }
 
     private DifferenceToneForNotesPiano getDifferenceTonePiano() {

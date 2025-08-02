@@ -23,6 +23,8 @@ class PlayController implements PlayControlButtons.Listener
     private int currentSoundIndex;
     private boolean playingReverse;
     
+    private SoundChannel pianoKeyConnector;
+    
     PlayController(NotesPianoPlayer view) {
         this.view = view;
     }
@@ -33,27 +35,30 @@ class PlayController implements PlayControlButtons.Listener
     public void fastBackwardPressed() {
         gotoStartOrEnd(true);
     }
-    
     @Override
     public void backwardPressed() {
-        playStep(false);
+        playSingleNote(false, true);
     }
-    
+    @Override
+    public void backwardReleased() {
+        playSingleNote(false, false);
+    }
     @Override
     public void reversePressed() {
-        playContinually(true);
+        playMelodyContinually(true);
     }
-    
     @Override
     public void playPressed() {
-        playContinually(false);
+        playMelodyContinually(false);
     }
-    
     @Override
     public void forwardPressed() {
-        playStep(true);
+        playSingleNote(true, true);
     }
-    
+    @Override
+    public void forwardReleased() {
+        playSingleNote(true, false);
+    }
     @Override
     public void fastForwardPressed() {
         gotoStartOrEnd(false);
@@ -111,7 +116,7 @@ class PlayController implements PlayControlButtons.Listener
     // helpers
     
     /** "Play" or "Reverse" callback. */
-    private void playContinually(boolean reverse) {
+    private void playMelodyContinually(boolean reverse) {
         synchronized(playerLock) {
             final boolean isStart = (player == null);
             if (isStart == false) { // currently playing, either reverse or forward
@@ -127,12 +132,12 @@ class PlayController implements PlayControlButtons.Listener
     }
     
     /** Single step callback. */
-    private void playStep(boolean forward) {
+    private void playSingleNote(boolean forward, boolean buttonPressed) {
         synchronized(playerLock) {
             if (player != null)
                 startOrStopPlayer(false, playingReverse); // stop when currently playing
             else
-                skip(forward); // play single note
+                skip(forward, buttonPressed); // play single note
         }
     }
     
@@ -173,7 +178,7 @@ class PlayController implements PlayControlButtons.Listener
         if (isStart) {
             final Note[] notesArray = readNotesFromTextArea(false);
             final Note[][] sounds = view.convertNotesToChords(notesArray); // optional override
-            startPlayer(sounds, true, reverse); // thread is running now
+            startPlayer(sounds, reverse); // thread is running now
         }
         else { // is stop
             if (player != null) {
@@ -186,17 +191,16 @@ class PlayController implements PlayControlButtons.Listener
     }
     
     /** Make sure to always call this synchronized(playerLock)! */
-    private void startPlayer(Note[][] sounds, boolean setSoundsAndIndex, boolean reverse) {
+    private void startPlayer(Note[][] sounds, boolean reverse) {
         // disable controls that may have been enabled by readNotesFromTextArea()
         view.timeSignatureChoice.setEnabled(false);
         view.tempoSpinner.setEnabled(false);
         view.formatBars.setEnabled(false);
         
-        final SoundChannel pianoKeyConnector = new PianoKeyConnector(view.piano);
-        this.player = new Player(pianoKeyConnector); // is synchronized because called from startOrStop()
+        this.player = new Player(pianoKeyConnector()); // is synchronized because called from startOrStop()
 
         // to allow "Stop" while playing, all playing happens in a background thread
-        final Thread playerThread = new Thread(() -> playNotes(sounds, setSoundsAndIndex, reverse));
+        final Thread playerThread = new Thread(() -> playNotes(sounds, reverse));
         playerThread.start();
     }
     
@@ -205,24 +209,20 @@ class PlayController implements PlayControlButtons.Listener
      * This method runs in a background-thread (to be interruptable), 
      * so any call to Swing must happen via SwingUtilities.invokeXXX().
      * @param sounds the intervals or chords to play on piano.
-     * @param continualPlaying when false, this is a single-step play, else it plays more.
+     * @param playingReverse false when playing backward, true when playing forward.
      */
-    private void playNotes(Note[][] sounds, boolean continualPlaying, boolean reverse) {
-        if (continualPlaying) {
-            this.sounds = Objects.requireNonNull(sounds);
-            this.playingReverse = reverse;
-            ensureExistingStartingIndex();
-        }
+    private void playNotes(Note[][] sounds, boolean playingReverse) {
+        this.sounds = Objects.requireNonNull(sounds);
+        this.playingReverse = playingReverse;
+        ensureExistingStartingIndex();
         
         final Player myPlayer = this.player; // remember which player to use
         
         boolean interrupted = false;
         RuntimeException exception = null;
-        final int startIndex = continualPlaying ? currentSoundIndex : 0; // 0 = single note play
         
-        for (int i = startIndex; interrupted == false && exception == null && i >= 0 && i < sounds.length; ) { // play all notes
-            if (continualPlaying)
-                currentSoundIndex = i;
+        for (int i = currentSoundIndex; interrupted == false && exception == null && i >= 0 && i < sounds.length; ) { // play all notes
+            currentSoundIndex = i;
             
             final Note[] currentSound = sounds[i];
             try {
@@ -241,14 +241,14 @@ class PlayController implements PlayControlButtons.Listener
                 interrupted = (myPlayer != this.player); // "Stop" button was pressed
             }
             
-            if (reverse)
+            if (playingReverse)
                 i--;
             else
                 i++;
         }
         
         if (interrupted) // was stopped but already incremented/decremented, correct that
-            if (reverse)
+            if (playingReverse)
                 currentSoundIndex++;
             else
                 currentSoundIndex--;
@@ -257,9 +257,7 @@ class PlayController implements PlayControlButtons.Listener
             synchronized(playerLock) {
                 if (myPlayer == this.player) { // not stopped by user, do self-stop
                     startOrStopPlayer(false, playingReverse);
-                    
-                    if (continualPlaying) // rewind
-                        this.currentSoundIndex = -1;
+                    this.currentSoundIndex = -1;
                 }
             }
         });
@@ -285,24 +283,33 @@ class PlayController implements PlayControlButtons.Listener
     }
     
     
-    private void skip(boolean forward) {
-        if (sounds == null) { // no "Play" was pressed before "Skip to Next"
-            final Note[] notesArray = readNotesFromTextArea(false);
-            sounds = view.convertNotesToChords(notesArray);
+    private void skip(boolean forward, boolean buttonPressed) {
+        if (buttonPressed == false) { // released
+            for (Note note : sounds[currentSoundIndex])
+                pianoKeyConnector.noteOff(note.midiNumber);
             
-            if (currentSoundIndex == 0) // if initial state
-                currentSoundIndex = -1; // will be changed below
+            view.enableUiOnPlaying(true);
         }
+        else {
+            if (sounds == null) { // no "Play" was pressed before "Forward"
+                final Note[] notesArray = readNotesFromTextArea(false);
+                sounds = view.convertNotesToChords(notesArray);
+                
+                if (currentSoundIndex == 0) // if initial state
+                    currentSoundIndex = -1; // will be changed below
+            }
 
-        int startIndex = Math.max(0, currentSoundIndex);
-        do { // search for a non-rest note
-            skipCurrentSoundIndex(forward);
-        }
-        while (startIndex != currentSoundIndex && sounds[currentSoundIndex][0].isRest());
-        
-        if (sounds[currentSoundIndex][0].isRest() == false) {
-            synchronized(playerLock) {
-                startPlayer(new Note[][] { sounds[currentSoundIndex] }, false, false);
+            final int startIndex = Math.max(0, currentSoundIndex);
+            do { // search for a non-rest note
+                skipCurrentSoundIndex(forward);
+            }
+            while (startIndex != currentSoundIndex && sounds[currentSoundIndex][0].isRest());
+            
+            if (sounds[currentSoundIndex][0].isRest() == false) {
+                view.enableUiOnPlaying(false);
+
+                for (Note note : sounds[currentSoundIndex])
+                    pianoKeyConnector().noteOn(note.midiNumber, note.volume);
             }
         }
     }
@@ -320,5 +327,11 @@ class PlayController implements PlayControlButtons.Listener
                     currentSoundIndex = sounds.length - 1;
             }
         }
+    }
+    
+    private SoundChannel pianoKeyConnector() {
+        if (pianoKeyConnector == null)
+            pianoKeyConnector = new PianoKeyConnector(view.piano);
+        return pianoKeyConnector;
     }
 }

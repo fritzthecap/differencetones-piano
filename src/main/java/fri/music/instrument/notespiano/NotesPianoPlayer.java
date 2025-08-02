@@ -272,8 +272,7 @@ public class NotesPianoPlayer
     }
     
     private JPanel buildNotesControlPanel() {
-        this.playButtons = new PlayControlButtons();
-        playButtons.setListener(playController);
+        this.playButtons = new PlayControlButtons(playController);
         
         this.formatBars = new JButton("Format Notes");
         formatBars.setToolTipText("Put each Bar into a Separate Line");

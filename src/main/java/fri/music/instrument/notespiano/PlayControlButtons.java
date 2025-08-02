@@ -5,6 +5,9 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Objects;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -23,6 +26,8 @@ class PlayControlButtons extends JPanel
         void playPressed();
         void fastForwardPressed();
         void forwardPressed();
+        void backwardReleased();
+        void forwardReleased();
     }
     
     private static final String REVERSE = "\u23F4";
@@ -38,16 +43,18 @@ class PlayControlButtons extends JPanel
     
     private Listener listener;
     
-    PlayControlButtons() {
+    PlayControlButtons(Listener listener) {
+        this.listener = Objects.requireNonNull(listener);
+        
         final BoxLayout layout = new BoxLayout(this, BoxLayout.X_AXIS);
         setLayout(layout);
         
-        add(fastBackward = newButton("\u23EE", "Rewind to Start"));
-        add(backward     = newButton("\u23EA", "Play Previous Note"));
-        add(reverse      = newButton(REVERSE, "Play Notes in Textarea in Reverse Order"));
-        add(play         = newButton(PLAY, "Play Notes in Textarea on Piano"));
-        add(forward      = newButton("\u23E9", "Play Next Note"));
-        add(fastForward  = newButton("\u23ED", "Go to End"));
+        add(this.fastBackward = newButton("\u23EE", "Rewind to Start", false));
+        add(this.backward     = newButton("\u23EA", "Play Previous Note", true));
+        add(this.reverse      = newButton(REVERSE, "Play Notes in Textarea in Reverse Order", false));
+        add(this.play         = newButton(PLAY, "Play Notes in Textarea on Piano", false));
+        add(this.forward      = newButton("\u23E9", "Play Next Note", true));
+        add(this.fastForward  = newButton("\u23ED", "Go to End", false));
     }
 
     /** Overridden to delegate enabling to buttons. */
@@ -61,11 +68,6 @@ class PlayControlButtons extends JPanel
         fastForward.setEnabled(enabled);
     }
     
-    /** Called by controller, sets it as listener. */
-    void setListener(Listener listener) {
-        this.listener = listener;
-    }
-
     /** Called by controller, sets the correct icon on "Play" button. */
     void setPlaying(boolean playing, boolean isReverse) {
         if (isReverse)
@@ -75,7 +77,7 @@ class PlayControlButtons extends JPanel
     }
 
     
-    private JButton newButton(String text, String tooltip) {
+    private JButton newButton(String text, String tooltip, boolean isSingleStepButton) {
         final JButton button = new JButton(text);
         button.setToolTipText(tooltip);
         // make font bigger for UNICODE letters
@@ -87,34 +89,43 @@ class PlayControlButtons extends JPanel
         button.setPreferredSize(size);
         button.setMaximumSize(size);
         button.setMinimumSize(size);
+        
         // install listener callbacks
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (listener != null)
+        if (isSingleStepButton)
+            button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    if (e.getSource() == backward)
+                        listener.backwardPressed();
+                    else if (e.getSource() == forward)
+                        listener.forwardPressed();
+                }
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (e.getSource() == backward)
+                        listener.backwardReleased();
+                    else if (e.getSource() == forward)
+                        listener.forwardReleased();
+                }
+            });
+        else
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (listener == null)
+                        throw new IllegalStateException("You forgot to set a button listener!");
+                    
                     if (e.getSource() == fastBackward)
                         listener.fastBackwardPressed();
-                    else if (e.getSource() == backward)
-                        listener.backwardPressed();
                     else if (e.getSource() == reverse)
                         listener.reversePressed();
                     else if (e.getSource() == play)
                         listener.playPressed();
-                    else if (e.getSource() == forward)
-                        listener.forwardPressed();
                     else if (e.getSource() == fastForward)
                         listener.fastForwardPressed();
-            }
-        });
+                }
+            });
+            
         return button;
-    }
-
-    public static void main(String[] args) {
-        javax.swing.JFrame f = new javax.swing.JFrame();
-        f.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-        f.getContentPane().add(new PlayControlButtons());
-        f.setSize(new Dimension(600, 200));
-        f.setLocationRelativeTo(null);
-        f.setVisible(true);
     }
 }
