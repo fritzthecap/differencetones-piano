@@ -1,4 +1,4 @@
-package fri.music.instrument.notespiano.wave;
+package fri.music.instrument.wave;
 
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;

@@ -29,6 +29,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import fri.music.instrument.PianoWithSound;
+import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;

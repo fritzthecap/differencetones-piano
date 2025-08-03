@@ -1,4 +1,4 @@
-package fri.music.instrument.notespiano;
+package fri.music.instrument.wave;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
@@ -9,18 +9,18 @@ import fri.music.swingutils.ButtonUtil;
 
 /**
  * Used as <code>SoundChannel</code> for <code>Player</code>, 
- * connects notes to the piano's keys.
- * That way <code>NotesPiano</code> never accesses the piano's
+ * connects notes to the according piano's keys.
+ * That way <code>NotesPianoPlayer</code> never accesses the piano's
  * <code>SoundChannel</code> directly, instead it always plays
  * tones using the piano keyboard.
  */
-class PianoKeyConnector implements SoundChannel
+public class PianoKeyConnector implements SoundChannel
 {
     private final PianoWithSound.MouseHandler mouseHandler;
     private final List<PianoWithSound.Keyboard.Key> keys;
     private final int lowestMidiNumber;
     
-    PianoKeyConnector(PianoWithSound piano) {
+    public PianoKeyConnector(PianoWithSound piano) {
         this.mouseHandler = piano.getMouseHandler();
         this.keys = piano.getKeys();
         this.lowestMidiNumber = keys.get(0).midiNoteNumber;

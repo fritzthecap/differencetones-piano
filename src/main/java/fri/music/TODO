@@ -1,16 +1,4 @@
  
-- Somehow visualize intervals for difference tones,
-    e.g. all intervals that generate "C3" should be displayed and 
-    optionally be played as piano keys upon click onto an interval item.
-    See DifferenceToneInversionsDemo. 
-    A piano with TuningComponent and DeviationComponent must be present,
-    also choosers for narrowest and widest interval.
-    Pressing a piano key would display a list of up to 8 difference-tone inversion intervals
-    that can generate the tone of the piano key.
-    Clicking onto one of the interval-items would play the interval and mark the resulting
-    difference-tone with a red-border. 
-    DifferenceToneForNotesPiano together with PianoKeyConnector should be reusable for this.
-
 - Configuration and display UI for:
     Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
     Difference tones in different tunings (DifferenceToneDemo)
@@ -43,4 +31,5 @@
     "Translate a Melody into Difference Tones" (DifferenceToneInversions, DefaultComposer, NotesWithDifferenceTonePianoPlayer), 
     "Look at Pianos" (PianoConfiguration), 
     "Try out Wave Generators" (WavePianoDemo, PianoConfiguration), 
+    TODO: there is more!
 

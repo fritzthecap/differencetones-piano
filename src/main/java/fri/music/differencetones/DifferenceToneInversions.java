@@ -24,8 +24,9 @@ public class DifferenceToneInversions extends DifferenceTones
 {
     /**
      * Builds a sufficient range of tones to model given melody with difference tones.
+     * A melody with 1.3 octaves tone-range requires about 4 octaves above its lowest note.
      * @param melody required, the melody to model with difference tones.
-     * @param toneStock required, the tones from the tone-system to be used for the melody and its difference tones.
+     * @param toneStock required, the 12-tone system to be used for the melody and its difference tones.
      * @param smallestSemitoneDistance optional, the number of semi-tones representing the 
      *      smallest difference-tone interval to provide in returned tone-inversions.
      *      Default is MINOR_THIRD.
@@ -34,6 +35,7 @@ public class DifferenceToneInversions extends DifferenceTones
      *      Default is MAJOR_SIXTH.
      * @param deviationTolerance required, the tolerance for finding difference-tones.
      * @return the intervals (inversions) that can represent given melody.
+     * @throws IllegalArgumentException when melody and its inversions do not fit into toneStock.
      */
     public static DifferenceToneInversions toneRangeFor(
             Tone[] melody, 
@@ -43,7 +45,6 @@ public class DifferenceToneInversions extends DifferenceTones
             double deviationTolerance)
     {
         // Find octave range of melody and calculate a subset of tones fitting to that range.
-        // An 1.3 octaves melody requires about 4 octaves above its lowest note. 
         final Tone[] sortedMelody = Arrays.copyOf(melody, melody.length);
         Arrays.sort(sortedMelody, (n1, n2) -> n1.midiNumber - n2.midiNumber);
         final Tone lowest  = sortedMelody[0];

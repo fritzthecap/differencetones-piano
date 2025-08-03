@@ -1,4 +1,4 @@
-package fri.music.instrument.notespiano.wave;
+package fri.music.instrument.wave;
 
 import java.awt.Color;
 import java.util.Iterator;
@@ -10,18 +10,15 @@ import javax.swing.border.Border;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
-import fri.music.instrument.wave.DeviationComponent;
-import fri.music.instrument.wave.DifferenceToneUtil;
-import fri.music.instrument.wave.TuningComponent;
 import fri.music.swingutils.ButtonUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
- * Piano that displays the difference-tone with a red border
- * when two (high) notes are played together.
- * This is not possible with mouse-buttons, so you need notes
- * in a <code>Player</code> with <code>PianoKeyConnector</code>
- * to drive this piano.
+ * Piano that marks a difference-tone with selection and a
+ * red border when two (high) notes are played together.
+ * It is not possible to select two keys with mouse-buttons,
+ * so you need a <code>PianoKeyConnector</code> and possibly
+ * a <code>Player</code> thread to drive this piano.
  */
 public class DifferenceToneForNotesPiano extends PianoWithVolume
 {
@@ -40,18 +37,28 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
 
         final JComponent pianoPanel = super.getKeyboard();
         
-        this.tuningComponent = new TuningComponent(
-                config.lowestToneIpnName, 
-                config.octaves, 
-                getWaveSoundChannel());
+        this.tuningComponent = newTuningComponent(config.lowestToneIpnName, config.octaves, getWaveSoundChannel());
         getControlPanel().add(tuningComponent.getChoice(null), 1);
         
-        this.deviationComponent = new DeviationComponent(DifferenceTones.DEFAULT_DEVIATION, config.isVertical);
+        this.deviationComponent = newDeviationComponent(DifferenceTones.DEFAULT_DEVIATION, config.isVertical);
         getControlPanel().add(deviationComponent.getSlider(), 2);
         
         return this.pianoPanel = pianoPanel;
     }
     
+    /** To be overridden. */
+    protected TuningComponent newTuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
+        return new TuningComponent(
+                lowestToneIpnName, 
+                octaves, 
+                soundChannel);
+    }
+
+    /** To be overridden. */
+    protected DeviationComponent newDeviationComponent(double deviation, boolean isVertical) {
+        return new DeviationComponent(deviation, isVertical);
+    }
+
     /** @return the used WaveSoundChannel, holding tones of a tone-system. */
     public WaveSoundChannel getWaveSoundChannel() {
         return (WaveSoundChannel) getSoundChannel();
@@ -71,7 +78,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         return deviationComponent.getDeviation();
     }
     
-
+    
     /** Overridden to return a DifferenceToneMouseHandler. */
     @Override
     protected MouseHandler newMouseHandler() {
@@ -144,7 +151,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         
         private void selectDifferenceTone(Keyboard.Key key, boolean select) {
             setRedBorder(key, select);
-            //visualSelect(key, select);
+            ButtonUtil.visualSelect(key, select);
             key.paintImmediately(key.getVisibleRect());
         }
         
@@ -152,7 +159,6 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
             if (originalBorder == null) // save original border for reset
                 originalBorder = key.getBorder();
             key.setBorder(select ? redBorder : originalBorder);
-            ButtonUtil.visualSelect(key, select);
         }
     }
 }

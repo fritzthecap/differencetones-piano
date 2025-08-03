@@ -123,10 +123,10 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
                         twoPlayingKeys[0].midiNoteNumber,
                         twoPlayingKeys[1].midiNoteNumber);
                 
-                    if (differenceToneKey != null) {
-                        selectedDifferenceKey = differenceToneKey;
-                        selectDifferenceTone(selectedDifferenceKey, true); // select and add red border
-                    }
+                if (differenceToneKey != null) {
+                    selectedDifferenceKey = differenceToneKey;
+                    selectDifferenceTone(selectedDifferenceKey, true); // select and add red border
+                }
             }
             else if (selectedDifferenceKey != null) {
                 if (holdPlayingNotes.contains(selectedDifferenceKey) == false) // selectedDifferenceKey is not on "Hold"

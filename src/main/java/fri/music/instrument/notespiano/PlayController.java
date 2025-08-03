@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.swing.SwingUtilities;
 import fri.music.SoundChannel;
 import fri.music.instrument.PianoWithSound;
+import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
