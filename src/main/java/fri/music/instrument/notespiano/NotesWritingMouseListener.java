@@ -2,19 +2,19 @@ package fri.music.instrument.notespiano;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import fri.music.instrument.PianoWithSound;
 import fri.music.player.Note;
 import fri.music.player.notelanguage.MelodyFactory;
+import fri.music.swingutils.MouseKeyAdapter;
 
 /**
  * Writes notes from piano keyboard to text-area.
- * Call <code>setActive(true)</code> to make it work.
+ * Call <code>setActive(true)</code> to make it work, initially it is not active.
  */
-class NotesWritingMouseListener extends MouseAdapter
+class NotesWritingMouseListener extends MouseKeyAdapter
 {
     private final NotesPianoPlayer notesPiano;
     private final JPopupMenu popup;
@@ -56,7 +56,7 @@ class NotesWritingMouseListener extends MouseAdapter
         
         key = getKey(e);
         
-        if (showPopupMenu(e) == false) // not right mouse button
+        if (showPopupMenu(e) == false) // is left mouse button
             startMillis = System.currentTimeMillis();
     }
     
@@ -65,7 +65,7 @@ class NotesWritingMouseListener extends MouseAdapter
         if (active == false || key == null || popup.isShowing()) // was a mouse drag
             return;
         
-        if (showPopupMenu(e) == false) // not right mouse button
+        if (showPopupMenu(e) == false) // is left mouse button
             calculateAndWriteNote();
     }
     

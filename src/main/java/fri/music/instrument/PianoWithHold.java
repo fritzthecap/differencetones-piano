@@ -3,7 +3,7 @@ package fri.music.instrument;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.InputEvent;
 import java.util.LinkedHashSet;
 import java.util.SequencedSet;
 import javax.swing.BorderFactory;
@@ -82,17 +82,16 @@ public class PianoWithHold extends PianoWithVolume
         }
 
         @Override
-        public void mousePressed(MouseEvent e) {
+        protected void pressed(InputEvent e) {
             if (isHoldActive() == false || isPlaying(e) == false)
-                super.mousePressed(e);
+                super.pressed(e);
             else // is playing
-                super.mouseReleased(e);
+                super.released(e);
         }
-        
         @Override
-        public void mouseReleased(MouseEvent e) {
+        protected void released(InputEvent e) {
             if (isHoldActive() == false)
-                super.mouseReleased(e);
+                super.released(e);
             else 
                 setMouseOverKeyToNull();
         }
@@ -137,7 +136,7 @@ public class PianoWithHold extends PianoWithVolume
             key.setBorder(select ? redBorder : originalBorder);
         }
         
-        private boolean isPlaying(MouseEvent e) {
+        private boolean isPlaying(InputEvent e) {
             return holdPlayingNotes.contains(getKey(e));
         }
     }

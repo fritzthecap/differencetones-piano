@@ -91,8 +91,10 @@ public class NotesPianoPlayer
         }
         
         // listen to piano mouse clicks and write notes into text-area
-        for (PianoWithSound.Keyboard.Key key : piano.getKeys())
+        for (PianoWithSound.Keyboard.Key key : piano.getKeys()) {
             key.addMouseListener(notesWritingPianoListener);
+            key.addKeyListener(notesWritingPianoListener);
+        }
         
         return this.playerPanel = playerPanel;
     }
@@ -199,7 +201,7 @@ public class NotesPianoPlayer
     void writeSingleNote(String noteWithLength) {
         removeSelectedText(); // overwrite selected text if any
         insertTextAtNearestSpace(noteWithLength); // intelligent insertion
-        notesText.requestFocus(); // jump from keyboard to text-area to edit immediately
+        //notesText.requestFocus(); // jump from keyboard to text-area to edit immediately
     }
     
     void playSingleNote(String noteWithLength) {

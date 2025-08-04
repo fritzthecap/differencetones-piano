@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -23,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
@@ -117,11 +119,15 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     // UI builder methods
     
     private JPanel createIntervalListsPanel() {
-        final JPanel intervalListsPanel = new JPanel();
-        intervalListsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        intervalListsPanel.setToolTipText("Press a Keyboard-Key to Display All Possible Difference-Tone Intervals for It");
-        intervalListsPanel.setBorder(BorderFactory.createTitledBorder("Lists of Intervals Generating a Pressed Keyboard-Key as Difference-Tone"));
-        intervalListsPanel.add(Box.createVerticalStrut(160)); // set the panel to an initial height as long as there are no frames
+        final JPanel intervalListsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // arrange frames from left to right, not LEADING
+        intervalListsPanel.setToolTipText(
+                "Press a keyboard-key to display all intervals that can generate it as difference-tone");
+        intervalListsPanel.setBorder(BorderFactory.createTitledBorder(
+                "Lists of Intervals Generating a Tone as Difference-Tone"));
+        
+        // set the panel to an initial height as long as there are no frames in it, else panel would collapse
+        intervalListsPanel.add(Box.createVerticalStrut(160));
+        
         return intervalListsPanel;
     }
 
@@ -261,10 +267,10 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         }
 
         @Override
-        public void mousePressed(MouseEvent e) {
+        protected void pressed(InputEvent e) {
             if (active)
                 getPiano().addIntervalListFrame(getKey(e).ipnName, getKey(e).midiNoteNumber);
-            super.mousePressed(e);
+            super.pressed(e);
         }
         
         private DifferenceToneInversionsPiano getPiano() {
@@ -316,9 +322,11 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    currentlyPlaying = list.getModel().getElementAt(list.locationToIndex(e.getPoint()));
-                    if (currentlyPlaying != null)
-                        intervalSelected(IntervalListFrame.this, currentlyPlaying, true);
+                    if (SwingUtilities.isLeftMouseButton(e)) {
+                        currentlyPlaying = list.getModel().getElementAt(list.locationToIndex(e.getPoint()));
+                        if (currentlyPlaying != null)
+                            intervalSelected(IntervalListFrame.this, currentlyPlaying, true);
+                    }
                 }
                 @Override
                 public void mouseReleased(MouseEvent e) {
@@ -357,7 +365,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         void setTitleBarSelected(boolean selected) {
             final Color borderColor = selected ? Color.BLACK : Color.LIGHT_GRAY;
             frameTitleBar.setBorder(BorderFactory.createLineBorder(borderColor, 1, true));
-            final Color backgroundColor = selected ? Color.LIGHT_GRAY : Color.WHITE;
+            final Color backgroundColor = selected ? list.getSelectionBackground() : list.getBackground();
             frameTitleBar.setBackground(backgroundColor);
         }
         

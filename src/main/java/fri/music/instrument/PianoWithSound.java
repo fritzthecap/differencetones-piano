@@ -5,7 +5,7 @@ import java.awt.Component;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.FocusEvent;
-import java.awt.event.MouseAdapter;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -20,6 +20,7 @@ import fri.music.ScaleTypes;
 import fri.music.SoundChannel;
 import fri.music.ToneSystem;
 import fri.music.swingutils.ButtonUtil;
+import fri.music.swingutils.MouseKeyAdapter;
 
 /**
  * Piano keyboard user-interface with 12 white and black keys.
@@ -178,54 +179,61 @@ public class PianoWithSound extends Piano
     
     
     /** Mouse handler that plays sound on mouse click, and manages glissandos. */
-    public static class MouseHandler extends MouseAdapter
+    public static class MouseHandler extends MouseKeyAdapter
     {
         protected final PianoWithSound piano;
-        private Keyboard.Key mouseOverKey;
+        private PianoWithSound.Keyboard.Key mouseOverKey;
         
         public MouseHandler(PianoWithSound piano) {
             this.piano = piano;
         }
         
-        /** Listens to key presses to start a tone. */
+        /** Listens to mouse presses to start a tone. */
         @Override
         public void mousePressed(MouseEvent e) {
-            if (SwingUtilities.isLeftMouseButton(e) == false)
-                return;
-            
-            final Keyboard.Key key = getKey(e);
-            noteOn(key);
-            mouseOverKey = key; // start glissando
+            if (SwingUtilities.isLeftMouseButton(e))
+                pressed(e);
         }
-        /** Listens to key releases to stop a tone. */
+        /** Listens to mouse releases to stop a tone. */
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (SwingUtilities.isLeftMouseButton(e) == false)
-                return;
-            
-            final Keyboard.Key key = getKey(e);
-            noteOff(key);
-            stopGlissando(key);
+            if (SwingUtilities.isLeftMouseButton(e))
+                released(e);
         }
         /** Listens to mouse drag to play entered key as glissando. */
         @Override
         public void mouseEntered(MouseEvent e) {
-            if (SwingUtilities.isLeftMouseButton(e) == false)
-                return;
-            
-            final Keyboard.Key key = getKey(e); // is never null
+            if (SwingUtilities.isLeftMouseButton(e))
+                entered(e);
+        }
+
+        /** Listens to key presses to start a tone. */
+        protected void pressed(InputEvent e) {
+            final PianoWithSound.Keyboard.Key key = getKey(e);
+            noteOn(key);
+            mouseOverKey = key; // start glissando
+        }
+        /** Listens to key releases to stop a tone. */
+        protected void released(InputEvent e) {
+            final PianoWithSound.Keyboard.Key key = getKey(e);
+            noteOff(key);
+            stopGlissando(key);
+        }
+        /** Listens to mouse drag to play entered key as glissando. */
+        protected void entered(InputEvent e) {
+            final PianoWithSound.Keyboard.Key key = getKey(e); // is never null
             if (mouseOverKey != null && mouseOverKey != key) { // mouse entered another key
                 stopGlissando(key);
                 continueGlissando(key);
             }
         }
-        
-        private void stopGlissando(Keyboard.Key key) {
-            if (mouseOverKey != null && mouseOverKey != key)
+
+        private void stopGlissando(PianoWithSound.Keyboard.Key nextKey) {
+            if (mouseOverKey != null && mouseOverKey != nextKey)
                 noteOff(mouseOverKey);
             setMouseOverKeyToNull();
         }
-        private void continueGlissando(Keyboard.Key newMouseOverKey) {
+        private void continueGlissando(PianoWithSound.Keyboard.Key newMouseOverKey) {
             noteOn(newMouseOverKey);
             mouseOverKey = newMouseOverKey;
             // visual selection of current key, will be removed by Swing
@@ -238,18 +246,18 @@ public class PianoWithSound extends Piano
             mouseOverKey = null;
         }
         
-        protected void visualSelect(Keyboard.Key key, boolean pressed) {
+        protected void visualSelect(PianoWithSound.Keyboard.Key key, boolean pressed) {
             ButtonUtil.visualSelect(key, pressed);
         }
         
-        protected Keyboard.Key getKey(MouseEvent e) {
-            return (Keyboard.Key) e.getSource();
+        protected PianoWithSound.Keyboard.Key getKey(InputEvent e) {
+            return (PianoWithSound.Keyboard.Key) e.getSource();
         }
         
-        protected void noteOn(Keyboard.Key key) {
+        protected void noteOn(PianoWithSound.Keyboard.Key key) {
             piano.getSoundChannel().noteOn(key.midiNoteNumber, piano.getVelocity());
         }
-        protected void noteOff(Keyboard.Key key) {
+        protected void noteOff(PianoWithSound.Keyboard.Key key) {
             piano.getSoundChannel().noteOff(key.midiNoteNumber);
         }
     }   // end class MouseHandler
@@ -261,7 +269,7 @@ public class PianoWithSound extends Piano
     /** The single mouse-handler for all piano views, visible for sub-classes. */
     private final MouseHandler mouseHandler;
     private JComponent pianoPanel;
-    private List<Keyboard.Key> keyList;
+    private List<PianoWithSound.Keyboard.Key> keyList;
     
     public PianoWithSound(SoundChannel channel) {
         this(null, channel);
@@ -303,7 +311,9 @@ public class PianoWithSound extends Piano
     /** Overridden to handle mouse events for playing sounds. */
     @Override
     protected void configureKeyboardKey(Piano.Keyboard.Key key) {
-        key.addMouseListener(getMouseHandler());
+        final MouseKeyAdapter mouseHandler = getMouseHandler();
+        key.addMouseListener(mouseHandler);
+        key.addKeyListener(mouseHandler);
     }
 
     /** @return the sound channel given to constructor. Can be overridden. */
@@ -312,15 +322,18 @@ public class PianoWithSound extends Piano
     }
     
     /** @return all keys of the keyboard, sorted by lowest first. */
-    public final List<Keyboard.Key> getKeys() {
+    public final List<PianoWithSound.Keyboard.Key> getKeys() {
         if (this.keyList != null)
             return this.keyList;
+        
+        if (pianoPanel == null)
+            getKeyboard();
         
         final JComponent viewPort = (JComponent) pianoPanel.getComponent(0);
         final JComponent keyboardPanel = (JComponent) viewPort.getComponent(0);
         final List<PianoWithSound.Keyboard.Key> keyList = new ArrayList<>();
         for (Component component : keyboardPanel.getComponents())
-            keyList.add((Keyboard.Key) component);
+            keyList.add((PianoWithSound.Keyboard.Key) component);
 
         Collections.sort(keyList); // Keyboard.Key implements Comparable via midiNoteNumber
         return this.keyList = keyList;
@@ -347,7 +360,7 @@ public class PianoWithSound extends Piano
     
     /** Removes mouse listener from all keys and turns off all sound. */
     public void destroyKeyboard(JComponent pianoPanel) {
-        for (Keyboard.Key key : getKeys())
+        for (PianoWithSound.Keyboard.Key key : getKeys())
             key.removeMouseListener(getMouseHandler());
         getSoundChannel().allNotesOff(); // closes all sound-channels
     }
