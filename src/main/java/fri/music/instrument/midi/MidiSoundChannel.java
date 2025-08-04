@@ -8,7 +8,10 @@ public class MidiSoundChannel implements SoundChannel
 {
     public final MidiChannel delegate;
     
-    /** Chooses channel[0] of given synthesizer as sound channel. */
+    /**
+     * Chooses channel[0] of given synthesizer as sound channel.
+     * @param synthesizer required, use <code>SynthesizerFactory.getOpenSynthesizer()</code>.
+     */
     public MidiSoundChannel(Synthesizer synthesizer) {
         this(synthesizer.getChannels()[0]);
     }
