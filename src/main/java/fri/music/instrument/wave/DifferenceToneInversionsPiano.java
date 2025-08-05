@@ -31,6 +31,7 @@ import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.instrument.PianoWithSound;
+import fri.music.swingutils.SizeUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -66,7 +67,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         closeAllIntervalFrames.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tuningParametersHaveChanged();
+                closeAllIntervalFrames();
             }
         });
         getControlPanel().add(closeAllIntervalFrames);
@@ -142,19 +143,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         }
         
         // not found, add new one when intervals exist for it
-        if (differenceToneInversions == null) { // will be set to null on any parameter change
-            differenceToneInversions = new DifferenceToneInversions(
-                    new DifferenceToneInversions.Configuration(
-                        getWaveSoundChannel().getTones(),
-                        ToneSystem.semitoneSteps(intervalRange.narrowestAllowedInterval()),
-                        ToneSystem.semitoneSteps(intervalRange.widestAllowedInterval()),
-                        getDeviation())
-                );
-            differenceToneInversions.removeDissonant(false);
-        }
-        
         final List<DifferenceToneInversions.TonePair> intervals = 
-                differenceToneInversions.getIntervalsGenerating(ipnNoteName);
+                getDifferenceToneInversions().getIntervalsGenerating(ipnNoteName);
         
         if (intervals != null) {
             final IntervalListFrame newFrame = new IntervalListFrame(ipnNoteName, midiNoteNumber, intervals);
@@ -166,6 +156,20 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             });
             addOrRemoveIntervalListFrame(newFrame, true);
         }
+    }
+    
+    private DifferenceToneInversions getDifferenceToneInversions() {
+        if (differenceToneInversions == null) { // will be set to null on any parameter change
+            differenceToneInversions = new DifferenceToneInversions(
+                    new DifferenceToneInversions.Configuration(
+                        getWaveSoundChannel().getTones(),
+                        ToneSystem.semitoneSteps(intervalRange.narrowestAllowedInterval()),
+                        ToneSystem.semitoneSteps(intervalRange.widestAllowedInterval()),
+                        getDeviation())
+                );
+            differenceToneInversions.removeDissonant(false);
+        }
+        return differenceToneInversions;
     }
 
     private void addOrRemoveIntervalListFrame(IntervalListFrame framePanel, boolean isAdd) {
@@ -183,27 +187,36 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             intervalListsPanel.remove(framePanel);
             closeAllIntervalFrames.setEnabled(getIntervalListFrames().size() > 0);
         }
+        
+        refreshFramesContainer();
+    }
+    
+    private void refreshFramesContainer() {
         intervalListsPanel.revalidate(); // refresh layout
         intervalListsPanel.repaint(); // refresh UI
     }
     
-    /** Reset calculated difference tone inversions, close all interval-frames. */
+    /** Calculated difference-tone inversions are not valid anymore, replace or remove them. */
     private void tuningParametersHaveChanged() {
         differenceToneInversions = null;
         
+        for (IntervalListFrame framePanel : getIntervalListFrames()) {
+            final List<DifferenceToneInversions.TonePair> intervals = 
+                    getDifferenceToneInversions().getIntervalsGenerating(framePanel.ipnNoteName);
+
+            framePanel.fillList(intervals);
+        }
+        
+        refreshFramesContainer();
+        
+        closeAllIntervalFrames.setEnabled(getIntervalListFrames().size() > 0);
+    }
+    
+    private void closeAllIntervalFrames() {
         for (IntervalListFrame framePanel : getIntervalListFrames())
             intervalListsPanel.remove(framePanel);
         
-        intervalListsPanel.revalidate(); // refresh layout
-        intervalListsPanel.repaint(); // refresh UI
-        
-        closeAllIntervalFrames.setEnabled(false);
-    }
-    
-    /** Called when clicking into an interval-frame title bar. */
-    void setFrameSelected(IntervalListFrame intervalListFrame) {
-        for (IntervalListFrame frame : getIntervalListFrames())
-            frame.setTitleBarSelected(frame == intervalListFrame);
+        refreshFramesContainer();
     }
 
     private List<IntervalListFrame> getIntervalListFrames() {
@@ -214,13 +227,29 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return list;
     }
     
-    /** Called when an interval is clicked. */
-    void intervalSelected(IntervalListFrame activeFrame, DifferenceToneInversions.TonePair pair, boolean mouseDown) {
+    private void ignoreMouseEvents(boolean ignore) {
+        final DifferenceToneInversionsMouseHandler mouseHandler = (DifferenceToneInversionsMouseHandler) getMouseHandler();
+        mouseHandler.setActive(ignore == false);
         
-        // no other frame should show a selection
-        for (IntervalListFrame frame : getIntervalListFrames())
-            if (activeFrame != frame)
+        for (PianoWithSound.Keyboard.Key key : getKeys())
+            key.setIgnoreMouse(ignore == true);
+    }
+    
+    
+    /** Called when clicking into an interval-frame title bar. */
+    void setFrameSelected(IntervalListFrame intervalListFrame) {
+        for (IntervalListFrame frame : getIntervalListFrames()) {
+            final boolean isThis = (frame == intervalListFrame);
+            frame.setTitleBarSelected(isThis);
+            if (isThis == false)
                 frame.clearListSelection();
+        }
+    }
+
+    /** Called by interval-list frame when an interval is clicked. */
+    void intervalSelected(IntervalListFrame activeFrame, DifferenceToneInversions.TonePair pair, boolean mouseDown) {
+        // no other frame should show a selection
+        setFrameSelected(activeFrame);
         
         if (mouseDown) { // start tone
             ignoreMouseEvents(true);
@@ -237,14 +266,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         }
     }
 
-    private void ignoreMouseEvents(boolean ignore) {
-        final DifferenceToneInversionsMouseHandler mouseHandler = (DifferenceToneInversionsMouseHandler) getMouseHandler();
-        mouseHandler.setActive(ignore == false);
-        
-        for (PianoWithSound.Keyboard.Key key : getKeys())
-            key.setIgnoreMouse(ignore == true);
-    }
-    
     
     
     /** Overridden to return a DifferenceToneMouseHandler. */
@@ -286,6 +307,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         public final JButton frameCloseButton;
         
         private final JList<DifferenceToneInversions.TonePair> list;
+        private final JLabel frameTitle;
         private final JPanel frameTitleBar;
         
         IntervalListFrame(String ipnNoteName, int midiNoteNumber, List<DifferenceToneInversions.TonePair> intervals) {
@@ -311,11 +333,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             list.addMouseListener(frameSelectionListener);
             list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             list.setCellRenderer(new IntervalListCellRenderer());
-            
-            final DefaultListModel<DifferenceToneInversions.TonePair> model = new DefaultListModel<>();
-            for (DifferenceToneInversions.TonePair tonePair : intervals)
-                model.addElement(tonePair);
-            list.setModel(model);
             
             list.addMouseListener(new MouseAdapter() {
                 private DifferenceToneInversions.TonePair currentlyPlaying;
@@ -343,7 +360,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             frameCloseButton.setFocusPainted(false);
             frameCloseButton.setToolTipText("Close List");
             
-            final JLabel frameTitle = new JLabel(ipnNoteName, JLabel.CENTER);
+            this.frameTitle = new JLabel(ipnNoteName, JLabel.CENTER);
             frameTitle.setToolTipText("Intervals Generating "+ipnNoteName);
             frameTitle.addMouseListener(frameSelectionListener);
             
@@ -355,8 +372,27 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             add(new JScrollPane(list), BorderLayout.CENTER);
             
             setBorder(BorderFactory.createLineBorder(Color.GRAY, 1, true));
+            
+            fillList(intervals); // put data into list
+            
+            SizeUtil.forceSize(this, new Dimension(210, 150)); // all frames should be equally sized
         }
         
+        
+        void fillList(List<DifferenceToneInversions.TonePair> intervals) {
+            final DefaultListModel<DifferenceToneInversions.TonePair> model = new DefaultListModel<>();
+            final int numberOfItems;
+            if (intervals != null) {
+                for (DifferenceToneInversions.TonePair tonePair : intervals)
+                    model.addElement(tonePair);
+                numberOfItems = intervals.size();
+            }
+            else {
+                numberOfItems = 0;
+            }
+            frameTitle.setText(ipnNoteName+"  ("+numberOfItems+")");
+            list.setModel(model);
+        }
         
         void clearListSelection() {
             list.clearSelection();
@@ -369,7 +405,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             frameTitleBar.setBackground(backgroundColor);
         }
         
-        
+
         private static class IntervalListCellRenderer implements ListCellRenderer<DifferenceToneInversions.TonePair>
         {
             private final JPanel listLine = new JPanel(new BorderLayout());
@@ -383,10 +419,10 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 listLine.add(Box.createRigidArea(new Dimension(12, 4)), BorderLayout.CENTER);
                 
                 final Dimension size = new Dimension(30, -1);
-                forceSize(lowerNoteName, size);
-                forceSize(upperNoteName, size);
+                SizeUtil.forceSize(lowerNoteName, size);
+                SizeUtil.forceSize(upperNoteName, size);
                 final JLabel separator = new JLabel("-", JLabel.CENTER);
-                forceSize(separator, size);
+                SizeUtil.forceSize(separator, size);
                 
                 final JPanel noteNames = new JPanel(new BorderLayout());
                 noteNames.setOpaque(false); // else panel will be gray
@@ -400,8 +436,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             @Override
             public Component getListCellRendererComponent(JList<? extends TonePair> list, TonePair tonePair, int index, boolean isSelected, boolean cellHasFocus) {
                 intervalName.setText(tonePair.intervalName());
-                lowerNoteName.setText(tonePair.lowerTone().ipnName);
-                upperNoteName.setText(tonePair.upperTone().ipnName);
+                lowerNoteName.setText(tonePair.lowerTone() != null ? tonePair.lowerTone().ipnName : "");
+                upperNoteName.setText(tonePair.upperTone() != null ? tonePair.upperTone().ipnName : "");
                 
                 if (isSelected) {
                     listLine.setBackground(list.getSelectionBackground());
@@ -412,12 +448,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                     listLine.setForeground(list.getForeground());
                 }
                 return listLine;
-            }
-            
-            private void forceSize(Component c, Dimension size) {
-                c.setPreferredSize(size);
-                c.setMinimumSize(size);
-                c.setMaximumSize(size);
             }
         }
     }
