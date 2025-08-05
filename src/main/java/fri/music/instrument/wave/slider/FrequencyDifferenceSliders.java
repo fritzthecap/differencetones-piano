@@ -323,7 +323,7 @@ public class FrequencyDifferenceSliders extends AbstractFrequencySliders
         final boolean isPureInterval = nearestInterval.startsWith(">");
         String fractionDisplay = "";
         if (isPureInterval)
-            fractionDisplay = fraction[0]+" / "+fraction[1];
+            fractionDisplay = fraction[0]+"/"+fraction[1];
         
         return new String[] { fractionDisplay, ""+octave, nearestInterval };
     }

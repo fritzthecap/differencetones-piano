@@ -8,19 +8,20 @@ import java.awt.event.MouseEvent;
 
 /**
  * Handles both mouse- and key-events in one class.
- * Only "pressed" and "released" key events are managed, not "typed",
- * and only ENTER, SPACE, and the popup-triggers F4 and Shift-F10.
- * These are redirected to the according MouseListener methods with
- * a generated MouseEvent.
+ * Only "pressed" and "released" key-events are managed, not "typed",
+ * and only SPACE and the popup-triggers F4 and Shift-F10 are accepted.
+ * These keys are redirected to the according <code>MouseListener</code> methods
+ * via a generated <code>MouseEvent</code>.
  * <p/>
  * For mouse-events, popup-trigger can be true on either "pressed"
- * or "released", this is platform-specific (WINDOWS, UNIX, ...).
- * Implementations must be flexible to catch both cases.
+ * or "released", this is platform-specific (WINDOWS, UNIX, ...),
+ * implementations must be flexible to catch both cases.
  * <p/>
- * Key-events repeat "pressed" as long as the key is down,
+ * The keyboards sends repeated "pressed" events as long as the key is down,
  * followed by a single "released" when it goes up.
- * This effect was removed here, thus there is only the first "pressed"
- * with a single "released" event afterwards.
+ * This effect <b>was removed here</b>, thus there is only the first "pressed"
+ * with a single "released" event afterwards. All press- or release-events
+ * of other keys in-between are ignored.
  */
 public class MouseKeyAdapter extends MouseAdapter implements KeyListener
 {
@@ -29,29 +30,29 @@ public class MouseKeyAdapter extends MouseAdapter implements KeyListener
     
     // interface KeyListener
     
-    /** Delegates to mousePressed() with a generated MouseEvent. */
+    /** Delegates to mousePressed() with a generated MouseEvent when no other key is down. */
     @Override
     public final void keyPressed(KeyEvent e) {
-        if (isIgnorableKey(e) == false && isRepeatedKeyPress(e) == false)
+        if (isIgnorableKey(e) == false && isRepeatedKeyPress() == false) {
             mousePressed(convertToMouseEvent(e));
+            setPressedState(e);
+        }
     }
     
     /** Delegates to mouseReleased() with a generated MouseEvent. */
     @Override
     public final void keyReleased(KeyEvent e) {
-        if (isIgnorableKey(e) == false && keyCode == e.getKeyCode()) {
-            keyIsDown = false;
-            keyCode = -1;
+        if (isIgnorableKey(e) == false && isMatchingKeyRelease(e) == true) {
+            setPressedState(null);
             mouseReleased(convertToMouseEvent(e));
         }
     }
-    
+
     /** Does nothing, to be overridden. Mind: this may be called before or after release! */
     @Override
     public void keyTyped(KeyEvent e) {
     }
     
-    // helpers
     
     /** @return true if given key is Shift-F10 or F4, else false. */
     protected boolean isPopupTrigger(KeyEvent e) {
@@ -60,42 +61,48 @@ public class MouseKeyAdapter extends MouseAdapter implements KeyListener
             (e.getKeyCode() == KeyEvent.VK_F10 && (e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) != 0); 
     }
     
-    private boolean isIgnorableKey(KeyEvent e) {
-        if (isPopupTrigger(e))
-            return false;
-        
-        switch(e.getKeyCode()) {
-            case KeyEvent.VK_ENTER:
+    /** @return whether given key should be ignored. Only ENTER, SPACE and popup-triggers are accepted. */
+    protected boolean isIgnorableKey(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            // case KeyEvent.VK_ENTER:
             case KeyEvent.VK_SPACE: // play tone
                 return e.getModifiersEx() != 0; // ignore SPACE and ENTER when modifiers
         }
-        return true;
+        return isPopupTrigger(e) == false;
     }
     
-    private boolean isRepeatedKeyPress(KeyEvent e) {
-        if (keyIsDown == false) {
-            keyIsDown = true;
-            keyCode = e.getKeyCode();
-            return false;
-        }
-        return true;
-    }
-    
-    private MouseEvent convertToMouseEvent(KeyEvent event) {
-        if (event.getID() != KeyEvent.KEY_PRESSED && event.getID() != KeyEvent.KEY_RELEASED)
-            throw new IllegalArgumentException("Only KEY_PRESSED and KEY_RELEASED KeyEvent are supported: "+event.paramString());
+    /** @return a MouseEvent generated from given KeyEvent. */
+    protected final MouseEvent convertToMouseEvent(KeyEvent event) {
+        final boolean isKeyPress   = (event.getID() == KeyEvent.KEY_PRESSED);
+        final boolean isKeyRelease = (event.getID() == KeyEvent.KEY_RELEASED);
         
-        final boolean popupTrigger = 
-                (isPopupTrigger(event) && event.getID() == KeyEvent.KEY_RELEASED);
+        final boolean popupTrigger = (isPopupTrigger(event) && isKeyRelease);
+                // when doing this on PRESSED, the RELEASED event would
+                // go to the popup-menu, which would ignore it,
+                // and losing the event would lock the keyIsDown state forever
         
         return new MouseEvent(
-                (Component) event.getSource(),
-                (event.getID() == KeyEvent.KEY_PRESSED ? MouseEvent.MOUSE_PRESSED : MouseEvent.MOUSE_RELEASED),
-                event.getWhen(),
+                (Component) event.getSource(), // source
+                isKeyPress ? MouseEvent.MOUSE_PRESSED : isKeyRelease ? MouseEvent.MOUSE_RELEASED : MouseEvent.MOUSE_CLICKED, // ID
+                event.getWhen(), // time
                 event.getModifiersEx(),
                 2, 2, /// x, y coordinates
                 1, // click count
                 popupTrigger,
-                (popupTrigger ? MouseEvent.BUTTON3 : MouseEvent.BUTTON1));
+                popupTrigger ? MouseEvent.BUTTON3 : MouseEvent.BUTTON1);
+    }
+    
+    
+    private boolean isRepeatedKeyPress() {
+        return keyIsDown; // ignore any key-press as long as keyIsDown
+    }
+    
+    private boolean isMatchingKeyRelease(KeyEvent e) {
+        return keyIsDown && keyCode == e.getKeyCode();
+    }
+    
+    private void setPressedState(KeyEvent event) {
+        keyIsDown = (event != null);
+        keyCode = keyIsDown ? event.getKeyCode() : -1;
     }
 }

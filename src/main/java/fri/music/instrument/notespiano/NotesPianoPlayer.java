@@ -133,7 +133,7 @@ public class NotesPianoPlayer
                 timeSignature[1]);
     }
 
-    // methods called by PlayController
+    // methods called by PlayController and maybe needed in sub-classes
     
     /**
      * Called before playing notes on piano.
@@ -159,10 +159,8 @@ public class NotesPianoPlayer
         // block mouse events for any listener
         for (PianoWithSound.Keyboard.Key key : piano.getKeys())
             key.setIgnoreMouse(isStop == false);
-            // setEnabled() did not reject mouse-events, and prevented key-down rendering
+            // setEnabled(false) does not reject mouse-events, and it prevents key-down rendering
     }
-    
-    // methods needed in sub-classes
     
     /**
      * Enable time-signature and tempo-chooser, optionally clear errors.
@@ -186,8 +184,8 @@ public class NotesPianoPlayer
         return null;
     }
     
-    // methods called by NotesWritingMouseListener
     
+    /** Method called by NotesWritingMouseListener. */
     String noteLengthForMillis(int durationMillis) {
         Integer beatsPerMinute = (Integer) tempoSpinner.getValue();
         final int beatDurationMillis = MelodyFactory.beatDurationMillis(beatsPerMinute);
@@ -198,12 +196,13 @@ public class NotesPianoPlayer
         return MelodyFactory.noteLengthDivisor(durationMillis, beatType, beatDurationMillis);
     }
     
+    /** Method called by NotesWritingMouseListener. */
     void writeSingleNote(String noteWithLength) {
         removeSelectedText(); // overwrite selected text if any
         insertTextAtNearestSpace(noteWithLength); // intelligent insertion
-        //notesText.requestFocus(); // jump from keyboard to text-area to edit immediately
     }
     
+    /** Method called by NotesWritingMouseListener. */
     void playSingleNote(String noteWithLength) {
         final Note[] note = newMelodyFactory().translate(new String[] { noteWithLength });
         new Player(new PianoKeyConnector(piano)).play(note[0]);

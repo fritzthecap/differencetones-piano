@@ -80,7 +80,7 @@ public interface ToneSystem
      * @return an interval name for given 0-12 number of semitones.
      */
     static String intervalName(int semitoneSteps)  {
-        switch(semitoneSteps) {
+        switch (semitoneSteps) {
             case 0: return UNISON;
             case 1: return MINOR_SECOND;
             case 2: return MAJOR_SECOND; 
@@ -104,7 +104,7 @@ public interface ToneSystem
      * @return an interval name for given 0-12 number of semitones.
      */
     static int semitoneSteps(String intervalName)  {
-        switch(intervalName) {
+        switch (intervalName) {
             case UNISON: return 0;
             case MINOR_SECOND: return 1;
             case MAJOR_SECOND: return 2; 

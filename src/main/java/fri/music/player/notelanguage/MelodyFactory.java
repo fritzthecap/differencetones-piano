@@ -592,25 +592,25 @@ public class MelodyFactory
         final double factor;
         // duplets (2) or quadruplets (4) will occur only in 3-ticks-per-beat, 6/8 or 12/8 
         switch (multipletType) {
-        case 2: // duplets take 3/2 duration, 2 notes on the duration of 3 equal notes
-            if (beatsPerBar % 3 != 0)
-                throw new IllegalArgumentException("Do not use duplets in "+beatsPerBar+"/"+beatType+" measures!");
-            factor = 3.0 / 2.0; 
-            break;
-        case 3: // triplets take 2/3 duration, 3 notes on the duration of 2 equal notes
-        case 6: // sixtuplets take 4/6==2/3 duration, 6 notes on the duration of 4 equal notes
-            factor = 2.0 / 3.0; 
-            break;
-        case 4: // quadruplets take 3/4 duration, 4 notes on the duration of 3 equal notes
-            if (beatsPerBar % 3 != 0)
-                throw new IllegalArgumentException("Do not use quadruplets in "+beatsPerBar+"/"+beatType+" measures!");
-            factor = 3.0 / 4.0;
-            break;
-        case 5: // quintuplets take 4/5 duration, 5 notes on the duration of 4 equal notes
-            factor = 4.0 / 5.0;
-            break;
-        default:
-            throw new IllegalArgumentException("Unsupported multiplet type: '"+multipletType+"'");
+            case 2: // duplets take 3/2 duration, 2 notes on the duration of 3 equal notes
+                if (beatsPerBar % 3 != 0)
+                    throw new IllegalArgumentException("Do not use duplets in "+beatsPerBar+"/"+beatType+" measures!");
+                factor = 3.0 / 2.0; 
+                break;
+            case 3: // triplets take 2/3 duration, 3 notes on the duration of 2 equal notes
+            case 6: // sixtuplets take 4/6==2/3 duration, 6 notes on the duration of 4 equal notes
+                factor = 2.0 / 3.0; 
+                break;
+            case 4: // quadruplets take 3/4 duration, 4 notes on the duration of 3 equal notes
+                if (beatsPerBar % 3 != 0)
+                    throw new IllegalArgumentException("Do not use quadruplets in "+beatsPerBar+"/"+beatType+" measures!");
+                factor = 3.0 / 4.0;
+                break;
+            case 5: // quintuplets take 4/5 duration, 5 notes on the duration of 4 equal notes
+                factor = 4.0 / 5.0;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported multiplet type: '"+multipletType+"'");
         }
         return millis * factor;
         /*
