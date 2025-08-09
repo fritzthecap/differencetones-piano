@@ -74,7 +74,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         
         getDifferenceTonePiano().setTuningControlsEnabled(isStop);
         convertToDifferenceTones.setEnabled(isStop);
-        intervalRange.setEnabled(isStop);
+        intervalRange.setEnabled(isStop && convertToDifferenceTones.isSelected());
     }
     
     /** Overridden to alternatively generate difference-tone intervals when playing. */

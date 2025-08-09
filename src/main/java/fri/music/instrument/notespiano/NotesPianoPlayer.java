@@ -461,15 +461,15 @@ public class NotesPianoPlayer
 When you turn on the "Write Notes" checkbox, 
 you can use the piano to write notes.
 Left click on any key writes to the text-area at cursor position 
-with a note length that is calculated
+with a note duration that is calculated
 from the time the mouse button was down.
 Right mouse click opens a context-menu that lets choose
-the length of the clicked note.
+the duration of the clicked note.
 </p>
 <h2>Notes Syntax</h2>
 <p>
 Every note is given as an IPN-name (international pitch notation)
-and its length behind a slash, for example: 
+and its duration behind a slash, for example: 
 </p>
 <ul>
 <li>"A4/8" for a eighth note on A4 (4th octave) with pitch 440 Hz</li>
@@ -480,7 +480,7 @@ and its length behind a slash, for example:
 <li>"-/4" for a quarter rest note.</li>
 </ul>
 <p>
-No space must appear inside notes and their length specification,
+No space must appear between a note and its duration specification,
 but at least one whitespace MUST be between different notes.
 In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
 and there is no German "H", such is written as "B".
