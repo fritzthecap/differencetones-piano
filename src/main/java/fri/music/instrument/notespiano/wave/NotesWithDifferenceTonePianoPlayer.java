@@ -48,12 +48,13 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         
         this.intervalRange = new IntervalRangeComponent(resetPlayerListener, resetPlayerListener);
         
+        int index = 1; // add below "Play" button
         convertToDifferenceTones.setAlignmentX(Component.CENTER_ALIGNMENT);
-        getNotesControlPanel().add(convertToDifferenceTones, 1); // add below "Play" button
+        getNotesControlPanel().add(convertToDifferenceTones, index++); // add below "Play" button
         intervalRange.getNarrowestChoice().setAlignmentX(Component.CENTER_ALIGNMENT);
-        getNotesControlPanel().add(intervalRange.getNarrowestChoice(), 2);
+        getNotesControlPanel().add(intervalRange.getNarrowestChoice(), index++);
         intervalRange.getWidestChoice().setAlignmentX(Component.CENTER_ALIGNMENT);
-        getNotesControlPanel().add(intervalRange.getWidestChoice(), 3);
+        getNotesControlPanel().add(intervalRange.getWidestChoice(), index++);
         
         convertToDifferenceTones.addActionListener(new ActionListener() {
             @Override

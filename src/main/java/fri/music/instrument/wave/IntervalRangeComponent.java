@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import fri.music.ToneSystem;
+import fri.music.swingutils.SmartComboBox;
 
 /**
  * Used for difference-tone interval construction.
@@ -29,14 +30,14 @@ public class IntervalRangeComponent
     private JComboBox<String> widestIntervalChoice;
 
     public IntervalRangeComponent(ActionListener narrowestListener, ActionListener widestListener) {
-        this.narrowestIntervalChoice = new JComboBox<String>(narrowestIntervalNames);
+        this.narrowestIntervalChoice = new SmartComboBox(narrowestIntervalNames);
         narrowestIntervalChoice.setBorder(BorderFactory.createTitledBorder("Narrowest Interval"));
         narrowestIntervalChoice.setToolTipText("Narrowest Allowed Interval for Generating Difference Tones");
         narrowestIntervalChoice.setSelectedItem(ToneSystem.MINOR_THIRD); // make good default
         if (narrowestListener != null)
             narrowestIntervalChoice.addActionListener(narrowestListener);
 
-        this.widestIntervalChoice = new JComboBox<String>(widestIntervalNames);
+        this.widestIntervalChoice = new SmartComboBox(widestIntervalNames);
         widestIntervalChoice.setBorder(BorderFactory.createTitledBorder("Widest Interval"));
         widestIntervalChoice.setToolTipText("Widest Allowed Interval for Generating Difference Tones");
         widestIntervalChoice.setSelectedItem(ToneSystem.MAJOR_SIXTH);

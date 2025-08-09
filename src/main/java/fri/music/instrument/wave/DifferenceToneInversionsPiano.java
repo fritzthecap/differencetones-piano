@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -47,6 +48,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     private JComponent pianoPanel;
     private IntervalRangeComponent intervalRange;
     private JPanel intervalListsPanel;
+    private JPanel mainContainer;
+    private JPanel centerPanel;
     private JButton closeAllIntervalFrames;
     private JCheckBox sortIntervalFrames;
     private PianoKeyConnector pianoKeyConnector;
@@ -65,48 +68,24 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         this.pianoKeyConnector = new PianoKeyConnector(this);
         
-        final ActionListener rangeChangeListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tuningParametersHaveChanged();
-            }
-        };
-        this.intervalRange = new IntervalRangeComponent(rangeChangeListener, rangeChangeListener);
-        
-        this.sortIntervalFrames = new JCheckBox("Sorted Frames", true);
-        sortIntervalFrames.setToolTipText("Insert New Interval-Frames Sorted by Pitch");
-        
-        this.closeAllIntervalFrames = new JButton("Close All Frames");
-        closeAllIntervalFrames.setToolTipText("Close All Open Interval-Frames");
-        closeAllIntervalFrames.setEnabled(false);
-        closeAllIntervalFrames.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                closeAllIntervalFrames();
-            }
-        });
-        
-        int index = 3;
-        getControlPanel().add(intervalRange.getNarrowestChoice(), index++);
-        getControlPanel().add(intervalRange.getWidestChoice(), index++);
-        
-        this.intervalListsPanel = createIntervalListsPanel();
-        
-        final JToolBar intervalListsToolbar = new JToolBar();
-        //intervalListsToolbar.add(Box.createHorizontalGlue()); // for right alignment
-        intervalListsToolbar.add(sortIntervalFrames);
-        intervalListsToolbar.add(closeAllIntervalFrames);
-        
-        final JPanel intervalListsContainer = new JPanel(new BorderLayout());
-        intervalListsContainer.add(intervalListsToolbar, BorderLayout.SOUTH);
-        final JComponent intervalListsScrollPane = new JScrollPane(intervalListsPanel);
-        intervalListsContainer.add(intervalListsScrollPane, BorderLayout.CENTER);
-        
-        pianoPanel.add(intervalListsContainer, BorderLayout.CENTER);
+        pianoPanel.add(buildUi(), BorderLayout.CENTER);
         
         return this.pianoPanel = pianoPanel;
     }
     
+    /** Overridden to dynamically provide a panel for adding to <code>BorderLayout.CENTER</code>. */
+    @Override
+    public JComponent getPanelWithFreeCenter() {
+        getKeyboard();
+        
+        if (this.centerPanel == null) {
+            this.centerPanel = new JPanel(new BorderLayout());
+            mainContainer.add(centerPanel, 0);
+        }
+        return centerPanel;
+    }
+    
+    /** Overridden to listen to tuning changes. */
     @Override
     protected TuningComponent newTuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
         final TuningComponent.Listener listener = new TuningComponent.Listener() {
@@ -122,6 +101,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 listener);
     }
     
+    /** Overridden to listen to deviation changes. */
     @Override
     protected DeviationComponent newDeviationComponent(double deviation, boolean isVertical) {
         final DeviationComponent deviationComponent = super.newDeviationComponent(deviation, isVertical);
@@ -133,20 +113,68 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         });
         return deviationComponent;
     }
+    
 
     // UI builder methods
     
-    private JPanel createIntervalListsPanel() {
-        final JPanel intervalListsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // arrange frames from left to right, not LEADING
+    private JPanel buildUi() {
+        buildControls();
+        final JPanel listsContainer = buildIntervalListsContainer();
+
+        this.mainContainer = new JPanel();
+        final BoxLayout mainLayout = new BoxLayout(mainContainer, BoxLayout.Y_AXIS);
+        mainContainer.setLayout(mainLayout);
+        
+        mainContainer.add(listsContainer);
+        return mainContainer;
+    }
+
+    private void buildControls() {
+        final ActionListener rangeChangeListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tuningParametersHaveChanged();
+            }
+        };
+        this.intervalRange = new IntervalRangeComponent(rangeChangeListener, rangeChangeListener);
+        
+        int index = 3;
+        getControlPanel().add(intervalRange.getNarrowestChoice(), index++);
+        getControlPanel().add(intervalRange.getWidestChoice(), index++);
+    }
+    
+    private JPanel buildIntervalListsContainer() {
+        this.intervalListsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // arrange frames from left to right
         intervalListsPanel.setToolTipText(
                 "Press a keyboard-key to display all intervals that can generate it as difference-tone");
         intervalListsPanel.setBorder(BorderFactory.createTitledBorder(
                 "Lists of Intervals Generating a Tone as Difference-Tone"));
-        
         // set the panel to an initial height as long as there are no frames in it, else panel would collapse
         intervalListsPanel.add(Box.createVerticalStrut(160));
         
-        return intervalListsPanel;
+        this.sortIntervalFrames = new JCheckBox("Sorted Frames", true);
+        sortIntervalFrames.setToolTipText("Insert New Interval-Frames Sorted by Pitch");
+        
+        this.closeAllIntervalFrames = new JButton("Close All Frames");
+        closeAllIntervalFrames.setToolTipText("Close All Open Interval-Frames");
+        closeAllIntervalFrames.setEnabled(false);
+        closeAllIntervalFrames.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closeAllIntervalFrames();
+            }
+        });
+        
+        final JToolBar intervalListsToolbar = new JToolBar();
+        //intervalListsToolbar.add(Box.createHorizontalGlue()); // for right alignment
+        intervalListsToolbar.add(sortIntervalFrames);
+        intervalListsToolbar.add(closeAllIntervalFrames);
+        
+        final JPanel intervalListsContainer = new JPanel(new BorderLayout());
+        intervalListsContainer.add(new JScrollPane(intervalListsPanel), BorderLayout.CENTER);
+        intervalListsContainer.add(intervalListsToolbar, BorderLayout.SOUTH);
+        
+        return intervalListsContainer;
     }
 
     /** Called when user clicks a piano key. */

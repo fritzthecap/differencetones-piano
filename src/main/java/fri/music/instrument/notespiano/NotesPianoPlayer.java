@@ -79,16 +79,22 @@ public class NotesPianoPlayer
         
         this.playController = newPlayController(this);
         
-        final JComponent playerPanel = piano.getKeyboard(); // using the piano's panel
-        playerPanel.add(buildNotesPanel(), BorderLayout.CENTER); // to CENTER, so that user can resize area
+        final JComponent playerPanel = piano.getKeyboard();
+        
+        piano.getPanelWithFreeCenter().add(
+                buildNotesPanel(), 
+                BorderLayout.CENTER); // to CENTER, so that user can resize area
         
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
             notesText.setText(melody); // triggers check via DocumentListener
             notesText.setCaretPosition(melody.length());
         }
-        else { // enable or disable all buttons
-            readNotesFromTextAreaCatchExceptions();
+        else {
+            writeToNotesCheckbox.setSelected(true); // enable immediate notes writing
+            notesWritingPianoListener.setActive(true);
         }
+        
+        readNotesFromTextAreaCatchExceptions(); // enable or disable player buttons
         
         // listen to piano mouse clicks and write notes into text-area
         for (PianoWithSound.Keyboard.Key key : piano.getKeys()) {
@@ -319,7 +325,7 @@ public class NotesPianoPlayer
         writeToNotesCheckbox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                notesWritingPianoListener.setActive(((JCheckBox) e.getSource()).isSelected());
+                notesWritingPianoListener.setActive(writeToNotesCheckbox.isSelected());
             }
         });
         

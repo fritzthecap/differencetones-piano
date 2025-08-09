@@ -287,6 +287,14 @@ public class PianoWithSound extends Piano
             return pianoPanel; // just one view, due to mouseHandler that stores UI-state
         return pianoPanel = super.getKeyboard();
     }
+    
+    /**
+     * This default implementation returns <code>getKeyboard()</code>.
+     * @return a layout panel where something can be added to BorderLayout.CENTER.
+     */
+    public JComponent getPanelWithFreeCenter() {
+        return getKeyboard();
+    }
 
     /** @return fixed velocity (touch force), 127 / 4 = a fourth of possible. To be overridden. */
     protected int getVelocity() {
