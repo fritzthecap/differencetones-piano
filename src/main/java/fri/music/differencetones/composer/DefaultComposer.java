@@ -1,6 +1,7 @@
 package fri.music.differencetones.composer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import fri.music.Tone;
 import fri.music.differencetones.composer.strategy.ByPitch;
@@ -35,12 +36,13 @@ public class DefaultComposer extends AbstractStrategicComposer
     }
     
     @Override
-    protected List<Strategy> getStrategies() {
+    protected List<Strategy> getSortedStrategies() {
         if (strategies.size() <= 0) {
             strategies.add(new PrecedingNearPitch()); // priority 10
             strategies.add(new OneNoteInCommon()); // priority 20
             strategies.add(new ByPitch()); // priority 30
             strategies.add(new NonParallel()); // priority 40
+            Collections.sort(strategies, (rule1, rule2) -> rule1.suggestedPriority() - rule2.suggestedPriority());
         }
         return strategies;
     }
