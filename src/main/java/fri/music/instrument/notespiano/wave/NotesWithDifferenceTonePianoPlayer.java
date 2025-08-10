@@ -9,7 +9,6 @@ import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
-import fri.music.instrument.wave.IntervalRangeComponent;
 import fri.music.player.Note;
 
 /**
@@ -21,7 +20,6 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
 {
     private JComponent playerPanel; // the component
     private JCheckBox convertToDifferenceTones;
-    private IntervalRangeComponent intervalRange;
     
     public NotesWithDifferenceTonePianoPlayer(DifferenceToneForNotesPiano piano) {
         super(piano);
@@ -46,22 +44,16 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         };
         convertToDifferenceTones.addActionListener(resetPlayerListener);
         
-        this.intervalRange = new IntervalRangeComponent(resetPlayerListener, resetPlayerListener);
+        getDifferenceTonePiano().addIntervalRangeActionListener(resetPlayerListener);
         
         int index = 1; // add below "Play" button
         convertToDifferenceTones.setAlignmentX(Component.CENTER_ALIGNMENT);
         getNotesControlPanel().add(convertToDifferenceTones, index++); // add below "Play" button
-        intervalRange.getNarrowestChoice().setAlignmentX(Component.CENTER_ALIGNMENT);
-        getNotesControlPanel().add(intervalRange.getNarrowestChoice(), index++);
-        intervalRange.getWidestChoice().setAlignmentX(Component.CENTER_ALIGNMENT);
-        getNotesControlPanel().add(intervalRange.getWidestChoice(), index++);
         
         convertToDifferenceTones.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final boolean playDifferenceTones = ((JCheckBox) e.getSource()).isSelected();
-                intervalRange.getNarrowestChoice().setEnabled(playDifferenceTones);
-                intervalRange.getWidestChoice().setEnabled(playDifferenceTones);
+                getDifferenceTonePiano().setDifferenceToneParametersEnabled(convertToDifferenceTones.isSelected());
             }
         });
         
@@ -75,7 +67,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         
         getDifferenceTonePiano().setTuningControlsEnabled(isStop);
         convertToDifferenceTones.setEnabled(isStop);
-        intervalRange.setEnabled(isStop && convertToDifferenceTones.isSelected());
+        getDifferenceTonePiano().setDifferenceToneParametersEnabled(isStop);
     }
     
     /** Overridden to alternatively generate difference-tone intervals when playing. */
@@ -85,15 +77,15 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
             final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceTonePiano();
             final AbstractComposer composer = new DefaultComposer(
                     differenceTonePiano.getWaveSoundChannel().getTones(),
-                    intervalRange.narrowestAllowedInterval(),
-                    intervalRange.widestAllowedInterval(),
+                    getDifferenceTonePiano().narrowestAllowedInterval(),
+                    getDifferenceTonePiano().widestAllowedInterval(),
                     differenceTonePiano.getDeviation());
             try {
                 return composer.compose(notesArray);
             }
             catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain difference-tones
                 getErrorArea().setText(e.getMessage()+". Used tuning: "+differenceTonePiano.getSelectedTuning());
-                return new Note[0][];
+                return null;
             }
         }
         return super.convertNotesToChords(notesArray);

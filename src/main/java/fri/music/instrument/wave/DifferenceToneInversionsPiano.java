@@ -48,7 +48,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     private static final int INTERVAL_FRAME_HEIGHT = 160;
     
     private JComponent pianoPanel;
-    private IntervalRangeComponent intervalRange;
     private JPanel intervalListsPanel;
     private JPanel mainContainer;
     private JPanel centerPanel;
@@ -138,11 +137,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 tuningParametersHaveChanged();
             }
         };
-        this.intervalRange = new IntervalRangeComponent(rangeChangeListener, rangeChangeListener);
-        
-        int index = 3;
-        getControlPanel().add(intervalRange.getNarrowestChoice(), index++);
-        getControlPanel().add(intervalRange.getWidestChoice(), index++);
+        addIntervalRangeActionListener(rangeChangeListener);
     }
     
     private JPanel buildIntervalListsContainer() {
@@ -182,6 +177,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         return intervalListsContainer;
     }
+    
 
     /** Called when user clicks a piano key. */
     protected void addIntervalListFrame(String ipnNoteName, int midiNoteNumber) {
@@ -197,16 +193,14 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         final List<DifferenceToneInversions.TonePair> intervals = 
                 getDifferenceToneInversions().getIntervalsGenerating(ipnNoteName);
         
-        if (intervals != null) {
-            final IntervalListFrame newFrame = new IntervalListFrame(ipnNoteName, midiNoteNumber, intervals);
-            newFrame.frameCloseButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addOrRemoveIntervalListFrame(newFrame, false);
-                }
-            });
-            addOrRemoveIntervalListFrame(newFrame, true);
-        }
+        final IntervalListFrame newFrame = new IntervalListFrame(ipnNoteName, midiNoteNumber, intervals);
+        newFrame.frameCloseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addOrRemoveIntervalListFrame(newFrame, false);
+            }
+        });
+        addOrRemoveIntervalListFrame(newFrame, true);
     }
     
     private DifferenceToneInversions getDifferenceToneInversions() {
@@ -214,12 +208,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             differenceToneInversions = new DifferenceToneInversions(
                     new DifferenceToneInversions.Configuration(
                         getWaveSoundChannel().getTones(),
-                        ToneSystem.semitoneSteps(intervalRange.narrowestAllowedInterval()),
-                        ToneSystem.semitoneSteps(intervalRange.widestAllowedInterval()),
+                        ToneSystem.semitoneSteps(narrowestAllowedInterval()),
+                        ToneSystem.semitoneSteps(widestAllowedInterval()),
                         getDeviation())
                 );
-            if (ToneSystem.MINOR_SECOND.equals(intervalRange.narrowestAllowedInterval()) == false &&
-                    ToneSystem.MAJOR_SEVENTH.equals(intervalRange.narrowestAllowedInterval()) == false)
+            if (ToneSystem.MINOR_SECOND.equals(narrowestAllowedInterval()) == false &&
+                    ToneSystem.MAJOR_SEVENTH.equals(widestAllowedInterval()) == false)
                 differenceToneInversions.removeDissonant(false);
                 // removing dissonant on minor-second would make choosing minor-second useless!
         }

@@ -1,6 +1,7 @@
 package fri.music.instrument.wave;
 
 import java.awt.Color;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.SequencedSet;
@@ -25,7 +26,8 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
     private JComponent pianoPanel;
     private TuningComponent tuningComponent;
     private DeviationComponent deviationComponent;
-    
+    private IntervalRangeComponent intervalRange;
+
     public DifferenceToneForNotesPiano(PianoWithSound.Configuration config, WaveSoundChannel soundChannel) {
         super(config, soundChannel);
     }
@@ -37,11 +39,17 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
 
         final JComponent pianoPanel = super.getKeyboard();
         
+        int index = 1;
+        
         this.tuningComponent = newTuningComponent(config.lowestToneIpnName, config.octaves, getWaveSoundChannel());
-        getControlPanel().add(tuningComponent.getChoice(null), 1);
+        getControlPanel().add(tuningComponent.getChoice(null), index++);
         
         this.deviationComponent = newDeviationComponent(DifferenceTones.DEFAULT_DEVIATION, config.isVertical);
-        getControlPanel().add(deviationComponent.getSlider(), 2);
+        getControlPanel().add(deviationComponent.getSlider(), index++);
+        
+        this.intervalRange = new IntervalRangeComponent(null, null);
+        getControlPanel().add(intervalRange.getNarrowestChoice(), index++);
+        getControlPanel().add(intervalRange.getWidestChoice(), index++);
         
         return this.pianoPanel = pianoPanel;
     }
@@ -59,6 +67,12 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         return new DeviationComponent(deviation, isVertical);
     }
 
+    /** Listen to changes in min/max interval range. */
+    public void addIntervalRangeActionListener(ActionListener intervalRangeListener) {
+        intervalRange.getNarrowestChoice().addActionListener(intervalRangeListener);
+        intervalRange.getWidestChoice().addActionListener(intervalRangeListener);
+    }
+    
     /** @return the used WaveSoundChannel, holding tones of a tone-system. */
     public WaveSoundChannel getWaveSoundChannel() {
         return (WaveSoundChannel) getSoundChannel();
@@ -69,13 +83,29 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
     }
     
     public void setTuningControlsEnabled(boolean enable) {
-        deviationComponent.getSlider().setEnabled(enable);
         tuningComponent.getChoice(null).setEnabled(enable);
+        setDifferenceToneParametersEnabled(enable);
+    }
+    
+    public void setDifferenceToneParametersEnabled(boolean enable) {
+        deviationComponent.getSlider().setEnabled(enable);
+        intervalRange.getNarrowestChoice().setEnabled(enable);
+        intervalRange.getWidestChoice().setEnabled(enable);
     }
     
     /** @return the current deviation value from slider as floating-point number 0..1. */
     public double getDeviation() {
         return deviationComponent.getDeviation();
+    }
+    
+    /** @return the minimum value of interval-range for a difference-tone. */
+    public String narrowestAllowedInterval() {
+        return intervalRange.narrowestAllowedInterval();
+    }
+    
+    /** @return the maximum value of interval-range for a difference-tone. */
+    public String widestAllowedInterval() {
+        return intervalRange.widestAllowedInterval();
     }
     
     

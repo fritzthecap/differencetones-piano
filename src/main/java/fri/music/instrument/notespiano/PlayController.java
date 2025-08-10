@@ -178,8 +178,9 @@ class PlayController implements PlayControlButtons.Listener
     
         if (isStart) {
             final Note[] notesArray = readNotesFromTextArea(false);
-            final Note[][] sounds = view.convertNotesToChords(notesArray); // optional override
-            startPlayer(sounds, reverse); // thread is running now
+            final Note[][] sounds = view.convertNotesToChords(notesArray); // is optionally overridden!
+            if (sounds != null && sounds.length > 0) // could have caused a reported exception
+                startPlayer(sounds, reverse); // thread is running now
         }
         else { // is stop
             if (player != null) {
@@ -286,15 +287,19 @@ class PlayController implements PlayControlButtons.Listener
     
     private void skip(boolean forward, boolean buttonPressed) {
         if (buttonPressed == false) { // released
-            for (Note note : sounds[currentSoundIndex])
-                pianoKeyConnector.noteOff(note.midiNumber);
-            
-            view.enableUiOnPlaying(true);
+            if (sounds != null && sounds.length > 0) {
+                for (Note note : sounds[currentSoundIndex]) // ArrayIndexOutOfBoundsException when min FORTH max FIFTH and LIMIT_5 and pressing "rewind" and then "step forward"
+                    pianoKeyConnector.noteOff(note.midiNumber);
+                
+                view.enableUiOnPlaying(true);
+            }
         }
         else {
-            if (sounds == null) { // no "Play" was pressed before "Forward"
+            if (sounds == null) { // no "Play" was pressed before "Step Forward"
                 final Note[] notesArray = readNotesFromTextArea(false);
                 sounds = view.convertNotesToChords(notesArray);
+                if (sounds == null || sounds.length <= 0)
+                    return;
                 
                 if (currentSoundIndex == 0) // if initial state
                     currentSoundIndex = -1; // will be changed below

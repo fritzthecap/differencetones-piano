@@ -133,9 +133,71 @@ public class DifferenceToneInversions extends DifferenceTones
     public DifferenceToneInversions(Configuration config) {
         super(config.tones, config.deviationTolerance, true); // true: need to find only primary difference tones
         this.config = config;
-        initialize();
     }
     
+    /**
+     * @param differenceToneIpnName the IPN-name of the difference-tone to find generating intervals for.
+     * @return the intervals that would generate given difference-tone, smaller intervals and higher pitch sorted at head.
+     */
+    public List<TonePair> getIntervalsGenerating(String differenceToneIpnName) {
+        return getIntervalsGenerating(forIpnName(differenceToneIpnName));
+    }
+    
+    /**
+     * @param differenceToneMidiNumber the MIDI-number of the difference-tone to find generating intervals for.
+     * @return the intervals that would generate given difference-tone, smaller intervals and higher pitch sorted at head.
+     */
+    public List<TonePair> getIntervalsGenerating(int differenceToneMidiNumber) {
+        return getIntervalsGenerating(forMidiNoteNumber(differenceToneMidiNumber));
+    }
+    
+    /**
+     * @param differenceTone the difference-tone to find generating intervals for.
+     * @return the intervals that would generate given difference-tone, smaller intervals and higher pitch sorted at head.
+     */
+    public List<TonePair> getIntervalsGenerating(Tone differenceTone) {
+       return differenceToneToGeneratingTones().get(Objects.requireNonNull(differenceTone));
+    }
+    
+    /**
+     * @return all difference-tones that all tones in all octaves of this tone-system can generate,
+     *      sorted by MIDI-number (lowest tone at head).
+     */
+    public List<Tone> differenceTones() {
+        final List<Tone> keys = new ArrayList<>(differenceToneToGeneratingTones().keySet());
+        Collections.sort(keys, (tone1, tone2) -> tone1.midiNumber - tone2.midiNumber);
+        return keys;
+    }
+    
+    /**
+     * Removes all intervals that have upper or lower tone just one semi-tone away from their difference-tone,
+     * independent of octave. Thus C4 = B6-D#6 (dirty MAJOR_THIRD in EDO-12) would be removed, as B is next to C.
+     * @param alsoInFifthRange remove also intervals whose tones are too close to the fifth of the difference tone.
+     */
+    public void removeDissonant(boolean alsoInFifthRange) {
+        for (final Map.Entry<Tone,List<TonePair>> entry : differenceToneToGeneratingTones().entrySet()) {
+            final Tone differenceTone = entry.getKey();
+            
+            final Iterator<TonePair> iterator = entry.getValue().iterator();
+            while (iterator.hasNext()) {
+                final TonePair interval = iterator.next();
+                if (isOneSemitoneAway(differenceTone, interval.upperTone()) ||
+                        isOneSemitoneAway(differenceTone, interval.lowerTone()) ||
+                        (alsoInFifthRange &&
+                            (isFifthOneSemitoneAway(differenceTone, interval.upperTone()) ||
+                            isFifthOneSemitoneAway(differenceTone, interval.lowerTone()))))
+                    iterator.remove();
+
+            }
+        }
+    }
+    
+    private Map<Tone,List<TonePair>> differenceToneToGeneratingTones() {
+        if (differenceToneToGeneratingTones.isEmpty())
+            initialize();
+        return differenceToneToGeneratingTones;
+    }
+
     private void initialize() {
         // in just-intonation, any tone-pair can give another difference tone, nearly no predictions are possible
         // build index of intervals from given tones
@@ -168,63 +230,6 @@ public class DifferenceToneInversions extends DifferenceTones
         }
     }
     
-    /**
-     * @param differenceToneIpnName the IPN-name of the difference-tone to find generating intervals for.
-     * @return the intervals that would generate given difference-tone, smaller intervals and higher pitch sorted at head.
-     */
-    public List<TonePair> getIntervalsGenerating(String differenceToneIpnName) {
-        return getIntervalsGenerating(forIpnName(differenceToneIpnName));
-    }
-    
-    /**
-     * @param differenceToneMidiNumber the MIDI-number of the difference-tone to find generating intervals for.
-     * @return the intervals that would generate given difference-tone, smaller intervals and higher pitch sorted at head.
-     */
-    public List<TonePair> getIntervalsGenerating(int differenceToneMidiNumber) {
-        return getIntervalsGenerating(forMidiNoteNumber(differenceToneMidiNumber));
-    }
-    
-    /**
-     * @param differenceTone the difference-tone to find generating intervals for.
-     * @return the intervals that would generate given difference-tone, smaller intervals and higher pitch sorted at head.
-     */
-    public List<TonePair> getIntervalsGenerating(Tone differenceTone) {
-       return differenceToneToGeneratingTones.get(Objects.requireNonNull(differenceTone));
-    }
-    
-    /**
-     * @return all difference-tones that all tones in all octaves of this tone-system can generate,
-     *      sorted by MIDI-number (lowest tone at head).
-     */
-    public List<Tone> differenceTones() {
-        final List<Tone> keys = new ArrayList<>(differenceToneToGeneratingTones.keySet());
-        Collections.sort(keys, (tone1, tone2) -> tone1.midiNumber - tone2.midiNumber);
-        return keys;
-    }
-    
-    /**
-     * Removes all intervals that have upper or lower tone just one semi-tone away from their difference-tone,
-     * independent of octave. Thus C4 = B6-D#6 (dirty MAJOR_THIRD in EDO-12) would be removed, as B is next to C.
-     * @param alsoInFifthRange remove also intervals whose tones are too close to the fifth of the difference tone.
-     */
-    public void removeDissonant(boolean alsoInFifthRange) {
-        for (final Map.Entry<Tone,List<TonePair>> entry : differenceToneToGeneratingTones.entrySet()) {
-            final Tone differenceTone = entry.getKey();
-            
-            final Iterator<TonePair> iterator = entry.getValue().iterator();
-            while (iterator.hasNext()) {
-                final TonePair interval = iterator.next();
-                if (isOneSemitoneAway(differenceTone, interval.upperTone()) ||
-                        isOneSemitoneAway(differenceTone, interval.lowerTone()) ||
-                        (alsoInFifthRange &&
-                            (isFifthOneSemitoneAway(differenceTone, interval.upperTone()) ||
-                            isFifthOneSemitoneAway(differenceTone, interval.lowerTone()))))
-                    iterator.remove();
-
-            }
-        }
-    }
-
     private boolean isOneSemitoneAway(Tone differenceTone, Tone intervalTone) {
         final int minorSecond = ToneSystem.semitoneSteps(ToneSystem.MINOR_SECOND);
         final int majorSeventh = ToneSystem.semitoneSteps(ToneSystem.MAJOR_SEVENTH);
