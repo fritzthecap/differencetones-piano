@@ -27,22 +27,26 @@ public class DeviationComponent
     
     
     private JSlider buildDeviationSlider(int defaultDeviationPercent, boolean isVertical) {
-        final String title = "Deviation Tolerance Percent: ";
-        final String tooltip = "Allowed deviation for finding difference-tones, 100 being the middle between two semitones";
+        final String title = "Deviation Tolerance: ";
         
         final JSlider deviationSlider = new JSlider(0, 90, defaultDeviationPercent); // min, max, current
-        deviationSlider.setBorder(BorderFactory.createTitledBorder(title+defaultDeviationPercent));
-        deviationSlider.setToolTipText(tooltip);
+        deviationSlider.setBorder(BorderFactory.createTitledBorder(title));
+        deviationSlider.setToolTipText(
+                "Allowed deviation for finding difference-tones, 100 being the middle between two semitones");
         deviationSlider.setOrientation(isVertical ? SwingConstants.VERTICAL : SwingConstants.HORIZONTAL);
         deviationSlider.setPaintLabels(true);
         deviationSlider.setMajorTickSpacing(10);
-        deviationSlider.addChangeListener(new ChangeListener() {
+        
+        final ChangeListener deviationChangeListener = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 final int deviationPercent = deviationSlider.getValue();
-                ((TitledBorder) deviationSlider.getBorder()).setTitle(title+deviationPercent);
+                ((TitledBorder) deviationSlider.getBorder()).setTitle(title+deviationPercent+" %");
             }
-        });
+        };
+        deviationSlider.addChangeListener(deviationChangeListener);
+        deviationChangeListener.stateChanged(null); // establish title with percentage
+        
         return deviationSlider;
     }
     
