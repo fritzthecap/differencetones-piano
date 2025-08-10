@@ -25,7 +25,7 @@ public abstract class AbstractStrategy implements Strategy
         // narrow interval first, high pitch first
         generatingIntervals = context.inversions().getIntervalsGenerating(context.note());
         if (generatingIntervals == null || generatingIntervals.size() <= 0)
-            throw new IllegalArgumentException("Following note could not be mapped to an interval: '"+context.note()+"'");
+            throw new IllegalArgumentException("Note '"+context.note()+"' could not be mapped to an interval!");
         
         lastIndex = generatingIntervals.size() - 1;
         considerAlternatives = (lastIndex > 0 && context.previousInterval() != null);

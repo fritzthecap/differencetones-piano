@@ -123,7 +123,7 @@ public abstract class AbstractComposer
     /** Puts Note objects into result, built from given tonePair and note. */
     private void assignInterval(Note[][] result, int resultIndex, Note note, TonePair tonePair) {
         if (tonePair == null)
-            throw new IllegalArgumentException("Following note at index "+resultIndex+" could not be mapped to an interval: '"+note+"'");
+            throw new IllegalArgumentException("Note '"+note+"' at index "+resultIndex+" could not be mapped to an interval!");
         
         result[resultIndex][0] = new Note(tonePair.lowerTone(), note);
         result[resultIndex][1] = new Note(tonePair.upperTone(), note);

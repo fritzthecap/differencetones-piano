@@ -77,14 +77,19 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
             final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceTonePiano();
             final AbstractComposer composer = new DefaultComposer(
                     differenceTonePiano.getWaveSoundChannel().getTones(),
-                    getDifferenceTonePiano().narrowestAllowedInterval(),
-                    getDifferenceTonePiano().widestAllowedInterval(),
+                    differenceTonePiano.narrowestAllowedInterval(),
+                    differenceTonePiano.widestAllowedInterval(),
                     differenceTonePiano.getDeviation());
             try {
                 return composer.compose(notesArray);
             }
             catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain difference-tones
-                getErrorArea().setText(e.getMessage()+". Used tuning: "+differenceTonePiano.getSelectedTuning());
+                getErrorArea().setText(
+                        e.getMessage()+
+                        " Tuning "+differenceTonePiano.getSelectedTuning()+
+                        ", deviation "+differenceTonePiano.getDeviation()+
+                        ", bounds "+getDifferenceTonePiano().narrowestAllowedInterval()+
+                        " to "+getDifferenceTonePiano().widestAllowedInterval());
                 return null;
             }
         }
