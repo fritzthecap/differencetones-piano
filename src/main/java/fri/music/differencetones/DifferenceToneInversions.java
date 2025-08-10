@@ -52,9 +52,17 @@ public class DifferenceToneInversions extends DifferenceTones
         final int numberOfSemitones = highest.midiNumber - lowest.midiNumber;
         final double melodyOctaves = (double) numberOfSemitones / (double) ToneSystem.SEMITONES_PER_OCTAVE;
         
-        // up to 1.3 -> 4 octaves, up to 2.3 -> 5, up to 3.3 -> 6, ...
+        // we need the tone below lowest melody note to make deviation work also for bottom
+        int lowestIndexInToneStock = Arrays.binarySearch(toneStock, lowest, (t1, t2) -> t1.midiNumber - t2.midiNumber);
+        lowestIndexInToneStock--; // go one deeper
+        if (lowestIndexInToneStock < 0)
+            throw new IllegalArgumentException("Tone stock is too small for lowest melody note "+lowest.ipnName+", its lowest is "+toneStock[0].ipnName);
+        
+        final String lowestIpnName = toneStock[lowestIndexInToneStock].ipnName;
+        
+        // melodyOctaves up to 1.3 -> 4 octaves, up to 2.3 -> 5, up to 3.3 -> 6, ...
         final int additionalOctavesTo4 = Math.min(0, (int) Math.ceil(melodyOctaves - 1.3));
-        toneStock = AbstractToneSystem.tones(toneStock, lowest.ipnName, 4 + additionalOctavesTo4);
+        toneStock = AbstractToneSystem.tones(toneStock, lowestIpnName, 4 + additionalOctavesTo4);
         
         return new DifferenceToneInversions(
             new DifferenceToneInversions.Configuration(
@@ -217,7 +225,6 @@ public class DifferenceToneInversions extends DifferenceTones
                 
                 if (differenceTone != null) {
                     final TonePair tonePair = new TonePair(lowerTone, upperTone);
-                    //System.err.println(differenceTone.ipnName+" => "+tonePair);
                     
                     List<TonePair> list = differenceToneToGeneratingTones.get(differenceTone);
                     if (list == null) {

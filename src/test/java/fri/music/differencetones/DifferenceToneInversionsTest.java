@@ -167,7 +167,7 @@ class DifferenceToneInversionsTest
     
     @Test
     void removeDissonant() {
-        final ToneSystem toneSystem = new EqualTemperament("C3", 5);
+        final ToneSystem toneSystem = new EqualTemperament("B2", 5); // lowest must be one below the tested "C3"
         final DifferenceToneInversions differenceToneInversions = new DifferenceToneInversions(
                 new DifferenceToneInversions.Configuration(
                     toneSystem.tones(),

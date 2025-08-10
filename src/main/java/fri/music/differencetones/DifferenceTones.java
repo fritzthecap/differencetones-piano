@@ -176,20 +176,23 @@ public class DifferenceTones extends Tones
        if (upper == lower) // exact match was found, or both null
            return lower; // both are the same
        
-       if (upper == null) { // frequency is below lowest tone
+       /*if (upper == null) { // frequency is below lowest tone
            final double gapToLower = lower.frequency - frequencyToMatch;
            final double assumedGap = getNextUpper(lower).frequency - lower.frequency;
            final double tolerance = assumedGap * deviationTolerance;
            return (gapToLower > tolerance) ? null : lower;
        }
-       
        if (lower == null) { // frequency is above highest tone
            final double gapToUpper = frequencyToMatch - upper.frequency;
            final double assumedGap = getNextLower(upper).frequency - upper.frequency;
            final double tolerance = assumedGap * deviationTolerance;
            return (gapToUpper > tolerance) ? null : upper;
-       }
+       }*/
        
+       if (upper == null || // frequency is below lowest tone
+               lower == null) // frequency is above highest tone
+           return null; // can not calculate an exact result, assumptions lead to mismatches
+
        final double gapToLower = frequencyToMatch - lower.frequency;
        final double gapToUpper = upper.frequency - frequencyToMatch;
        final boolean preferLower = (gapToLower < gapToUpper);
@@ -197,6 +200,7 @@ public class DifferenceTones extends Tones
        final double gap = upper.frequency - lower.frequency;
        final double tolerance = gap * deviationTolerance; // deviation is never negative
        final double smallerGap = preferLower ? gapToLower : gapToUpper;
+       
        return (smallerGap > tolerance) ? null : preferLower ? lower : upper;
     }
 }
