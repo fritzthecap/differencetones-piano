@@ -150,7 +150,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         intervalListsPanel.setBorder(BorderFactory.createTitledBorder(
                 "Lists of Intervals Generating a Tone as Difference-Tone"));
         // set the panel to an initial height as long as there are no frames in it, else panel would collapse
-        intervalListsPanel.add(Box.createVerticalStrut(160));
+        intervalListsPanel.add(Box.createVerticalStrut(160 + 10));
         
         this.sortIntervalFrames = new JCheckBox("Sorted Frames", true);
         sortIntervalFrames.setToolTipText("Insert New Interval-Frames Sorted by Pitch");
@@ -217,23 +217,23 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return differenceToneInversions;
     }
 
-    private void addOrRemoveIntervalListFrame(IntervalListFrame framePanel, boolean isAdd) {
+    private void addOrRemoveIntervalListFrame(IntervalListFrame frame, boolean isAdd) {
         if (isAdd) {
             final List<IntervalListFrame> frames = getIntervalListFrames(); 
             int targetIndex = 0;
             if (sortIntervalFrames.isSelected()) { // sort in new frame
-                while (targetIndex < frames.size() && frames.get(targetIndex).midiNoteNumber < framePanel.midiNoteNumber)
+                while (targetIndex < frames.size() && frames.get(targetIndex).midiNoteNumber < frame.midiNoteNumber)
                     targetIndex++;
             }
-            else {
+            else { // append to end
                 targetIndex = frames.size();
             }
             
-            intervalListsPanel.add(framePanel, targetIndex);
-            setFrameSelected(framePanel);
+            intervalListsPanel.add(frame, targetIndex);
+            setFrameSelected(frame);
         }
         else {
-            intervalListsPanel.remove(framePanel);
+            intervalListsPanel.remove(frame);
         }
         
         refreshFramesContainer();
@@ -289,7 +289,9 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         for (IntervalListFrame frame : getIntervalListFrames()) {
             final boolean isThis = (frame == intervalListFrame);
             frame.setTitleBarSelected(isThis);
-            if (isThis == false)
+            if (isThis)
+                frame.scrollToVisible();
+            else
                 frame.clearListSelection();
         }
     }
@@ -423,10 +425,16 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             
             fillList(intervals); // put data into list
             
-            SizeUtil.forceSize(this, new Dimension(210, 150)); // all frames should be equally sized
+            SizeUtil.forceSize(this, new Dimension(190, 160)); // all frames should be equally sized
         }
         
         
+        // methods called by outer class
+        
+        void scrollToVisible() {
+            ((JComponent) getParent()).scrollRectToVisible(getBounds());
+        }
+
         void fillList(List<DifferenceToneInversions.TonePair> intervals) {
             final DefaultListModel<DifferenceToneInversions.TonePair> model = new DefaultListModel<>();
             final int numberOfItems;
@@ -464,13 +472,14 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             IntervalListCellRenderer() {
                 listLine.add(intervalName, BorderLayout.WEST);
                 
-                listLine.add(Box.createRigidArea(new Dimension(12, 4)), BorderLayout.CENTER);
+                listLine.add(Box.createRigidArea(new Dimension(4, -1)), BorderLayout.CENTER);
                 
-                final Dimension size = new Dimension(30, -1);
+                final Dimension size = new Dimension(28, -1);
                 SizeUtil.forceSize(lowerNoteName, size);
                 SizeUtil.forceSize(upperNoteName, size);
-                final JLabel separator = new JLabel("-", JLabel.CENTER);
-                SizeUtil.forceSize(separator, size);
+                final JLabel separator = new JLabel(" ", JLabel.CENTER);
+                final Dimension separatorSize = new Dimension(5, -1);
+                SizeUtil.forceSize(separator, separatorSize);
                 
                 final JPanel noteNames = new JPanel(new BorderLayout());
                 noteNames.setOpaque(false); // else panel will be gray
