@@ -29,6 +29,7 @@ public class DifferenceToneUtil
         final DifferenceTones differenceTones = new DifferenceTones(tones, deviation, true); // true: find primary difference tone only
         try {
             final Tone[] allDifferenceTones = differenceTones.findDifferenceTones(midiNoteNumber1, midiNoteNumber2);
+            
             if (allDifferenceTones[0] != null) { // difference-tone is in tones range
                 final Tone primaryDifferenceTone = allDifferenceTones[0];
 

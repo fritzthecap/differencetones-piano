@@ -103,7 +103,7 @@ public class DifferenceTones extends Tones
         super(toneSystem);
         
         if (deviationTolerance > MAXIMUM_DEVIATION || deviationTolerance < 0.0)
-            throw new IllegalArgumentException("deviationTolerance must be between 0 and "+MAXIMUM_DEVIATION+", given was "+deviationTolerance);
+            throw new IllegalArgumentException("Deviation tolerance must be between 0 and "+MAXIMUM_DEVIATION+", given was "+deviationTolerance);
         
         this.deviationTolerance = deviationTolerance;
         this.primaryDifferenceToneOnly = primaryDifferenceToneOnly;
