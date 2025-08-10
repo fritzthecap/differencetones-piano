@@ -40,6 +40,8 @@ import fri.music.swingutils.TextAreaActions;
 
 /**
  * A notes area that can play user-editable notes on a given piano.
+ * It uses a constructor-given piano to play the entered notes, thus
+ * it is called "Player" and not "Piano", although it displays a piano.
  */
 public class NotesPianoPlayer
 {
@@ -251,10 +253,12 @@ public class NotesPianoPlayer
         
         this.error = new JTextField();
         error.setBorder(BorderFactory.createTitledBorder("Error"));
+        error.setToolTipText("First Found Syntax Error in Notes Text");
         error.setEditable(false);
         error.setForeground(Color.RED);
         
         final JButton help = new JButton("Help");
+        help.setToolTipText("Notes Text Syntax Documentation");
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
