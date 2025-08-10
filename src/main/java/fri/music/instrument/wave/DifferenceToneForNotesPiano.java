@@ -124,7 +124,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         private Border originalBorder;
         private Keyboard.Key selectedDifferenceKey;
         
-        public DifferenceToneMouseHandler(PianoWithSound piano, WaveSoundChannel soundChannel) {
+        public DifferenceToneMouseHandler(DifferenceToneForNotesPiano piano, WaveSoundChannel soundChannel) {
             super(piano);
             this.soundChannel = soundChannel;
             this.redBorder = BorderFactory.createLineBorder(Color.RED, 2);
@@ -153,7 +153,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
                 
                 final Keyboard.Key differenceToneKey = DifferenceToneUtil.getDifferenceToneKey(
                         soundChannel.getTones(), 
-                        ((DifferenceToneForNotesPiano) piano).getDeviation(),
+                        getPiano().getDeviation(),
                         piano,
                         twoPlayingKeys[0].midiNoteNumber,
                         twoPlayingKeys[1].midiNoteNumber);
@@ -189,6 +189,10 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
             if (originalBorder == null) // save original border for reset
                 originalBorder = key.getBorder();
             key.setBorder(select ? redBorder : originalBorder);
+        }
+        
+        private DifferenceToneForNotesPiano getPiano() {
+            return (DifferenceToneForNotesPiano) piano;
         }
     }
 }

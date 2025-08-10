@@ -332,7 +332,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     {
         private boolean active = true;
         
-        public DifferenceToneInversionsMouseHandler(PianoWithSound piano, WaveSoundChannel soundChannel) {
+        public DifferenceToneInversionsMouseHandler(DifferenceToneInversionsPiano piano, WaveSoundChannel soundChannel) {
             super(piano, soundChannel);
         }
         
