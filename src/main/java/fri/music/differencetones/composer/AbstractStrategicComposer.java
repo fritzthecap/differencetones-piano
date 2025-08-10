@@ -1,6 +1,5 @@
 package fri.music.differencetones.composer;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.SequencedMap;
 import fri.music.Tone;
@@ -30,7 +29,7 @@ public abstract class AbstractStrategicComposer extends AbstractComposer
      * @return a sorted list of <code>Strategy</code> objects to find 
      *      difference-tone intervals for a given melody.
      */
-    protected abstract List<Strategy> getStrategies();
+    protected abstract List<Strategy> getSortedStrategies();
 
     /**
      * Maps given note using a sorted list of <code>Strategy</code> objects.
@@ -54,8 +53,7 @@ public abstract class AbstractStrategicComposer extends AbstractComposer
                 note,
                 result);
         
-        final List<Strategy> strategies = getStrategies();
-        Collections.sort(strategies, (rule1, rule2) -> rule1.suggestedPriority() - rule2.suggestedPriority());
+        final List<Strategy> strategies = getSortedStrategies();
         
         for (Strategy strategy : strategies) {
             final TonePair solution = strategy.solution(strategyContext);
