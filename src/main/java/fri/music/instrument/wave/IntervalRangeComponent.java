@@ -14,16 +14,20 @@ import fri.music.swingutils.SmartComboBox;
 public class IntervalRangeComponent
 {
     private static final String[] narrowestIntervalNames = new String[] {
+            ToneSystem.MINOR_SECOND,
             ToneSystem.MAJOR_SECOND,
             ToneSystem.MINOR_THIRD,
             ToneSystem.MAJOR_THIRD,
-            ToneSystem.FOURTH
+            ToneSystem.FOURTH,
+            ToneSystem.TRITONE,
         };
     private static final String[] widestIntervalNames = new String[] {
+            ToneSystem.TRITONE,
             ToneSystem.FIFTH,
             ToneSystem.MINOR_SIXTH,
             ToneSystem.MAJOR_SIXTH,
-            ToneSystem.MINOR_SEVENTH
+            ToneSystem.MINOR_SEVENTH,
+            ToneSystem.MAJOR_SEVENTH,
         };
 
     private JComboBox<String> narrowestIntervalChoice;

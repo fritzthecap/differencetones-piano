@@ -45,6 +45,8 @@ import fri.music.wavegenerator.WaveSoundChannel;
  */
 public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
 {
+    private static final int INTERVAL_FRAME_HEIGHT = 160;
+    
     private JComponent pianoPanel;
     private IntervalRangeComponent intervalRange;
     private JPanel intervalListsPanel;
@@ -144,13 +146,13 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     private JPanel buildIntervalListsContainer() {
-        this.intervalListsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // arrange frames from left to right
+        final FlowLayout layout = new FlowLayout(FlowLayout.LEFT); // arrange frames from left to right
+        layout.setHgap(0);
+        this.intervalListsPanel = new JPanel(layout);
         intervalListsPanel.setToolTipText(
                 "Press a keyboard-key to display all intervals that can generate it as difference-tone");
-        intervalListsPanel.setBorder(BorderFactory.createTitledBorder(
-                "Lists of Intervals Generating a Tone as Difference-Tone"));
         // set the panel to an initial height as long as there are no frames in it, else panel would collapse
-        intervalListsPanel.add(Box.createVerticalStrut(160 + 10));
+        intervalListsPanel.add(Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4));
         
         this.sortIntervalFrames = new JCheckBox("Sorted Frames", true);
         sortIntervalFrames.setToolTipText("Insert New Interval-Frames Sorted by Pitch");
@@ -171,7 +173,11 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         intervalListsToolbar.add(closeAllIntervalFrames);
         
         final JPanel intervalListsContainer = new JPanel(new BorderLayout());
-        intervalListsContainer.add(new JScrollPane(intervalListsPanel), BorderLayout.CENTER);
+        final JScrollPane intervalListsScrollPane = new JScrollPane(intervalListsPanel);
+        intervalListsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        intervalListsScrollPane.setBorder(BorderFactory.createTitledBorder(
+                "Lists of Intervals Generating a Tone as Difference-Tone"));
+        intervalListsContainer.add(intervalListsScrollPane, BorderLayout.CENTER);
         intervalListsContainer.add(intervalListsToolbar, BorderLayout.SOUTH);
         
         return intervalListsContainer;
@@ -212,12 +218,15 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                         ToneSystem.semitoneSteps(intervalRange.widestAllowedInterval()),
                         getDeviation())
                 );
-            differenceToneInversions.removeDissonant(false);
+            if (ToneSystem.MINOR_SECOND.equals(intervalRange.narrowestAllowedInterval()) == false &&
+                    ToneSystem.MAJOR_SEVENTH.equals(intervalRange.narrowestAllowedInterval()) == false)
+                differenceToneInversions.removeDissonant(false);
+                // removing dissonant on minor-second would make choosing minor-second useless!
         }
         return differenceToneInversions;
     }
 
-    private void addOrRemoveIntervalListFrame(IntervalListFrame frame, boolean isAdd) {
+    private void addOrRemoveIntervalListFrame(final IntervalListFrame frame, boolean isAdd) {
         if (isAdd) {
             final List<IntervalListFrame> frames = getIntervalListFrames(); 
             int targetIndex = 0;
@@ -230,7 +239,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             }
             
             intervalListsPanel.add(frame, targetIndex);
-            setFrameSelected(frame);
+            SwingUtilities.invokeLater(() -> setFrameSelected(frame));
         }
         else {
             intervalListsPanel.remove(frame);
@@ -425,7 +434,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             
             fillList(intervals); // put data into list
             
-            SizeUtil.forceSize(this, new Dimension(190, 160)); // all frames should be equally sized
+            SizeUtil.forceSize(this, new Dimension(190, INTERVAL_FRAME_HEIGHT));
         }
         
         
@@ -459,6 +468,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             frameTitleBar.setBorder(BorderFactory.createLineBorder(borderColor, 1, true));
             final Color backgroundColor = selected ? list.getSelectionBackground() : list.getBackground();
             frameTitleBar.setBackground(backgroundColor);
+            frameTitleBar.paintImmediately(frameTitleBar.getVisibleRect());
         }
         
 
