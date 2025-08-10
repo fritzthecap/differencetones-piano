@@ -359,7 +359,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         public final int midiNoteNumber;
         public final JButton frameCloseButton;
         
-        private final JList<DifferenceToneInversions.TonePair> list;
+        private final JList<DifferenceToneInversions.TonePair> intervalList;
         private final JLabel frameTitle;
         private final JPanel frameTitleBar;
         
@@ -376,26 +376,29 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 }
             };
             
-            this.list = new JList<>() {
+            this.intervalList = new JList<>() {
                 /** Avoid selection change by mouse drag. */
                 protected void processMouseMotionEvent(MouseEvent e) {
                     if (e.getID() != MouseEvent.MOUSE_DRAGGED)
                         super.processMouseMotionEvent(e);
                 }
             };
-            list.addMouseListener(frameSelectionListener);
-            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            list.setCellRenderer(new IntervalListCellRenderer());
+            intervalList.addMouseListener(frameSelectionListener);
+            intervalList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            intervalList.setCellRenderer(new IntervalListCellRenderer());
             
-            list.addMouseListener(new MouseAdapter() {
+            intervalList.addMouseListener(new MouseAdapter() {
                 private DifferenceToneInversions.TonePair currentlyPlaying;
                 
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
-                        currentlyPlaying = list.getModel().getElementAt(list.locationToIndex(e.getPoint()));
-                        if (currentlyPlaying != null)
-                            intervalSelected(IntervalListFrame.this, currentlyPlaying, true);
+                        final int index = intervalList.locationToIndex(e.getPoint());
+                        if (index >= 0 && index < intervalList.getModel().getSize()) {
+                            currentlyPlaying = intervalList.getModel().getElementAt(index);
+                            if (currentlyPlaying != null)
+                                intervalSelected(IntervalListFrame.this, currentlyPlaying, true);
+                        }
                     }
                 }
                 @Override
@@ -422,7 +425,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             frameTitleBar.add(frameCloseButton, BorderLayout.EAST);
             
             add(frameTitleBar, BorderLayout.NORTH);
-            add(new JScrollPane(list), BorderLayout.CENTER);
+            add(new JScrollPane(intervalList), BorderLayout.CENTER);
             
             setBorder(BorderFactory.createLineBorder(Color.GRAY, 1, true));
             
@@ -450,17 +453,17 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 numberOfItems = 0;
             }
             frameTitle.setText(ipnNoteName+"  ("+numberOfItems+")");
-            list.setModel(model);
+            intervalList.setModel(model);
         }
         
         void clearListSelection() {
-            list.clearSelection();
+            intervalList.clearSelection();
         }
 
         void setTitleBarSelected(boolean selected) {
             final Color borderColor = selected ? Color.BLACK : Color.LIGHT_GRAY;
             frameTitleBar.setBorder(BorderFactory.createLineBorder(borderColor, 1, true));
-            final Color backgroundColor = selected ? list.getSelectionBackground() : list.getBackground();
+            final Color backgroundColor = selected ? intervalList.getSelectionBackground() : intervalList.getBackground();
             frameTitleBar.setBackground(backgroundColor);
             frameTitleBar.paintImmediately(frameTitleBar.getVisibleRect());
         }
