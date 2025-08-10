@@ -13,8 +13,8 @@ import javax.swing.border.Border;
 import fri.music.SoundChannel;
 
 /**
- * Piano that enables to continue playing clicked keys
- * until they get clicked again.
+ * Piano that enables to continue playing clicked keys until they get clicked again.
+ * The "Hold" state is rendered by a red border, but no other visual selection.
  */
 public class PianoWithHold extends PianoWithVolume
 {

@@ -122,6 +122,7 @@ public abstract class AbstractToneSystem implements ToneSystem
      * @param octaves the 0-n number of octaves + 1 to return.
      *      When zero, just the lowest tone is returned.
      * @return all tones from given IPN-name up to given octaves + 1.
+     * @throws IllegalArgumentException when given number of octaves is too big for given tones stock.
      */
     public static Tone[] tones(Tone[] tones, String lowestIpnName, int octaves) {
         if (octaves < 0)

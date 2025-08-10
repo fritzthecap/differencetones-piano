@@ -12,6 +12,7 @@ import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
  * Piano that displays difference-tones for two high notes sounding together.
+ * The "Difference Tone" state is rendered by a red border combined with visual selection.
  */
 public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
 {

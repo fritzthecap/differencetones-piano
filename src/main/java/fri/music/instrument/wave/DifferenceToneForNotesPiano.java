@@ -14,11 +14,11 @@ import fri.music.swingutils.ButtonUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
- * Piano that marks a difference-tone with selection and a
- * red border when two (high) notes are played together.
- * It is not possible to select two keys with mouse-buttons,
- * so you need a <code>PianoKeyConnector</code> and possibly
- * a <code>Player</code> thread to drive this piano.
+ * Piano that marks a difference-tone when two (high) notes are played together.
+ * The "Difference Tone" state is rendered by a red border combined with visual selection.
+ * <p/>
+ * As it is not possible to select two keys with a single mouse-buttons, you will need a
+ * <code>PianoKeyConnector</code> and possibly a <code>Player</code> thread to drive this piano.
  */
 public class DifferenceToneForNotesPiano extends PianoWithVolume
 {
