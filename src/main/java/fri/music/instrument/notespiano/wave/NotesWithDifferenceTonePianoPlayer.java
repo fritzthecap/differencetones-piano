@@ -81,6 +81,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
                     differenceTonePiano.widestAllowedInterval(),
                     differenceTonePiano.getDeviation());
             try {
+                getErrorArea().setText("");
                 return composer.compose(notesArray);
             }
             catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain difference-tones
