@@ -21,9 +21,15 @@ public class Note extends Tone
      *      or both, all having SAME pitch. Null means not tied, 
      *      TRUE means tie start or continued, FALSE means tie end.
      *      If a tie is not started but continued, the note's durationMilliseconds will be zero.
+     * @param chord a note that is part of a chord. Null means not part of a chord,
+     *      TRUE means chord start or continued, FALSE means chord end.
      */
-    public record ConnectionFlags(Boolean slurred, Boolean tied)
+    public record ConnectionFlags(Boolean slurred, Boolean tied, Boolean chord)
     {
+        /** Convenience constructor for a note with no connection at all. */
+        public ConnectionFlags() {
+            this(null, null, null);
+        }
     }
     
     /**
@@ -114,7 +120,7 @@ public class Note extends Tone
         this.durationMilliseconds = (durationMilliseconds < 0) ? DEFAULT_BEAT_DURATION : durationMilliseconds;
         this.volume = (volume <= 0 || volume > 127) ? DEFAULT_VOLUME : volume;
         this.emphasized = emphasized;
-        this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags(null, null);
+        this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags();
         this.lengthNotation = lengthNotation;
         this.beatInfo = (beatInfo != null) ? beatInfo : new BeatInfo(null, null);
     }
@@ -130,7 +136,7 @@ public class Note extends Tone
         this.durationMilliseconds = durationMilliseconds;
         this.volume = note.volume;
         this.emphasized = note.emphasized;
-        this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags(null, null);
+        this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags();
         this.lengthNotation = lengthNotation;
         this.beatInfo = note.beatInfo;
     }
@@ -142,7 +148,7 @@ public class Note extends Tone
         this.durationMilliseconds = durationMilliseconds;
         this.volume = 0;
         this.emphasized = emphasized;
-        this.connectionFlags = new ConnectionFlags(null, null);
+        this.connectionFlags = new ConnectionFlags();
         this.lengthNotation = lengthNotation;
         this.beatInfo = (beatInfo != null) ? beatInfo : new BeatInfo(null, null);
     }

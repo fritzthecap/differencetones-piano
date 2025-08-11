@@ -54,6 +54,12 @@ Slurs are started by a brace "{" and ended by "}",
 notes in between MUST NOT be enclosed in "{...}",
 because it is not clear how to phrase several notes that are all slurred together.
 Space between braces and note is allowed.
+</p><p>
+Chord notes are two or more notes of different pitch that are played simultaneously.
+Chords are started by a bracket "[" and ended by "]", 
+just the first note needs to have a duration, it is assumed that all have the same length.
+Ties and slurs from inside to outside of a chord are allowed.
+Space between brackets and note is allowed.
 </p>
  */
 public class MelodyFactory
@@ -124,7 +130,8 @@ public class MelodyFactory
     private Integer beatsPerMinute; // BPM
     private Integer beatsPerBar; // time signature, waltz (3) or foxtrot (4) or ...
     private Integer beatType; // beat-notes in bar, eighth (8) or quarter (4) or ... er changes. */
-    private int beatDurationMilliseconds; // duration in milliseconds of one beat
+    /** Duration of one beat in milliseconds, package-visible for unit-tests. */
+    int beatDurationMilliseconds;
 
     private String timeSignatureOnTop;
     private Integer tempoOnTop;
@@ -197,7 +204,7 @@ public class MelodyFactory
      * @param text contains the notes of the melody, including ties and time signature changes.
      * @throws IllegalArgumentException when notes are invalid.
      */
-    public Note[] translate(String text) {
+    public Note[][] translate(String text) {
         return translate(new InputTextScanner().toStringArray(text));
     }
     
@@ -211,14 +218,14 @@ public class MelodyFactory
      * @return a sequence of <code>Note</code> objects representing <code>melodyTokens</code>.
      * @throws IllegalArgumentException when notes are invalid.
      */
-    public Note[] translate(String[] melodyTokens) {
+    public Note[][] translate(String[] melodyTokens) {
         final List<MelodyToken> melodyNotes = new ArrayList<>(melodyTokens.length);
         
         final List<Note> rawNotes = buildRawNotes(melodyTokens, melodyNotes);
         
-        final List<Note> connectedNotes = connectSlurredAndTiedNotes(melodyNotes, rawNotes);
+        final List<Note[]> connectedNotes = buildConnectedNotes(melodyNotes, rawNotes);
         
-        return connectedNotes.toArray(new Note[connectedNotes.size()]);
+        return connectedNotes.toArray(new Note[connectedNotes.size()][]);
     }
     
     /**
@@ -226,61 +233,74 @@ public class MelodyFactory
      * @param notes the notes to output bar-formatted as string.
      * @return a text where each bar of given notes will be displayed in a new line.
      */
-    public String toString(Note[] notes, boolean writeTempo, boolean writeTimeSignature) {
+    public String toString(Note[][] notes, boolean writeTempo, boolean writeTimeSignature) {
         final StringBuilder result = new StringBuilder();
         boolean inSlur = false;
         boolean inTie = false;
+        boolean inChord = false;
         
         for (int i = 0; i < notes.length; i++) {
-            final Note note = notes[i];
-            // optional tempo and time-signature is attached to note
-            
-            if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
-                throw new IllegalArgumentException("Note has no length: "+note.ipnName);
-            
-            final boolean addNewlineBeforeNote = (note.emphasized && i > 0);
-            
-            if (i == 0 && writeTempo)
-                result.append("" + note.beatInfo.beatsPerMinute() + NEWLINE);
-
-            if ((i > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar-type
-                result.append(
-                    (i <= 0 || endsWithNewline(result) ? "" : NEWLINE) +
-                    note.beatInfo.timeSignature() +
-                    (addNewlineBeforeNote ? "" : NEWLINE));
-            
-            if (addNewlineBeforeNote) // break line before first note in bar
-                result.append(NEWLINE);
-            
-            if (Boolean.TRUE.equals(note.connectionFlags.slurred())) {
-                if (inSlur == false)
-                    result.append(NoteConnections.SLUR_START_SYMBOL);
-                inSlur = true;
-            }
-            
-            if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
-                result.append(NoteConnections.TIE_START_SYMBOL);
-            }
+            for (Note note : notes[i]) {
+                if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
+                    throw new IllegalArgumentException("Note has no length: "+note.ipnName);
                 
-            result.append(note.toString());
-            
-            if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
-                if (inTie == true) // enclose every note within tie into parentheses
+                final boolean addNewlineBeforeNote = (note.emphasized && i > 0);
+                
+                // tempo can be attached to first note
+                if (i == 0 && writeTempo)
+                    result.append("" + note.beatInfo.beatsPerMinute() + NEWLINE);
+    
+                // time-signature changes can be attached to any note
+                if ((i > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar-type
+                    result.append(
+                        (i <= 0 || endsWithNewline(result) ? "" : NEWLINE) +
+                        note.beatInfo.timeSignature() +
+                        (addNewlineBeforeNote ? "" : NEWLINE));
+                
+                if (addNewlineBeforeNote) // break line before first note in bar
+                    result.append(NEWLINE);
+                
+                if (Boolean.TRUE.equals(note.connectionFlags.slurred())) {
+                    if (inSlur == false)
+                        result.append(NoteConnections.SLUR_START_SYMBOL);
+                    inSlur = true;
+                }
+                
+                if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
+                    result.append(NoteConnections.TIE_START_SYMBOL);
+                }
+                    
+                if (Boolean.TRUE.equals(note.connectionFlags.chord())) {
+                    if (inChord == false)
+                        result.append(NoteConnections.CHORD_START_SYMBOL);
+                    inChord = true;
+                }
+                    
+                result.append(note.toString());
+                
+                if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
+                    if (inTie == true) // enclose every note within tie into parentheses
+                        result.append(NoteConnections.TIE_END_SYMBOL);
+                    inTie = true;
+                }
+                else if (Boolean.FALSE.equals(note.connectionFlags.tied())) {
                     result.append(NoteConnections.TIE_END_SYMBOL);
-                inTie = true;
+                    inTie = false;
+                }
+                
+                if (Boolean.FALSE.equals(note.connectionFlags.slurred())) {
+                    result.append(NoteConnections.SLUR_END_SYMBOL);
+                    inSlur = false;
+                }
+                
+                if (Boolean.FALSE.equals(note.connectionFlags.chord())) {
+                    result.append(NoteConnections.CHORD_END_SYMBOL);
+                    inChord = false;
+                }
+                
+                if (i < notes.length - 1 && (inChord || notes[i + 1][0].emphasized == false))
+                    result.append(" "); // separate notes by space when not last in bar
             }
-            else if (Boolean.FALSE.equals(note.connectionFlags.tied())) {
-                result.append(NoteConnections.TIE_END_SYMBOL);
-                inTie = false;
-            }
-            
-            if (Boolean.FALSE.equals(note.connectionFlags.slurred())) {
-                result.append(NoteConnections.SLUR_END_SYMBOL);
-                inSlur = false;
-            }
-            
-            if (i < notes.length - 1 && notes[i + 1].emphasized == false)
-                result.append(" "); // separate notes by space when not last in bar
         }
         
         result.append(NEWLINE);
@@ -299,11 +319,6 @@ public class MelodyFactory
     }
     
 
-    /** @return the milliseconds one beat lasts, for unit-tests. */
-    int getBeatDurationMilliseconds() {
-        return beatDurationMilliseconds;
-    }
-    
     private void calculateBeatDurationMilliseconds() {
         this.beatDurationMilliseconds = beatDurationMillis(this.beatsPerMinute);
     }
@@ -353,9 +368,10 @@ public class MelodyFactory
         String previousTimeSignature = timeSignature(beatsPerBar, beatType);
         String currentTimeSignature = previousTimeSignature;
         boolean previousTokenWasNote = true;
+        String chordLength = null;
         
         for (int i = 0; i < melodyTokens.length; i++) {
-            final InputToken inputToken = newInputToken(melodyTokens[i].trim());
+            final InputToken inputToken = newInputToken(melodyTokens[i].trim(), chordLength);
             
             if (inputToken instanceof BeatsPerMinuteToken) {
                 if (notes.size() > 0 || tempoOnTop != null)
@@ -399,9 +415,14 @@ public class MelodyFactory
                         (notes.size() <= 0 || previousTimeSignature.equals(currentTimeSignature) == false);
                 previousTimeSignature = currentTimeSignature;
                 
-                final Note note = buildRawNote(melodyToken, barState, currentTimeSignature, beatInfoRequired);
+                final Note note = buildRawNote(melodyToken, barState, currentTimeSignature, beatInfoRequired, chordLength != null);
                 notes.add(note);
                 
+                if (melodyToken.noteConnections.isChordStart())
+                    chordLength = melodyToken.length;
+                else if (melodyToken.noteConnections.isChordEnd())
+                    chordLength = null;
+                    
                 previousTokenWasNote = true;
             }
         }
@@ -409,7 +430,7 @@ public class MelodyFactory
     }
 
     
-    private InputToken newInputToken(String melodyToken) {
+    private InputToken newInputToken(String melodyToken, String chordLength) {
         final NoteConnections noteConnections = new NoteConnections(melodyToken);
         
         final MelodyToken noteAndLength = splitByDurationSeparator(noteConnections.melodyToken);
@@ -425,7 +446,11 @@ public class MelodyFactory
         
         checkValidIpnName(noteAndLength.ipnName);
         
-        final String length = (noteAndLength.length != null) ? noteAndLength.length : DEFAULT_NOTE_LENGTH;
+        final String length = (chordLength != null)
+                ? chordLength
+                : (noteAndLength.length != null)
+                    ? noteAndLength.length
+                    : DEFAULT_NOTE_LENGTH;
         
         return new MelodyToken(noteAndLength.ipnName, length, noteConnections);
     }
@@ -507,14 +532,20 @@ public class MelodyFactory
     }
     
     
-    private Note buildRawNote(MelodyToken melodyToken, BarState barState, String currentTimeSignature, boolean beatInfoRequired) {
-        final int duration = durationMilliseconds(melodyToken.length);
+    private Note buildRawNote(
+            MelodyToken melodyToken, 
+            BarState barState, 
+            String currentTimeSignature, 
+            boolean beatInfoRequired,
+            boolean inChord)
+    {
+        final int duration = inChord ? 0 : durationMilliseconds(melodyToken.length); // inChord is false on chord start
         
         final double volumeFactor = getVolumeFactor(barState);
         final int volumeInBar = (int) Math.round(volumeFactor * (double) volume);
-        final boolean emphasized = (volumeFactor == BAR_START_VOLUME_FACTOR);
+        final boolean emphasized = (inChord == false) && (volumeFactor == BAR_START_VOLUME_FACTOR);
         
-        // finally skip barState to next note
+        // skip barState to next note
         barState.add(duration);
         
         final Note.BeatInfo beatInfo;
@@ -641,10 +672,14 @@ public class MelodyFactory
     }
     
     
-    private List<Note> connectSlurredAndTiedNotes(List<MelodyToken> melodyTokens, List<Note> rawNotes) {
-        final List<Note> connectedNotes = new ArrayList<>(melodyTokens.size());
+    private List<Note[]> buildConnectedNotes(List<MelodyToken> melodyTokens, List<Note> rawNotes) {
+        final List<Note[]> connectedNotes = new ArrayList<>(melodyTokens.size());
+        final List<Note> chordNotes = new ArrayList<Note>();
+        
         boolean inTie = false;
         boolean inSlur = false;
+        boolean inChord = false;
+        
         for (int i = 0; i < melodyTokens.size(); i++) {
             final MelodyToken melodyNote = melodyTokens.get(i);
             final Note rawNote = rawNotes.get(i);
@@ -657,23 +692,38 @@ public class MelodyFactory
             final boolean tieEnd   = (inTie == true  && melodyNote.noteConnections.isTieEnd());
             final Boolean tied = tieEnd ? Boolean.FALSE : (tieStart || inTie) ? Boolean.TRUE : null;
             
+            final boolean chordStart = (inChord == false && melodyNote.noteConnections.isChordStart());
+            final boolean chordEnd   = (inChord == true  && melodyNote.noteConnections.isChordEnd());
+            final Boolean chord = chordEnd ? Boolean.FALSE : (chordStart || inChord) ? Boolean.TRUE : null;
+            
             final int durationMilliseconds;
+            
             if (tieStart)
                 durationMilliseconds = sumTiedDurations(rawNotes, i, melodyTokens);
-            else if (inTie) // durations have been moved to note where tie starts
-                durationMilliseconds = 0;
-            else // not in tie
+            else if (inTie || inChord) // durations have been moved to note where tie starts
+                durationMilliseconds = 0; // only first note of chord gets duration, restricting all to same length
+            else // not in tie, not in chord or chord start
                 durationMilliseconds = rawNote.durationMilliseconds;
             
-            final Note tiedAndSlurredNote = new Note(
+            final Note connectedNote = new Note(
                     rawNote, 
                     durationMilliseconds, 
-                    new Note.ConnectionFlags(slurred, tied), 
+                    new Note.ConnectionFlags(slurred, tied, chord), 
                     rawNote.lengthNotation);
-            connectedNotes.add(tiedAndSlurredNote);
             
+            if (chordStart || inChord)
+                chordNotes.add(connectedNote);
+            else
+                connectedNotes.add(new Note[] { connectedNote });
+            
+            if (chordEnd) {
+                connectedNotes.add(chordNotes.toArray(new Note[chordNotes.size()]));
+                chordNotes.clear();
+            }
+
             inSlur = slurStart ? true : slurEnd ? false : inSlur;
             inTie = tieStart ? true : tieEnd ? false : inTie;
+            inChord = chordStart ? true : chordEnd ? false : inChord;
         }
         return connectedNotes;
     }

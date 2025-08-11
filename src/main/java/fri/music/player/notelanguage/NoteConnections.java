@@ -16,6 +16,10 @@ class NoteConnections
     static final String SLUR_START_SYMBOL = "{";
     /** The character used to end a slur. */
     static final String SLUR_END_SYMBOL = "}";
+    /** The character used to start a chord. */
+    static final String CHORD_START_SYMBOL = "[";
+    /** The character used to end a chord. */
+    static final String CHORD_END_SYMBOL = "]";
     
     private static class NoteConnection
     {
@@ -34,7 +38,7 @@ class NoteConnections
             if (index < 0)
                 return melodyToken;
             
-            if (index != 0 && index != melodyToken.length() - 1)
+            if (index != 0 && index != melodyToken.length() - 1) // must be at begin or end of note
                 throw new IllegalArgumentException("Invalid position of "+symbolToRemove+" in "+melodyToken);
             
             return melodyToken.substring(0, index) + 
@@ -49,6 +53,8 @@ class NoteConnections
     private final boolean slurEnd;
     private final boolean tieStart;
     private final boolean tieEnd;
+    private final boolean chordStart;
+    private final boolean chordEnd;
     
     NoteConnections(String melodyToken) {
         NoteConnection noteConnection;
@@ -60,6 +66,16 @@ class NoteConnections
         this.tieStart = noteConnection.exists;
         noteConnection = new NoteConnection(noteConnection.editedToken, TIE_END_SYMBOL);
         this.tieEnd = noteConnection.exists;
+        noteConnection = new NoteConnection(noteConnection.editedToken, CHORD_START_SYMBOL);
+        this.chordStart = noteConnection.exists;
+        noteConnection = new NoteConnection(noteConnection.editedToken, CHORD_END_SYMBOL);
+        this.chordEnd = noteConnection.exists;
+        
+        if (slurStart && slurEnd)
+           throw new IllegalArgumentException("Slur end must not be on slur start: "+melodyToken);
+        
+        if (chordStart && chordEnd)
+            throw new IllegalArgumentException("A chord must contain more than one note: "+melodyToken);
         
         this.melodyToken = noteConnection.editedToken; // text without symbols
     }
@@ -76,5 +92,12 @@ class NoteConnections
     }
     public boolean isTieEnd() {
         return tieStart == false && tieEnd == true;
+    }
+    
+    public boolean isChordStart() {
+        return chordStart == true && chordEnd == false;
+    }
+    public boolean isChordEnd() {
+        return chordStart == false && chordEnd == true;
     }
 }

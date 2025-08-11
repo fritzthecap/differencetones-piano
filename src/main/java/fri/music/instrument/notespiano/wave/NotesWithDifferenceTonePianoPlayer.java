@@ -10,6 +10,7 @@ import fri.music.differencetones.composer.DefaultComposer;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.player.Note;
+import fri.music.player.NotesUtil;
 
 /**
  * Plays the tune in notes-area as difference-tones.
@@ -72,7 +73,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
     
     /** Overridden to alternatively generate difference-tone intervals when playing. */
     @Override
-    protected Note[][] convertNotesToChords(Note[] notesArray) {
+    protected Note[][] convertNotes(Note[][] notesArray) {
         if (convertToDifferenceTones.isSelected()) {
             final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceTonePiano();
             final AbstractComposer composer = new DefaultComposer(
@@ -82,19 +83,19 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
                     differenceTonePiano.getDeviation());
             try {
                 getErrorArea().setText("");
-                return composer.compose(notesArray);
+                return composer.compose(NotesUtil.toSingleNotesArray(notesArray));
             }
             catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain difference-tones
                 getErrorArea().setText(
                         e.getMessage()+
                         " Tuning "+differenceTonePiano.getSelectedTuning()+
-                        ", deviation "+differenceTonePiano.getDeviation()+
+                        ", deviation "+Math.round(differenceTonePiano.getDeviation() * 2.0 * 100.0)+
                         ", bounds "+getDifferenceTonePiano().narrowestAllowedInterval()+
                         " to "+getDifferenceTonePiano().widestAllowedInterval());
                 return null;
             }
         }
-        return super.convertNotesToChords(notesArray);
+        return super.convertNotes(notesArray);
     }
 
     private DifferenceToneForNotesPiano getDifferenceTonePiano() {

@@ -67,16 +67,16 @@ class PlayController implements PlayControlButtons.Listener
     
     // methods called by view
     
-    Note[] readNotesFromTextArea(boolean clearCurrentSounds) throws IllegalArgumentException {
+    Note[][] readNotesFromTextArea(boolean clearCurrentSounds) throws IllegalArgumentException {
         if (clearCurrentSounds)
             sounds = null; // currentSoundIndex stays on its value, to further support single-steps
         
         final String notesString = view.notesText.getText();
         final boolean enable;
-        final Note[] notes;
+        final Note[][] notes;
         
         if (notesString.trim().isEmpty()) { // nothing in text-area
-            notes = new Note[0];
+            notes = new Note[0][];
             enable = false; // no actions can be performed when empty
             view.timeSignatureChoice.setEnabled(true); // let user choose tempo and bar-type
             view.tempoSpinner.setEnabled(true);
@@ -157,17 +157,18 @@ class PlayController implements PlayControlButtons.Listener
     }
     
     
-    private void checkNotesRange(Note[] notesArray) {
+    private void checkNotesRange(Note[][] notesArray) {
         if (notesArray.length <= 0)
             throw new IllegalArgumentException("No notes were given!");
         
         final List<PianoWithSound.Keyboard.Key> keys = view.piano.getKeys();
         final int lowestMidiNumber  = keys.get(0).midiNoteNumber;
         final int highestMidiNumber = keys.get(keys.size() - 1).midiNoteNumber;
-        for (Note note : notesArray)
-            if (note.isRest() == false)
-                if (lowestMidiNumber > note.midiNumber || highestMidiNumber < note.midiNumber)
-                    throw new IllegalArgumentException("Note is not in keyboard range: "+note.ipnName);
+        for (Note[] chords : notesArray)
+            for (Note note : chords)
+                if (note.isRest() == false)
+                    if (lowestMidiNumber > note.midiNumber || highestMidiNumber < note.midiNumber)
+                        throw new IllegalArgumentException("Note is not in keyboard range: "+note.ipnName);
     }
     
     /** Make sure to always call this synchronized(playerLock)! */
@@ -177,12 +178,12 @@ class PlayController implements PlayControlButtons.Listener
         view.enableUiOnPlaying(isStart == false);
     
         if (isStart) {
-            final Note[] notesArray = readNotesFromTextArea(false);
-            final Note[][] sounds = view.convertNotesToChords(notesArray); // is optionally overridden!
+            final Note[][] notesArray = readNotesFromTextArea(false);
+            final Note[][] sounds = view.convertNotes(notesArray); // is optionally overridden!
             if (sounds != null && sounds.length > 0) // could have caused a reported exception
                 startPlayer(sounds, reverse); // thread is running now
             else
-                startOrStopPlayer(false, reverse);
+                startOrStopPlayer(false, reverse); // stop, there were errors reported
         }
         else { // is stop
             if (player != null) {
@@ -290,8 +291,8 @@ class PlayController implements PlayControlButtons.Listener
     private void skip(boolean forward, boolean buttonPressed) {
         if (buttonPressed) {
             if (sounds == null) { // no "Play" was pressed before "Step Forward"
-                final Note[] notesArray = readNotesFromTextArea(false);
-                sounds = view.convertNotesToChords(notesArray);
+                final Note[][] notesArray = readNotesFromTextArea(false);
+                sounds = view.convertNotes(notesArray);
                 if (sounds == null || sounds.length <= 0)
                     return;
                 

@@ -6,6 +6,7 @@ import fri.music.*;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.player.Note;
+import fri.music.player.NotesUtil;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.wavegenerator.SineWaveSoundChannel;
@@ -72,17 +73,18 @@ class DefaultComposerTest
         final Tones tones = new Tones(toneSystem.tones());
         
         final MelodyFactory melodyFactory = new MelodyFactory(toneSystem);
-        final Note[] melodyNotes = melodyFactory.translate(melody);
+        final Note[][] melodyNotes = melodyFactory.translate(melody);
+        final Note[] melody = NotesUtil.toSingleNotesArray(melodyNotes);
         final AbstractComposer composer = new DefaultComposer(toneSystem.tones(), null, null, deviation);
         
         // perform test
-        final Note[][] intervals = composer.compose(melodyNotes);
+        final Note[][] intervals = composer.compose(melody);
         
         // assert results
         assertNotNull(intervals);
         assertEquals(melody.length, intervals.length);
         
-        optionalOutputs(toneSystem, tones, melodyNotes, intervals);
+        optionalOutputs(toneSystem, tones, melody, intervals);
         
         for (int row = 0; row < expectedIntervals.length; row++) {
             final String[] expectedInterval = expectedIntervals[row];

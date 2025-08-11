@@ -144,19 +144,13 @@ public class NotesPianoPlayer
     // methods called by PlayController and maybe needed in sub-classes
     
     /**
-     * Called before playing notes on piano.
-     * Converts given 1-dimensional notes from text-area to 2-dimensional chords-array.
-     * To be overridden for other conversions than just one note per chord.
+     * Called before playing notes on piano. Simply returns given array.
+     * To be overridden for conversions.
      * @param notesArray the notes from text-area to convert to a 2-dimensional chords array.
      * @return a 2-dimensional chords array built from given notes.
      */
-    protected Note[][] convertNotesToChords(Note[] notesArray) {
-        final Note[][] chordsArray = new Note[notesArray.length][];
-        for (int i = 0; i < notesArray.length; i++) {
-            chordsArray[i] = new Note[1];
-            chordsArray[i][0] = notesArray[i];
-        }
-        return chordsArray;
+    protected Note[][] convertNotes(Note[][] notesArray) {
+        return notesArray;
     }
     
     /** Called when starting or stopping the player thread. */
@@ -175,9 +169,9 @@ public class NotesPianoPlayer
      * This is called on any text input, and also when starting or stopping melody.
      * @return null when error, else the notes-array from text area.
      */
-    protected final Note[] readNotesFromTextAreaCatchExceptions() {
+    protected final Note[][] readNotesFromTextAreaCatchExceptions() {
         try {
-            final Note[] notes = playController.readNotesFromTextArea(true);
+            final Note[][] notes = playController.readNotesFromTextArea(true);
             getErrorArea().setText(""); // no exception was thrown, so clear errors
             return notes;
         }
@@ -212,8 +206,8 @@ public class NotesPianoPlayer
     
     /** Method called by NotesWritingMouseListener. */
     void playSingleNote(String noteWithLength) {
-        final Note[] note = newMelodyFactory().translate(new String[] { noteWithLength });
-        new Player(new PianoKeyConnector(piano)).play(note[0]);
+        final Note[][] note = newMelodyFactory().translate(new String[] { noteWithLength });
+        new Player(new PianoKeyConnector(piano)).playSimultaneously(note[0]);
     }
     
     // UI build methods
@@ -449,7 +443,7 @@ public class NotesPianoPlayer
     }
 
     private void formatNotes() {
-        final Note[] notes = readNotesFromTextAreaCatchExceptions();
+        final Note[][] notes = readNotesFromTextAreaCatchExceptions();
         if (notes != null) {
             final String formatted = newMelodyFactory().toString(
                     notes, 
