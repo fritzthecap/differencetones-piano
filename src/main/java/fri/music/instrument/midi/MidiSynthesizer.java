@@ -1,6 +1,5 @@
 package fri.music.instrument.midi;
 
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedHashSet;
@@ -64,9 +63,16 @@ public class MidiSynthesizer extends PianoWithHold
         return this.pianoPanel = pianoPanel;
     }
     
+    /** Overridden to put piano keyboard to NORTH. */
+    @Override
+    protected String getPianoPanelBorderLayoutConstraint() {
+        return super.getControlPanelBorderLayoutConstraint();
+    }
+    
+    /** Overridden to put controls to SOUTH, so that instrument choice does not obscure the keyboard. */
     @Override
     protected String getControlPanelBorderLayoutConstraint() {
-        return config.isVertical ? BorderLayout.EAST : BorderLayout.SOUTH;
+        return super.getPianoPanelBorderLayoutConstraint();
     }
     
     @Override
