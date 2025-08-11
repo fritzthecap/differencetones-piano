@@ -2,7 +2,6 @@ package fri.music.demos;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import fri.music.ScaleTypes;
 import fri.music.SoundChannel;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
@@ -63,8 +62,7 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
         final int octaves = 7;
         final String lowestToneIpnName = "C2";
         
-        final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame("NotesPianoPlayer ("+scale+" "+octaves+" Octaves)");
+        final JFrame frame = new JFrame("Write Notes with Piano and Play Them ("+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(
@@ -74,7 +72,7 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
                 13);
         final SoundChannel soundChannel = new SineWaveSoundChannel(null);
         final NotesPianoPlayer player = new NotesPianoPlayer(new PianoWithVolume(config, soundChannel));
-        final JComponent playerPanel = player.getPlayer(null /*TUBULAR_BELLS*/);
+        final JComponent playerPanel = player.getPlayer(TUBULAR_BELLS);
         
         frame.addWindowListener(player.getWindowClosingListener());
         frame.add(playerPanel);

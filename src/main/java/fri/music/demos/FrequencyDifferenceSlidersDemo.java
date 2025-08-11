@@ -8,7 +8,7 @@ public class FrequencyDifferenceSlidersDemo
 {
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
-        frame.setTitle("FrequencyDifferenceSliders Demo");
+        frame.setTitle("See Intervals and Their Difference Tones on Frequency Sliders");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final AbstractFrequencySliders sliders = new FrequencyDifferenceSliders();

@@ -2,7 +2,6 @@ package fri.music.demos;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import fri.music.ScaleTypes;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.wave.TriadPlayingPiano;
 import fri.music.wavegenerator.SineWaveSoundChannel;
@@ -13,8 +12,7 @@ public class TriadPlayingPianoDemo
         final int octaves = 5;
         final String lowestToneIpnName = "C3";
         
-        final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame("TriadPlayingPiano ("+scale+", "+octaves+" Octaves)");
+        final JFrame frame = new JFrame("Hear Triad Beatings in Different Tunings ("+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, 22);

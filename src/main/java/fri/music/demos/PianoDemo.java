@@ -8,11 +8,11 @@ import fri.music.instrument.Piano;
 public class PianoDemo
 {
     public static void main(String[] args) {
-        final int octaves = 2;
-        final String lowestToneIpnName = "C3";
-        
+        final int octaves = 3;
+        final String lowestToneIpnName = "E3";
         final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame(Piano.class.getSimpleName()+" ("+scale+", "+octaves+" Octaves)");
+        
+        final JFrame frame = new JFrame("Silent Piano Example ("+scale+", "+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final Piano.Configuration config = new Piano.Configuration(octaves, lowestToneIpnName);

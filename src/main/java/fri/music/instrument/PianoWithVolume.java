@@ -126,7 +126,6 @@ public class PianoWithVolume extends PianoWithSound
     
     /** Locates the control-panel SOUTH (horizontal piano) or EAST (vertical piano). To be overridden. */
     protected String getPianoPanelBorderLayoutConstraint() {
-        //return BorderLayout.CENTER;
         return config.isVertical ? BorderLayout.EAST : BorderLayout.SOUTH;
     }
     

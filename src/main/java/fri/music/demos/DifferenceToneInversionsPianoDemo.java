@@ -3,7 +3,6 @@ package fri.music.demos;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import fri.music.EqualTemperament;
-import fri.music.ScaleTypes;
 import fri.music.ToneSystem;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
@@ -15,8 +14,7 @@ public class DifferenceToneInversionsPianoDemo
         final int octaves = 6;
         final String lowestToneIpnName = "C3";
         
-        final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame("DifferenceToneInversionsPiano ("+scale+", "+octaves+" Octaves)");
+        final JFrame frame = new JFrame("See Which Intervals Can Generate a Difference Tone ("+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final ToneSystem toneSystem = new EqualTemperament(lowestToneIpnName, octaves);

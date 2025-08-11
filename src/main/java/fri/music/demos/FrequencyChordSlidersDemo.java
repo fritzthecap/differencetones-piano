@@ -8,7 +8,7 @@ public class FrequencyChordSlidersDemo
 {
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
-        frame.setTitle("FrequencyChordSliders Demo");
+        frame.setTitle("Study Chords with Frequency Sliders");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final AbstractFrequencySliders sliders = new FrequencyChordSliders();

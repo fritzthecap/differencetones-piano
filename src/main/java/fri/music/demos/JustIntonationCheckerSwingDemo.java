@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import fri.music.justintonation.ConfigurationPanel;
-import fri.music.justintonation.JustIntonationChecker;
 
 public class JustIntonationCheckerSwingDemo
 {
@@ -35,7 +34,7 @@ public class JustIntonationCheckerSwingDemo
         mainPanel.add(configurationPanel.panel, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        startFrame(JustIntonationChecker.class.getSimpleName()+" Demo", mainPanel, WindowConstants.EXIT_ON_CLOSE);
+        startFrame("Check Just-Intonation Tunings for Purity", mainPanel, WindowConstants.EXIT_ON_CLOSE);
 
         showDiagnosisButton.addActionListener(new ActionListener() {
             @Override

@@ -16,12 +16,16 @@ public class MidiPianoDemo
         final String lowestToneIpnName = "F3";
         
         final String scale = ScaleTypes.scaleName(lowestToneIpnName);
-        final JFrame frame = new JFrame("MIDI Piano ("+scale+", "+octaves+" Octaves)");
+        final JFrame frame = new JFrame("Vertical Java MIDI Piano ("+scale+", "+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final Synthesizer synth = MidiSystem.getSynthesizer();
         synth.open();
-        final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, true, 16);
+        final PianoWithSound.Configuration config = new PianoWithSound.Configuration(
+                octaves, 
+                lowestToneIpnName, 
+                true, // vertical
+                16);
         final PianoWithSound piano = new PianoWithSound(config, new MidiSoundChannel(synth));
         final JComponent pianoPanel = piano.getKeyboard();
         

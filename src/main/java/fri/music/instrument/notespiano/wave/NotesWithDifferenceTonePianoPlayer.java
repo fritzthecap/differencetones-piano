@@ -14,7 +14,7 @@ import fri.music.player.Note;
 /**
  * Plays the tune in notes-area as difference-tones.
  * This can be switched off via a checkbox.
- * Different tunings can be chosen, but not during play.
+ * Different tunings and parameters can be chosen, but not during play.
  */
 public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
 {

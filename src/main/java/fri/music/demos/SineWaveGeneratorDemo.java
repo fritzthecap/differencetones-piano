@@ -4,32 +4,6 @@ import fri.music.wavegenerator.SineWaveGenerator;
 
 public class SineWaveGeneratorDemo
 {
-//  public static void main(String[] args) throws Exception {
-//      SineWaveGenerator sineWaveGenerator = new SineWaveGenerator();
-//      
-//      int volume = MAXIMUM_VOLUME / 3;
-//      // getting warm
-//      sineWaveGenerator.play(220, 100, volume); // play many seconds
-//      
-//      // measuring
-//      System.err.println("Playing 440 Hertz");
-//      System.err.println(new java.util.Date());
-//      
-//      sineWaveGenerator.play(440, 10 * 1000, volume); // play many seconds
-//      
-//      System.err.println(new java.util.Date());
-//      
-//      // measuring
-//      System.err.println("Playing 660 Hertz");
-//      System.err.println(new java.util.Date());
-//      
-//      sineWaveGenerator.play(660, 10 * 1000, volume); // play many seconds
-//      
-//      System.err.println(new java.util.Date());
-//      
-//      sineWaveGenerator.close();
-//  }
-
   public static void main(String[] args) throws Exception {
       SineWaveGenerator sineWaveGenerator = new SineWaveGenerator();
       
@@ -89,26 +63,4 @@ public class SineWaveGeneratorDemo
       
       sineWaveGenerator.close();
   }
-
-//  public static void main(String[] args) throws Exception {
-//      SineWaveGenerator sineWaveGenerator = new SineWaveGenerator();
-//      
-//      System.out.println(new java.util.Date());
-//
-//      sineWaveGenerator.start(660, 50);
-//      Thread.sleep(1000);
-//      sineWaveGenerator.stop();
-//      
-//      System.out.println(new java.util.Date());
-//      Thread.sleep(400);
-//      
-//      sineWaveGenerator.start(660, 50);
-//      Thread.sleep(1000);
-//      sineWaveGenerator.stop();
-//      
-//      System.out.println(new java.util.Date());
-//      
-//      sineWaveGenerator.close();
-//  }
-
 }
