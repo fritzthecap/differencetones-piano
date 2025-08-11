@@ -1,4 +1,19 @@
- 
+
+- Notes of intervals clicked in DifferenceToneInversionsPiano 
+    should be written into a second text-area,
+    see (unfinished) NotesWithDifferenceToneInversionsPianoPlayerDemo.
+    The second text-area should also have player controls.
+    Maybe open another piano-window for that?
+
+- Provide a converter of MelodyFactory notes to ABC format.
+    This should be available via context menu in any notes text area.
+
+- Provide an "Export to ABC" button that writes notes in ABC format
+    and renders the result in a non-modal text-dialog.
+    For NotesWithDifferenceTonePianoPlayer, this would also generate 
+    the according difference-tone intervals ("inversions")
+    in a separate note-line above.
+
 - Configuration and display UI for:
     Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
     Difference tones in different tunings (DifferenceToneDemo)
@@ -6,12 +21,6 @@
     
 - Must be able to load and save melodies (from/to files, or predefined String resources) 
     in NotesPiano.
-
-- Provide an "Export to ABC" button that writes notes in ABC format
-    and renders the result in a non-modal text-dialog.
-    For NotesWithDifferenceTonePianoPlayer, this would also generate 
-    the according difference-tone intervals ("inversions")
-    in a separate note-line above.
 
 - Documentation UI, leading through different topics.
     This should be in foreground initially, but can be made optional
@@ -33,3 +42,9 @@
     "Try out Wave Generators" (WavePianoDemo, PianoConfiguration), 
     TODO: there is more!
 
+
+Fixed Bugs
+
+    - Bug NotesWithDifferenceTonePianoPlayer: LIMIT_17, FOURTH-FIFTH, deviation 76 %.
+        A4 and D#5 should generate G3, but no difference tone appears on piano.
+    
