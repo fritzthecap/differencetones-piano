@@ -15,7 +15,7 @@ public class NotesWithDifferenceTonePianoPlayerDemo
         final int octaves = 7;
         final String lowestToneIpnName = "C2";
         
-        final JFrame frame = new JFrame("Play Written Notes Through Difference Tone Intervals ("+octaves+" Octaves)");
+        final JFrame frame = new JFrame("Auto-Compose Difference Tones for Written Notes ("+octaves+" Octaves)");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName);
