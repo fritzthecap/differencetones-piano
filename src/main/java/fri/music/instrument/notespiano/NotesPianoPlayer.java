@@ -498,22 +498,37 @@ on top of the notes only, it can not change in-between.
 Do not care about bars, the player will automatically calculate bar bounds
 using the given time signature(s).
 You can use the "Format" button to put every bar into a separate line.
-</p><p>
+</p>
+<h3>Ties</h3>
+<p>
 Notes connected by a "tie" are notes of same pitch that are played as single note, 
 even across several bars.
 Ties are started by an parenthesis "(" and ended by ")",
 notes in between the start and end note SHOULD be enclosed in
 parentheses, because this is how it would look like in written notes.
-Space between parentheses and note is allowed.
+Spaces between parentheses and notes are allowed.
 You can not tie rests.
-</p><p>
+</p>
+<h3>Slurs</h3>
+<p>
 Notes connected by a "slur" are notes of different pitch that are phrased together, 
 even across several bars.
 Slurs are started by a brace "{" and ended by "}",
 notes in between MUST NOT be enclosed in "{...}",
 because it is not clear how to phrase several notes that are all slurred together.
-Space between braces and note is allowed.
+Spaces between braces and notes are allowed.
 You can not slur rests.
+</p>
+<h3>Chords</h3>
+<p>
+Chord notes are two or more notes of different pitch that are played simultaneously.
+Chords are started by a bracket "[" and ended by "]", 
+just the first note needs to have a duration, it is assumed that all have the same length.
+Ties and slurs from inside to outside of a chord are not allowed, but you can tie chords,
+also across bars.
+Spaces between brackets and notes are allowed.
+</p>
+
 </p>
 <h2>Editor Actions</h2>
 <p>
