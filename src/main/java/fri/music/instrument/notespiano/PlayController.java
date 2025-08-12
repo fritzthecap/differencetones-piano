@@ -297,11 +297,12 @@ class PlayController implements PlayControlButtons.Listener
                     return;
                 
                 if (currentSoundIndex == 0) // if initial state
-                    currentSoundIndex = -1; // will be changed below
+                    currentSoundIndex = -1; // will be incremented in skipCurrentSoundIndex()
             }
 
-            final int startIndex = Math.max(0, currentSoundIndex);
-            do { // search for a non-rest note
+            // search for a non-rest note, but avoid endless loop when having only rests
+            final int startIndex = (currentSoundIndex <= 0) ? (sounds.length - 1) : currentSoundIndex;
+            do { 
                 skipCurrentSoundIndex(forward);
             }
             while (startIndex != currentSoundIndex && sounds[currentSoundIndex][0].isRest());
@@ -314,9 +315,11 @@ class PlayController implements PlayControlButtons.Listener
             }
         }
         else { // button released
-            if (sounds != null && sounds.length > 0) {
-                for (Note note : sounds[currentSoundIndex]) // ArrayIndexOutOfBoundsException when min FORTH max FIFTH and LIMIT_5 and pressing "rewind" and then "step forward"
-                    pianoKeyConnector.noteOff(note.midiNumber);
+            if (sounds != null && sounds.length > 0 && 
+                    currentSoundIndex >= 0 && sounds[currentSoundIndex][0].isRest() == false)
+            {
+                for (Note note : sounds[currentSoundIndex])
+                    pianoKeyConnector().noteOff(note.midiNumber);
                 
                 view.enableUiOnPlaying(true);
             }

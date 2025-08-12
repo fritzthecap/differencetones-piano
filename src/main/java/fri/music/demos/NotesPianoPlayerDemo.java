@@ -82,7 +82,7 @@ e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
                 13);
         final SoundChannel soundChannel = new SineWaveSoundChannel(null);
         final NotesPianoPlayer player = new NotesPianoPlayer(new PianoWithVolume(config, soundChannel));
-        final JComponent playerPanel = player.getPlayer(CHORDS);
+        final JComponent playerPanel = player.getPlayer(TUBULAR_BELLS);
         
         frame.addWindowListener(player.getWindowClosingListener());
         frame.add(playerPanel);
