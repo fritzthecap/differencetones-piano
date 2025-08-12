@@ -542,11 +542,9 @@ public class MelodyFactory
             BarState barState, 
             String currentTimeSignature, 
             boolean beatInfoRequired,
-            Note firstChordNote) // not null only on second chord note
+            Note firstChordNote) // not null from 2nd chord note on
     {
-        final int duration = durationMilliseconds((firstChordNote != null)
-                ? firstChordNote.lengthNotation 
-                : melodyToken.length);
+        final int duration = durationMilliseconds(melodyToken.length);
         // give all notes in a chord same length, determined by first chord note
         
         final double volumeFactor = getVolumeFactor(barState);
@@ -557,8 +555,8 @@ public class MelodyFactory
                 ? firstChordNote.emphasized
                 : (volumeFactor == BAR_START_VOLUME_FACTOR);
         
-        // increment barState
-        barState.add((firstChordNote != null) ? 0 : duration);
+        // increment barState when not in chord
+        barState.add((firstChordNote == null) ? duration : 0);
         
         final Note.BeatInfo beatInfo;
         if (beatInfoRequired)
@@ -568,12 +566,16 @@ public class MelodyFactory
         else
             beatInfo = null; // Note constructor will set a non-null default
 
-        if (melodyToken.ipnName.equals(ToneSystem.REST_SYMBOL))
+        if (melodyToken.ipnName.equals(ToneSystem.REST_SYMBOL)) {
+            if (firstChordNote != null)
+                throw new IllegalArgumentException("You can not have a rest in a chord: "+melodyToken.ipnName+"/"+melodyToken.length);
+            
             return new Note(duration, emphasized, melodyToken.length, beatInfo);
+        }
         
         final Tone tone = toneSystem.forIpnName(melodyToken.ipnName);
         if (tone == null)
-            throw new IllegalArgumentException("IPN note name out of range: "+melodyToken.ipnName);
+            throw new IllegalArgumentException("Unknown note name: "+melodyToken.ipnName);
         
         return new Note( // is a raw note because no tie/slur connections yet
                 tone,
@@ -712,6 +714,8 @@ public class MelodyFactory
             
             if (tieStart)
                 durationMilliseconds = sumTiedDurations(rawNotes, i, melodyTokens, chord);
+            else if (inChord) // all chord notes have same length
+                durationMilliseconds = chordNotes.get(0).durationMilliseconds;
             else if (inTie) // duration gets summed on note where tie starts
                 durationMilliseconds = 0;
             else // not in tie
@@ -754,7 +758,10 @@ public class MelodyFactory
                     chord = null;
             }
             else {
-                duration += rawNotes.get(i).durationMilliseconds;
+                final Note rawNote = rawNotes.get(i);
+                duration += rawNote.durationMilliseconds;
+                if (connections.isChordStart() == true)
+                    chord = Boolean.TRUE;
             }
             i++;
         }

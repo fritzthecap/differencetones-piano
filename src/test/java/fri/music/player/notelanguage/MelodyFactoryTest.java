@@ -486,6 +486,29 @@ class MelodyFactoryTest
         assertTrue(parsed[5][0].emphasized);
     }
     
+    @Test
+    void chordsWithTiesShouldWork() {
+        final String chords = "([C4/1 E4 G4] [C4/1 E4 G4] [C4/1 E4 G4]) [C4/1 E4 G4]";
+        final Integer beatsPerMinute = 120;
+        
+        final MelodyFactory melodyFactory = new MelodyFactory(beatsPerMinute);
+        final Note[][] parsed = melodyFactory.translate(chords);
+        
+        assertEquals(4, parsed.length);
+        // first chord aggregates all duration
+        for (int i = 0; i < 3; i++)
+            assertEquals(6000, parsed[0][i].durationMilliseconds); // three bars with 2000 millis each
+        // second chord has no duration
+        for (int i = 0; i < 3; i++)
+            assertEquals(0, parsed[1][i].durationMilliseconds);
+        // also third chord has no duration
+        for (int i = 0; i < 3; i++)
+            assertEquals(0, parsed[2][i].durationMilliseconds);
+        // last chord has not been tied
+        for (int i = 0; i < 3; i++)
+            assertEquals(2000, parsed[3][i].durationMilliseconds); // one bar with 2000 millis
+    }
+
 
     private Note[] translate(MelodyFactory melodyFactory, String[] notesArray) {
         Note[][] notes = melodyFactory.translate(notesArray);
