@@ -486,6 +486,8 @@ and its duration behind a slash, for example:
 <p>
 No space must appear between a note and its duration specification,
 but at least one whitespace MUST be between different notes.
+Spaces are allowed between notes and tie-, slur- and chord-symbols.
+</p><p>
 In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
 and there is no German "H", such is written as "B".
 But you can use both lower or upper case letters in IPN-names.
@@ -503,30 +505,24 @@ You can use the "Format" button to put every bar into a separate line.
 <p>
 Notes connected by a "tie" are notes of same pitch that are played as single note, 
 even across several bars.
-Ties are started by an parenthesis "(" and ended by ")",
-notes in between the start and end note SHOULD be enclosed in
-parentheses, because this is how it would look like in written notes.
-Spaces between parentheses and notes are allowed.
-You can not tie rests.
+Ties are started by an opened parenthesis "(" and ended by a closed ")",
+notes in between MUST NOT be enclosed in parentheses (no nested parentheses).
 </p>
 <h3>Slurs</h3>
 <p>
 Notes connected by a "slur" are notes of different pitch that are phrased together, 
 even across several bars.
-Slurs are started by a brace "{" and ended by "}",
-notes in between MUST NOT be enclosed in "{...}",
+Slurs are started by an opened brace "{" and ended by a closed "}",
+notes in between MUST NOT be enclosed in "{...}" (no nested braces),
 because it is not clear how to phrase several notes that are all slurred together.
-Spaces between braces and notes are allowed.
-You can not slur rests.
 </p>
 <h3>Chords</h3>
 <p>
 Chord notes are two or more notes of different pitch that are played simultaneously.
-Chords are started by a bracket "[" and ended by "]", 
+Chords are started by an opened bracket "[" and ended by closed "]", 
 just the first note needs to have a duration, it is assumed that all have the same length.
 Ties and slurs from inside to outside of a chord are not allowed, but you can tie chords,
-also across bars.
-Spaces between brackets and notes are allowed.
+even across bars.
 </p>
 
 </p>
