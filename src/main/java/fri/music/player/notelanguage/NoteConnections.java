@@ -23,7 +23,9 @@ class NoteConnections
     
     private static class NoteConnection
     {
+        /** True when the symbolToDetect has been found on construction. */
         public final boolean exists;
+        /** The note without symbolToDetect after construction. */
         public final String editedToken;
         
         NoteConnection(String melodyToken, String symbolToDetect) {
@@ -70,9 +72,6 @@ class NoteConnections
         this.chordStart = noteConnection.exists;
         noteConnection = new NoteConnection(noteConnection.editedToken, CHORD_END_SYMBOL);
         this.chordEnd = noteConnection.exists;
-        
-        if (slurStart && slurEnd)
-           throw new IllegalArgumentException("Slur end must not be on slur start: "+melodyToken);
         
         if (chordStart && chordEnd)
             throw new IllegalArgumentException("A chord must contain more than one note: "+melodyToken);

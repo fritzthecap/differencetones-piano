@@ -20,9 +20,11 @@ C4/4 D4/4 E4/4 F4/4 G4/4 A4/4 B4/4 C5/4
 [ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ] 
 [ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ]
 [ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ]
-[ F4/8 A4 D5 ] C5/8 G4/8 C4/8 
+[ F4/8 A4 D5 ] C5/8 A4/8 G4/8 
+C4/2
 """;
-            
+    
+    /** "Oh du lieber Augustin" (Wiener Volksweise aus der Pestzeit) */
     static final String AUGUSTIN = 
         """
 3/4

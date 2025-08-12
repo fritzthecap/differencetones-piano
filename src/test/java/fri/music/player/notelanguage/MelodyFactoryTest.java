@@ -10,7 +10,7 @@ import fri.music.player.NotesUtil;
 
 class MelodyFactoryTest
 {
-    private final static String[] AUGUSTIN = new String[] { // "Oh du lieber Augustin"
+    private final static String[] AUGUSTIN = new String[] {
             "G4/4.", "A4/8", "G4/8", "F4/8", 
             "E4/4", "C4/4", "C4/4", 
             "D4/4", "G3/4", "G3/4", 
@@ -117,7 +117,7 @@ class MelodyFactoryTest
     void tiesAcrossBarsShouldBeFormattedCorrectly() {
         final String tieAcrossBars = "E5/2. B5/8 {E5/8 (A5/1} (A5/1) A5/1)";
         
-        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        final MelodyFactory melodyFactory = new MelodyFactory();
         
         final Note[][] notes = melodyFactory.translate(tieAcrossBars);
         final String text = melodyFactory.toString(notes, false, false);
@@ -324,7 +324,7 @@ class MelodyFactoryTest
             "4/4 ", // time signature change!
             "F5", "G5", "A5", "G5", // 7, 8, 9, 10
         };
-        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        final MelodyFactory melodyFactory = new MelodyFactory();
         final Note[] melody = translate(melodyFactory, notes);
         
         assertEquals(notes.length - 3, melody.length);
@@ -403,7 +403,7 @@ class MelodyFactoryTest
         final String[] notes = new String[] {
             "A4/8", "( B4/8", "B4/4", "B4/8)", "C5/4.",
         };
-        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        final MelodyFactory melodyFactory = new MelodyFactory();
         
         final Note[] resultMelody = translate(melodyFactory, notes);
         
@@ -419,7 +419,7 @@ class MelodyFactoryTest
         final String[] notes = new String[] {
             "{ A4/8", "( B4/8", " (B4/4 ) ", "B4/8)", "C5/4.}",
         };
-        final MelodyFactory melodyFactory = new MelodyFactory(); // 120 BPM default
+        final MelodyFactory melodyFactory = new MelodyFactory();
         
         final Note[] resultMelody = translate(melodyFactory, notes);
         
@@ -439,6 +439,53 @@ class MelodyFactoryTest
         assertEquals(Boolean.FALSE, resultMelody[4].connectionFlags.slurred());
     }
 
+    @Test
+    void chordsShouldWork() {
+        final String chords = "[ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ] G4/2 C4/4";
+        final Integer beatsPerMinute = 120;
+        
+        final MelodyFactory melodyFactory = new MelodyFactory(beatsPerMinute);
+        final Note[][] parsed = melodyFactory.translate(chords);
+        
+        assertEquals(3, parsed[0].length);
+        assertEquals(Boolean.TRUE, parsed[0][0].connectionFlags.chord());
+        assertEquals(Boolean.TRUE, parsed[0][1].connectionFlags.chord());
+        assertEquals(Boolean.FALSE, parsed[0][2].connectionFlags.chord());
+        assertEquals(250, parsed[0][0].durationMilliseconds); // 250 is eighth in 120 BPM
+        assertEquals(250, parsed[0][1].durationMilliseconds);
+        assertEquals(250, parsed[0][2].durationMilliseconds);
+        assertTrue(parsed[0][0].emphasized);
+        assertTrue(parsed[0][1].emphasized);
+        assertTrue(parsed[0][2].emphasized);
+        
+        assertEquals(1, parsed[1].length);
+        assertNull(parsed[1][0].connectionFlags.chord());
+        assertEquals(250, parsed[1][0].durationMilliseconds);
+        assertFalse(parsed[1][0].emphasized);
+        
+        assertEquals(1, parsed[2].length);
+        assertNull(parsed[2][0].connectionFlags.chord());
+        assertFalse(parsed[2][0].emphasized);
+
+        assertEquals(2, parsed[3].length);
+        assertEquals(Boolean.TRUE, parsed[3][0].connectionFlags.chord());
+        assertEquals(Boolean.FALSE, parsed[3][1].connectionFlags.chord());
+        assertEquals(250, parsed[3][0].durationMilliseconds);
+        assertEquals(250, parsed[3][1].durationMilliseconds);
+        assertFalse(parsed[3][0].emphasized);
+        assertFalse(parsed[3][1].emphasized);
+        
+        assertEquals(1, parsed[4].length);
+        assertNull(parsed[4][0].connectionFlags.chord());
+        assertEquals(1000, parsed[4][0].durationMilliseconds); // one before last is half note
+        assertFalse(parsed[4][0].emphasized);
+        
+        assertEquals(1, parsed[5].length);
+        assertNull(parsed[5][0].connectionFlags.chord());
+        assertEquals(500, parsed[5][0].durationMilliseconds); // last is quarter note
+        assertTrue(parsed[5][0].emphasized);
+    }
+    
 
     private Note[] translate(MelodyFactory melodyFactory, String[] notesArray) {
         Note[][] notes = melodyFactory.translate(notesArray);

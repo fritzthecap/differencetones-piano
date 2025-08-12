@@ -223,6 +223,9 @@ public class MelodyFactory
         
         final List<Note> rawNotes = buildRawNotes(melodyTokens, melodyNotes);
         
+        if (melodyNotes.size() != rawNotes.size())
+            throw new IllegalArgumentException("Built "+rawNotes.size()+" raw notes but given were "+melodyNotes.size()+" melody notes!");
+        
         final List<Note[]> connectedNotes = buildConnectedNotes(melodyNotes, rawNotes);
         
         return connectedNotes.toArray(new Note[connectedNotes.size()][]);
@@ -244,7 +247,7 @@ public class MelodyFactory
                 if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
                     throw new IllegalArgumentException("Note has no length: "+note.ipnName);
                 
-                final boolean addNewlineBeforeNote = (note.emphasized && i > 0);
+                final boolean addNewlineBeforeNote = (note.emphasized && inChord == false && i > 0);
                 
                 // tempo can be attached to first note
                 if (i == 0 && writeTempo)
@@ -368,10 +371,12 @@ public class MelodyFactory
         String previousTimeSignature = timeSignature(beatsPerBar, beatType);
         String currentTimeSignature = previousTimeSignature;
         boolean previousTokenWasNote = true;
-        String chordLength = null;
+        Note firstChordNote = null;
         
         for (int i = 0; i < melodyTokens.length; i++) {
-            final InputToken inputToken = newInputToken(melodyTokens[i].trim(), chordLength);
+            final InputToken inputToken = newInputToken(
+                    melodyTokens[i].trim(), 
+                    (firstChordNote != null) ? firstChordNote.lengthNotation : null);
             
             if (inputToken instanceof BeatsPerMinuteToken) {
                 if (notes.size() > 0 || tempoOnTop != null)
@@ -415,13 +420,13 @@ public class MelodyFactory
                         (notes.size() <= 0 || previousTimeSignature.equals(currentTimeSignature) == false);
                 previousTimeSignature = currentTimeSignature;
                 
-                final Note note = buildRawNote(melodyToken, barState, currentTimeSignature, beatInfoRequired, chordLength != null);
+                final Note note = buildRawNote(melodyToken, barState, currentTimeSignature, beatInfoRequired, firstChordNote);
                 notes.add(note);
                 
                 if (melodyToken.noteConnections.isChordStart())
-                    chordLength = melodyToken.length;
+                    firstChordNote = note;
                 else if (melodyToken.noteConnections.isChordEnd())
-                    chordLength = null;
+                    firstChordNote = null;
                     
                 previousTokenWasNote = true;
             }
@@ -537,16 +542,23 @@ public class MelodyFactory
             BarState barState, 
             String currentTimeSignature, 
             boolean beatInfoRequired,
-            boolean inChord)
+            Note firstChordNote) // not null only on second chord note
     {
-        final int duration = inChord ? 0 : durationMilliseconds(melodyToken.length); // inChord is false on chord start
+        final int duration = durationMilliseconds((firstChordNote != null)
+                ? firstChordNote.lengthNotation 
+                : melodyToken.length);
+        // give all notes in a chord same length, determined by first chord note
         
         final double volumeFactor = getVolumeFactor(barState);
-        final int volumeInBar = (int) Math.round(volumeFactor * (double) volume);
-        final boolean emphasized = (inChord == false) && (volumeFactor == BAR_START_VOLUME_FACTOR);
+        final int volumeOfNote = (firstChordNote != null)
+                ? firstChordNote.volume
+                : (int) Math.round(volumeFactor * (double) this.volume);
+        final boolean emphasized = (firstChordNote != null)
+                ? firstChordNote.emphasized
+                : (volumeFactor == BAR_START_VOLUME_FACTOR);
         
-        // skip barState to next note
-        barState.add(duration);
+        // increment barState
+        barState.add((firstChordNote != null) ? 0 : duration);
         
         final Note.BeatInfo beatInfo;
         if (beatInfoRequired)
@@ -566,7 +578,7 @@ public class MelodyFactory
         return new Note( // is a raw note because no tie/slur connections yet
                 tone,
                 duration,
-                volumeInBar,
+                volumeOfNote,
                 emphasized,
                 null, // connectionFlags will be added later
                 melodyToken.length,
@@ -699,10 +711,10 @@ public class MelodyFactory
             final int durationMilliseconds;
             
             if (tieStart)
-                durationMilliseconds = sumTiedDurations(rawNotes, i, melodyTokens);
-            else if (inTie || inChord) // durations have been moved to note where tie starts
-                durationMilliseconds = 0; // only first note of chord gets duration, restricting all to same length
-            else // not in tie, not in chord or chord start
+                durationMilliseconds = sumTiedDurations(rawNotes, i, melodyTokens, chord);
+            else if (inTie) // duration gets summed on note where tie starts
+                durationMilliseconds = 0;
+            else // not in tie
                 durationMilliseconds = rawNote.durationMilliseconds;
             
             final Note connectedNote = new Note(
@@ -728,16 +740,26 @@ public class MelodyFactory
         return connectedNotes;
     }
     
-    private int sumTiedDurations(List<Note> rawNotes, int fromIndex, List<MelodyToken> melodyTokens) {
-        int duration = 0;
-        int i = fromIndex;
+    private int sumTiedDurations(List<Note> rawNotes, int fromIndex, List<MelodyToken> melodyTokens, Boolean chord) {
+        final Note startNote = rawNotes.get(fromIndex);
+        int duration = startNote.durationMilliseconds;
+        int i = fromIndex + 1;
+        // sum duration until tie ends
         NoteConnections connections;
         do {
             connections = melodyTokens.get(i).noteConnections;
-            duration += rawNotes.get(i).durationMilliseconds;
+            // if in chord, go to end of chord
+            if (chord != null) {
+                if (connections.isChordEnd() == true)
+                    chord = null;
+            }
+            else {
+                duration += rawNotes.get(i).durationMilliseconds;
+            }
             i++;
         }
         while (i < rawNotes.size() && connections.isTieEnd() == false);
+
         return duration;
     }
     
