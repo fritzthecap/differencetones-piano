@@ -109,7 +109,7 @@ class MelodyFactoryTest
         final String expectedResult = 
                 ""+BEATS_PER_MINUTE + MelodyFactory.NEWLINE+
                 ""+BEATS_PER_BAR+"/"+BEAT_TYPE + MelodyFactory.NEWLINE+
-                "(G4/8 (G4/8) G4/8) {A4/8 G4/8 F4/8}" + MelodyFactory.NEWLINE;
+                "(G4/8 G4/8 G4/8) {A4/8 G4/8 F4/8}" + MelodyFactory.NEWLINE;
         assertEquals(expectedResult, textNotation);
     }
     
@@ -125,7 +125,7 @@ class MelodyFactoryTest
         final String expectedResult = 
                 "E5/2. B5/8 {E5/8" + MelodyFactory.NEWLINE +
                 "(A5/1}" + MelodyFactory.NEWLINE +
-                "(A5/1)" + MelodyFactory.NEWLINE +
+                "A5/1" + MelodyFactory.NEWLINE +
                 "A5/1)" + MelodyFactory.NEWLINE;
         
         assertEquals(expectedResult, text);
@@ -495,7 +495,7 @@ class MelodyFactoryTest
         final Note[][] parsed = melodyFactory.translate(chords);
         
         assertEquals(4, parsed.length);
-        // first chord aggregates all duration
+        // first chord aggregates all durations
         for (int i = 0; i < 3; i++)
             assertEquals(6000, parsed[0][i].durationMilliseconds); // three bars with 2000 millis each
         // second chord has no duration
@@ -504,7 +504,7 @@ class MelodyFactoryTest
         // also third chord has no duration
         for (int i = 0; i < 3; i++)
             assertEquals(0, parsed[2][i].durationMilliseconds);
-        // last chord has not been tied
+        // last chord has not been tied, so it has a duration
         for (int i = 0; i < 3; i++)
             assertEquals(2000, parsed[3][i].durationMilliseconds); // one bar with 2000 millis
     }

@@ -242,67 +242,68 @@ public class MelodyFactory
         boolean inTie = false;
         boolean inChord = false;
         
-        for (int i = 0; i < notes.length; i++) {
-            for (Note note : notes[i]) {
-                if (note.lengthNotation == null || note.lengthNotation.length() <= 0)
-                    throw new IllegalArgumentException("Note has no length: "+note.ipnName);
+        for (int chordIndex = 0; chordIndex < notes.length; chordIndex++) {
+            final Note[] chord = notes[chordIndex];
+            Note note = chord[0];
+            
+            // tempo can be attached to first note only
+            if (chordIndex == 0 && writeTempo)
+                result.append("" + note.beatInfo.beatsPerMinute() + NEWLINE);
+            
+            final boolean barStart = note.emphasized;
+            final boolean addNewline = (barStart && chordIndex > 0);
                 
-                final boolean addNewlineBeforeNote = (note.emphasized && inChord == false && i > 0);
-                
-                // tempo can be attached to first note
-                if (i == 0 && writeTempo)
-                    result.append("" + note.beatInfo.beatsPerMinute() + NEWLINE);
-    
-                // time-signature changes can be attached to any note
-                if ((i > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar-type
-                    result.append(
-                        (i <= 0 || endsWithNewline(result) ? "" : NEWLINE) +
-                        note.beatInfo.timeSignature() +
-                        (addNewlineBeforeNote ? "" : NEWLINE));
-                
-                if (addNewlineBeforeNote) // break line before first note in bar
-                    result.append(NEWLINE);
-                
-                if (Boolean.TRUE.equals(note.connectionFlags.slurred())) {
-                    if (inSlur == false)
-                        result.append(NoteConnections.SLUR_START_SYMBOL);
-                    inSlur = true;
-                }
-                
-                if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
+            // time-signature change can be attached to any note at bar-start
+            if ((chordIndex > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar-type
+                result.append(
+                    (chordIndex <= 0 || endsWithNewline(result) ? "" : NEWLINE) +
+                    note.beatInfo.timeSignature() +
+                    (addNewline ? "" : NEWLINE)); // add newline only if it wouldn't be added later
+            
+            if (addNewline) // break line before first note in bar
+                result.append(NEWLINE);
+            else if (chordIndex > 0)
+                result.append(" ");
+            
+            if (Boolean.TRUE.equals(note.connectionFlags.slurred())) {
+                if (inSlur == false)
+                    result.append(NoteConnections.SLUR_START_SYMBOL);
+                inSlur = true;
+            }
+            
+            if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
+                if (inTie == false && inChord == false)
                     result.append(NoteConnections.TIE_START_SYMBOL);
-                }
-                    
-                if (Boolean.TRUE.equals(note.connectionFlags.chord())) {
-                    if (inChord == false)
-                        result.append(NoteConnections.CHORD_START_SYMBOL);
-                    inChord = true;
-                }
-                    
+                inTie = true;
+            }
+            
+            if (chord.length > 1) {
+                result.append(NoteConnections.CHORD_START_SYMBOL);
+                inChord = true;
+            }
+            else {
+                inChord = false;
+            }
+            
+            for (int i = 0; i < chord.length; i++) { // mostly there will be just one note in chord
+                note = chord[i];
                 result.append(note.toString());
                 
-                if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
-                    if (inTie == true) // enclose every note within tie into parentheses
-                        result.append(NoteConnections.TIE_END_SYMBOL);
-                    inTie = true;
-                }
-                else if (Boolean.FALSE.equals(note.connectionFlags.tied())) {
-                    result.append(NoteConnections.TIE_END_SYMBOL);
-                    inTie = false;
-                }
-                
-                if (Boolean.FALSE.equals(note.connectionFlags.slurred())) {
-                    result.append(NoteConnections.SLUR_END_SYMBOL);
-                    inSlur = false;
-                }
-                
-                if (Boolean.FALSE.equals(note.connectionFlags.chord())) {
-                    result.append(NoteConnections.CHORD_END_SYMBOL);
-                    inChord = false;
-                }
-                
-                if (i < notes.length - 1 && (inChord || notes[i + 1][0].emphasized == false))
-                    result.append(" "); // separate notes by space when not last in bar
+                if (i < chord.length - 1)
+                    result.append(" ");
+            }
+            
+            if (inChord)
+                result.append(NoteConnections.CHORD_END_SYMBOL);
+            
+            if (Boolean.FALSE.equals(note.connectionFlags.tied())) {
+                result.append(NoteConnections.TIE_END_SYMBOL);
+                inTie = false;
+            }
+            
+            if (Boolean.FALSE.equals(note.connectionFlags.slurred())) {
+                result.append(NoteConnections.SLUR_END_SYMBOL);
+                inSlur = false;
             }
         }
         
