@@ -17,6 +17,8 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import fri.music.ScaleTypes;
 import fri.music.SoundChannel;
 import fri.music.ToneSystem;
@@ -160,12 +162,30 @@ public class ConfigurationPanel
     
     
     private void buildPianoConfigurationFields() {
-        this.octaves = new JSlider(1, ToneSystem.MAXIMUM_OCTAVES, 5);
-        octaves.setBorder(BorderFactory.createTitledBorder("Number of Octaves"));
+        final int INITIAL_NUMBER_OF_OCTAVES= 5;
+        
+        final ChangeListener octavesListener = new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (e != null && ((JSlider) e.getSource()).getValueIsAdjusting())
+                    return;
+                final int startOctave = lowestToneOctave.getValue();
+                final int maximumPossibleOctaves = ToneSystem.MAXIMUM_OCTAVES - startOctave;
+                final boolean isMaximum = (octaves.getValue() == octaves.getMaximum());
+                octaves.setMaximum(maximumPossibleOctaves);
+                // try to keep a good value
+                if (isMaximum && maximumPossibleOctaves <= INITIAL_NUMBER_OF_OCTAVES)
+                    octaves.setValue(maximumPossibleOctaves);
+            }
+        };
+        
+        this.octaves = new JSlider(1, ToneSystem.MAXIMUM_OCTAVES, INITIAL_NUMBER_OF_OCTAVES);
+        octaves.setBorder(BorderFactory.createTitledBorder("Number of Octaves (Maximum 10)"));
         octaves.setSnapToTicks(true);
         octaves.setPaintLabels(true);
         octaves.setPaintTicks(true);
         octaves.setMajorTickSpacing(1);
+        octaves.addChangeListener(octavesListener);
         
         final List<String> ipnBaseNamesList = Stream.of(ToneSystem.IPN_BASE_NAMES)
             .filter(ipnName -> ipnName.contains("#") == false)
@@ -198,13 +218,14 @@ public class ConfigurationPanel
             }
         });
         
-        this.lowestToneOctave = new JSlider(ToneSystem.LOWEST_OCTAVE, ToneSystem.MAXIMUM_OCTAVES - 1, 2);
+        this.lowestToneOctave = new JSlider(ToneSystem.LOWEST_OCTAVE, ToneSystem.MAXIMUM_OCTAVES - 1, 3);
         lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Start Octave"));
-        lowestToneOctave.setToolTipText("The Lowest Octave of the Keyboard");
+        lowestToneOctave.setToolTipText("The Lowest (Leftmost) Octave of the Keyboard");
         lowestToneOctave.setSnapToTicks(true);
         lowestToneOctave.setPaintLabels(true);
         lowestToneOctave.setPaintTicks(true);
         lowestToneOctave.setMajorTickSpacing(1);
+        lowestToneOctave.addChangeListener(octavesListener);
         
         this.isVertical = new JCheckBox("Vertical Orientation"); // selected = false by default
         isVertical.setToolTipText("Not supported by all pianos. Please select 'PianoWithSound' to test vertical orientation!");
@@ -227,6 +248,8 @@ public class ConfigurationPanel
         this.colouredOctaves = new JCheckBox("Coloured Octaves");
         colouredOctaves.setToolTipText("Show Every Octave with a Different Color");
         colouredOctaves.setSelected(false);
+        
+        octavesListener.stateChanged(null);
     }
     
     private void buildSoundChoiceFields() {
@@ -259,16 +282,16 @@ public class ConfigurationPanel
         waveChoice.setToolTipText("Different Piano Sounds");
         
         final PianoClassChoiceItem[] pianoClasses = new PianoClassChoiceItem[] {
-                new PianoClassChoiceItem(DifferenceToneForIntervalPiano.class),
-                new PianoClassChoiceItem(TriadPlayingPiano.class),
-                new PianoClassChoiceItem(IntervalPlayingPiano.class),
+                new PianoClassChoiceItem(PianoWithSound.class),
                 new PianoClassChoiceItem(PianoWithHold.class),
                 new PianoClassChoiceItem(PianoWithVolume.class),
-                new PianoClassChoiceItem(PianoWithSound.class),
+                new PianoClassChoiceItem(IntervalPlayingPiano.class),
+                new PianoClassChoiceItem(TriadPlayingPiano.class),
+                new PianoClassChoiceItem(DifferenceToneForIntervalPiano.class),
             };
         pianoClassChoice = new JComboBox<>(pianoClasses);
         pianoClassChoice.setBorder(BorderFactory.createTitledBorder("Piano Type"));
-        pianoClassChoice.setToolTipText("Java Class of Piano");
+        pianoClassChoice.setToolTipText("Capabilities of Piano (Java Class)");
         pianoClassChoice.addActionListener(soundSelectionListener);
         
         soundSelectionListener.actionPerformed(null); // enable choice according to current setting
