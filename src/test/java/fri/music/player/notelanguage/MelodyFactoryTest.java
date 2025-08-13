@@ -78,7 +78,7 @@ class MelodyFactoryTest
         
         final MelodyFactory melodyFactory = new MelodyFactory(BEATS_PER_MINUTE, BEATS_PER_BAR, BEAT_TYPE);
         final Note[][] melody = melodyFactory.translate(AUGUSTIN);
-        final String textNotation = melodyFactory.toString(melody, true, true);
+        final String textNotation = melodyFactory.formatBarLines(melody, true, true);
         
         final String expectedResult = 
                 ""+BEATS_PER_MINUTE + MelodyFactory.NEWLINE+
@@ -104,7 +104,7 @@ class MelodyFactoryTest
         final String[] notes = new String[] { "(G4/8", "G4/8", "G4/8)", "{A4/8", "G4/8", "F4/8}" };
 
         final Note[][] melody = melodyFactory.translate(notes);
-        final String textNotation = melodyFactory.toString(melody, true, true);
+        final String textNotation = melodyFactory.formatBarLines(melody, true, true);
         
         final String expectedResult = 
                 ""+BEATS_PER_MINUTE + MelodyFactory.NEWLINE+
@@ -120,7 +120,7 @@ class MelodyFactoryTest
         final MelodyFactory melodyFactory = new MelodyFactory();
         
         final Note[][] notes = melodyFactory.translate(tieAcrossBars);
-        final String text = melodyFactory.toString(notes, false, false);
+        final String text = melodyFactory.formatBarLines(notes, false, false);
         
         final String expectedResult = 
                 "E5/2. B5/8 {E5/8" + MelodyFactory.NEWLINE +

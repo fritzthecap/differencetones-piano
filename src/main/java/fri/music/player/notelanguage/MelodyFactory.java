@@ -236,7 +236,7 @@ public class MelodyFactory
      * @param notes the notes to output bar-formatted as string.
      * @return a text where each bar of given notes will be displayed in a new line.
      */
-    public String toString(Note[][] notes, boolean writeTempo, boolean writeTimeSignature) {
+    public String formatBarLines(Note[][] notes, boolean writeTempo, boolean writeTimeSignature) {
         final StringBuilder result = new StringBuilder();
         boolean inSlur = false;
         boolean inTie = false;

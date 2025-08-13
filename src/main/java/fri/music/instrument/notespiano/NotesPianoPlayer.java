@@ -445,7 +445,7 @@ public class NotesPianoPlayer
     private void formatNotes() {
         final Note[][] notes = readNotesFromTextAreaCatchExceptions();
         if (notes != null) {
-            final String formatted = newMelodyFactory().toString(
+            final String formatted = newMelodyFactory().formatBarLines(
                     notes, 
                     tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
                     timeSignatureChoice.isEnabled() == false);
