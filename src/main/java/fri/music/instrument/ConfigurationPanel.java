@@ -99,6 +99,11 @@ public class ConfigurationPanel
         panel.add(moveLeftSoundPanel);
     }
 
+    /**
+     * Creates and returns the configured piano.
+     * Call <code>piano.getKeyboard()</code> for a visible UI panel.
+     * Install the </code>piano.getWindowClosingListener()</code> onto the parent frame.
+     */
     public PianoWithSound getPiano() {
         final PianoWithSound.Configuration configuration = getPianoConfiguration();
         
@@ -167,12 +172,14 @@ public class ConfigurationPanel
             .collect(Collectors.toList());
         final String[] ipnBaseNames = ipnBaseNamesList.toArray(new String[ipnBaseNamesList.size()]);
         this.lowestToneBaseName = new SmartComboBox(ipnBaseNames);
-        lowestToneBaseName.setBorder(BorderFactory.createTitledBorder("Name"));
+        lowestToneBaseName.setBorder(BorderFactory.createTitledBorder("Key"));
+        lowestToneBaseName.setToolTipText("Leftmost (and Rightmost) Tone of the Keyboard");
         
         final Set<String> scaleNamesSet = ScaleTypes.scaleToStartNote.sequencedKeySet();
         final String[] scaleNames = scaleNamesSet.toArray(new String[scaleNamesSet.size()]);
         this.lowestToneScaleName = new SmartComboBox(scaleNames);
-        lowestToneScaleName.setBorder(BorderFactory.createTitledBorder("Scale"));
+        lowestToneScaleName.setBorder(BorderFactory.createTitledBorder("or Scale"));
+        lowestToneScaleName.setToolTipText("Modal Scale Type");
         
         lowestToneBaseName.addActionListener(new ActionListener() {
             @Override
@@ -192,34 +199,41 @@ public class ConfigurationPanel
         });
         
         this.lowestToneOctave = new JSlider(ToneSystem.LOWEST_OCTAVE, ToneSystem.MAXIMUM_OCTAVES - 1, 2);
-        lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Octave"));
+        lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Start Octave"));
+        lowestToneOctave.setToolTipText("The Lowest Octave of the Keyboard");
         lowestToneOctave.setSnapToTicks(true);
         lowestToneOctave.setPaintLabels(true);
         lowestToneOctave.setPaintTicks(true);
         lowestToneOctave.setMajorTickSpacing(1);
         
         this.isVertical = new JCheckBox("Vertical Orientation"); // selected = false by default
-        isVertical.setToolTipText("Please select 'PianoWithSound' to test this option");
+        isVertical.setToolTipText("Not supported by all pianos. Please select 'PianoWithSound' to test vertical orientation!");
         
         this.blackKeyPixelWidth = new JSlider(4, 60, 16);
         blackKeyPixelWidth.setBorder(BorderFactory.createTitledBorder("Black Key Pixel Width"));
+        blackKeyPixelWidth.setToolTipText("Bigger or Smaller Keyboard Keys");
         blackKeyPixelWidth.setPaintLabels(true);
         blackKeyPixelWidth.setPaintTicks(true);
         blackKeyPixelWidth.setMajorTickSpacing(4);
         
         this.showIpnNameOnKey = new JCheckBox("IPN-Names on Keys");
+        showIpnNameOnKey.setToolTipText("Show Note Names on Piano Keys");
         showIpnNameOnKey.setSelected(true);
         
-        this.showMidiNumberAsTooltip = new JCheckBox("MIDI-Numbers as Tooltips on Keys");
-        showMidiNumberAsTooltip.setSelected(true);
+        this.showMidiNumberAsTooltip = new JCheckBox("MIDI-Numbers as Tooltips");
+        showMidiNumberAsTooltip.setToolTipText("Show MIDI-Numbers as Tooltips on Piano Keys (e.g. C4 is 60)");
+        showMidiNumberAsTooltip.setSelected(false);
         
-        this.colouredOctaves = new JCheckBox("Octaves with Different Colors");
-        colouredOctaves.setSelected(true);
+        this.colouredOctaves = new JCheckBox("Coloured Octaves");
+        colouredOctaves.setToolTipText("Show Every Octave with a Different Color");
+        colouredOctaves.setSelected(false);
     }
     
     private void buildSoundChoiceFields() {
         this.radioButtonWave = new JRadioButton("Wave Generator", true);
+        radioButtonWave.setToolTipText("Wave Generators Support Different Tunings");
         this.radioButtonMidi = new JRadioButton("MIDI Synthesizer", false);
+        radioButtonMidi.setToolTipText("Java Sound Framework, no Support for Different Tunings");
         
         final ButtonGroup radioGroup = new ButtonGroup(); // exclusive selection
         radioGroup.add(radioButtonWave);
@@ -242,6 +256,7 @@ public class ConfigurationPanel
         
         this.waveChoice = new JComboBox<>(WaveNames.getNames());
         waveChoice.setBorder(BorderFactory.createTitledBorder("Wave Type"));
+        waveChoice.setToolTipText("Different Piano Sounds");
         
         final PianoClassChoiceItem[] pianoClasses = new PianoClassChoiceItem[] {
                 new PianoClassChoiceItem(DifferenceToneForIntervalPiano.class),
@@ -253,6 +268,7 @@ public class ConfigurationPanel
             };
         pianoClassChoice = new JComboBox<>(pianoClasses);
         pianoClassChoice.setBorder(BorderFactory.createTitledBorder("Piano Type"));
+        pianoClassChoice.setToolTipText("Java Class of Piano");
         pianoClassChoice.addActionListener(soundSelectionListener);
         
         soundSelectionListener.actionPerformed(null); // enable choice according to current setting
