@@ -2,6 +2,7 @@ package fri.music.player.notelanguage;
 
 import java.util.ArrayList;
 import java.util.List;
+import fri.music.TextUtil;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
@@ -81,7 +82,7 @@ public class MelodyFactory
     /** Notes can be 1/1, 1/2, 1/4, 1/. 1/16, 1/32, 1/64, not smaller. */
     public static final int SHORTEST_NOTELENGTH_DIVISOR = 64;
 
-    static final String NEWLINE = System.getProperty("line.separator");
+    static final String NEWLINE = TextUtil.NEWLINE;
 
     /** Factor by which first note in bar should be louder than subsequent notes. */
     private static final double BAR_START_VOLUME_FACTOR = 1.8;
@@ -90,7 +91,7 @@ public class MelodyFactory
     /** The symbol at the end of dotted notes, duration factor 3/2. */
     private static final String DOTTED_SYMBOL = ".";
     /** The separator character for triplet and other multiplet numbers. */
-    private static final char MULTIPLET_SEPARATOR = ',';
+    static final char MULTIPLET_SEPARATOR = ',';
     
     /** @return the amount of milliseconds one beat would last. */
     public static int beatDurationMillis(int beatsPerMinute) {
@@ -256,7 +257,7 @@ public class MelodyFactory
             // time-signature change can be attached to any note at bar-start
             if ((chordIndex > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar-type
                 result.append(
-                    (chordIndex <= 0 || endsWithNewline(result) ? "" : NEWLINE) +
+                    (chordIndex <= 0 || TextUtil.endsWithNewline(result) ? "" : NEWLINE) +
                     note.beatInfo.timeSignature() +
                     (addNewline ? "" : NEWLINE)); // add newline only if it wouldn't be added later
             
@@ -461,7 +462,7 @@ public class MelodyFactory
         return new MelodyToken(noteAndLength.ipnName, length, noteConnections);
     }
 
-    private Integer toIntegerOrNull(final String string) {
+    private static Integer toIntegerOrNull(final String string) {
         try {
             return Integer.valueOf(string);
         }
@@ -610,7 +611,7 @@ public class MelodyFactory
         return toMillis(length, dotted, multipletType);
     }
     
-    private Integer getMultipletType(String noteLengthString, int multipletSeparatorIndex) {
+    static Integer getMultipletType(String noteLengthString, int multipletSeparatorIndex) {
         if (multipletSeparatorIndex <= 0)
             return null;
         
@@ -769,18 +770,5 @@ public class MelodyFactory
         while (i < rawNotes.size() && connections.isTieEnd() == false);
 
         return duration;
-    }
-    
-    private boolean endsWithNewline(StringBuilder sb) {
-        final int newlineLength = NEWLINE.length();
-        if (sb.length() < newlineLength)
-            return false;
-        
-        int checkPosition = sb.length() - newlineLength;
-        for (int i = 0; i < NEWLINE.length(); i++, checkPosition++)
-            if (sb.charAt(checkPosition) != NEWLINE.charAt(i))
-                return false;
-        
-        return true;
     }
 }

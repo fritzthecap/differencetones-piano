@@ -16,6 +16,7 @@ import fri.music.JustIntonation;
 import fri.music.AbstractJustIntonation.ChromaticScale;
 import fri.music.MathUtils;
 import fri.music.ScaleTypes;
+import fri.music.TextUtil;
 import fri.music.ToneSystem;
 
 /**
@@ -47,7 +48,7 @@ import fri.music.ToneSystem;
  */
 public class JustIntonationChecker
 {
-    public static final String newline = System.getProperty("line.separator");
+    static final String NEWLINE = TextUtil.NEWLINE;
     
     /** Options to pass to JustIntonationChecker constructor. */
     public static class Configuration
@@ -126,7 +127,7 @@ public class JustIntonationChecker
             final String intervals = Stream.of(chromaticScale().intervals())
                     .map(interval -> interval.ratioString(0))
                     .collect(Collectors.joining(", "));
-            sb.append(intervals+newline);
+            sb.append(intervals+NEWLINE);
             
             final List<ChromaticScaleCheckResult> chromaticScaleResults = chromaticScaleCheckResults();
             if (chromaticScaleResults.size() > 0) {
@@ -136,7 +137,7 @@ public class JustIntonationChecker
                 sb.append(
                         "Found "+unjustDifferenceTones+" unjust difference-tones in "+
                         chromaticScaleResults.size()+" checked intervals"+
-                        (unjustDifferenceTones > 0 ? ":" : "!")+newline);
+                        (unjustDifferenceTones > 0 ? ":" : "!")+NEWLINE);
                 
                 for (ChromaticScaleCheckResult scaleResult : chromaticScaleResults)
                     sb.append(scaleResult.toString(configuration));
@@ -152,14 +153,14 @@ public class JustIntonationChecker
                     .limit(6) // display just first octave, leaving out trailing OCTAVE 2/1
                     .map(interval -> interval.ratioString())
                     .collect(Collectors.joining(", "));
-            sb.append("Diatonic LCM = "+leastCommonMultiple+" (least common multiple of diatonic divisors in "+diatonicIntervalRatios+")"+newline);
+            sb.append("Diatonic LCM = "+leastCommonMultiple+" (least common multiple of diatonic divisors in "+diatonicIntervalRatios+")"+NEWLINE);
             
             final String harmonicIntervals = firstResult.harmonicIntervals().stream()
                     .map(interval -> interval.name()+"("+interval.ratioString(0)+")")
                     .collect(Collectors.joining(", "));
-            sb.append("Checking "+firstResult.harmonicIntervals().size()+" intervals: "+harmonicIntervals+newline);
+            sb.append("Checking "+firstResult.harmonicIntervals().size()+" intervals: "+harmonicIntervals+NEWLINE);
             
-            sb.append(newline);
+            sb.append(NEWLINE);
             
             final Set<IntervalCheckResult> unjustIntervalsUnique = diatonicScaleResults.stream()
                     .map(r -> r.unJustIntervals())
@@ -170,7 +171,7 @@ public class JustIntonationChecker
             sb.append("Found "+
                     unjustIntervalsUnique.size()+" unjust intervals and "+ // contains no repetitions
                     unjustTriadsUnique.size()+" unjust triads in "+diatonicScaleCheckResults.size()+" diatonic scales:"+ // contains no repetitions
-                    newline);
+                    NEWLINE);
 
             for (DiatonicScaleCheckResult scaleResult : diatonicScaleResults)
                 sb.append(scaleResult.toString(configuration));
@@ -196,7 +197,7 @@ public class JustIntonationChecker
                     (differenceTone != null 
                         ? "\tDifference-tone in scale:\t"+differenceTone.targetNoteName+"["+differenceTone.ipnOctave+"]"
                         : "\tDifference-tone NOT in scale!")+
-                    newline;
+                    NEWLINE;
         }
     }
     
@@ -214,13 +215,13 @@ public class JustIntonationChecker
         public String toString(Configuration configuration) {
             final StringBuilder sb = new StringBuilder();
             
-            sb.append("\tScale "+scaleInfo()+":"+newline);
+            sb.append("\tScale "+scaleInfo()+":"+NEWLINE);
             
             final long unustTriads = triadResults().stream().filter(r -> r.isJust() == false).count();
-            final String triadTitle = "\t\tTriads: "+unustTriads+" unjust of "+triadResults().size()+newline;
+            final String triadTitle = "\t\tTriads: "+unustTriads+" unjust of "+triadResults().size()+NEWLINE;
 
             final long allCheckedIntervals = intervalResults().entrySet().stream().flatMap(e -> e.getValue().stream()).count();
-            final String intervalTitle = "\t\tIntervals: "+unJustIntervals().size()+" unjust of "+allCheckedIntervals+newline;
+            final String intervalTitle = "\t\tIntervals: "+unJustIntervals().size()+" unjust of "+allCheckedIntervals+NEWLINE;
             
             if (configuration.showScalesOnly == true) { // no triad or interval details
                 sb.append(triadTitle);
@@ -243,7 +244,7 @@ public class JustIntonationChecker
                         sb.append(intervalTitle);
                     
                     for (Map.Entry<String,List<IntervalCheckResult>> intervalResult : intervalResults().entrySet()) {
-                        final String title = "\t\t\t"+intervalResult.getKey()+newline; // interval name
+                        final String title = "\t\t\t"+intervalResult.getKey()+NEWLINE; // interval name
                         titleAppended = false;
                         for (IntervalCheckResult checkResult : intervalResult.getValue()) {
                             final String output = checkResult.toString(configuration, title, titleAppended);
@@ -286,7 +287,7 @@ public class JustIntonationChecker
                             ? ",\texpected: "+expectedRatio()+", actual: "+actualRatio()+
                                 (isJust() || centError() == 0 ? "" : ", "+(centError() > 0 ? "+"+centError() : centError())+" cent")
                             : "")+
-                        newline);
+                        NEWLINE);
             }
             
             return sb.toString();
@@ -310,7 +311,7 @@ public class JustIntonationChecker
                 sb.append("\t\t\t"+triadName()+notes()+":\t");
                 sb.append(
                         (isJust() ? "OK" : "unjust:\t"+unjustReasons())+
-                        newline);
+                        NEWLINE);
             }
             
             return sb.toString();

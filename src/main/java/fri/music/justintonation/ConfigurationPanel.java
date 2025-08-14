@@ -104,7 +104,7 @@ public class ConfigurationPanel
             final JustIntonationChecker.Result result = new JustIntonationChecker(configuration).check(chromaticScale);
             resultText.append(result.toString());
             if (i < selectedValues.size())
-                resultText.append(JustIntonationChecker.newline);
+                resultText.append(JustIntonationChecker.NEWLINE);
         }
         
         return new String[] { titleText.toString(), resultText.toString() };
