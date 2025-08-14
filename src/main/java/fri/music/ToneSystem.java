@@ -14,7 +14,7 @@ public interface ToneSystem
     /** "A4", the (immutable) IPN-name of the tone that all pitches will be calculated from. */
     String REFERENCE_FREQUENCY_IPN_NAME = "A4";
     
-    /** The 12 base-names of tones (without octave number), starting with "C", ending with "B". */
+    /** The 12 base-names of tones (without octave number), starting with "C", ending with "B", sharp accent is "#". */
     String[] IPN_BASE_NAMES = new String[] 
             { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 
