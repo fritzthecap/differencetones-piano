@@ -1,5 +1,7 @@
 package fri.music.player.notelanguage;
 
+import fri.music.player.Note;
+
 /** Helper that tracks the millisecond position in bar. */
 class BarState
 {
@@ -26,7 +28,7 @@ class BarState
     public void add(int durationMilliseconds) {
         currentMillis += durationMilliseconds;
         
-        if (touches(currentMillis, barDurationMilliseconds))
+        if (matches(currentMillis, barDurationMilliseconds))
             currentMillis = 0;
     }
     
@@ -41,14 +43,8 @@ class BarState
                 matches(currentMillis, barDurationMillisecondsHalf);
     }
 
-    private boolean touches(int currentMillis, int limit) {
-        return currentMillis > limit ||
-                matches(currentMillis, limit);
-    }
-
     private boolean matches(int currentMillis, int limit) {
-        return currentMillis == limit ||
-                currentMillis == limit - 1 ||
-                currentMillis == limit + 1;
+        return currentMillis + Note.MINIMAL_DURATION >= limit && 
+                currentMillis - Note.MINIMAL_DURATION <= limit;
     }
 }

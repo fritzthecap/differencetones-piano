@@ -7,7 +7,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import fri.music.instrument.PianoWithSound;
 import fri.music.player.Note;
-import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.swingutils.MouseKeyAdapter;
 
 /**
@@ -33,7 +32,7 @@ class NotesWritingMouseListener extends MouseKeyAdapter
                 noteLengthSelected(((JMenuItem) e.getSource()).getActionCommand());
             }
         };
-        for (int i = 1; i <= MelodyFactory.SHORTEST_NOTELENGTH_DIVISOR; i *= 2) { // 1, 2, 4, 8, 16, 32, 64
+        for (int i = 1; i <= Note.SHORTEST_NOTELENGTH_DIVISOR; i *= 2) { // 1, 2, 4, 8, 16, 32, 64
             final String actionCommand = Integer.toString(i);
             final JMenuItem menuItem = new JMenuItem(actionCommand);
             menuItem.setToolTipText("1/"+actionCommand+" Note");

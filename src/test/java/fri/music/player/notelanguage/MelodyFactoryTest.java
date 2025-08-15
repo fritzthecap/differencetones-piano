@@ -209,7 +209,7 @@ class MelodyFactoryTest
     void customTripletDuration() {
         final String[] notes = new String[] {
             "G4/4", "A4/4", 
-            "B4/2,3", "A4/4,3", // triplet
+            "B4/2,3", "A4/4,3", // custom triplet
             "D4/1",
         };
         

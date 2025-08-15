@@ -6,6 +6,7 @@ import fri.music.TextUtil;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
+import fri.music.player.Multiplet;
 import fri.music.player.Note;
 
 /**
@@ -76,12 +77,6 @@ public class MelodyFactory
     /** Maximum beats per bar is a dicussed topic. */
     public static final Integer MAXIMUM_BEATS_PER_BAR = 16; //32;
     
-    public static final int TEMPO_MINIMUM_BPM = 40;
-    public static final int TEMPO_MAXIMUM_BPM = 208;
-    
-    /** Notes can be 1/1, 1/2, 1/4, 1/. 1/16, 1/32, 1/64, not smaller. */
-    public static final int SHORTEST_NOTELENGTH_DIVISOR = 64;
-
     static final String NEWLINE = TextUtil.NEWLINE;
 
     /** Factor by which first note in bar should be louder than subsequent notes. */
@@ -89,9 +84,10 @@ public class MelodyFactory
     private static final double BAR_HALF_VOLUME_FACTOR = 1.4;
     
     /** The symbol at the end of dotted notes, duration factor 3/2. */
-    private static final String DOTTED_SYMBOL = ".";
+    static final String DOTTED_SYMBOL = ".";
     /** The separator character for triplet and other multiplet numbers. */
     static final char MULTIPLET_SEPARATOR = ',';
+    
     
     /** @return the amount of milliseconds one beat would last. */
     public static int beatDurationMillis(int beatsPerMinute) {
@@ -102,7 +98,7 @@ public class MelodyFactory
     public static double noteLengthMillis(int noteLengthDivisor, int beatType, int beatDurationMillis) {
         final double beatFactor = (double) beatType / (double) noteLengthDivisor;
         return (double) beatDurationMillis * beatFactor;
-        // "C4/1" in a 3/4 waltz must be written as "C4/2."! (mind the dot)
+        // "C4/1" in a 3/4 waltz must be written as "C4/2." (mind the dot!)
     }
     
     /** @return the divisor for a note with given duration in milliseconds. */
@@ -114,7 +110,7 @@ public class MelodyFactory
         final int noteLengthDivisor = (int) Math.round((double) beatDurationMillis * beatFactor);
         
         int minimum = Integer.MAX_VALUE, difference = Integer.MAX_VALUE, nearest = 0;
-        for (int i = 1; i <= SHORTEST_NOTELENGTH_DIVISOR && difference <= minimum; i *= 2) {
+        for (int i = 1; i <= Note.SHORTEST_NOTELENGTH_DIVISOR && difference <= minimum; i *= 2) {
             difference = Math.abs(noteLengthDivisor - i);
             if (difference < minimum) {
                 minimum = difference;
@@ -340,8 +336,8 @@ public class MelodyFactory
     }
 
     private void checkValidBeatsPerMinute(Integer beatsPerMinute) {
-        if (beatsPerMinute == null || beatsPerMinute < TEMPO_MINIMUM_BPM || beatsPerMinute > TEMPO_MAXIMUM_BPM)
-            throw new IllegalArgumentException("Illegal tempo "+beatsPerMinute+" (BPM), must be "+TEMPO_MINIMUM_BPM+" - "+TEMPO_MAXIMUM_BPM+".");
+        if (beatsPerMinute == null || beatsPerMinute < Note.TEMPO_MINIMUM_BPM || beatsPerMinute > Note.TEMPO_MAXIMUM_BPM)
+            throw new IllegalArgumentException("Illegal tempo "+beatsPerMinute+" (BPM), must be "+Note.TEMPO_MINIMUM_BPM+" - "+Note.TEMPO_MAXIMUM_BPM);
     }
     
     private void checkValidBeatsPerBar(Integer beatsPerBar) throws IllegalArgumentException {
@@ -353,7 +349,7 @@ public class MelodyFactory
     private void checkValidNoteLength(Integer beatType, String errorMessage) {
         boolean result = false;
         if (beatType != null)
-            for (int i = 1; result == false && i <= SHORTEST_NOTELENGTH_DIVISOR; i *= 2) // 1, 2, 4, 8, 16, ...
+            for (int i = 1; result == false && i <= Note.SHORTEST_NOTELENGTH_DIVISOR; i *= 2) // 1, 2, 4, 8, 16, ...
                 if (beatType.intValue() == i)
                     result = true;
         
@@ -437,7 +433,7 @@ public class MelodyFactory
     }
 
     
-    private InputToken newInputToken(String melodyToken, String chordLength) {
+    private InputToken newInputToken(String melodyToken, String firstChordNoteLength) {
         final NoteConnections noteConnections = new NoteConnections(melodyToken);
         
         final MelodyToken noteAndLength = splitByDurationSeparator(noteConnections.melodyToken);
@@ -453,8 +449,8 @@ public class MelodyFactory
         
         checkValidIpnName(noteAndLength.ipnName);
         
-        final String length = (chordLength != null)
-                ? chordLength
+        final String length = (firstChordNoteLength != null)
+                ? firstChordNoteLength
                 : (noteAndLength.length != null)
                     ? noteAndLength.length
                     : DEFAULT_NOTE_LENGTH;
@@ -462,7 +458,7 @@ public class MelodyFactory
         return new MelodyToken(noteAndLength.ipnName, length, noteConnections);
     }
 
-    private static Integer toIntegerOrNull(final String string) {
+    private Integer toIntegerOrNull(final String string) {
         try {
             return Integer.valueOf(string);
         }
@@ -504,11 +500,31 @@ public class MelodyFactory
         public final String ipnName;
         public final String length;
         public final NoteConnections noteConnections;
+        
+        private int overallMultipletDuration;
+        private Integer multipletType;
 
         MelodyToken(String ipnName, String length, NoteConnections noteConnections) {
             this.ipnName = ipnName;
             this.length = length;
             this.noteConnections = noteConnections;
+        }
+        
+        /**
+         * This is needed to know where a triplet (multiplet) ends.
+         * @param overallMultipletDuration gives the duration sum of this and all
+         *      subsequent multiplet notes, assuming they have same length.
+         */
+        public void setOverallMultipletDuration(int overallMultipletDuration, Integer multipletType) {
+            this.overallMultipletDuration = overallMultipletDuration;
+            this.multipletType = multipletType;
+        }
+        /** @return the duration sum of this and all subsequent multiplet notes, assuming they have same length. */
+        public int getOverallMultipletDuration() {
+            return overallMultipletDuration;
+        }
+        public Integer getMultipletType() {
+            return multipletType;
         }
     }
     
@@ -544,10 +560,10 @@ public class MelodyFactory
             BarState barState, 
             String currentTimeSignature, 
             boolean beatInfoRequired,
-            Note firstChordNote) // not null from 2nd chord note on
+            Note firstChordNote) // not null from 2nd chord note on, give all notes in a chord first note's length
     {
-        final int duration = durationMilliseconds(melodyToken.length);
-        // give all notes in a chord same length, determined by first chord note
+        final DurationWithMultiplet durationAndMultiplet = durationMilliseconds(melodyToken.length);
+        final int duration = durationAndMultiplet.duration;
         
         final double volumeFactor = getVolumeFactor(barState);
         final int volumeOfNote = (firstChordNote != null)
@@ -568,112 +584,121 @@ public class MelodyFactory
         else
             beatInfo = null; // Note constructor will set a non-null default
 
+        final Note rawNote;
         if (melodyToken.ipnName.equals(ToneSystem.REST_SYMBOL)) {
             if (firstChordNote != null)
-                throw new IllegalArgumentException("You can not have a rest in a chord: "+melodyToken.ipnName+"/"+melodyToken.length);
+                throw new IllegalArgumentException("A rest can not be in a chord: "+melodyToken.ipnName+"/"+melodyToken.length);
             
-            return new Note(duration, emphasized, melodyToken.length, beatInfo);
+            rawNote = new Note(
+                    duration,
+                    emphasized,
+                    melodyToken.length,
+                    beatInfo);
+        }
+        else {
+            final Tone tone = toneSystem.forIpnName(melodyToken.ipnName);
+            if (tone == null)
+                throw new IllegalArgumentException("Unknown note name: "+melodyToken.ipnName);
+            
+            rawNote = new Note( // is a raw note because no tie/slur connections yet
+                    tone,
+                    duration,
+                    volumeOfNote,
+                    emphasized,
+                    null, // connectionFlags will be added later
+                    melodyToken.length,
+                    beatInfo);
         }
         
-        final Tone tone = toneSystem.forIpnName(melodyToken.ipnName);
-        if (tone == null)
-            throw new IllegalArgumentException("Unknown note name: "+melodyToken.ipnName);
+        if (durationAndMultiplet.overallMultipletDuration > 0)
+            melodyToken.setOverallMultipletDuration(
+                    durationAndMultiplet.overallMultipletDuration,
+                    durationAndMultiplet.multipletType);
         
-        return new Note( // is a raw note because no tie/slur connections yet
-                tone,
-                duration,
-                volumeOfNote,
-                emphasized,
-                null, // connectionFlags will be added later
-                melodyToken.length,
-                beatInfo);
+        return rawNote;
     }
 
-    private int durationMilliseconds(final String noteLength) {
-        String noteLengthString = noteLength;
-        // remove optional dot at right end
-        final boolean dotted = noteLengthString.endsWith(DOTTED_SYMBOL);
-        if (dotted)
-            noteLengthString = noteLengthString.substring(0, noteLengthString.length() - DOTTED_SYMBOL.length());
-        
-        // remove optional multiplet-type, left of dot
-        final int multipletSeparatorIndex = noteLengthString.indexOf(MULTIPLET_SEPARATOR);
-        final Integer multipletType = getMultipletType(noteLengthString, multipletSeparatorIndex);
-        if (multipletType != null)
-            noteLengthString = noteLengthString.substring(0, multipletSeparatorIndex);
-        
-        final Integer length = toIntegerOrNull(noteLengthString);
-        if (length == null)
-            throw new IllegalArgumentException("Note length is not a number: '"+noteLength+"'");
-        
-        checkValidNoteLength(length, "Illegal note length:");
-        
-        return toMillis(length, dotted, multipletType);
+    
+    private record DurationWithMultiplet(int duration, int overallMultipletDuration, Integer multipletType)
+    {
     }
     
-    static Integer getMultipletType(String noteLengthString, int multipletSeparatorIndex) {
+    private DurationWithMultiplet durationMilliseconds(String noteLength) {
+        // remove optional dot at right end
+        final boolean dotted = noteLength.endsWith(DOTTED_SYMBOL);
+        if (dotted)
+            noteLength = noteLength.substring(0, noteLength.length() - DOTTED_SYMBOL.length());
+        
+        // remove optional multiplet-type, left of dot
+        final int multipletSeparatorIndex = noteLength.indexOf(MULTIPLET_SEPARATOR);
+        final Integer multipletType = getMultipletType(noteLength, multipletSeparatorIndex);
+        if (multipletType != null)
+            noteLength = noteLength.substring(0, multipletSeparatorIndex);
+        
+        final Integer length = toIntegerOrNull(noteLength);
+        checkValidNoteLength(length, "Unknown note length:");
+        
+        final int[] durations = toMillis(length, dotted, multipletType);
+        
+        return new DurationWithMultiplet(durations[0], durations[1], multipletType);
+    }
+    
+    private Integer getMultipletType(String noteLengthString, int multipletSeparatorIndex) {
         if (multipletSeparatorIndex <= 0)
             return null;
         
         final String multipletString = noteLengthString.substring(multipletSeparatorIndex + 1);
-        Integer multipletType = toIntegerOrNull(multipletString);
+        final Integer multipletType = toIntegerOrNull(multipletString);
         if (multipletType == null)
             throw new IllegalArgumentException("Multiplet type is not a number: '"+noteLengthString+"'");
         
         return multipletType;
     }
 
-    private int toMillis(int noteLengthDivisor, boolean isDottedNote, Integer multipletType) {
+    private int[] toMillis(int noteLengthDivisor, boolean isDottedNote, Integer multipletType) {
         double millis = noteLengthMillis(noteLengthDivisor, beatType, beatDurationMilliseconds);
         
-        if (multipletType != null)
-            millis = calculateMultipletDuration(multipletType, millis);
+        final int overallMultipletDuration;
+        if (multipletType != null) {
+            double[] durations = calculateMultipletDuration(multipletType, millis);
+            millis = durations[0];
+            overallMultipletDuration = (int) Math.round(durations[1]);
+        }
+        else {
+            overallMultipletDuration = -1;
+        }
         
         if (isDottedNote)
             millis *= 1.5; // dotted factor
         
-        return (int) Math.round(millis);
+        return new int[] { 
+                (int) Math.round(millis), 
+                overallMultipletDuration
+            };
     }
 
-    private double calculateMultipletDuration(Integer multipletType, double millis) {
-        final double factor;
-        // duplets (2) or quadruplets (4) will occur only in 3-ticks-per-beat, 6/8 or 12/8 
-        switch (multipletType) {
-            case 2: // duplets take 3/2 duration, 2 notes on the duration of 3 equal notes
-                if (beatsPerBar % 3 != 0)
-                    throw new IllegalArgumentException("Do not use duplets in "+beatsPerBar+"/"+beatType+" measures!");
-                factor = 3.0 / 2.0; 
-                break;
-            case 3: // triplets take 2/3 duration, 3 notes on the duration of 2 equal notes
-            case 6: // sixtuplets take 4/6==2/3 duration, 6 notes on the duration of 4 equal notes
-                factor = 2.0 / 3.0; 
-                break;
-            case 4: // quadruplets take 3/4 duration, 4 notes on the duration of 3 equal notes
-                if (beatsPerBar % 3 != 0)
-                    throw new IllegalArgumentException("Do not use quadruplets in "+beatsPerBar+"/"+beatType+" measures!");
-                factor = 3.0 / 4.0;
-                break;
-            case 5: // quintuplets take 4/5 duration, 5 notes on the duration of 4 equal notes
-                factor = 4.0 / 5.0;
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported multiplet type: '"+multipletType+"'");
-        }
-        return millis * factor;
+    private double[] calculateMultipletDuration(Integer multipletType, double millis) {
+        // duplets (2) or quadruplets (4) will occur only in "compound" time-signatures like 6/8 or 12/8
+        final boolean compound = (beatsPerBar % 3 == 0);
+        if (compound == false) // is even time-signature like 4/4
+            if (multipletType == 2) // duplet
+                throwUnsupportedMultiplet("duplets");
+            else if (multipletType == 4) // quadruplet
+                throwUnsupportedMultiplet("quadruplets");
+
+        return Multiplet.toEnum(multipletType).adjust(millis);
         /*
-         * Following spec from https://abcwiki.org/abc:syntax
-         * contradicts https://en.wikipedia.org/wiki/Tuplet#Rhythm where "(5" is described as 5 over 4,
-         * 
-           If the time signature is compound (6/8, 9/8, 12/8) then n is three, otherwise n is two.
-            "(2" = 2 notes in the time of 3
-            "(3" = 3 notes in the time of 2
-            "(4" = 4 notes in the time of 3
-            "(5" = 5 notes in the time of n
-            "(6" = 6 notes in the time of 2
-            "(7" = 7 notes in the time of n
-            "(8" = 8 notes in the time of 3
-            "(9" = 9 notes in the time of n
+         * Following specification from https://abcwiki.org/abc:syntax#duplets_triplets_quadruplets_etc
+         * contradicts https://en.wikipedia.org/wiki/Tuplet#Rhythm 
+         * where a quintole is described as 5 over 4, and a sextole as 6 over 4:
+               If the time signature is compound (6/8, 9/8, 12/8) then n is 3, otherwise n is 2.
+                "(5" = 5 notes in the time of n
+                "(6" = 6 notes in the time of 2
          */
+    }
+    
+    private void throwUnsupportedMultiplet(String multipletType) {
+        throw new IllegalArgumentException("In "+beatsPerBar+"/"+beatType+" time-signatures, "+multipletType+" are ambiguous and thus not supported!");
     }
 
     /** Notes at first beat should be louder. */
@@ -696,22 +721,43 @@ public class MelodyFactory
         boolean inSlur = false;
         boolean inChord = false;
         
+        int overallMultipletDuration = 0;
+        int multipletDuration = 0;
+        
         for (int i = 0; i < melodyTokens.size(); i++) {
-            final MelodyToken melodyNote = melodyTokens.get(i);
+            final MelodyToken melodyToken = melodyTokens.get(i);
             final Note rawNote = rawNotes.get(i);
             
-            final boolean slurStart = (inSlur == false && melodyNote.noteConnections.isSlurStart());
-            final boolean slurEnd   = (inSlur == true  && melodyNote.noteConnections.isSlurEnd());
+            final boolean slurStart = (inSlur == false && melodyToken.noteConnections.isSlurStart());
+            final boolean slurEnd   = (inSlur == true  && melodyToken.noteConnections.isSlurEnd());
             final Boolean slurred = slurEnd ? Boolean.FALSE : (slurStart || inSlur) ? Boolean.TRUE : null;
             
-            final boolean tieStart = (inTie == false && melodyNote.noteConnections.isTieStart());
-            final boolean tieEnd   = (inTie == true  && melodyNote.noteConnections.isTieEnd());
+            final boolean tieStart = (inTie == false && melodyToken.noteConnections.isTieStart());
+            final boolean tieEnd   = (inTie == true  && melodyToken.noteConnections.isTieEnd());
             final Boolean tied = tieEnd ? Boolean.FALSE : (tieStart || inTie) ? Boolean.TRUE : null;
             
-            final boolean chordStart = (inChord == false && melodyNote.noteConnections.isChordStart());
-            final boolean chordEnd   = (inChord == true  && melodyNote.noteConnections.isChordEnd());
+            final boolean chordStart = (inChord == false && melodyToken.noteConnections.isChordStart());
+            final boolean chordEnd   = (inChord == true  && melodyToken.noteConnections.isChordEnd());
             final Boolean chord = chordEnd ? Boolean.FALSE : (chordStart || inChord) ? Boolean.TRUE : null;
             
+            Boolean multiplet = null;
+            if (overallMultipletDuration <= 0) {
+                if ((overallMultipletDuration = melodyToken.getOverallMultipletDuration()) > 0) { // start of a multiplet
+                    multipletDuration = rawNote.durationMilliseconds;
+                    multiplet = Boolean.TRUE;
+                }
+                else {
+                    multiplet = null;
+                }
+            }
+            else { // running multiplet
+                multipletDuration += rawNote.durationMilliseconds;
+                if (overallMultipletDuration <= multipletDuration + Note.MINIMAL_DURATION) { // 999 is 1000
+                    overallMultipletDuration = 0; // terminate multiplet
+                    multiplet = Boolean.FALSE;
+                }
+            }
+      
             final int durationMilliseconds;
             
             if (tieStart)
@@ -726,7 +772,7 @@ public class MelodyFactory
             final Note connectedNote = new Note(
                     rawNote, 
                     durationMilliseconds, 
-                    new Note.ConnectionFlags(slurred, tied, chord), 
+                    new Note.ConnectionFlags(slurred, tied, chord, multiplet, melodyToken.getMultipletType()), 
                     rawNote.lengthNotation);
             
             if (chordStart || inChord)

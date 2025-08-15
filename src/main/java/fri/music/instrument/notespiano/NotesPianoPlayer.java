@@ -302,8 +302,8 @@ public class NotesPianoPlayer
         
         final SpinnerModel tempoModel = new SpinnerNumberModel(
                 Note.DEFAULT_TEMPO_BPM, // initial value
-                MelodyFactory.TEMPO_MINIMUM_BPM, // minimum
-                MelodyFactory.TEMPO_MAXIMUM_BPM, // maximum
+                Note.TEMPO_MINIMUM_BPM, // minimum
+                Note.TEMPO_MAXIMUM_BPM, // maximum
                 4); // step width
         this.tempoSpinner = new JSpinner(tempoModel);
         tempoSpinner.setToolTipText("Beats Per Minute");

@@ -1,5 +1,6 @@
 package fri.music.player.notelanguage;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,7 +11,8 @@ import fri.music.ToneSystem;
 import fri.music.player.Note;
 
 /**
- * 
+ * Exports MelodyFactory notation to ABC notation.
+ * @see https://abcnotation.com/wiki/abc:standard:v2.1
  */
 public class ExportToAbc
 {
@@ -89,18 +91,19 @@ public class ExportToAbc
     
     /** ABC header data. */
     public record Configuration(
+            Integer songNumber,
             String title, 
             String subTitle, 
-            String keyAndClef, 
             String author, 
             String date,
+            String keyAndClef, 
             int numberOfBarsPerLine)
     {
         public Configuration() {
-            this("Title", "C", "Author");
+            this(null, null, "C");
         }
-        public Configuration(String title, String keyAndClef, String author) {
-            this(title, null, keyAndClef, author, null, 4);
+        public Configuration(String title, String author, String keyAndClef) {
+            this(1, title, null, author, null, keyAndClef, 4);
         }
         
         /** @return true when the tune's key is F, Bb, Eb, Ab, ... Db, else false. */
@@ -115,6 +118,7 @@ public class ExportToAbc
     
     
     private final Note[][] notes;
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
     /** Construct an exporter for different export-configurations. */
     public ExportToAbc(Note[][] notes) {
@@ -144,10 +148,14 @@ public class ExportToAbc
         String timeSignature = writeHeader(configuration, result);
         int barCount = 0;
         boolean wasDotted = false;
+        boolean inSlur = false;
+        boolean inMultiplet = false;
         
         for (int i = 0; i < notes.length; i++) {
             final Note[] chord = notes[i];
             final Note firstNote = chord[0];
+            final Note lastNote = chord[chord.length - 1];
+            final Note nextNote = (i < notes.length - 1) ? notes[i + 1][0] : null;
             
             final boolean barStart = (i > 0 && firstNote.emphasized);
             if (barStart) {
@@ -157,85 +165,58 @@ public class ExportToAbc
             
             final boolean gotoNextLine = (barCount == numberOfBarsPerLine);
             
-            // check for bar change
-            final boolean barChange = 
-                    (null != firstNote.beatInfo.timeSignature() &&
-                    false == firstNote.beatInfo.timeSignature().equals(timeSignature));
-            
-            if (barChange) {
-                timeSignature = firstNote.beatInfo.timeSignature();
-                
-                if (barStart == false)
-                    result.append("|");
-                result.append(TextUtil.NEWLINE);
-                result.append("M: "+timeSignature);
-                if (gotoNextLine == false)
-                    result.append(TextUtil.NEWLINE);
-            }
+            // check for time-signature change
+            final boolean meterChange = isMeterChange(timeSignature, firstNote);
+            if (meterChange)
+                timeSignature = meterChange(result, timeSignature, firstNote, barStart, gotoNextLine);
                 
             if (gotoNextLine) {
                 result.append(TextUtil.NEWLINE);
                 barCount = 0;
             }
-            else if (barStart && false == barChange)
+            else if (barStart && false == meterChange)
                 result.append(" ");
             
-            final boolean slurStart = Boolean.TRUE.equals(firstNote.connectionFlags.slurred());
-            if (slurStart)
-                result.append("(");
+            inSlur = detectSlurStart(result, inSlur, firstNote);
             
             final boolean moreThanOneNote = (chord.length > 1);
             if (moreThanOneNote)
                 result.append("[");
             
-            final Integer multipletType = isMultipletLength(firstNote.lengthNotation);
-            if (multipletType != null)
-                result.append("("+multipletType+" ");
+            if (firstNote.connectionFlags.multiplet() == Boolean.TRUE) {
+                if (inMultiplet == false) { // multiplet start
+                    result.append("("+firstNote.connectionFlags.multipletType()+" ");
+                    inMultiplet = true;
+                }
+            }
+            else if (firstNote.connectionFlags.multiplet() == Boolean.FALSE) {
+                inMultiplet = false;
+            }
             
             final boolean isDotted = isDotted(firstNote.lengthNotation);
-            final String length;
-            if (wasDotted)
-                length = toAbcDoubleLength(firstNote.lengthNotation, isDotted);
-            else
-                length = toAbcLength(firstNote.lengthNotation, isDotted);
-                
+            final String length = getAbcDottedLength(wasDotted, firstNote, isDotted);
             wasDotted = isDotted;
             
-            for (Note note : chord) { // single notes, mostly just one
-                final String noteName;
-                if (isFlatKey)
-                    noteName = IPN_NOTE_TO_ABC_FLAT.get(note.ipnName);
-                else
-                    noteName = IPN_NOTE_TO_ABC_SHARP.get(note.ipnName);
-                
-                result.append(noteName);
-                result.append("/"+length);
-            }
+            writeChordNotes(result, isFlatKey, chord, length);
             
             if (moreThanOneNote)
                 result.append("]");
             
-            final boolean tied = Boolean.TRUE.equals(firstNote.connectionFlags.tied());
-            if (tied)
+            if (Boolean.TRUE.equals(lastNote.connectionFlags.tied()))
                 result.append("-");
             
-            final boolean slurEnd = Boolean.FALSE.equals(firstNote.connectionFlags.slurred());
-            if (slurEnd)
-                result.append(")");
+            inSlur = detectSlurEnd(result, inSlur, lastNote);
             
-            if (isEighthOrShorter(firstNote.lengthNotation))
-                result.append('`'); // connect short notes by beam
-            else
-                result.append(' ');
+            finish(result, lastNote, moreThanOneNote, nextNote);
         }
         
         result.append("||");
         return result.toString();
     }
 
-
+    
     private String writeHeader(Configuration configuration, StringBuilder result) {
-        appendLine(result, "X: 1");
+        appendLine(result, "X: "+(configuration.songNumber() != null ? configuration.songNumber() : 1));
         
         if (configuration.title() != null)
             appendLine(result, "T: "+configuration.title());
@@ -244,12 +225,10 @@ public class ExportToAbc
             appendLine(result, "T: "+configuration.subTitle());
 
         final String date = (configuration.date() != null)
-                ? configuration.date()
-                : new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+                ? ", "+configuration.date().replace("{date}", dateFormat.format(new Date()))
+                : "";
         if (configuration.author() != null)
-            appendLine(result, "C: "+configuration.author()+", "+date);
-        else
-            appendLine(result, "C: "+date);
+            appendLine(result, "C: "+configuration.author() + date);
         
         final Note firstNote = notes[0][0];
         final String timeSignature = Objects.requireNonNull(firstNote.beatInfo.timeSignature());
@@ -270,14 +249,89 @@ public class ExportToAbc
         stringBuilder.append(TextUtil.NEWLINE);
     }
     
-    
-    private Integer isMultipletLength(String lengthNotation) {
-        final int multipletSeparatorIndex = lengthNotation.indexOf(MelodyFactory.MULTIPLET_SEPARATOR);
-        return MelodyFactory.getMultipletType(lengthNotation, multipletSeparatorIndex);
+    private boolean isMeterChange(String timeSignature, Note firstNote) {
+        return firstNote.beatInfo.timeSignature() != null &&
+                false == timeSignature.equals(firstNote.beatInfo.timeSignature());
+    }
+
+    private String meterChange(
+            StringBuilder result, 
+            String timeSignature, 
+            Note firstNote,
+            boolean barStart, 
+            boolean gotoNextLine)
+    {
+        timeSignature = firstNote.beatInfo.timeSignature(); // pick up new one
+        
+        if (barStart == false)
+            result.append("|");
+        final String escape = gotoNextLine ? "" : "\\";
+        result.append(escape+TextUtil.NEWLINE);
+        result.append("M:"+timeSignature); // no space allowed here in mid-tune!
+        if (gotoNextLine == false)
+            result.append(TextUtil.NEWLINE);
+        
+        return timeSignature;
     }
     
+    private void writeChordNotes(StringBuilder result, boolean isFlatKey, Note[] chord, String length) {
+        for (Note note : chord) { // single notes, mostly just one
+            final String noteName;
+            if (isFlatKey)
+                noteName = IPN_NOTE_TO_ABC_FLAT.get(note.ipnName);
+            else
+                noteName = IPN_NOTE_TO_ABC_SHARP.get(note.ipnName);
+            
+            result.append(noteName);
+            result.append("/"+length);
+            
+            if (isEighthOrShorter(length) == false && note != chord[chord.length - 1])
+                result.append(" ");
+        }
+    }
+    
+    private String getAbcDottedLength(boolean wasDotted, Note firstNote, boolean isDotted) {
+        return wasDotted
+                ? toAbcDoubleLength(firstNote.lengthNotation, isDotted)
+                : toAbcLength(firstNote.lengthNotation, isDotted);
+    }
+
+    private boolean detectSlurStart(StringBuilder result, boolean inSlur, Note firstNote) {
+        final boolean slurStart = (inSlur == false) && Boolean.TRUE.equals(firstNote.connectionFlags.slurred());
+        if (slurStart) {
+            result.append("(");
+            inSlur = true;
+        }
+        return inSlur;
+    }
+
+    private boolean detectSlurEnd(StringBuilder result, boolean inSlur, Note lastNote) {
+        final boolean slurEnd = (inSlur == true) && Boolean.FALSE.equals(lastNote.connectionFlags.slurred());
+        if (slurEnd) {
+            result.append(")");
+            inSlur = false;
+        }
+        return inSlur;
+    }
+
+    private void finish(StringBuilder result, Note firstNote, boolean moreThanOneNote, Note nextNote) {
+        if (isEighthOrShorter(firstNote.lengthNotation) && 
+                firstNote.connectionFlags.multiplet() != Boolean.FALSE &&
+                nextNote != null && nextNote.emphasized == false &&
+                nextNote.connectionFlags.multiplet() != Boolean.TRUE &&
+                isEighthOrShorter(nextNote.lengthNotation)) // connect short notes by beam
+        {
+            if (moreThanOneNote == false) // no ` inside a chord
+                result.append('`');
+            // else create beam by leaving out space
+        }
+        else { // longer than eighth, separate by space for readability
+            result.append(' ');
+        }
+    }
+
     private boolean isDotted(String lengthNotation) {
-        return lengthNotation.endsWith(".");
+        return lengthNotation.endsWith(MelodyFactory.DOTTED_SYMBOL);
     }
     
     private String toAbcLength(String lengthNotation, boolean isDotted) {
@@ -297,7 +351,7 @@ public class ExportToAbc
     
     private String stripLengthToNumber(String lengthNotation, boolean isDotted) {
         if (isDotted)
-            lengthNotation = lengthNotation.substring(0, lengthNotation.length() - ".".length());
+            lengthNotation = lengthNotation.substring(0, lengthNotation.length() - MelodyFactory.DOTTED_SYMBOL.length());
         
         final int multipletSeparatorIndex = lengthNotation.indexOf(MelodyFactory.MULTIPLET_SEPARATOR);
         if (multipletSeparatorIndex >= 0)

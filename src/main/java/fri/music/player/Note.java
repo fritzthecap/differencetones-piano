@@ -23,12 +23,14 @@ public class Note extends Tone
      *      If a tie is not started but continued, the note's durationMilliseconds will be zero.
      * @param chord a note that is part of a chord. Null means not part of a chord,
      *      TRUE means chord start or continued, FALSE means chord end.
+     * @param multiplet null for normal note, TRUE when triplet starts, FALSE when it ends.
+     * @param multipletType null for normal note, 3 for triplet, 4 for quadruplet, ...
      */
-    public record ConnectionFlags(Boolean slurred, Boolean tied, Boolean chord)
+    public record ConnectionFlags(Boolean slurred, Boolean tied, Boolean chord, Boolean multiplet, Integer multipletType)
     {
         /** Convenience constructor for a note with no connection at all. */
         public ConnectionFlags() {
-            this(null, null, null);
+            this(null, null, null, null, null);
         }
     }
     
@@ -40,6 +42,7 @@ public class Note extends Tone
     {
     }
     
+    
     /** Default loudness, 0-127. */
     public static final int DEFAULT_VOLUME = 7;
     /** Default tempo is 120 BPM. */
@@ -47,7 +50,14 @@ public class Note extends Tone
     /** Default duration of a quarter-note on 120 BPM, in milliseconds. */
     public static final int DEFAULT_BEAT_DURATION = 1000 * 60 / DEFAULT_TEMPO_BPM; //500
     
+    public static final int TEMPO_MINIMUM_BPM = 40;
+    public static final int TEMPO_MAXIMUM_BPM = 208;
+    /** Notes can be 1/1, 1/2, 1/4, 1/. 1/16, 1/32, 1/64, not smaller. */
+    public static final int SHORTEST_NOTELENGTH_DIVISOR = 64;
+    public static final int MINIMAL_DURATION = (1000 * 60 / TEMPO_MAXIMUM_BPM) / SHORTEST_NOTELENGTH_DIVISOR;
+    
     public static final char DURATION_SEPARATOR = '/';
+    
     
     /** The length of this note, in milliseconds. */
     public final int durationMilliseconds;
@@ -64,7 +74,8 @@ public class Note extends Tone
     public final ConnectionFlags connectionFlags;
     
     /** Time signature changes and tempo. */
-    public BeatInfo beatInfo;
+    public final BeatInfo beatInfo;
+
     
     /** A note from given tone-system with default duration (quarter note). */
     public Note(Tones toneSystem, String ipnName) {
@@ -154,6 +165,7 @@ public class Note extends Tone
     }
     
     
+    /** @return true if this note is a rest, false otherwise. */
     public boolean isRest() {
         return ToneSystem.REST_SYMBOL.equals(ipnName);
     }
