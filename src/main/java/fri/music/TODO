@@ -1,25 +1,21 @@
 
+- Notes of intervals clicked in DifferenceToneInversionsPiano
+    should be written into a second text-area,
+    see (unfinished) NotesWithDifferenceToneInversionsPianoPlayerDemo.
+    The second text-area should also have player controls.
+    Maybe open another piano-window for that?
+    Target would be to support difference-tone composing.
+    
+    The export to ABC would require two voices, the lower one with the tune,
+    the upper one with its difference tone intervals.
 
-- Provide an "Export to ABC" button that writes notes in ABC format
-    and renders the result in a non-modal text-dialog.
-    The conversion needs a config-dialog that lets set some abc header fields.
-    For NotesWithDifferenceTonePianoPlayer, this would also generate 
-    the according difference-tone intervals ("inversions")
-    in a separate note-line above.
-
+- For NotesPianoPlayer and sub-classes there should be a ConfigurationPanel.
+    
 - The titles of demo apps should be also visible when running
     pianos from ConfigurationPanel.
     A "Help" button in configuration panel should document the 
     different pianos available here.
     
-- For NotesPianoPlayer and sub-classes there should be a ConfigurationPanel.
-    
-- Notes of intervals clicked in DifferenceToneInversionsPiano 
-    should be written into a second text-area,
-    see (unfinished) NotesWithDifferenceToneInversionsPianoPlayerDemo.
-    The second text-area should also have player controls.
-    Maybe open another piano-window for that?
-
 - Configuration and display UI for:
     Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
     Difference tones in different tunings (DifferenceToneDemo)
@@ -49,7 +45,7 @@
     TODO: there is more!
 
 
-Fixed Bugs
+Fixed Bugs:
 
     - Bug NotesWithDifferenceTonePianoPlayer: LIMIT_17, FOURTH-FIFTH, deviation 76 %.
         A4 and D#5 should generate G3, but no difference tone appears on piano.
