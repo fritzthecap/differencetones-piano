@@ -12,7 +12,21 @@ import fri.music.player.Note;
 
 /**
  * Exports MelodyFactory notation to ABC notation.
- * Can be tried out on
+ * <pre>
+     IPN = ABC note-name and octave
+     C0 = C,,,, 
+     ...
+     C2 = C,,
+     C3 = C,
+     C4 = C D E F G A B 
+     C5 = c d e f g a b
+     C6 = c'
+     C7 = c''
+     ...
+     C9 = c''''
+     C10 = c'''''
+ * </pre>
+ * Result can be tried out on
  * <ul>
  *  <li>https://notabc.app/abc-converter/</li>
  *  <li>https://www.abcjs.net/abcjs-editor</li>
@@ -28,6 +42,34 @@ import fri.music.player.Note;
  */
 public class ExportToAbc
 {
+    /** ABC header data. */
+    public record Configuration(
+            Integer songNumber,
+            String title, 
+            String subTitle, 
+            String author, 
+            String date,
+            String keyAndClef, 
+            int numberOfBarsPerLine)
+    {
+        public Configuration() {
+            this(null, null, "C");
+        }
+        public Configuration(String title, String author, String keyAndClef) {
+            this(1, title, null, author, null, keyAndClef, 4);
+        }
+        
+        /** @return true when the tune's key is F, Bb, Eb, Ab, ... Db, else false. */
+        public boolean isFlatKey() {
+            if (keyAndClef.startsWith("F"))
+                return true;
+            if (keyAndClef.length() > 1 && keyAndClef.charAt(1) == 'b')
+                return true;
+            return false;
+        }
+    }
+    
+    
     private static final Map<String,String> IPN_NOTE_TO_ABC_FLAT = new HashMap<>();
     private static final Map<String,String> IPN_NOTE_TO_ABC_SHARP = new HashMap<>();
     
@@ -36,18 +78,10 @@ public class ExportToAbc
     }
     
     private static void buildIpnToAbcNameMapping() {
-        // IPN = ABC note-name and octave
-        // C0 = C,,,, 
-        // ...
-        // C2 = C,,
-        // C3 = C,
-        // C4 = C D E F G A B 
-        // C5 = c d e f g a b
-        // C6 = c'
-        // C7 = c''
-        // ...
-        // C9 = c''''
-        // C10 = c'''''
+        final String ABC_REST = "z";
+        IPN_NOTE_TO_ABC_SHARP.put(ToneSystem.REST_SYMBOL, ABC_REST);
+        IPN_NOTE_TO_ABC_FLAT.put(ToneSystem.REST_SYMBOL, ABC_REST);
+        
         for (int octave = ToneSystem.LOWEST_OCTAVE; octave < ToneSystem.MAXIMUM_OCTAVES; octave++) {
             if (octave < 0)
                 throw new IllegalArgumentException("Can not process octave < 0!");
@@ -101,38 +135,15 @@ public class ExportToAbc
     }
     
     
-    /** ABC header data. */
-    public record Configuration(
-            Integer songNumber,
-            String title, 
-            String subTitle, 
-            String author, 
-            String date,
-            String keyAndClef, 
-            int numberOfBarsPerLine)
-    {
-        public Configuration() {
-            this(null, null, "C");
-        }
-        public Configuration(String title, String author, String keyAndClef) {
-            this(1, title, null, author, null, keyAndClef, 4);
-        }
-        
-        /** @return true when the tune's key is F, Bb, Eb, Ab, ... Db, else false. */
-        public boolean isFlatKey() {
-            if (keyAndClef.startsWith("F"))
-                return true;
-            if (keyAndClef.length() > 1 && keyAndClef.charAt(1) == 'b')
-                return true;
-            return false;
-        }
-    }
-    
-    
     private final Note[][] notes;
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
-    /** Construct an exporter for different export-configurations. */
+    /** Constructor of an exporter for different export-configurations from text. */
+    public ExportToAbc(String notes, MelodyFactory melodyFactory) {
+        this(melodyFactory.translate(notes));
+    }
+    
+    /** Constructor of an exporter for different export-configurations from parsed notes. */
     public ExportToAbc(Note[][] notes) {
         Objects.requireNonNull(notes);
         if (notes.length <= 0 || notes[0].length <= 0)
@@ -230,17 +241,22 @@ public class ExportToAbc
     private String writeHeader(Configuration configuration, StringBuilder result) {
         appendLine(result, "X: "+(configuration.songNumber() != null ? configuration.songNumber() : 1));
         
-        if (configuration.title() != null)
+        if (nonEmpty(configuration.title()))
             appendLine(result, "T: "+configuration.title());
 
-        if (configuration.subTitle() != null)
+        if (nonEmpty(configuration.subTitle()))
             appendLine(result, "T: "+configuration.subTitle());
 
-        final String date = (configuration.date() != null)
-                ? ", "+configuration.date().replace("{date}", dateFormat.format(new Date()))
+        final String date = nonEmpty(configuration.date())
+                ? configuration.date().replace("{date}", dateFormat.format(new Date()))
                 : "";
-        if (configuration.author() != null)
-            appendLine(result, "C: "+configuration.author() + date);
+        if (nonEmpty(configuration.author()))
+            if (nonEmpty(date))
+                appendLine(result, "C: "+configuration.author()+", "+date);
+            else
+                appendLine(result, "C: "+configuration.author());
+        else if (nonEmpty(date))
+            appendLine(result, "C: "+date);
         
         final Note firstNote = notes[0][0];
         final String timeSignature = Objects.requireNonNull(firstNote.beatInfo.timeSignature());
@@ -249,11 +265,16 @@ public class ExportToAbc
         if (firstNote.beatInfo.beatsPerMinute() != null)
             appendLine(result, "Q: 1/4="+firstNote.beatInfo.beatsPerMinute());
         
-        appendLine(result, "L: 1/1");
+        appendLine(result, "L: 1/1"); // always keep duration on note, not in "L" field!
         
-        appendLine(result, "K: "+configuration.keyAndClef());
+        if (nonEmpty(configuration.keyAndClef()))
+            appendLine(result, "K: "+configuration.keyAndClef());
         
         return timeSignature;
+    }
+    
+    private boolean nonEmpty(String s) {
+        return s != null && s.trim().length() > 0;
     }
     
     private void appendLine(StringBuilder stringBuilder,  String toAppend) {
