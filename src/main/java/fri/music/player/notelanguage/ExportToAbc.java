@@ -315,6 +315,9 @@ public class ExportToAbc
             else
                 noteName = IPN_NOTE_TO_ABC_SHARP.get(note.ipnName);
             
+            if (noteName == null)
+                throw new IllegalArgumentException("No ABC mapping found for IPN-name '"+note.ipnName+"'");
+            
             result.append(noteName);
             result.append("/"+length);
             

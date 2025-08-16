@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,17 +24,22 @@ public class ExportToAbcDemo
         final int ROWS = 12;
         final int COLUMNS = 24;
         final JTextArea notesText = new JTextArea(ROWS, COLUMNS);
+        final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
+        notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes Text"));
+        
         notesText.setText(NotesPianoPlayerDemo.TUBULAR_BELLS);
         final JTextArea abcText = new JTextArea(ROWS, COLUMNS);
         abcText.setEditable(false);
+        final JScrollPane abcTextScrollPane = new JScrollPane(abcText);
+        abcTextScrollPane.setBorder(BorderFactory.createTitledBorder("ABC Text"));
         
         final JSplitPane textSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        textSplitPanel.setLeftComponent(new JScrollPane(notesText));
-        textSplitPanel.setRightComponent(new JScrollPane(abcText));
+        textSplitPanel.setLeftComponent(notesTextScrollPane);
+        textSplitPanel.setRightComponent(abcTextScrollPane);
         
         final AbcExportConfigurationPanel configuration = new AbcExportConfigurationPanel();
         
-        final JButton exportButton = new JButton("Export to ABC");
+        final JButton exportButton = new JButton("Export");
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
