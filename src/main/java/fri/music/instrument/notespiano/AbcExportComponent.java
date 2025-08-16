@@ -53,6 +53,8 @@ public class AbcExportComponent extends JSplitPane
         setRightComponent(abcTextScrollPane);
         
         writeExportToTextarea(notesText, abcTextarea, configuration);
+        
+        setResizeWeight(0.3);
     }
     
     private void writeExportToTextarea(
