@@ -315,15 +315,24 @@ public class ExportToAbc
     }
 
     private void finish(StringBuilder result, Note firstNote, boolean moreThanOneNote, Note nextNote) {
-        if (isEighthOrShorter(firstNote.lengthNotation) && 
-                firstNote.connectionFlags.multiplet() != Boolean.FALSE &&
-                nextNote != null && nextNote.emphasized == false &&
-                nextNote.connectionFlags.multiplet() != Boolean.TRUE &&
-                isEighthOrShorter(nextNote.lengthNotation)) // connect short notes by beam
+        final boolean thisEighthOrShorter = isEighthOrShorter(firstNote.lengthNotation);
+        final boolean nextEighthOrShorter = (nextNote != null && isEighthOrShorter(nextNote.lengthNotation));
+        final boolean barEnd = (nextNote == null || nextNote.emphasized);
+        final boolean endOfMultiplet = 
+                (firstNote.connectionFlags.multiplet() == Boolean.FALSE);
+        final boolean beforeMultiplet = 
+                (firstNote.connectionFlags.multiplet() == null &&
+                 nextNote != null && nextNote.connectionFlags.multiplet() == Boolean.TRUE);
+        
+        if (thisEighthOrShorter && 
+                nextEighthOrShorter && 
+                barEnd == false && 
+                endOfMultiplet == false &&
+                beforeMultiplet == false)
         {
-            if (moreThanOneNote == false) // no ` inside a chord
+            if (moreThanOneNote == false) // no ` inside a chord ...
                 result.append('`');
-            // else create beam by leaving out space
+            // ... else create beam by leaving out space
         }
         else { // longer than eighth, separate by space for readability
             result.append(' ');

@@ -7,8 +7,9 @@ import fri.music.player.Note;
 class ExportToAbcTest
 {
     ////////////////////////////////////////////////////////////////////////////
+    
     @Test
-    void singleNotesShouldWork() {
+    void singleNotes() {
         final String MELODY_NOTES = """
 3/4
 G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
@@ -53,8 +54,9 @@ G/4> A/4`G/8`F/8 | E/4 C/4 C/4 | D/4 G,/4 G,/4 | C/2> ||""";
     
     
     ////////////////////////////////////////////////////////////////////////////
+    
     @Test
-    void chordsShouldWork() {
+    void chords() {
         final String CHORD_NOTES = """
 {[ C4/8 E4/8 G4/8 ] [ D4/8 F#4/8 A4/8 ]}
 ([ C4/8 E4/8 G4/8 ] [ C4/8 E4/8 G4/8 ])
@@ -74,8 +76,9 @@ K: C
 
     
     ////////////////////////////////////////////////////////////////////////////
+    
     @Test
-    void tripletsShouldWork() {
+    void tripletQuarters() {
         final String TRIPLET_QUARTER_NOTES = """
 G4/4 A4/4 B4/4,3 A4/4,3 G4/4,3 B4/4,3 A4/4,3 G4/4,3 B4/4,3 A4/4,3 G4/4,3 D4/1""";
         
@@ -88,7 +91,13 @@ K: C
 G/4 A/4 (3 B/4 A/4 G/4 | (3 B/4 A/4 G/4 (3 B/4 A/4 G/4 | D/1 ||""";
         
         runTest(TRIPLET_QUARTER_NOTES, expected);
-        
+    }
+    
+    
+    ////////////////////////////////////////////////////////////////////////////
+    
+    @Test
+    void tripletEighths() {
         final String TRIPLET_EIGHTH_NOTES = """
 G4/8 A4/8 B4/8,3 A4/8,3 G4/8,3 B4/8,3 A4/8,3 G4/8,3 B4/8,3 A4/8,3 G4/8,3 D4/1""";
         
@@ -105,8 +114,28 @@ G/8`A/8 (3 B/8`A/8`G/8 (3 B/8`A/8`G/8 (3 B/8`A/8`G/8 | D/1 ||""";
     
     
     ////////////////////////////////////////////////////////////////////////////
+    
     @Test
-    void meterChangeShouldWork() {
+    void tripletMixed() {
+        final String MIXED_TRIPLET_NOTES = """
+G4/4 A4/4 B4/2,3 A4/4,3 D4/1""";
+        
+        final String expected3 = """
+X: 1
+M: 4/4
+Q: 1/4=120
+L: 1/1
+K: C
+G/4 A/4 (3 B/2 A/4 | D/1 ||""";
+        
+        runTest(MIXED_TRIPLET_NOTES, expected3);
+    }
+    
+    
+    ////////////////////////////////////////////////////////////////////////////
+    
+    @Test
+    void timeSignatureChange() {
         final String METER_CHANGE_NOTES = """
 3/4
 G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
@@ -134,8 +163,9 @@ D/4 G,/4 G,/4 | C/2> ||""";
     
     
     ////////////////////////////////////////////////////////////////////////////
+    
     @Test
-    void multipleVoicesShouldWork() {
+    void multipleVoices() {
         // TODO
     }
     

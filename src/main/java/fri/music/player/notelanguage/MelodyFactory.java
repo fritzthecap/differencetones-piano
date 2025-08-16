@@ -740,7 +740,7 @@ public class MelodyFactory
             final boolean chordEnd   = (inChord == true  && melodyToken.noteConnections.isChordEnd());
             final Boolean chord = chordEnd ? Boolean.FALSE : (chordStart || inChord) ? Boolean.TRUE : null;
             
-            Boolean multiplet = null;
+            final Boolean multiplet;
             if (overallMultipletDuration <= 0) {
                 if ((overallMultipletDuration = melodyToken.getOverallMultipletDuration()) > 0) { // start of a multiplet
                     multipletDuration = rawNote.durationMilliseconds;
@@ -755,6 +755,9 @@ public class MelodyFactory
                 if (overallMultipletDuration <= multipletDuration + Note.MINIMAL_DURATION) { // 999 is 1000
                     overallMultipletDuration = 0; // terminate multiplet
                     multiplet = Boolean.FALSE;
+                }
+                else {
+                    multiplet = Boolean.TRUE;
                 }
             }
       

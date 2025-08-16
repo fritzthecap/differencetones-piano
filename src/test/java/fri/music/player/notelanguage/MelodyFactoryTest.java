@@ -54,7 +54,7 @@ class MelodyFactoryTest
     }
 
     @Test
-    void restShouldWork() {
+    void rest() {
         final String[] notes = new String[] { ToneSystem.REST_SYMBOL };
         final MelodyFactory melodyFactory = new MelodyFactory();
         final Note[] melody = translate(melodyFactory, notes);
@@ -203,13 +203,20 @@ class MelodyFactoryTest
                 melody[2].durationMilliseconds + melody[3].durationMilliseconds + melody[4].durationMilliseconds, 
                 1, // one millisecond comparison precision 
                 "Three triplet quarter notes should be of same duration as two quarter notes!");
+        
+        assertEquals(Boolean.TRUE, melody[2].connectionFlags.multiplet());
+        assertEquals(3, melody[2].connectionFlags.multipletType());
+        
+        assertEquals(Boolean.FALSE, melody[4].connectionFlags.multiplet());
+        
+        assertNull(melody[5].connectionFlags.multiplet());
     }
 
     @Test
-    void customTripletDuration() {
+    void mixedTripletDuration() {
         final String[] notes = new String[] {
             "G4/4", "A4/4", 
-            "B4/2,3", "A4/4,3", // custom triplet
+            "B4/4,3", "A4/2,3", // mixed lengths triplet
             "D4/1",
         };
         
@@ -224,10 +231,22 @@ class MelodyFactoryTest
                 "Custom triplet should be of same duration as two quarter notes!");
         // the first triplet note must be twice as long as the second
         assertEquals(
-                melody[2].durationMilliseconds,
-                2 * melody[3].durationMilliseconds, 
+                melody[3].durationMilliseconds,
+                2 * melody[2].durationMilliseconds, 
                 1, // one millisecond comparison precision 
                 "First triplet note should be twice as long as second triplet note!");
+        
+        assertEquals(Boolean.TRUE, melody[2].connectionFlags.multiplet());
+        assertEquals(3, melody[2].connectionFlags.multipletType());
+        
+        assertEquals(Boolean.FALSE, melody[3].connectionFlags.multiplet());
+        
+        assertNull(melody[4].connectionFlags.multiplet());
+        
+        // Error case "B4/2,3", "A4/4,3":
+        // The "B4/2,3" triplet would carry a wrong overallMultipletDuration 
+        // because that duration is calculated from first note.
+        // So we could not test connectionFlags.multiplet() Booleans in that case!
     }
 
     @Test
@@ -286,7 +305,7 @@ class MelodyFactoryTest
     }
 
     @Test
-    void textInputShouldWork() {
+    void textInput() {
         final String notesText = "G4/16 "+ToneSystem.REST_SYMBOL+"/16 A4/16";
         final MelodyFactory melodyFactory = new MelodyFactory();
         final Note[][] melody = melodyFactory.translate(notesText);
@@ -315,7 +334,7 @@ class MelodyFactoryTest
     }
 
     @Test
-    void timeSignatureChangeShouldWork() {
+    void timeSignatureChange() {
         final String[] notes = new String[] {
             "4/4 ", // not a note but time signature change!
             "A4", "B4", "C5", "B4", // 0, 1, 2, 3
@@ -349,7 +368,7 @@ class MelodyFactoryTest
     }
 
     @Test
-    void tiesAndSlursShouldWork() {
+    void tiesAndSlurs() {
         final String[] notes = new String[] {
             "A4/8", "( B4/8", " (B4/4 ) ", "B4/8)", "C5/4.",
             "{ B4", " C5 ", " B4}", "A4"
@@ -415,7 +434,7 @@ class MelodyFactoryTest
     }
 
     @Test
-    void nestedTiesAndSlursShouldWork() {
+    void nestedTiesAndSlurs() {
         final String[] notes = new String[] {
             "{ A4/8", "( B4/8", " (B4/4 ) ", "B4/8)", "C5/4.}",
         };
@@ -440,7 +459,7 @@ class MelodyFactoryTest
     }
 
     @Test
-    void chordsShouldWork() {
+    void chords() {
         final String chords = "[ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ] G4/2 C4/4";
         final Integer beatsPerMinute = 120;
         
@@ -487,7 +506,7 @@ class MelodyFactoryTest
     }
     
     @Test
-    void chordsWithTiesShouldWork() {
+    void chordsWithTies() {
         final String chords = "([C4/1 E4 G4] [C4/1 E4 G4] [C4/1 E4 G4]) [C4/1 E4 G4]";
         final Integer beatsPerMinute = 120;
         
