@@ -1,6 +1,5 @@
 package fri.music.instrument.notespiano.wave;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
@@ -48,7 +47,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         getDifferenceTonePiano().addIntervalRangeActionListener(resetPlayerListener);
         
         int index = 1; // add below "Play" button
-        convertToDifferenceTones.setAlignmentX(Component.CENTER_ALIGNMENT);
+        convertToDifferenceTones.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         getNotesControlPanel().add(convertToDifferenceTones, index++); // add below "Play" button
         
         convertToDifferenceTones.addActionListener(new ActionListener() {

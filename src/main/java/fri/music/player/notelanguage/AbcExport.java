@@ -40,7 +40,7 @@ import fri.music.player.Note;
  * </ul>
  * @see https://abcnotation.com/wiki/abc:standard:v2.1
  */
-public class ExportToAbc
+public class AbcExport
 {
     /** ABC header data. */
     public record Configuration(
@@ -139,12 +139,12 @@ public class ExportToAbc
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
     /** Constructor of an exporter for different export-configurations from text. */
-    public ExportToAbc(String notes, MelodyFactory melodyFactory) {
+    public AbcExport(String notes, MelodyFactory melodyFactory) {
         this(melodyFactory.translate(notes));
     }
     
     /** Constructor of an exporter for different export-configurations from parsed notes. */
-    public ExportToAbc(Note[][] notes) {
+    public AbcExport(Note[][] notes) {
         Objects.requireNonNull(notes);
         if (notes.length <= 0 || notes[0].length <= 0)
             throw new IllegalArgumentException("Can not export empty notes!");
@@ -350,7 +350,7 @@ public class ExportToAbc
         return inSlur;
     }
 
-    private void finish(StringBuilder result, Note firstNote, boolean insideChord, Note nextNote) {
+    private void finish(StringBuilder result, Note firstNote, boolean moreThanOneNoteInChord, Note nextNote) {
         final boolean isEighthOrShorter = isEighthOrShorter(firstNote.lengthNotation);
         final boolean nextIsEighthOrShorter = (nextNote != null && isEighthOrShorter(nextNote.lengthNotation));
         final boolean barEnd = (nextNote == null || nextNote.emphasized);
@@ -359,14 +359,16 @@ public class ExportToAbc
         final boolean beforeMultiplet = 
                 (firstNote.connectionFlags.multiplet() == null &&
                  nextNote != null && nextNote.connectionFlags.multiplet() == Boolean.TRUE);
+        final boolean isRest = firstNote.isRest() || (nextNote != null && nextNote.isRest());
         
         if (isEighthOrShorter && 
                 nextIsEighthOrShorter && 
                 barEnd == false && 
                 endOfMultiplet == false &&
-                beforeMultiplet == false)
+                beforeMultiplet == false &&
+                isRest == false)
         {
-            if (insideChord == false) // no ` inside a chord ...
+            if (moreThanOneNoteInChord == false) // no ` inside a chord ...
                 result.append('`');
             // ... else create beam by leaving out space
         }

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import fri.music.player.Note;
 
-class ExportToAbcTest
+class AbcExportTest
 {
     ////////////////////////////////////////////////////////////////////////////
     
@@ -26,7 +26,7 @@ D4/4 G3/4 G3/4 C4/2.""";
                 3, // beats per bar
                 4); // beat type is quarter note
         
-        final ExportToAbc.Configuration configuration = new ExportToAbc.Configuration(
+        final AbcExport.Configuration configuration = new AbcExport.Configuration(
                 2, // song number
                 "Oh du lieber Augustin", // title
                 "Wiener Lied aus der Pestzeit", // sub-title
@@ -193,10 +193,10 @@ D/4 G,/4 G,/4 | C/2> ||""";
         runTest(testData, expected, new MelodyFactory(), null);
     }
     
-    private void runTest(String testData, String expected, MelodyFactory melodyFactory, ExportToAbc.Configuration configuration) {
+    private void runTest(String testData, String expected, MelodyFactory melodyFactory, AbcExport.Configuration configuration) {
         final Note[][] notes = melodyFactory.translate(testData);
         
-        final ExportToAbc exporter = new ExportToAbc(notes);
+        final AbcExport exporter = new AbcExport(notes);
         final String abcText = exporter.export(configuration);
         
         //System.out.println(abcText);

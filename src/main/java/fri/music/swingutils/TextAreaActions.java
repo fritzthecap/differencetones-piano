@@ -41,6 +41,7 @@ public class TextAreaActions extends MouseAdapter
     private final Action clear;
     private final Action undo;
     private final Action redo;
+    private final Action selectAll;
     private final UndoManager undoManager;
     private final JPopupMenu contextMenu;
     
@@ -55,11 +56,13 @@ public class TextAreaActions extends MouseAdapter
         final ActionMap actionMap = textComponent.getActionMap();
         
         this.cut = actionMap.get(DefaultEditorKit.cutAction); // Ctrl-x
-        cut.putValue(Action.NAME, "Cut");
+        cut.putValue(Action.NAME, "Cut (Ctr-x)");
         this.copy = actionMap.get(DefaultEditorKit.copyAction); // Ctrl-c
-        copy.putValue(Action.NAME, "Copy");
+        copy.putValue(Action.NAME, "Copy (Ctr-c)");
         this.paste = actionMap.get(DefaultEditorKit.pasteAction); // Ctrl-v
-        paste.putValue(Action.NAME, "Paste");
+        paste.putValue(Action.NAME, "Paste (Ctr-v)");
+        this.selectAll = actionMap.get(DefaultEditorKit.selectAllAction); // Ctrl-a
+        selectAll.putValue(Action.NAME, "Select All (Ctr-a)");
         
         this.undoManager = new UndoManager();
         undoManager.setLimit(300);
@@ -83,6 +86,7 @@ public class TextAreaActions extends MouseAdapter
         contextMenu.add(undo);
         contextMenu.add(redo);
         contextMenu.addSeparator();
+        contextMenu.add(selectAll);
         contextMenu.add(clear);
         
         // we need to listen to any key for enabling actions
@@ -122,7 +126,7 @@ public class TextAreaActions extends MouseAdapter
 
         final Keymap keymap = JTextComponent.addKeymap("TextArea-Undo-Redo-Bindings", textComponent.getKeymap());
 
-        final Action undo = new AbstractAction("Undo")  {
+        final Action undo = new AbstractAction("Undo (Ctr-z)")  {
             @Override
             public void actionPerformed(ActionEvent e)  {
                 try { undoManager.undo(); } catch (CannotUndoException ex)  {}
@@ -131,7 +135,7 @@ public class TextAreaActions extends MouseAdapter
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK);
         keymap.addActionForKeyStroke(key, undo);
 
-        final Action redo = new AbstractAction("Redo")  {
+        final Action redo = new AbstractAction("Redo (Ctr-y)")  {
             @Override
             public void actionPerformed(ActionEvent e)  {
                 try { undoManager.redo(); } catch (CannotRedoException ex)  {}

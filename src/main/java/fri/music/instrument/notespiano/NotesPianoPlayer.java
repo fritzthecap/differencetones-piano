@@ -2,7 +2,6 @@ package fri.music.instrument.notespiano;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -258,13 +257,27 @@ public class NotesPianoPlayer
             public void actionPerformed(ActionEvent e) {
                 DialogUtil.showModelessHtmlDialog(
                         "Notes Edit Help", 
-                        playerPanel, 
+                        playerPanel, // parent
                         NOTES_EDIT_HELP, 
-                        new Dimension(660, 460));
+                        null);
             }
         });
+        final JButton abcExport = new JButton("Export to ABC");
+        abcExport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DialogUtil.showModelessDialog(
+                        "Export to ABC",
+                        playerPanel, // parent
+                        new AbcExportComponent(notesText.getText()),
+                        null);
+            }
+        });
+        abcExport.setToolTipText("Convert Notes Text to ABC Notation");
+        
         final JPanel helpLayoutPanel = new JPanel();
         helpLayoutPanel.add(help);
+        helpLayoutPanel.add(abcExport);
         
         final JPanel errorsAndHelpPanel = new JPanel(new BorderLayout());
         errorsAndHelpPanel.add(helpLayoutPanel, BorderLayout.WEST);
@@ -333,22 +346,23 @@ public class NotesPianoPlayer
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)));
         notesControlPanel.setLayout(new BoxLayout(notesControlPanel, piano.config.isVertical ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
         
-        playButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playButtons.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(playButtons);
         notesControlPanel.add(Box.createRigidArea(new Dimension(1, 8))); // space to next button
         
-        formatBars.setAlignmentX(Component.CENTER_ALIGNMENT);
+        formatBars.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(formatBars);
         notesControlPanel.add(Box.createRigidArea(new Dimension(1, 6))); // space to other control fields
         
-        tempoLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tempoLayoutPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(tempoLayoutPanel);
-        notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
         
-        timeLayoutPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        timeLayoutPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(timeLayoutPanel);
         
-        writeToNotesCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
+        
+        writeToNotesCheckbox.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(writeToNotesCheckbox);
         
         return notesControlPanel;

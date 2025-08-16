@@ -10,7 +10,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
-import fri.music.player.notelanguage.ExportToAbc;
+import fri.music.player.notelanguage.AbcExport;
 
 /**
  * Use it like this:
@@ -54,8 +54,8 @@ public class AbcExportConfigurationPanel
      * Result of this panel is a ABC export configuration.
      * @return a configuration object for ABC export.
      */
-    public ExportToAbc.Configuration getExportToAbcConfiguration() {
-        return new ExportToAbc.Configuration(
+    public AbcExport.Configuration getExportToAbcConfiguration() {
+        return new AbcExport.Configuration(
                 (Integer) songNumberField.getValue(),
                 titleField.getText(),
                 subTitleField.getText(),

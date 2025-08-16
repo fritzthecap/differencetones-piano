@@ -34,13 +34,48 @@ public class DialogUtil
     /**
      * Opens a non-modal dialog showing given plain text in a scroll-pane.
      * @param title the text to show in the dialog's title bar.
-     * @param text the text to render in returned JTextPane.
+     * @param plainText the text to render in returned JTextPane.
      * @param parent required, a parent Component in same Window where to locate dialog relatively.
      * @param size optional, the dimension when different from 600 x 460.
      */
-    public static void showModelessTextDialog(String title, Component parent, String text, Dimension size) {
-        showModelessDialog(title, parent, buildPlainTextArea(text), size);
+    public static void showModelessTextDialog(String title, Component parent, String plainText, Dimension size) {
+        showModelessDialog(title, parent, buildPlainTextArea(plainText), size);
     }
+
+    /**
+     * Opens a non-modal dialog showing given component.
+     * @param title text for title-bar.
+     * @param componentToShow the panel to render.
+     * @param parent the parent Component to show over.
+     * @param size the wanted size of the dialog.
+     */
+    public static void showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size) {
+        final Window window = SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
+        final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
+        dialog.getContentPane().add(new JScrollPane(componentToShow));
+        
+        final KeyListener escapeListener = new KeyAdapter()   {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    dialog.setVisible(false);
+                    try { dialog.dispose(); } catch (Exception ex) {}
+                }
+            }
+        };
+        componentToShow.addKeyListener(escapeListener);
+        componentToShow.setFocusable(true); // else no ESCAPE
+        dialog.addKeyListener(escapeListener);
+        dialog.setFocusable(true); // else no ESCAPE
+        
+        if (size == null)
+            size = new Dimension(660, 460);
+        
+        dialog.setSize(size);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setVisible(true);
+    }
+
 
     /**
      * Builds a TextPane containing given HTML text. Has no JScrollPane yet!
@@ -70,32 +105,5 @@ public class DialogUtil
         textComponent.setEditable(false);
         textComponent.setText(text);
         textComponent.setCaretPosition(0); // scroll back to top
-    }
-
-    private static void showModelessDialog(String title, Component parent, JComponent textComponent, Dimension size) {
-        final Window window = SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
-        final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
-        dialog.getContentPane().add(new JScrollPane(textComponent));
-        
-        final KeyListener escapeListener = new KeyAdapter()   {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    dialog.setVisible(false);
-                    try { dialog.dispose(); } catch (Exception ex) {}
-                }
-            }
-        };
-        textComponent.addKeyListener(escapeListener);
-        textComponent.setFocusable(true); // else no ESCAPE
-        dialog.addKeyListener(escapeListener);
-        dialog.setFocusable(true); // else no ESCAPE
-        
-        if (size == null)
-            size = new Dimension(600, 460);
-        
-        dialog.setSize(size);
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
     }
 }

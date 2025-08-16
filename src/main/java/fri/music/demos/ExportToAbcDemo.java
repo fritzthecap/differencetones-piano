@@ -1,13 +1,13 @@
 package fri.music.demos;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -15,7 +15,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import fri.music.instrument.notespiano.AbcExportConfigurationPanel;
 import fri.music.player.Note;
-import fri.music.player.notelanguage.ExportToAbc;
+import fri.music.player.notelanguage.AbcExport;
 import fri.music.player.notelanguage.MelodyFactory;
 
 public class ExportToAbcDemo
@@ -24,10 +24,10 @@ public class ExportToAbcDemo
         final int ROWS = 12;
         final int COLUMNS = 24;
         final JTextArea notesText = new JTextArea(ROWS, COLUMNS);
+        notesText.setText(NotesPianoPlayerDemo.TUBULAR_BELLS);
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
         notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes Text"));
         
-        notesText.setText(NotesPianoPlayerDemo.TUBULAR_BELLS);
         final JTextArea abcText = new JTextArea(ROWS, COLUMNS);
         abcText.setEditable(false);
         final JScrollPane abcTextScrollPane = new JScrollPane(abcText);
@@ -45,7 +45,7 @@ public class ExportToAbcDemo
             public void actionPerformed(ActionEvent e) {
                 final MelodyFactory melodyFactory = new MelodyFactory();
                 final Note[][] notes = melodyFactory.translate(notesText.getText());
-                final ExportToAbc exportToAbc = new ExportToAbc(notes);
+                final AbcExport exportToAbc = new AbcExport(notes);
                 final String abc = exportToAbc.export(configuration.getExportToAbcConfiguration());
                 abcText.setText(abc);
             }
@@ -61,8 +61,8 @@ public class ExportToAbcDemo
         final BoxLayout mainLayout = new BoxLayout(mainPanel, BoxLayout.X_AXIS);
         mainPanel.setLayout(mainLayout);
         mainPanel.add(configPanel);
-        textSplitPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        textSplitPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        textSplitPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        textSplitPanel.setAlignmentY(JComponent.CENTER_ALIGNMENT);
         mainPanel.add(textSplitPanel);
         
         final JFrame frame = new JFrame("Export to ABC Notation");
