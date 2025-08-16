@@ -12,6 +12,18 @@ import fri.music.player.Note;
 
 /**
  * Exports MelodyFactory notation to ABC notation.
+ * Can be tried out on
+ * <ul>
+ *  <li>https://notabc.app/abc-converter/</li>
+ *  <li>https://www.abcjs.net/abcjs-editor</li>
+ *  <li>https://editor.drawthedots.com/</li>
+ *  <li>https://abc.hieuthi.com/</li>
+ *  <li>https://abc.rectanglered.com/</li>
+ *  <li>https://michaeleskin.com/abctools/abctools.html</li>
+ *  <li>https://www.abctransposer.de/</li>
+ *  <li>https://www.maztr.com/sheetmusiceditor</li>
+ *  <li>https://spuds.thursdaycontra.com/SPUDSConverter.html</li>
+ * </ul>
  * @see https://abcnotation.com/wiki/abc:standard:v2.1
  */
 public class ExportToAbc

@@ -1,18 +1,24 @@
 
+
+- Provide an "Export to ABC" button that writes notes in ABC format
+    and renders the result in a non-modal text-dialog.
+    The conversion needs a config-dialog that lets set some abc header fields.
+    For NotesWithDifferenceTonePianoPlayer, this would also generate 
+    the according difference-tone intervals ("inversions")
+    in a separate note-line above.
+
+- The titles of demo apps should be also visible when running
+    pianos from ConfigurationPanel.
+    A "Help" button in configuration panel should document the 
+    different pianos available here.
+    
+- For NotesPianoPlayer and sub-classes there should be a ConfigurationPanel.
+    
 - Notes of intervals clicked in DifferenceToneInversionsPiano 
     should be written into a second text-area,
     see (unfinished) NotesWithDifferenceToneInversionsPianoPlayerDemo.
     The second text-area should also have player controls.
     Maybe open another piano-window for that?
-
-- Provide a converter of MelodyFactory notes to ABC format.
-    This should be available via context menu in any notes text area.
-
-- Provide an "Export to ABC" button that writes notes in ABC format
-    and renders the result in a non-modal text-dialog.
-    For NotesWithDifferenceTonePianoPlayer, this would also generate 
-    the according difference-tone intervals ("inversions")
-    in a separate note-line above.
 
 - Configuration and display UI for:
     Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
@@ -47,4 +53,18 @@ Fixed Bugs
 
     - Bug NotesWithDifferenceTonePianoPlayer: LIMIT_17, FOURTH-FIFTH, deviation 76 %.
         A4 and D#5 should generate G3, but no difference tone appears on piano.
+        
+        Fixed by removing the assumptive calculation of derivation when 
+        no deeper tone is present than the one in quest. Returning null in that case now.
+        Had to adapt a DefaultComposerTest case for this.
+    
+    - Bug in Piano ConfigurationPanel, happens when you choose 10 octaves starting on 5th:
+        Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: 
+        The midiNoteNumber 197 could not be found in Tones, 10 octaves, range C0(12) - C10(132)
+        
+        Fixed by restricting the octave sliders to mutual maximum values.
+
+    - Big problem: where does a triplet end?
+        Every note of the triplet has a length and the triplet tag,
+        but when there are two triplet groups in succession, where does the first triplet group end?
     
