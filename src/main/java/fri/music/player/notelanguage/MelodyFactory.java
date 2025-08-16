@@ -23,7 +23,9 @@ and its length behind a slash, for example:
 <li>"A4/4" for a quarter note on pitch of A4 (440 Hz)</li>
 <li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
 <li>"E5/8,3" for a E5 triplet eighth note 
-    (each of the triplets must have the ",3" postfix!)</li>
+    (each of the triplets must have the ",3" postfix!)
+    A quarter note triplet must start with a quarter note (that can be tied),
+    it MUST NOT start with an eighth note or a half note.</li>
 <li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
 <li>"-/2" for a half rest note.</li>
 </ul>

@@ -314,9 +314,9 @@ public class ExportToAbc
         return inSlur;
     }
 
-    private void finish(StringBuilder result, Note firstNote, boolean moreThanOneNote, Note nextNote) {
-        final boolean thisEighthOrShorter = isEighthOrShorter(firstNote.lengthNotation);
-        final boolean nextEighthOrShorter = (nextNote != null && isEighthOrShorter(nextNote.lengthNotation));
+    private void finish(StringBuilder result, Note firstNote, boolean insideChord, Note nextNote) {
+        final boolean isEighthOrShorter = isEighthOrShorter(firstNote.lengthNotation);
+        final boolean nextIsEighthOrShorter = (nextNote != null && isEighthOrShorter(nextNote.lengthNotation));
         final boolean barEnd = (nextNote == null || nextNote.emphasized);
         final boolean endOfMultiplet = 
                 (firstNote.connectionFlags.multiplet() == Boolean.FALSE);
@@ -324,13 +324,13 @@ public class ExportToAbc
                 (firstNote.connectionFlags.multiplet() == null &&
                  nextNote != null && nextNote.connectionFlags.multiplet() == Boolean.TRUE);
         
-        if (thisEighthOrShorter && 
-                nextEighthOrShorter && 
+        if (isEighthOrShorter && 
+                nextIsEighthOrShorter && 
                 barEnd == false && 
                 endOfMultiplet == false &&
                 beforeMultiplet == false)
         {
-            if (moreThanOneNote == false) // no ` inside a chord ...
+            if (insideChord == false) // no ` inside a chord ...
                 result.append('`');
             // ... else create beam by leaving out space
         }

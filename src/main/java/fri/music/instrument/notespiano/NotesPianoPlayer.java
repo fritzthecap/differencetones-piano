@@ -479,8 +479,11 @@ and its duration behind a slash, for example:
 <li>"A4/8" for a eighth note on A4 (4th octave) with pitch 440 Hz</li>
 <li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
 <li>"E5/16,3" for a E5 triplet sixteenth note 
-    (each of the triplets must have the ",3" postfix!)</li>
-<li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three bars</li>
+    (each of the triplets must have the ",3" postfix!)
+    A quarter note triplet must start with a quarter note (that can be tied),
+    it MUST NOT start with an eighth note or a half note,
+    same applies to eighth or half note triplets.</li>
+<li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
 <li>"-/4" for a quarter rest note.</li>
 </ul>
 <p>

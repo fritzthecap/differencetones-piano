@@ -118,7 +118,7 @@ G/8`A/8 (3 B/8`A/8`G/8 (3 B/8`A/8`G/8 (3 B/8`A/8`G/8 | D/1 ||""";
     @Test
     void tripletMixed() {
         final String MIXED_TRIPLET_NOTES = """
-G4/4 A4/4 B4/2,3 A4/4,3 D4/1""";
+G4/4 A4/4 B4/4,3 A4/2,3 D4/1""";
         
         final String expected3 = """
 X: 1
@@ -126,7 +126,7 @@ M: 4/4
 Q: 1/4=120
 L: 1/1
 K: C
-G/4 A/4 (3 B/2 A/4 | D/1 ||""";
+G/4 A/4 (3 B/4 A/2 | D/1 ||""";
         
         runTest(MIXED_TRIPLET_NOTES, expected3);
     }
@@ -171,10 +171,6 @@ D/4 G,/4 G,/4 | C/2> ||""";
     
     
     private void runTest(String testData, String expected) {
-        runTest(testData, expected, null);
-    }
-    
-    private void runTest(String testData, String expected, ExportToAbc.Configuration configuration) {
         runTest(testData, expected, new MelodyFactory(), null);
     }
     
