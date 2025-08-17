@@ -41,7 +41,7 @@ class PlayControlButtons extends JPanel
     private final JButton forward;
     private final JButton fastForward;
     
-    private Listener listener;
+    private final Listener listener;
     
     PlayControlButtons(Listener listener) {
         this.listener = Objects.requireNonNull(listener);

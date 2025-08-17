@@ -24,7 +24,7 @@ public class ExportToAbcDemo
         final int ROWS = 12;
         final int COLUMNS = 24;
         final JTextArea notesText = new JTextArea(ROWS, COLUMNS);
-        notesText.setText(NotesPianoPlayerDemo.TUBULAR_BELLS);
+        notesText.setText(NoteExamples.TUBULAR_BELLS);
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
         notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes Text"));
         

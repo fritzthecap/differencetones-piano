@@ -14,7 +14,7 @@ public class DifferenceToneInversionsPianoDemo
         final int octaves = 6;
         final String lowestToneIpnName = "C3";
         
-        final JFrame frame = new JFrame("See Which Intervals Can Generate a Difference Tone ("+octaves+" Octaves)");
+        final JFrame frame = new JFrame("See Which Intervals Can Generate a Difference-Tone");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final ToneSystem toneSystem = new EqualTemperament(lowestToneIpnName, octaves);
