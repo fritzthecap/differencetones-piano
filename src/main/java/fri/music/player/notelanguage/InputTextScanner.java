@@ -4,7 +4,8 @@ import static fri.music.player.notelanguage.NoteConnections.*;
 
 /**
  * Reads a melody text and builds a String array for <code>MelodyFactory</code> from it.
- * This is needed to remove spaces between ties and notes, or slurs and notes.
+ * This removes spaces between opening or closing match-symbols and notes, i.e.
+ * ties, slurs and chord brackets. Finally the text is split by whitespace.
  */
 class InputTextScanner
 {
