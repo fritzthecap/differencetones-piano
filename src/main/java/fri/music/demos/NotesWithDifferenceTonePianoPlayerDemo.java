@@ -15,15 +15,13 @@ public class NotesWithDifferenceTonePianoPlayerDemo
         final int octaves = 7;
         final String lowestToneIpnName = "C2";
         
-        final JFrame frame = new JFrame("Auto-Compose Difference Tones for Written Notes ("+octaves+" Octaves)");
+        final JFrame frame = new JFrame("Auto-Compose Difference-Tone Intervals for Written Notes");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName);
         final WaveSoundChannel soundChannel = new SineWaveSoundChannel(null);
         final NotesPianoPlayer player = new NotesWithDifferenceTonePianoPlayer(new DifferenceToneForNotesPiano(config, soundChannel));
-        //final JComponent playerPanel = player.getPlayer(null);
-        final JComponent playerPanel = player.getPlayer(NotesPianoPlayerDemo.AUGUSTIN);
-        //final JComponent playerPanel = player.getPlayer(NotesPianoPlayerDemo.TUBULAR_BELLS);
+        final JComponent playerPanel = player.getPlayer(NoteExamples.AUGUSTIN);
         
         frame.addWindowListener(player.getWindowClosingListener());
         frame.add(playerPanel);
