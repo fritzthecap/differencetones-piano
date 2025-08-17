@@ -30,12 +30,14 @@ public class PianoKeyConnector implements SoundChannel
     public void noteOn(int midiNoteNumber, int velocity) {
         final PianoWithSound.Keyboard.Key key = findKey(midiNoteNumber);
         //velocityChange(velocity);
-        pressOrReleaseKey(key, true);
+        if (key != null)
+            pressOrReleaseKey(key, true);
     }
     @Override
     public void noteOff(int midiNoteNumber) {
         final PianoWithSound.Keyboard.Key key = findKey(midiNoteNumber);
-        pressOrReleaseKey(key, false);
+        if (key != null)
+            pressOrReleaseKey(key, false);
     }
     
     @Override
@@ -47,6 +49,9 @@ public class PianoKeyConnector implements SoundChannel
     
     
     private PianoWithSound.Keyboard.Key findKey(int midiNoteNumber) {
+        final int index = midiNoteNumber - lowestMidiNumber;
+        if (index < 0 || index >= keys.size())
+            return null;
         return keys.get(midiNoteNumber - lowestMidiNumber);
     }
     
