@@ -28,12 +28,12 @@ import fri.music.player.Note;
  * </pre>
  * Result can be tried out on
  * <ul>
- *  <li>https://notabc.app/abc-converter/</li>
  *  <li>https://www.abcjs.net/abcjs-editor</li>
+ *  <li>https://michaeleskin.com/abctools/abctools.html</li>
+ *  <li>https://notabc.app/abc-converter/</li>
  *  <li>https://editor.drawthedots.com/</li>
  *  <li>https://abc.hieuthi.com/</li>
  *  <li>https://abc.rectanglered.com/</li>
- *  <li>https://michaeleskin.com/abctools/abctools.html</li>
  *  <li>https://www.abctransposer.de/</li>
  *  <li>https://www.maztr.com/sheetmusiceditor</li>
  *  <li>https://spuds.thursdaycontra.com/SPUDSConverter.html</li>

@@ -15,10 +15,12 @@ import fri.music.player.notelanguage.MelodyFactory;
  */
 class PlayController implements PlayControlButtons.Listener
 {
-    private final NotesPianoPlayer view;
-    
     private final Object playerLock = new Object();
     private Player player;
+    
+    private final NotesPianoPlayer notesPianoPlayer;
+    
+    private NotesTextPanel view;
     
     private Note[][] sounds; // playing notes, possibly polyphonic
     private int currentSoundIndex;
@@ -26,7 +28,11 @@ class PlayController implements PlayControlButtons.Listener
     
     private SoundChannel pianoKeyConnector;
     
-    PlayController(NotesPianoPlayer view) {
+    public PlayController(NotesPianoPlayer notesPianoPlayer) {
+        this.notesPianoPlayer = notesPianoPlayer;
+    }
+    
+    void setView(NotesTextPanel view) {
         this.view = view;
     }
     
@@ -82,7 +88,7 @@ class PlayController implements PlayControlButtons.Listener
             view.tempoSpinner.setEnabled(true);
         }
         else { // parse notes
-            final MelodyFactory melodyFactory = view.newMelodyFactory();
+            final MelodyFactory melodyFactory = notesPianoPlayer.newMelodyFactory();
             notes = melodyFactory.translate(notesString); // throws exceptions
             checkNotesRange(notes); // throws exceptions
             
@@ -161,7 +167,7 @@ class PlayController implements PlayControlButtons.Listener
         if (notesArray.length <= 0)
             throw new IllegalArgumentException("No notes were given!");
         
-        final List<PianoWithSound.Keyboard.Key> keys = view.piano.getKeys();
+        final List<PianoWithSound.Keyboard.Key> keys = notesPianoPlayer.piano.getKeys();
         final int lowestMidiNumber  = keys.get(0).midiNoteNumber;
         final int highestMidiNumber = keys.get(keys.size() - 1).midiNoteNumber;
         for (Note[] chords : notesArray)
@@ -175,11 +181,11 @@ class PlayController implements PlayControlButtons.Listener
     private void startOrStopPlayer(boolean isStart, boolean reverse) {
         view.playButtons.setPlaying(isStart == true, reverse);
         
-        view.enableUiOnPlaying(isStart == false);
+        notesPianoPlayer.enableUiOnPlaying(isStart == false, view);
     
         if (isStart) {
             final Note[][] notesArray = readNotesFromTextArea(false);
-            final Note[][] sounds = view.convertNotes(notesArray); // is optionally overridden!
+            final Note[][] sounds = notesPianoPlayer.convertNotes(notesArray); // is optionally overridden!
             if (sounds != null && sounds.length > 0) // could have caused a reported exception
                 startPlayer(sounds, reverse); // thread is running now
             else
@@ -292,7 +298,7 @@ class PlayController implements PlayControlButtons.Listener
         if (buttonPressed) {
             if (sounds == null) { // no "Play" was pressed before "Step Forward"
                 final Note[][] notesArray = readNotesFromTextArea(false);
-                sounds = view.convertNotes(notesArray);
+                sounds = notesPianoPlayer.convertNotes(notesArray);
                 if (sounds == null || sounds.length <= 0)
                     return;
                 
@@ -308,7 +314,7 @@ class PlayController implements PlayControlButtons.Listener
             while (startIndex != currentSoundIndex && sounds[currentSoundIndex][0].isRest());
             
             if (sounds[currentSoundIndex][0].isRest() == false) {
-                view.enableUiOnPlaying(false);
+                notesPianoPlayer.enableUiOnPlaying(false, view);
 
                 for (Note note : sounds[currentSoundIndex])
                     pianoKeyConnector().noteOn(note.midiNumber, note.volume);
@@ -321,7 +327,7 @@ class PlayController implements PlayControlButtons.Listener
                 for (Note note : sounds[currentSoundIndex])
                     pianoKeyConnector().noteOff(note.midiNumber);
                 
-                view.enableUiOnPlaying(true);
+                notesPianoPlayer.enableUiOnPlaying(true, view);
             }
         }
     }
@@ -343,7 +349,7 @@ class PlayController implements PlayControlButtons.Listener
     
     private SoundChannel pianoKeyConnector() {
         if (pianoKeyConnector == null)
-            pianoKeyConnector = new PianoKeyConnector(view.piano);
+            pianoKeyConnector = new PianoKeyConnector(notesPianoPlayer.piano);
         return pianoKeyConnector;
     }
 }

@@ -55,14 +55,14 @@ public class TextAreaActions extends MouseAdapter
     public TextAreaActions(JTextComponent textComponent) {
         final ActionMap actionMap = textComponent.getActionMap();
         
-        this.cut = actionMap.get(DefaultEditorKit.cutAction); // Ctrl-x
-        cut.putValue(Action.NAME, "Cut (Ctr-x)");
-        this.copy = actionMap.get(DefaultEditorKit.copyAction); // Ctrl-c
-        copy.putValue(Action.NAME, "Copy (Ctr-c)");
-        this.paste = actionMap.get(DefaultEditorKit.pasteAction); // Ctrl-v
-        paste.putValue(Action.NAME, "Paste (Ctr-v)");
-        this.selectAll = actionMap.get(DefaultEditorKit.selectAllAction); // Ctrl-a
-        selectAll.putValue(Action.NAME, "Select All (Ctr-a)");
+        this.cut = actionMap.get(DefaultEditorKit.cutAction);
+        cut.putValue(Action.NAME, "Cut (Ctrl-X)");
+        this.copy = actionMap.get(DefaultEditorKit.copyAction);
+        copy.putValue(Action.NAME, "Copy (Ctrl-C)");
+        this.paste = actionMap.get(DefaultEditorKit.pasteAction);
+        paste.putValue(Action.NAME, "Paste (Ctrl-V)");
+        this.selectAll = actionMap.get(DefaultEditorKit.selectAllAction);
+        selectAll.putValue(Action.NAME, "Select (Ctrl-A)");
         
         this.undoManager = new UndoManager();
         undoManager.setLimit(300);
@@ -126,7 +126,7 @@ public class TextAreaActions extends MouseAdapter
 
         final Keymap keymap = JTextComponent.addKeymap("TextArea-Undo-Redo-Bindings", textComponent.getKeymap());
 
-        final Action undo = new AbstractAction("Undo (Ctr-z)")  {
+        final Action undo = new AbstractAction("Undo (Ctrl-Z)")  {
             @Override
             public void actionPerformed(ActionEvent e)  {
                 try { undoManager.undo(); } catch (CannotUndoException ex)  {}
@@ -135,7 +135,7 @@ public class TextAreaActions extends MouseAdapter
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK);
         keymap.addActionForKeyStroke(key, undo);
 
-        final Action redo = new AbstractAction("Redo (Ctr-y)")  {
+        final Action redo = new AbstractAction("Redo (Ctrl-Y)")  {
             @Override
             public void actionPerformed(ActionEvent e)  {
                 try { undoManager.redo(); } catch (CannotRedoException ex)  {}
