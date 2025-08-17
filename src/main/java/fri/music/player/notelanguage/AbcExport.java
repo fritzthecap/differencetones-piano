@@ -128,9 +128,9 @@ public class AbcExport
     
     private static String getAbcOctave(int octave) {
         if (octave < 4)
-            return ",".repeat(4 - octave);
+            return ",".repeat(4 - octave); // ABC octave down symbol
         else if (octave > 5)
-            return "'".repeat(octave - 5);
+            return "'".repeat(octave - 5); // ABC octave up symbol
         return "";
     }
     
@@ -378,7 +378,7 @@ public class AbcExport
     }
 
     private boolean isDotted(String lengthNotation) {
-        return lengthNotation.endsWith(MelodyFactory.DOTTED_SYMBOL);
+        return lengthNotation.endsWith(Note.DOTTED_SYMBOL);
     }
     
     private String toAbcLength(String lengthNotation, boolean isDotted) {
@@ -398,9 +398,9 @@ public class AbcExport
     
     private String stripLengthToNumber(String lengthNotation, boolean isDotted) {
         if (isDotted)
-            lengthNotation = lengthNotation.substring(0, lengthNotation.length() - MelodyFactory.DOTTED_SYMBOL.length());
+            lengthNotation = lengthNotation.substring(0, lengthNotation.length() - Note.DOTTED_SYMBOL.length());
         
-        final int multipletSeparatorIndex = lengthNotation.indexOf(MelodyFactory.MULTIPLET_SEPARATOR);
+        final int multipletSeparatorIndex = lengthNotation.indexOf(Note.MULTIPLET_SEPARATOR);
         if (multipletSeparatorIndex >= 0)
             lengthNotation = lengthNotation.substring(0, multipletSeparatorIndex);
         

@@ -22,10 +22,12 @@ and its length behind a slash, for example:
 <ul>
 <li>"A4/4" for a quarter note on pitch of A4 (440 Hz)</li>
 <li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
-<li>"E5/8,3" for a E5 triplet eighth note 
-    (each of the triplets must have the ",3" postfix!)
-    A quarter note triplet must start with a quarter note (that can be tied),
-    it MUST NOT start with an eighth note or a half note.</li>
+<li>"E5/16~3" for a E5 triplet sixteenth note 
+    (each of the triplets must have the "~3" postfix!)
+    A quarter note triplet must start with a quarter note 
+    (that may be tied to a subsequent one),
+    but it MUST NOT start with an eighth note or a half note,
+    same applies to eighth or half note triplets.</li>
 <li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
 <li>"-/2" for a half rest note.</li>
 </ul>
@@ -85,16 +87,6 @@ public class MelodyFactory
     private static final double BAR_START_VOLUME_FACTOR = 1.8;
     private static final double BAR_HALF_VOLUME_FACTOR = 1.4;
     
-    /** The symbol at the end of dotted notes, duration factor 3/2. */
-    static final String DOTTED_SYMBOL = ".";
-    /** The separator character for triplet and other multiplet numbers. */
-    static final char MULTIPLET_SEPARATOR = ',';
-    
-    
-    /** @return the amount of milliseconds one beat would last. */
-    public static int beatDurationMillis(int beatsPerMinute) {
-        return (int) Math.round(1000.0 * 60.0 / (double) beatsPerMinute);
-    }
     
     /** @return the amount of milliseconds a note with given noteLengthDivisor would last. */
     public static double noteLengthMillis(int noteLengthDivisor, int beatType, int beatDurationMillis) {
@@ -323,7 +315,7 @@ public class MelodyFactory
     
 
     private void calculateBeatDurationMilliseconds() {
-        this.beatDurationMilliseconds = beatDurationMillis(this.beatsPerMinute);
+        this.beatDurationMilliseconds = Note.beatDurationMillis(this.beatsPerMinute);
     }
     
     
@@ -627,12 +619,12 @@ public class MelodyFactory
     
     private DurationWithMultiplet durationMilliseconds(String noteLength) {
         // remove optional dot at right end
-        final boolean dotted = noteLength.endsWith(DOTTED_SYMBOL);
+        final boolean dotted = noteLength.endsWith(Note.DOTTED_SYMBOL);
         if (dotted)
-            noteLength = noteLength.substring(0, noteLength.length() - DOTTED_SYMBOL.length());
+            noteLength = noteLength.substring(0, noteLength.length() - Note.DOTTED_SYMBOL.length());
         
         // remove optional multiplet-type, left of dot
-        final int multipletSeparatorIndex = noteLength.indexOf(MULTIPLET_SEPARATOR);
+        final int multipletSeparatorIndex = noteLength.indexOf(Note.MULTIPLET_SEPARATOR);
         final Integer multipletType = getMultipletType(noteLength, multipletSeparatorIndex);
         if (multipletType != null)
             noteLength = noteLength.substring(0, multipletSeparatorIndex);

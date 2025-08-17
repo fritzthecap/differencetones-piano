@@ -43,20 +43,31 @@ public class Note extends Tone
     }
     
     
+    /** @return the amount of milliseconds one beat would last. */
+    public static int beatDurationMillis(int beatsPerMinute) {
+        return (int) Math.round(1000.0 * 60.0 / (double) beatsPerMinute);
+    }
+    
     /** Default loudness, 0-127. */
     public static final int DEFAULT_VOLUME = 7;
     /** Default tempo is 120 BPM. */
     public static final int DEFAULT_TEMPO_BPM = 120;
     /** Default duration of a quarter-note on 120 BPM, in milliseconds. */
-    public static final int DEFAULT_BEAT_DURATION = 1000 * 60 / DEFAULT_TEMPO_BPM; //500
+    public static final int DEFAULT_BEAT_DURATION = beatDurationMillis(DEFAULT_TEMPO_BPM); //500
     
     public static final int TEMPO_MINIMUM_BPM = 40;
     public static final int TEMPO_MAXIMUM_BPM = 208;
     /** Notes can be 1/1, 1/2, 1/4, 1/. 1/16, 1/32, 1/64, not smaller. */
     public static final int SHORTEST_NOTELENGTH_DIVISOR = 64;
-    public static final int MINIMAL_DURATION = (1000 * 60 / TEMPO_MAXIMUM_BPM) / SHORTEST_NOTELENGTH_DIVISOR;
+    /** The minimal duration of a 64th note in fastest tempo. */
+    public static final int MINIMAL_DURATION = beatDurationMillis(TEMPO_MAXIMUM_BPM) / SHORTEST_NOTELENGTH_DIVISOR;
     
+    /** The symbol that separates the IPN note name from its length (duration): "A4/4". */
     public static final char DURATION_SEPARATOR = '/';
+    /** The symbol that stretches a (dotted) note by its half: "A4/4.". */
+    public static final String DOTTED_SYMBOL = ".";
+    /** The separator character for triplet and other multiplet numbers, after length number. */
+    public static final char MULTIPLET_SEPARATOR = '~';
     
     
     /** The length of this note, in milliseconds. */
@@ -67,7 +78,7 @@ public class Note extends Tone
     /** The first note in a bar would be emphasized, meaning it is louder than others. */
     public final boolean emphasized;
     
-    /** The symbolic notation of the length, e.g. "4,3." */
+    /** The symbolic notation of the length, e.g. "4~3." for a dotted quarter triplet. */
     public final String lengthNotation;
     
     /** Ties and slurs. */

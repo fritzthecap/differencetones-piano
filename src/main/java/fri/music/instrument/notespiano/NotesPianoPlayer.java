@@ -78,13 +78,12 @@ public class NotesPianoPlayer
         if (this.playerPanel != null)
             return this.playerPanel; // just one view, due to mouseHandler that stores UI-state
         
-        this.playController = newPlayController(this);
+        this.playController = new PlayController(this);
         
         final JComponent playerPanel = piano.getKeyboard();
         
-        piano.getPanelWithFreeCenter().add(
-                buildNotesPanel(), 
-                BorderLayout.CENTER); // to CENTER, so that user can resize area
+        piano.getPanelWithFreeCenter().add(buildCenterPanel(),  BorderLayout.CENTER);
+        // to CENTER, so that user can resize text-area
         
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
             notesText.setText(melody); // triggers check via DocumentListener
@@ -112,12 +111,9 @@ public class NotesPianoPlayer
     }
     
     
-    /** 
-     * Factory-method, called just once from <code>getPlayer()</code>.
-     * @return a new PlayController.
-     */
-    protected PlayController newPlayController(NotesPianoPlayer notesPianoPlayer) {
-        return new PlayController(this);
+    /** @return the notes panel in CENTER, to be overridden for other components. */
+    protected JComponent buildCenterPanel() {
+        return buildNotesPanel();
     }
     
     /** @return the left-side panel with note controls. */
@@ -145,8 +141,8 @@ public class NotesPianoPlayer
     /**
      * Called before playing notes on piano. Simply returns given array.
      * To be overridden for conversions.
-     * @param notesArray the notes from text-area to convert to a 2-dimensional chords array.
-     * @return a 2-dimensional chords array built from given notes.
+     * @param notesArray the notes from text-area.
+     * @return the notes to be played on piano.
      */
     protected Note[][] convertNotes(Note[][] notesArray) {
         return notesArray;
@@ -189,7 +185,7 @@ public class NotesPianoPlayer
     /** Method called by NotesWritingMouseListener. */
     String noteLengthForMillis(int durationMillis) {
         Integer beatsPerMinute = (Integer) tempoSpinner.getValue();
-        final int beatDurationMillis = MelodyFactory.beatDurationMillis(beatsPerMinute);
+        final int beatDurationMillis = Note.beatDurationMillis(beatsPerMinute);
         
         final Integer[] timeSignature = timeSignatureParts();
         final Integer beatType = timeSignature[1];
@@ -223,7 +219,8 @@ public class NotesPianoPlayer
     }
     
     private JComponent buildNotesTextArea() {
-        this.notesText = new JTextArea();
+        final int ROWS = 9, COLUMNS = 20;
+        this.notesText = new JTextArea(ROWS, COLUMNS);
         notesText.addMouseListener(new TextAreaActions(notesText));
         notesText.setToolTipText("Write Notes to be Played on Piano");
         // on every text change, try to translate into notes and render errors
@@ -263,6 +260,7 @@ public class NotesPianoPlayer
             }
         });
         final JButton abcExport = new JButton("Export to ABC");
+        abcExport.setToolTipText("Convert Notes Text to ABC Notation");
         abcExport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -273,7 +271,6 @@ public class NotesPianoPlayer
                         null);
             }
         });
-        abcExport.setToolTipText("Convert Notes Text to ABC Notation");
         
         final JPanel helpLayoutPanel = new JPanel();
         helpLayoutPanel.add(help);
@@ -492,10 +489,11 @@ and its duration behind a slash, for example:
 <ul>
 <li>"A4/8" for a eighth note on A4 (4th octave) with pitch 440 Hz</li>
 <li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
-<li>"E5/16,3" for a E5 triplet sixteenth note 
-    (each of the triplets must have the ",3" postfix!)
-    A quarter note triplet must start with a quarter note (that can be tied),
-    it MUST NOT start with an eighth note or a half note,
+<li>"E5/16~3" for a E5 triplet sixteenth note 
+    (each of the triplets must have the "~3" postfix!)
+    A quarter note triplet must start with a quarter note 
+    (that may be tied to a subsequent one),
+    but it MUST NOT start with an eighth note or a half note,
     same applies to eighth or half note triplets.</li>
 <li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
 <li>"-/4" for a quarter rest note.</li>

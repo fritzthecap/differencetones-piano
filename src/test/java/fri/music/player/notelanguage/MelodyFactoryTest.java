@@ -134,7 +134,7 @@ class MelodyFactoryTest
     @Test
     void noteLengthMillis() {
         final int beatsPerMinute = 120;
-        final int beatDurationMillis = MelodyFactory.beatDurationMillis(beatsPerMinute);
+        final int beatDurationMillis = Note.beatDurationMillis(beatsPerMinute);
         assertEquals(500, beatDurationMillis); 
         
         // calculate 1/16 when BPM = 120 and beat-type is quarter note (like in 4/4 time signature)
@@ -149,7 +149,7 @@ class MelodyFactoryTest
     @Test
     void noteLengthDivisor() {
         final int beatsPerMinute = 120;
-        final int beatDurationMillis = MelodyFactory.beatDurationMillis(beatsPerMinute);
+        final int beatDurationMillis = Note.beatDurationMillis(beatsPerMinute);
         assertEquals(500, beatDurationMillis); 
         
         // calculate 1/16 when BPM = 120 and beat-type is quarter note (like in 4/4 time signature)
@@ -184,7 +184,7 @@ class MelodyFactoryTest
     void tripletDuration() {
         final String[] notes = new String[] { // one 4/4 bar
             "G4/4", "A4/4", 
-            "B4/4,3", "A4/4,3", "G4/4,3", // triplet
+            "B4/4~3", "A4/4~3", "G4/4~3", // triplet
             "D4/1",
         };
         
@@ -216,7 +216,7 @@ class MelodyFactoryTest
     void mixedTripletDuration() {
         final String[] notes = new String[] {
             "G4/4", "A4/4", 
-            "B4/4,3", "A4/2,3", // mixed lengths triplet
+            "B4/4~3", "A4/2~3", // mixed lengths triplet
             "D4/1",
         };
         
@@ -243,8 +243,8 @@ class MelodyFactoryTest
         
         assertNull(melody[4].connectionFlags.multiplet());
         
-        // Error case "B4/2,3", "A4/4,3":
-        // The "B4/2,3" triplet would carry a wrong overallMultipletDuration 
+        // Error case "B4/2~3", "A4/4~3":
+        // The "B4/2~3" triplet would carry a wrong overallMultipletDuration 
         // because that duration is calculated from first note.
         // So we could not test connectionFlags.multiplet() Booleans in that case!
     }
@@ -253,14 +253,14 @@ class MelodyFactoryTest
     void quintupletDuration() {
         final String[] notes = new String[] {
             "E4/4", "D4/4", 
-            "G4/8,5", "A4/8,5", "B4/8,5", "A4/8,5", "G4/8,5", // quintuplet
+            "G4/8~5", "A4/8~5", "B4/8~5", "A4/8~5", "G4/8~5", // quintuplet
             "D5/2",
         };
         
         final MelodyFactory melodyFactory = new MelodyFactory();
         final Note[] melody = translate(melodyFactory, notes);
         
-        // quintuplet must have different duration than eighth
+        // a quintuplet must have a different duration than an eighth
         assertNotEquals(melody[0].durationMilliseconds, melody[2].durationMilliseconds);
         
         // all quintuplets must have same duration
@@ -283,7 +283,7 @@ class MelodyFactoryTest
     @Test
     void wrongMultipletType() {
         final String[] notes = new String[] {
-            "G4/8,7", // septuplet is ambiguous and thus not supported
+            "G4/8~7", // septuplet is ambiguous and thus not supported
         };
         assertThrows(
             IllegalArgumentException.class, 

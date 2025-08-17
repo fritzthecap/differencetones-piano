@@ -56,7 +56,7 @@ G/4> A/4`G/8`F/8 | E/4 C/4 C/4 | D/4 G,/4 G,/4 | C/2> ||""";
     ////////////////////////////////////////////////////////////////////////////
     
     @Test
-    void chords() {
+    void chordsWithTiesAndSlurs() {
         final String CHORD_NOTES = """
 {[ C4/8 E4/8 G4/8 ] [ D4/8 F#4/8 A4/8 ]}
 ([ C4/8 E4/8 G4/8 ] [ C4/8 E4/8 G4/8 ])
@@ -80,7 +80,7 @@ K: C
     @Test
     void tripletQuarters() {
         final String TRIPLET_QUARTER_NOTES = """
-G4/4 A4/4 B4/4,3 A4/4,3 G4/4,3 B4/4,3 A4/4,3 G4/4,3 B4/4,3 A4/4,3 G4/4,3 D4/1""";
+G4/4 A4/4 B4/4~3 A4/4~3 G4/4~3 B4/4~3 A4/4~3 G4/4~3 B4/4~3 A4/4~3 G4/4~3 D4/1""";
         
         final String expected = """
 X: 1
@@ -99,7 +99,7 @@ G/4 A/4 (3 B/4 A/4 G/4 | (3 B/4 A/4 G/4 (3 B/4 A/4 G/4 | D/1 ||""";
     @Test
     void tripletEighths() {
         final String TRIPLET_EIGHTH_NOTES = """
-G4/8 A4/8 B4/8,3 A4/8,3 G4/8,3 B4/8,3 A4/8,3 G4/8,3 B4/8,3 A4/8,3 G4/8,3 D4/1""";
+G4/8 A4/8 B4/8~3 A4/8~3 G4/8~3 B4/8~3 A4/8~3 G4/8~3 B4/8~3 A4/8~3 G4/8~3 D4/1""";
         
         final String expected2 = """
 X: 1
@@ -118,7 +118,7 @@ G/8`A/8 (3 B/8`A/8`G/8 (3 B/8`A/8`G/8 (3 B/8`A/8`G/8 | D/1 ||""";
     @Test
     void tripletHalfAndQuarterMixed() {
         final String MIXED_TRIPLET_NOTES = """
-G4/4 A4/4 B4/4,3 A4/2,3 G4/1""";
+G4/4 A4/4 B4/4~3 A4/2~3 G4/1""";
         
         final String expected3 = """
 X: 1
@@ -137,7 +137,7 @@ G/4 A/4 (3 B/4 A/2 | G/1 ||""";
     @Test
     void tripletQuarterAndEighthMixed() {
         final String MIXED_TRIPLET_NOTES2 = """
-G4/4 A4/4 B4/4,3 A4/8,3 g4/8,3 E4/8,3 D#4/8,3 D4/1""";
+G4/4 A4/4 B4/4~3 A4/8~3 g4/8~3 E4/8~3 D#4/8~3 D4/1""";
         
         final String expected3 = """
 X: 1
