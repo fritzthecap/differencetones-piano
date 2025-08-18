@@ -62,8 +62,8 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
     
     /** Overridden to disable several <code>DifferenceToneForNotesPiano</code> controls on playing. */
     @Override
-    protected void enableUiOnPlaying(boolean isStop, NotesTextPanel view) {
-        super.enableUiOnPlaying(isStop, view);
+    protected void enableUiOnPlaying(boolean isStop) {
+        super.enableUiOnPlaying(isStop);
         
         getDifferenceTonePiano().setTuningControlsEnabled(isStop);
         convertToDifferenceTones.setEnabled(isStop);

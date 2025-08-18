@@ -94,9 +94,14 @@ public class Player
     private void turnNotesOnOrOff(Note[] chord, boolean on) {
         for (Note note : chord)
             if (note.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
-                if (on)
-                    soundChannel.noteOn(note.midiNumber, note.volume);
-                else
-                    soundChannel.noteOff(note.midiNumber);
+                noteOnOrOff(soundChannel, note, on);
+    }
+    
+    /** Called by all play methods. */
+    protected void noteOnOrOff(SoundChannel soundChannel, Note note, boolean on) {
+        if (on)
+            soundChannel.noteOn(note.midiNumber, note.volume);
+        else
+            soundChannel.noteOff(note.midiNumber);
     }
 }

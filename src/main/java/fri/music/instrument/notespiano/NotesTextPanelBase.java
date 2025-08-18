@@ -29,7 +29,7 @@ public class NotesTextPanelBase extends JPanel
     
     protected final JPanel textAreaButtonsPanel;
     
-    NotesTextPanelBase(PlayController playController, boolean pianoIsVertical) {
+    public NotesTextPanelBase(PlayControllerBase playController, boolean pianoIsVertical) {
         super(new BorderLayout());
         
         // START build public fields
@@ -42,7 +42,7 @@ public class NotesTextPanelBase extends JPanel
         
         this.textAreaButtonsPanel = new JPanel();
         
-        this.notesControlPanel = buildNotesControlPanel(playController, pianoIsVertical);
+        this.notesControlPanel = buildNotesControlPanel(pianoIsVertical);
         // END build public fields
         
         final JComponent notesTextAndErrors = buildNotesTextArea();
@@ -88,7 +88,7 @@ public class NotesTextPanelBase extends JPanel
         return textAreaAndError;
     }
     
-    private JPanel buildNotesControlPanel(PlayController playController, boolean pianoIsVertical) {
+    private JPanel buildNotesControlPanel(boolean pianoIsVertical) {
         formatBars.setToolTipText("Put each Bar into a Separate Line");
         
         final JPanel notesControlPanel = new JPanel(); // else button is too big

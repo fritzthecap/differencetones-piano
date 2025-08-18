@@ -107,7 +107,7 @@ class NotesWritingMouseListener extends MouseKeyAdapter
 
     private String writeNoteToTextarea(String noteLength) {
         final String noteWithLength = key.ipnName + Note.DURATION_SEPARATOR + noteLength;
-        notesPiano.writeSingleNote(noteWithLength);
+        notesPiano.writeSingleNote(notesPiano.view(), noteWithLength);
         return noteWithLength;
     }
 

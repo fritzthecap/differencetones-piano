@@ -45,6 +45,17 @@ import fri.music.wavegenerator.WaveSoundChannel;
  */
 public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
 {
+    /** Listen to mouse clicks onto a interval list item in a interval list frame. */
+    public interface IntervalSelectionListener
+    {
+        /**
+         * The given interval was clicked and played on piano.
+         * @param note the note the interval represents as difference-tone.
+         * @param interval the selected interval.
+         */
+        void intervalSelected(DifferenceToneInversions.TonePair interval, String lengthNotation);
+    }
+    
     private static final int INTERVAL_FRAME_HEIGHT = 160;
     
     private JComponent pianoPanel;
@@ -55,6 +66,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     private JCheckBox sortIntervalFrames;
     private PianoKeyConnector pianoKeyConnector;
     private DifferenceToneInversions differenceToneInversions;
+    
+    private IntervalSelectionListener intervalSelectionListener;
     
     public DifferenceToneInversionsPiano(PianoWithSound.Configuration config, WaveSoundChannel soundChannel) {
         super(config, soundChannel);
@@ -84,6 +97,11 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             mainContainer.add(centerPanel, 0);
         }
         return centerPanel;
+    }
+    
+    /** Listen to interval selection in any list frame. */
+    public void setIntervalSelectionListener(IntervalSelectionListener intervalSelectionListener) {
+        this.intervalSelectionListener = intervalSelectionListener;
     }
     
     /** Overridden to listen to tuning changes. */
@@ -304,9 +322,13 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     /** Called by interval-list frame when an interval is clicked. */
     void intervalSelected(IntervalListFrame activeFrame, DifferenceToneInversions.TonePair pair, boolean mouseDown) {
         setFrameSelected(activeFrame);
+        
         playNotes(
                 new int[] { pair.lowerTone().midiNumber, pair.upperTone().midiNumber },
                 mouseDown);
+        
+        if (mouseDown && intervalSelectionListener != null)
+            intervalSelectionListener.intervalSelected(pair, "4"); // TODO
     }
 
     /** Called by interval-list frame when the title-bar of an interval is clicked. */
@@ -339,7 +361,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     
-    protected static class DifferenceToneInversionsMouseHandler extends DifferenceToneMouseHandler
+    public static class DifferenceToneInversionsMouseHandler extends DifferenceToneMouseHandler
     {
         private boolean active = true;
         

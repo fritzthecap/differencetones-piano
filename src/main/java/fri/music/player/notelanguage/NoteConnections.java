@@ -6,20 +6,20 @@ package fri.music.player.notelanguage;
  * with same pitch, but the parentheses must be repeated on any note within.
  * Slurs and ties can be combined, but slur must be the outer symbol, like "{(A4".
  */
-class NoteConnections
+public class NoteConnections
 {
     /** The character used to start a tie. */
-    static final String TIE_START_SYMBOL = "(";
+    public static final String TIE_START_SYMBOL = "(";
     /** The character used to end a tie. */
-    static final String TIE_END_SYMBOL = ")";
+    public static final String TIE_END_SYMBOL = ")";
     /** The character used to start a slur. */
-    static final String SLUR_START_SYMBOL = "{";
+    public static final String SLUR_START_SYMBOL = "{";
     /** The character used to end a slur. */
-    static final String SLUR_END_SYMBOL = "}";
+    public static final String SLUR_END_SYMBOL = "}";
     /** The character used to start a chord. */
-    static final String CHORD_START_SYMBOL = "[";
+    public static final String CHORD_START_SYMBOL = "[";
     /** The character used to end a chord. */
-    static final String CHORD_END_SYMBOL = "]";
+    public static final String CHORD_END_SYMBOL = "]";
     
     private static class NoteConnection
     {

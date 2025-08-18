@@ -15,19 +15,27 @@ import javax.swing.JPanel;
 /**
  * The player controls for playing, rewinding and single-step playing.
  */
-class PlayControlButtons extends JPanel
+public class PlayControlButtons extends JPanel
 {
     /** Who wants to receive control button clicks implements this interface. */
     public interface Listener
     {
+        /** Stops playing when playing and rewinds to start but does not play any note. */
         void fastBackwardPressed();
+        /** Plays the previous note continually, or stops playing. */
         void backwardPressed();
-        void reversePressed();
-        void playPressed();
-        void fastForwardPressed();
-        void forwardPressed();
+        /** Stops continual playing of previous note. */
         void backwardReleased();
+        /** Plays the melody backwards. */
+        void reversePressed();
+        /** Plays the melody forwards. */
+        void playPressed();
+        /** Plays the next note continually, or stops playing when playing. */
+        void forwardPressed();
+        /** Stops continual playing of next note. */
         void forwardReleased();
+        /** Stops playing when playing and goes to end but does not play any note. */
+        void fastForwardPressed();
     }
     
     private static final String REVERSE = "\u23F4";
