@@ -1,4 +1,7 @@
 
+- NotesPianoPlayer bug: all tied notes parts are played in single step mode.
+    A tied note should occur just once in single-step mode.
+    
 - Notes of intervals clicked in DifferenceToneInversionsPiano
     should be written into a second text-area,
     see (unfinished) NotesWithDifferenceToneInversionsPianoPlayerDemo.
@@ -8,6 +11,8 @@
     
     The export to ABC would require two voices, the lower one with the tune,
     the upper one with its difference tone intervals.
+
+- Support double dots. Count number of dots at end of note instead of making a boolean.
 
 - For NotesPianoPlayer and sub-classes there should be a ConfigurationPanel.
     
