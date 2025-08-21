@@ -29,6 +29,8 @@ public class NotesTextPanelBase extends JPanel
     
     protected final JPanel textAreaButtonsPanel;
     
+    private boolean permanentNotesCheck = true;
+    
     public NotesTextPanelBase(PlayControllerBase playController, boolean pianoIsVertical) {
         super(new BorderLayout());
         
@@ -51,9 +53,16 @@ public class NotesTextPanelBase extends JPanel
         add(notesControlPanel, pianoIsVertical ? BorderLayout.NORTH : BorderLayout.WEST);
     }
     
+    public boolean isPermanentNotesCheck() {
+        return permanentNotesCheck;
+    }
+    public void setPermanentNotesCheck(boolean active) {
+        this.permanentNotesCheck = active;
+    }
+    
     private JComponent buildNotesTextArea() {
         notesText.addMouseListener(new TextAreaActions(notesText));
-        notesText.setToolTipText("Write Notes to be Played on Piano");
+        notesText.setToolTipText("Write Notes to be Played on Piano, Context Actions via Right Mouse Click");
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
         notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes"));
         

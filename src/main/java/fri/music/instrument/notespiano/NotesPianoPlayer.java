@@ -21,23 +21,25 @@ import fri.music.player.notelanguage.MelodyFactory;
  * A notes area that can play user-editable notes on a given piano.
  * It uses a constructor-given piano to play the entered notes, thus
  * it is called "Player" and not "Piano", although it displays a piano.
+ * <p/>
+ * It installs an additional mouse-listener to the keyboard that writes
+ * clicked notes from keyboard to the "Notes" text-area.
  */
 public class NotesPianoPlayer
 {
     /** The piano obtained from constructor. */
     protected final PianoWithSound piano;
-    /** The PlayController for this' view. */
-    protected final  PlayController playController;
+
+    private PlayController playController;
     
     private JComponent playerPanel; // the object-singleton component
     
     private NotesTextPanel view;
-    private final NotesWritingMouseListener notesWritingPianoListener = new NotesWritingMouseListener(this);
+    private NotesWritingMouseListener notesWritingPianoListener;
     
     /** @param piano required, the piano on which to play notes. */
     public NotesPianoPlayer(PianoWithSound piano) {
         this.piano = Objects.requireNonNull(piano);
-        this.playController = new PlayController(this);
     }
     
     /**
@@ -49,6 +51,9 @@ public class NotesPianoPlayer
         if (this.playerPanel != null)
             return this.playerPanel; // just one view, due to mouseHandler that stores UI-state
         
+        this.playController = newPlayController();
+        this.notesWritingPianoListener = newNotesWritingMouseListener();
+
         final JComponent playerPanel = piano.getKeyboard(); // build up the piano
         
         piano.getPanelWithFreeCenter().add( // now we can add UI
@@ -81,8 +86,23 @@ public class NotesPianoPlayer
     }
     
     
-    /** Get a new MelodyFactory with current parameters from UI. */
-    protected MelodyFactory newMelodyFactory() {
+    /** Factory method for customized PlayController classes. */
+    protected PlayController newPlayController() {
+        return new PlayController(this);
+    }
+    
+    /** @return the PlayController created by getPlayer(). */
+    protected final PlayController getPlayController() {
+        return playController;
+    }
+
+    /** Factory method for customized PlayController classes. */
+    protected NotesWritingMouseListener newNotesWritingMouseListener() {
+        return new NotesWritingMouseListener(this);
+    }
+
+    /** @return a new MelodyFactory with current parameters from UI. */
+    protected final MelodyFactory newMelodyFactory() {
         final Integer[] timeSignature = timeSignatureParts();
         return new MelodyFactory(
                 null,
@@ -90,7 +110,7 @@ public class NotesPianoPlayer
                 timeSignature[0],
                 timeSignature[1]);
     }
-
+    
     // override-able UI builder methods
     
     /** @return the notes panel in CENTER, to be overridden for other components. */
@@ -178,18 +198,20 @@ public class NotesPianoPlayer
      * @return null when error, else the notes-array from text area.
      */
     protected final Note[][] readNotesFromTextAreaCatchExceptions(PlayControllerBase playController, NotesTextPanelBase view) {
-        try {
-            final Note[][] notes = playController.readNotesFromTextArea(true);
-            view.error.setText(""); // no exception was thrown, so clear errors
-            return notes;
-        }
-        catch (Exception e) {
-            view.error.setText(e.getMessage());
-            view.playButtons.setEnabled(false);
-            view.formatBars.setEnabled(false);
-            
-            if (e instanceof IllegalArgumentException == false)
-                e.printStackTrace();
+        if (view.isPermanentNotesCheck() == true) {
+            try {
+                final Note[][] notes = playController.readNotesFromTextArea(true);
+                view.error.setText(""); // no exception was thrown, so clear errors
+                return notes;
+            }
+            catch (Exception e) {
+                view.error.setText(e.getMessage());
+                view.playButtons.setEnabled(false);
+                view.formatBars.setEnabled(false);
+                
+                if (e instanceof IllegalArgumentException == false)
+                    e.printStackTrace();
+            }
         }
         return null;
     }

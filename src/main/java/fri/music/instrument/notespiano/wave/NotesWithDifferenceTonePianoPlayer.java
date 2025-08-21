@@ -7,7 +7,6 @@ import javax.swing.JComponent;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
-import fri.music.instrument.notespiano.NotesTextPanel;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.player.Note;
 import fri.music.player.NotesUtil;
@@ -40,7 +39,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
             /** Reload player when changing. */
             @Override
             public void actionPerformed(ActionEvent e) {
-                readNotesFromTextAreaCatchExceptions(playController, view());
+                readNotesFromTextAreaCatchExceptions(getPlayController(), view());
             }
         };
         convertToDifferenceTones.addActionListener(resetPlayerListener);

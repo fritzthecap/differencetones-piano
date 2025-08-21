@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -50,10 +51,10 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     {
         /**
          * The given interval was clicked and played on piano.
-         * @param note the note the interval represents as difference-tone.
-         * @param interval the selected interval.
+         * @param ipnNoteName the tone the interval represents as difference-tone.
+         * @param interval the selected difference-tone interval.
          */
-        void intervalSelected(DifferenceToneInversions.TonePair interval, String lengthNotation);
+        void intervalSelected(JComponent list, Point point, String ipnNoteName, DifferenceToneInversions.TonePair interval);
     }
     
     private static final int INTERVAL_FRAME_HEIGHT = 160;
@@ -167,7 +168,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         // set the panel to an initial height as long as there are no frames in it, else panel would collapse
         intervalListsPanel.add(Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4));
         
-        this.sortIntervalFrames = new JCheckBox("Sorted Frames", true);
+        this.sortIntervalFrames = new JCheckBox("Sort Frames by Pitch", true);
         sortIntervalFrames.setToolTipText("Insert New Interval-Frames Sorted by Pitch");
         
         this.closeAllIntervalFrames = new JButton("Close All Frames");
@@ -320,25 +321,25 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     /** Called by interval-list frame when an interval is clicked. */
-    void intervalSelected(IntervalListFrame activeFrame, DifferenceToneInversions.TonePair pair, boolean mouseDown) {
+    void intervalSelected(IntervalListFrame activeFrame, Point point, DifferenceToneInversions.TonePair pair, boolean mouseDown) {
         setFrameSelected(activeFrame);
         
-        playNotes(
+        playNotesWithoutOpeningIntervalFrames(
                 new int[] { pair.lowerTone().midiNumber, pair.upperTone().midiNumber },
                 mouseDown);
         
         if (mouseDown && intervalSelectionListener != null)
-            intervalSelectionListener.intervalSelected(pair, "4"); // TODO
+            intervalSelectionListener.intervalSelected(activeFrame, point, activeFrame.ipnNoteName, pair);
     }
 
     /** Called by interval-list frame when the title-bar of an interval is clicked. */
     void listTitleSelected(int midiNoteNumber, boolean mouseDown) {
-        playNotes(
+        playNotesWithoutOpeningIntervalFrames(
                 new int[] { midiNoteNumber },
                 mouseDown);
     }
 
-    private void playNotes(int[] midiNoteNumbers, boolean mouseDown) {
+    private void playNotesWithoutOpeningIntervalFrames(int[] midiNoteNumbers, boolean mouseDown) {
         if (mouseDown == true) // start tone
             ignoreMouseEvents(true);
             
@@ -361,6 +362,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     
+    /** Creates an interval-frame showing possible intervals for a clicked piano-key. */
     public static class DifferenceToneInversionsMouseHandler extends DifferenceToneMouseHandler
     {
         private boolean active = true;
@@ -369,14 +371,18 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             super(piano, soundChannel);
         }
         
+        /** Turns the listener on or off. */
         public void setActive(boolean active) {
             this.active = active;
         }
 
+        /** Overridden to add an interval frame when active and a tone gets played. */
         @Override
         protected void pressed(InputEvent e) {
-            if (active)
-                getPiano().addIntervalListFrame(getKey(e).ipnName, getKey(e).midiNoteNumber);
+            if (active) {
+                final Keyboard.Key keyboardKey = getKey(e);
+                getPiano().addIntervalListFrame(keyboardKey.ipnName, keyboardKey.midiNoteNumber);
+            }
             super.pressed(e);
         }
         
@@ -431,14 +437,14 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                         if (index >= 0 && index < intervalList.getModel().getSize()) {
                             currentlyPlaying = intervalList.getModel().getElementAt(index);
                             if (currentlyPlaying != null)
-                                intervalSelected(IntervalListFrame.this, currentlyPlaying, true);
+                                intervalSelected(IntervalListFrame.this, e.getPoint(), currentlyPlaying, true);
                         }
                     }
                 }
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e) && currentlyPlaying != null) {
-                        intervalSelected(IntervalListFrame.this, currentlyPlaying, false);
+                        intervalSelected(IntervalListFrame.this, e.getPoint(), currentlyPlaying, false);
                         currentlyPlaying = null;
                     }
                 }
