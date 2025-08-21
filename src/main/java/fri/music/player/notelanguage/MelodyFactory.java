@@ -12,61 +12,7 @@ import fri.music.player.Note;
 /**
  * Reads in a number of notes with length, headed by time-signature and tempo, 
  * and produces a melody (array of Note) from it, playable by a <code>Player</code>.
- * Just single notes are possible, no chords.
- * <p/>
- * <b>Input DSL:</b><br/>
-<p>
-Every note is given as an IPN-name (international pitch notation)
-and its length behind a slash, for example: 
-</p>
-<ul>
-<li>"A4/4" for a quarter note on pitch of A4 (440 Hz)</li>
-<li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
-<li>"E5/16~3" for a E5 triplet sixteenth note 
-    (each of the triplets must have the "~3" postfix!)
-    A quarter note triplet must start with a quarter note 
-    (that may be tied to a subsequent one),
-    but it MUST NOT start with an eighth note or a half note,
-    same applies to eighth or half note triplets.</li>
-<li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
-<li>"-/2" for a half rest note.</li>
-</ul>
-<p>
-No space must appear inside notes and their length specification,
-but at least one whitespace MUST be between different notes.
-In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
-and there is no German "H", such is written as "B".
-But you can use both lower or upper case letters in IPN-names.
-</p><p>
-The time signature can appear on top of the notes, or everywhere in-between,
-written as "4/4" or "3/4" or similar.
-The tempo can appear as simple BPM number (beats per minute)
-on top of the notes only, it can not change in-between.
-</p><p>
-Do not care about bars, the player will automatically calculate bar bounds
-using the given time signature(s).
-You can use the "Format" button to put every bar into a separate text line.
-</p><p>
-Notes connected by a "tie" are notes of same pitch that are played as single note, 
-even across several bars.
-Ties are started by an parenthesis "(" and ended by ")", 
-notes in between the start and end note SHOULD be enclosed in
-parentheses, because this is how it would look like in written notes.
-Space between parentheses and note is allowed.
-</p><p>
-Notes connected by a "slur" are notes of different pitch that are phrased together, 
-even across several bars.
-Slurs are started by a brace "{" and ended by "}", 
-notes in between MUST NOT be enclosed in "{...}",
-because it is not clear how to phrase several notes that are all slurred together.
-Space between braces and note is allowed.
-</p><p>
-Chord notes are two or more notes of different pitch that are played simultaneously.
-Chords are started by a bracket "[" and ended by "]", 
-just the first note needs to have a duration, it is assumed that all have the same length.
-Ties and slurs from inside to outside of a chord are allowed.
-Space between brackets and note is allowed.
-</p>
+ * For specification of the notes-language see <code>NotesTextPanel.NOTES_EDIT_HELP</code>.
  */
 public class MelodyFactory
 {
@@ -231,7 +177,6 @@ public class MelodyFactory
         final StringBuilder result = new StringBuilder();
         boolean inSlur = false;
         boolean inTie = false;
-        boolean inChord = false;
         
         for (int chordIndex = 0; chordIndex < notes.length; chordIndex++) {
             final Note[] chord = notes[chordIndex];
@@ -263,18 +208,14 @@ public class MelodyFactory
             }
             
             if (Boolean.TRUE.equals(note.connectionFlags.tied())) {
-                if (inTie == false && inChord == false)
+                if (inTie == false)
                     result.append(NoteConnections.TIE_START_SYMBOL);
                 inTie = true;
             }
             
-            if (chord.length > 1) {
+            final boolean inChord = (chord.length > 1);
+            if (inChord)
                 result.append(NoteConnections.CHORD_START_SYMBOL);
-                inChord = true;
-            }
-            else {
-                inChord = false;
-            }
             
             for (int i = 0; i < chord.length; i++) { // mostly there will be just one note in chord
                 note = chord[i];
@@ -796,21 +737,24 @@ public class MelodyFactory
         // sum duration until tie ends
         NoteConnections connections;
         do {
-            connections = melodyTokens.get(i).noteConnections;
-            // if in chord, go to end of chord
-            if (chord != null) {
-                if (connections.isChordEnd() == true)
-                    chord = null;
+            connections = null;
+            if (i < melodyTokens.size()) {
+                connections = melodyTokens.get(i).noteConnections;
+                // if in chord, go to end of chord
+                if (chord != null) {
+                    if (connections.isChordEnd() == true)
+                        chord = null;
+                }
+                else {
+                    final Note rawNote = rawNotes.get(i);
+                    duration += rawNote.durationMilliseconds;
+                    if (connections.isChordStart() == true)
+                        chord = Boolean.TRUE;
+                }
+                i++;
             }
-            else {
-                final Note rawNote = rawNotes.get(i);
-                duration += rawNote.durationMilliseconds;
-                if (connections.isChordStart() == true)
-                    chord = Boolean.TRUE;
-            }
-            i++;
         }
-        while (i < rawNotes.size() && connections.isTieEnd() == false);
+        while (i < rawNotes.size() && connections != null && connections.isTieEnd() == false);
 
         return duration;
     }
