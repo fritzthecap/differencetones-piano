@@ -1,7 +1,7 @@
 
-- NotesPianoPlayer bug: all tied notes parts are played in single step mode.
-    A tied note should occur just once in single-step mode.
-    
+- NotesPianoPlayer bug: Format button does not auto-break too long notes
+    across bar end.
+
 - Notes of intervals clicked in DifferenceToneInversionsPiano
     should be written into a second text-area,
     see (unfinished) NotesWithDifferenceToneInversionsPianoPlayerDemo.
