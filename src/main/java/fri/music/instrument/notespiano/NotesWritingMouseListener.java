@@ -13,17 +13,17 @@ import fri.music.swingutils.MouseKeyAdapter;
  * Writes notes from piano keyboard to text-area.
  * Call <code>setActive(true)</code> to make it work, initially it is not active.
  */
-class NotesWritingMouseListener extends MouseKeyAdapter
+public class NotesWritingMouseListener extends MouseKeyAdapter
 {
-    private final NotesPianoPlayer notesPiano;
+    private final NotesPianoPlayer notesPianoPlayer;
     private final JPopupMenu popup;
     
     private boolean active;
     private PianoWithSound.Keyboard.Key key;
     private long startMillis;
     
-    NotesWritingMouseListener(NotesPianoPlayer notesPiano) {
-        this.notesPiano = notesPiano;
+    public NotesWritingMouseListener(NotesPianoPlayer notesPianoPlayer) {
+        this.notesPianoPlayer = notesPianoPlayer;
         
         this.popup = new JPopupMenu();
         final ActionListener menuListener = new ActionListener() {
@@ -41,18 +41,19 @@ class NotesWritingMouseListener extends MouseKeyAdapter
         }
     }
     
-    /** Turns off and on this mouse listener. Initially it is NOT active. */
+    /** Turns this mouse listener on and off. Initially it is NOT active. */
     public void setActive(boolean active) {
         this.active = active;
+    }
+    
+    protected final boolean isActive() {
+        return active;
     }
     
     // mouse listener methods
     
     @Override
     public void mousePressed(MouseEvent e) {
-        if (active == false)
-            return;
-        
         key = getKey(e);
         
         if (showPopupMenu(e) == false) // is left mouse button
@@ -61,7 +62,7 @@ class NotesWritingMouseListener extends MouseKeyAdapter
     
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (active == false || key == null || popup.isShowing()) // was a mouse drag
+        if (key == null || popup.isShowing()) // was a mouse drag
             return;
         
         if (showPopupMenu(e) == false) // is left mouse button
@@ -70,7 +71,7 @@ class NotesWritingMouseListener extends MouseKeyAdapter
     
     @Override
     public void mouseEntered(MouseEvent e) {
-        if (active && key != getKey(e))
+        if (key != getKey(e))
             key = null; // ignore mouse drags
     }
     
@@ -81,7 +82,8 @@ class NotesWritingMouseListener extends MouseKeyAdapter
             return; // some wrong state
 
         final String noteString = writeNoteToTextarea(noteLength);
-        notesPiano.playSingleNote(noteString);
+        if (noteString != null)
+            notesPianoPlayer.playSingleNote(noteString);
     }
     
     /**
@@ -89,7 +91,7 @@ class NotesWritingMouseListener extends MouseKeyAdapter
      * is to do it on both mouse-press and mouse-release events.
      */
     private boolean showPopupMenu(MouseEvent e) {
-        final boolean isPopupEvent = e.isPopupTrigger();
+        final boolean isPopupEvent = (active && e.isPopupTrigger());
         if (isPopupEvent)
             popup.show(getKey(e), e.getX(), e.getY());
         return isPopupEvent;
@@ -100,14 +102,18 @@ class NotesWritingMouseListener extends MouseKeyAdapter
         final double SHRINK_FACTOR = 0.8; // this makes it easier to achieve 1/16 notes
         final long durationMillis = Math.round(SHRINK_FACTOR * (double) (endMillis - startMillis));
         // calculate noteLengthDivisor from durationMillis
-        final String noteLength = notesPiano.noteLengthForMillis((int) durationMillis);
+        final String noteLength = notesPianoPlayer.noteLengthForMillis((int) durationMillis);
         
         writeNoteToTextarea(noteLength);
     }
 
-    private String writeNoteToTextarea(String noteLength) {
+    /** Writes clicked key plus selected or measured note-length to notesPianoPlayer when active, else returns null. */
+    protected String writeNoteToTextarea(String noteLength) {
+        if (active == false)
+            return null;
+        
         final String noteWithLength = key.ipnName + Note.DURATION_SEPARATOR + noteLength;
-        notesPiano.writeSingleNote(notesPiano.view(), noteWithLength);
+        notesPianoPlayer.writeSingleNote(notesPianoPlayer.view(), noteWithLength);
         return noteWithLength;
     }
 

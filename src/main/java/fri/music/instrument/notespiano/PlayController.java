@@ -3,7 +3,7 @@ package fri.music.instrument.notespiano;
 /**
  * Manages the player for full NotesTextPanel.
  */
-class PlayController extends PlayControllerBase
+public class PlayController extends PlayControllerBase
 {
     private NotesTextPanel view;
     

@@ -116,6 +116,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
     }
     
     
+    /** When two notes are played together (interval), this listener displays their difference-tone red-bordered. */
     protected static class DifferenceToneMouseHandler extends MouseHandler
     {
         private final WaveSoundChannel soundChannel;
@@ -154,7 +155,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
                 final Keyboard.Key differenceToneKey = DifferenceToneUtil.getDifferenceToneKey(
                         soundChannel.getTones(), 
                         getPiano().getDeviation(),
-                        piano,
+                        getPiano(),
                         twoPlayingKeys[0].midiNoteNumber,
                         twoPlayingKeys[1].midiNoteNumber);
                 

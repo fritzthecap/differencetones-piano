@@ -48,6 +48,10 @@ public class Note extends Tone
         return (int) Math.round(1000.0 * 60.0 / (double) beatsPerMinute);
     }
     
+    public static String toString(String ipnName, String lengthNotation) {
+        return ipnName + DURATION_SEPARATOR + lengthNotation;
+    }
+    
     /** Default loudness, 0-127. */
     public static final int DEFAULT_VOLUME = 7;
     /** Default tempo is 120 BPM. */
@@ -183,6 +187,6 @@ public class Note extends Tone
     
     @Override
     public String toString() {
-        return ipnName + DURATION_SEPARATOR + lengthNotation;
+        return toString(ipnName, lengthNotation);
     }
 }

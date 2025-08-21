@@ -112,14 +112,16 @@ and its duration behind a slash, for example:
 <ul>
 <li>"A4/8" for a eighth note on A4 (4th octave) with pitch 440 Hz</li>
 <li>"C#4/2." for a dotted C#4 half note (spans three quarter notes)</li>
+<li>"-/4" for a quarter rest note</li>
 <li>"E5/16~3" for a E5 triplet sixteenth note 
-    (each of the triplets must have the "~3" postfix!)
-    A quarter note triplet must start with a quarter note 
+    (each of the triplets must have the "~3" tilde-postfix!);
+    a quarter note triplet MUST start with a quarter note 
     (that may be tied to a subsequent one),
-    but it MUST NOT start with an eighth note or a half note,
-    same applies to eighth or half note triplets.</li>
-<li>"(G5/1 (G5/1) G5/1)" for a G5 whole note that spans three 4/4 bars</li>
-<li>"-/4" for a quarter rest note.</li>
+    but it MUST NOT start with an eighth note or a half note, 
+    else it will be regarded as eighth or half triplet</li>
+<li>"[C4/4 E4 G4]" for a C-major chord, only the first note needs to have a length</li>
+<li>"(G5/1 G5/1 G5/1)" for a G5 whole note that spans three 4/4 bars</li>
+<li>"{A5/4 B5/4 C5/4}" for slurred notes</li>
 </ul>
 <p>
 No space must appear between a note and its duration specification,
@@ -130,10 +132,12 @@ In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
 and there is no German "H", such is written as "B".
 But you can use both lower or upper case letters in IPN-names.
 </p><p>
-The time signature can appear on top of the notes, or everywhere in-between,
-written as "4/4" or "3/4" or similar.
-The tempo can appear as simple BPM number (beats per minute)
+The <b>tempo</b> can appear as simple BPM-number (beats per minute)
 on top of the notes only, it can not change in-between.
+It always refers to a quarter note.
+</p><p>
+The <b>time signature</b> can appear on top of the notes, or everywhere in-between,
+written as "4/4" or "3/4" or similar.
 </p><p>
 Do not care about bars, the player will automatically calculate bar bounds
 using the given time signature(s).

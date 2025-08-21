@@ -73,6 +73,20 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     
     /**
      * Mind that this is possibly called from the player thread, so don't do Swing actions here!
+     * Enables to catch a note when starting or stopping it.
+     * @param soundChannel the pianoKeyConnector.
+     * @param note the note to start or stop.
+     * @param noteOn when true, start, else stop note.
+     */
+    protected void playOrStopNote(SoundChannel soundChannel, Note note, boolean noteOn) {
+        if (noteOn)
+            soundChannel.noteOn(note.midiNumber, note.volume);
+        else
+            soundChannel.noteOff(note.midiNumber);
+    }
+    
+    /**
+     * Mind that this is possibly called from the player thread, so don't do Swing actions here!
      * Called before and after this controller actually plays or stops a note.
      * When a note goes on, this is called twice, once before turning on the sound,
      * once after the sound was turned on (but is not yet off).
@@ -221,7 +235,13 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         view.formatBars.setEnabled(false);
         
         // following assignment is synchronized because called from startOrStop()
-        this.player = new Player(pianoKeyConnector());
+        this.player = new Player(pianoKeyConnector()) {
+            /** Overridden to let catch the played note. */
+            @Override
+            protected void noteOnOrOff(SoundChannel soundChannel, Note note, boolean on) {
+                playOrStopNote(soundChannel, note, on);
+            }
+        };
 
         // to allow "Stop" while playing, all playing happens in a background thread
         final Thread playerThread = new Thread(() -> playNotes(sounds, reverse));
@@ -321,29 +341,32 @@ public class PlayControllerBase implements PlayControlButtons.Listener
 
             // search for a non-rest note, but avoid endless loop when having only rests
             final int startIndex = (currentSoundIndex <= 0) ? (sounds.length - 1) : currentSoundIndex;
-            do { 
+            do {
                 skipCurrentSoundIndex(forward);
             }
-            while (startIndex != currentSoundIndex && sounds[currentSoundIndex][0].isRest());
+            while (startIndex != currentSoundIndex && 
+                    sounds[currentSoundIndex][0].isRest() || sounds[currentSoundIndex][0].durationMilliseconds <= 0);
             
-            if (sounds[currentSoundIndex][0].isRest() == false) {
+            final Note firstNote = sounds[currentSoundIndex][0];
+            if (firstNote.isRest() == false) {
                 enableUiOnPlaying(false);
-
-                for (Note note : sounds[currentSoundIndex])
-                    pianoKeyConnector().noteOn(note.midiNumber, note.volume);
+                
+                for (Note note : sounds[currentSoundIndex]) // starts playing all notes
+                    playOrStopNote(pianoKeyConnector(), note, true);
             }
         }
         else { // button released
             if (sounds != null && sounds.length > 0 && 
                     currentSoundIndex >= 0 && sounds[currentSoundIndex][0].isRest() == false)
             {
-                for (Note note : sounds[currentSoundIndex])
-                    pianoKeyConnector().noteOff(note.midiNumber);
+                for (Note note : sounds[currentSoundIndex]) // stops playing all notes
+                    playOrStopNote(pianoKeyConnector(), note, false);
                 
                 enableUiOnPlaying(true);
             }
         }
     }
+
 
     private void enableUiOnPlaying(boolean isStop) {
         onEnableUiOnPlaying(isStop);
@@ -366,7 +389,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
             }
         }
     }
-    
+
     private SoundChannel pianoKeyConnector() {
         if (pianoKeyConnector == null)
             pianoKeyConnector = new PianoKeyConnector(notesPianoPlayer.piano) {
