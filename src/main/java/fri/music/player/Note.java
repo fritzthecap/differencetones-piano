@@ -63,7 +63,7 @@ public class Note extends Tone
     public static final int TEMPO_MAXIMUM_BPM = 208;
     /** Notes can be 1/1, 1/2, 1/4, 1/. 1/16, 1/32, 1/64, not smaller. */
     public static final int SHORTEST_NOTELENGTH_DIVISOR = 64;
-    /** The minimal duration of a 64th note in fastest tempo. */
+    /** The minimal duration of a 64th note in fastest tempo 208 is about 4.5 milliseconds. */
     public static final int MINIMAL_DURATION = beatDurationMillis(TEMPO_MAXIMUM_BPM) / SHORTEST_NOTELENGTH_DIVISOR;
     
     /** The symbol that separates the IPN note name from its length (duration): "A4/4". */
