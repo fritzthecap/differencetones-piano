@@ -73,7 +73,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     
     /**
      * Mind that this is possibly called from the player thread, so don't do Swing actions here!
-     * Enables to catch a note when starting or stopping it.
+     * Enables, by override, to catch a note when starting or stopping it.
      * @param soundChannel the pianoKeyConnector.
      * @param note the note to start or stop.
      * @param noteOn when true, start, else stop note.

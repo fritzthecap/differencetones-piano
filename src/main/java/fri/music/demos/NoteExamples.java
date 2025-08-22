@@ -6,6 +6,14 @@ public interface NoteExamples
 C4/4 D4/4 E4/4 F4/4 G4/4 A4/4 B4/4 C5/4
 """;
             
+    String A_MINOR_SCALE = """
+A4/4 B4/4 C5/4 D5/4 E5/4 F5/4 G5/4 A5/4
+""";
+            
+    String CHROMATIC_SCALE = """
+C4/4 C#4/4 D4/4 D#4/4 E4/4 F4/4 F#4/4 G4/4 G#4/4 A4/4 A#4/4 B4/4 C5/4
+""";
+            
     String CHORDS = """
 [ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ] 
 [ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ]

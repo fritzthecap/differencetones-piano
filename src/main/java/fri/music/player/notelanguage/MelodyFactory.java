@@ -515,7 +515,7 @@ public class MelodyFactory
         // increment barState when not in chord
         barState.add((firstChordNote == null) ? duration : 0);
         if (barState.isBarExceed() != 0)
-            throw new IllegalArgumentException("Note "+melodyToken+" too long for "+currentTimeSignature+" bar, please break and tie it.");
+            throw new IllegalArgumentException("Note "+melodyToken+" too long for "+currentTimeSignature+" bar, please split and tie it.");
         
         final Note.BeatInfo beatInfo;
         if (beatInfoRequired)

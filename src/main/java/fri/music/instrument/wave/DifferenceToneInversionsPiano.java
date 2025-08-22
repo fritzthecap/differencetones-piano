@@ -105,6 +105,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         this.intervalSelectionListener = intervalSelectionListener;
     }
     
+    
     /** Overridden to listen to tuning changes. */
     @Override
     protected TuningComponent newTuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
@@ -134,6 +135,70 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return deviationComponent;
     }
     
+    /** Overridden to return a DifferenceToneInversionsMouseHandler. */
+    @Override
+    protected MouseHandler newMouseHandler() {
+        return new DifferenceToneInversionsMouseHandler(this, getWaveSoundChannel());
+    }
+    
+    // list frame callbacks
+    
+    /** Called when user clicks a piano key, opens an interval list for the key when not already existing. */
+    void addIntervalListFrame(String ipnNoteName, int midiNoteNumber) {
+        // avoid duplicate frames
+        for (IntervalListFrame frame : getIntervalListFrames()) {
+            if (frame.ipnNoteName.equals(ipnNoteName)) {
+                setFrameSelected(frame);
+                return;
+            }
+        }
+        
+        // not found, add new one when intervals exist for it
+        final List<DifferenceToneInversions.TonePair> intervals = 
+                getDifferenceToneInversions().getIntervalsGenerating(ipnNoteName);
+        
+        final IntervalListFrame newFrame = new IntervalListFrame(ipnNoteName, midiNoteNumber, intervals);
+        newFrame.frameCloseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addOrRemoveIntervalListFrame(newFrame, false);
+            }
+        });
+        addOrRemoveIntervalListFrame(newFrame, true);
+    }
+    
+    /**
+     * Called when clicking into an interval-frame title bar.
+     * No other than given frame should show selection.
+     * Also scrolls the frame to visible.
+     */
+    void setFrameSelected(IntervalListFrame intervalListFrame) {
+        for (IntervalListFrame frame : getIntervalListFrames()) {
+            final boolean isThis = (frame == intervalListFrame); // true just once
+            frame.setTitleBarSelected(isThis);
+            if (isThis)
+                frame.scrollToVisible();
+        }
+    }
+
+    /** Called by interval-list frame when an interval is clicked. */
+    void intervalSelected(IntervalListFrame activeFrame, Point point, DifferenceToneInversions.TonePair pair, boolean mouseDown) {
+        setFrameSelected(activeFrame);
+        
+        playNotesWithoutOpeningIntervalFrames(
+                new int[] { pair.lowerTone().midiNumber, pair.upperTone().midiNumber },
+                mouseDown);
+        
+        if (mouseDown && intervalSelectionListener != null)
+            intervalSelectionListener.intervalSelected(activeFrame, point, activeFrame.ipnNoteName, pair);
+    }
+
+    /** Called by interval-list frame when the title-bar of an interval is clicked. */
+    void listTitleSelected(int midiNoteNumber, boolean mouseDown) {
+        playNotesWithoutOpeningIntervalFrames(
+                new int[] { midiNoteNumber },
+                mouseDown);
+    }
 
     // UI builder methods
     
@@ -197,30 +262,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return intervalListsContainer;
     }
     
-
-    /** Called when user clicks a piano key. */
-    protected void addIntervalListFrame(String ipnNoteName, int midiNoteNumber) {
-        // avoid duplicate frames
-        for (IntervalListFrame frame : getIntervalListFrames()) {
-            if (frame.ipnNoteName.equals(ipnNoteName)) {
-                setFrameSelected(frame);
-                return;
-            }
-        }
-        
-        // not found, add new one when intervals exist for it
-        final List<DifferenceToneInversions.TonePair> intervals = 
-                getDifferenceToneInversions().getIntervalsGenerating(ipnNoteName);
-        
-        final IntervalListFrame newFrame = new IntervalListFrame(ipnNoteName, midiNoteNumber, intervals);
-        newFrame.frameCloseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addOrRemoveIntervalListFrame(newFrame, false);
-            }
-        });
-        addOrRemoveIntervalListFrame(newFrame, true);
-    }
+    // callback helpers
     
     private DifferenceToneInversions getDifferenceToneInversions() {
         if (differenceToneInversions == null) { // will be set to null on any parameter change
@@ -305,40 +347,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             key.setIgnoreMouse(ignore == true);
     }
     
-    
-    /**
-     * Called when clicking into an interval-frame title bar.
-     * No other than given frame should show selection.
-     * Scrolls the frame to visible.
-     */
-    void setFrameSelected(IntervalListFrame intervalListFrame) {
-        for (IntervalListFrame frame : getIntervalListFrames()) {
-            final boolean isThis = (frame == intervalListFrame); // true just once
-            frame.setTitleBarSelected(isThis);
-            if (isThis)
-                frame.scrollToVisible();
-        }
-    }
-
-    /** Called by interval-list frame when an interval is clicked. */
-    void intervalSelected(IntervalListFrame activeFrame, Point point, DifferenceToneInversions.TonePair pair, boolean mouseDown) {
-        setFrameSelected(activeFrame);
-        
-        playNotesWithoutOpeningIntervalFrames(
-                new int[] { pair.lowerTone().midiNumber, pair.upperTone().midiNumber },
-                mouseDown);
-        
-        if (mouseDown && intervalSelectionListener != null)
-            intervalSelectionListener.intervalSelected(activeFrame, point, activeFrame.ipnNoteName, pair);
-    }
-
-    /** Called by interval-list frame when the title-bar of an interval is clicked. */
-    void listTitleSelected(int midiNoteNumber, boolean mouseDown) {
-        playNotesWithoutOpeningIntervalFrames(
-                new int[] { midiNoteNumber },
-                mouseDown);
-    }
-
     private void playNotesWithoutOpeningIntervalFrames(int[] midiNoteNumbers, boolean mouseDown) {
         if (mouseDown == true) // start tone
             ignoreMouseEvents(true);
@@ -355,14 +363,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     
-    /** Overridden to return a DifferenceToneMouseHandler. */
-    @Override
-    protected MouseHandler newMouseHandler() {
-        return new DifferenceToneInversionsMouseHandler(this, getWaveSoundChannel());
-    }
-    
-    
-    /** Creates an interval-frame showing possible intervals for a clicked piano-key. */
+    /** Creates an interval-frame showing possible intervals for every clicked piano-key. */
     public static class DifferenceToneInversionsMouseHandler extends DifferenceToneMouseHandler
     {
         private boolean active = true;
