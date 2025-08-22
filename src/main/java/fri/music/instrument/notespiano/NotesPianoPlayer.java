@@ -209,18 +209,18 @@ public class NotesPianoPlayer
         if (view.isPermanentNotesCheck() == true) {
             try {
                 final Note[][] notes = playController.readNotesFromTextArea(true);
-                enableUiOnReadNotes(null);
+                enableUiOnReadNotes(null, view);
                 return notes;
             }
             catch (Exception e) {
-                enableUiOnReadNotes(e);
+                enableUiOnReadNotes(e, view);
             }
         }
         return null;
     }
     
     /** Called when notes text or sound parameters change. */
-    protected void enableUiOnReadNotes(Exception e) {
+    protected void enableUiOnReadNotes(Exception e, NotesTextPanelBase view) {
         if (e == null) {
             view.error.setText(""); // no exception was thrown, so clear errors
         }
