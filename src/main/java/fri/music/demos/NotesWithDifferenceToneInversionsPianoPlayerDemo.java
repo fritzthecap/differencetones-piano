@@ -25,7 +25,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayerDemo
         final NotesWithDifferenceToneInversionsPianoPlayer player = 
                 new NotesWithDifferenceToneInversionsPianoPlayer(
                         new DifferenceToneInversionsPiano(config, soundChannel));
-        final JComponent playerPanel = player.getPlayer(NoteExamples.WHEN_THE_SAINTS_GO_MARCHING);
+        //final JComponent playerPanel = player.getPlayer(NoteExamples.WHEN_THE_SAINTS_GO_MARCHING);
+        final JComponent playerPanel = player.getPlayer(null);
         
         frame.addWindowListener(player.getWindowClosingListener());
         frame.add(playerPanel);

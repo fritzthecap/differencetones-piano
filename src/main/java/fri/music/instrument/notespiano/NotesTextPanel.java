@@ -27,7 +27,7 @@ public class NotesTextPanel extends NotesTextPanelBase
     public final JCheckBox writeToNotesCheckbox;
     
     NotesTextPanel(PlayController playController, boolean pianoIsVertical) {
-        super(playController, pianoIsVertical);
+        super(playController, pianoIsVertical, true);
         
         // START build public fields
         final String[] timeSignatures = new String[] {
@@ -59,7 +59,7 @@ public class NotesTextPanel extends NotesTextPanelBase
                         null);
             }
         });
-        textAreaButtonsPanel.add(help, 0);
+        textAreaButtonsPanel.add(help, 0); // "Help" button on the very left
     }
     
     private void buildNotesControlPanel(boolean pianoIsVertical) {

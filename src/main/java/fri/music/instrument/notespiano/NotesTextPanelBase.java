@@ -31,7 +31,7 @@ public class NotesTextPanelBase extends JPanel
     
     private boolean permanentNotesCheck = true;
     
-    public NotesTextPanelBase(PlayControllerBase playController, boolean pianoIsVertical) {
+    public NotesTextPanelBase(PlayControllerBase playController, boolean pianoIsVertical, boolean addControlPanelToWest) {
         super(new BorderLayout());
         
         // START build public fields
@@ -47,10 +47,10 @@ public class NotesTextPanelBase extends JPanel
         this.notesControlPanel = buildNotesControlPanel(pianoIsVertical);
         // END build public fields
         
-        final JComponent notesTextAndErrors = buildNotesTextArea();
+        final JComponent notesTextAndErrors = buildNotesTextArea(addControlPanelToWest);
         
         add(notesTextAndErrors, BorderLayout.CENTER);
-        add(notesControlPanel, pianoIsVertical ? BorderLayout.NORTH : BorderLayout.WEST);
+        add(notesControlPanel, pianoIsVertical ? BorderLayout.NORTH : addControlPanelToWest ? BorderLayout.WEST : BorderLayout.EAST);
     }
     
     public boolean isPermanentNotesCheck() {
@@ -60,7 +60,7 @@ public class NotesTextPanelBase extends JPanel
         this.permanentNotesCheck = active;
     }
     
-    private JComponent buildNotesTextArea() {
+    private JComponent buildNotesTextArea(boolean addControlPanelToWest) {
         notesText.addMouseListener(new TextAreaActions(notesText));
         notesText.setToolTipText("Write Notes to be Played on Piano, Context Actions via Right Mouse Click");
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
@@ -87,7 +87,7 @@ public class NotesTextPanelBase extends JPanel
         textAreaButtonsPanel.add(abcExport);
         
         final JPanel errorsAndHelpPanel = new JPanel(new BorderLayout());
-        errorsAndHelpPanel.add(textAreaButtonsPanel, BorderLayout.WEST);
+        errorsAndHelpPanel.add(textAreaButtonsPanel, addControlPanelToWest ? BorderLayout.WEST : BorderLayout.EAST);
         errorsAndHelpPanel.add(error, BorderLayout.CENTER);
         
         final JPanel textAreaAndError = new JPanel(new BorderLayout());

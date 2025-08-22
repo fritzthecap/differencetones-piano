@@ -12,6 +12,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import fri.music.SoundChannel;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
@@ -27,9 +28,10 @@ import fri.music.player.notelanguage.NoteConnections;
 
 public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlayer
 {
-    private PlayControllerBase playController;
+    private PlayControllerBase intervalPlayController;
     private NotesTextPanelBase intervalNotes;
     private JButton autoCompose;
+    private JCheckBox writeToIntervalsCheckbox;
     
     public NotesWithDifferenceToneInversionsPianoPlayer(DifferenceToneInversionsPiano piano) {
         super(piano);
@@ -50,16 +52,27 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     }
     
     @Override
-    protected void enableUiOnReadNotes(Exception e) {
-        super.enableUiOnReadNotes(e);
+    protected void enableUiOnReadNotes(Exception e, NotesTextPanelBase view) {
+        super.enableUiOnReadNotes(e, view);
         
-        autoCompose.setEnabled(e == null && view().notesText.getDocument().getLength() > 0);
+        autoCompose.setEnabled(
+                e == null && 
+                view().notesText.getDocument().getLength() > 0 &&
+                intervalNotes.notesText.getDocument().getLength() <= 0);
     }
     
     
     private NotesTextPanelBase buildIntervalNotesView() {
-        this.playController = new PlayControllerBase(this) {
-            /** Avoid opening interval frames when playing intervals. */
+        this.intervalPlayController = new PlayControllerBase(this) {
+            private Note firstIntervalNote;
+            
+            @Override
+            protected void onEnableUiOnPlaying(boolean isStop) {
+                super.onEnableUiOnPlaying(isStop);
+                writeToIntervalsCheckbox.setEnabled(isStop);
+            }
+            
+            /** Avoid opening interval list frames for every interval tone when playing intervals. */
             @Override
             protected void aroundPlayEvent(boolean before, boolean isNoteOn) { // no Swing calls allowed here!
                 if (before && isNoteOn) // before turning on
@@ -67,12 +80,31 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 else if (before == false && isNoteOn == false) // after turning off
                     getIntervalFrameOpeningMouseHandler().setActive(true); // re-activate frame opener
             }
+            
+            /** Select interval list item in frame when having two notes. */
+            @Override
+            protected void playOrStopNote(SoundChannel soundChannel, Note note, boolean noteOn) {
+                super.playOrStopNote(soundChannel, note, noteOn);
+                if (noteOn) // wait for two notes
+                    if (firstIntervalNote == null)
+                        firstIntervalNote = note;
+                    else
+                        selectListFrameLine(note);
+            }
+
+            private void selectListFrameLine(Note note2) {
+                getDifferenceToneInversionsPiano().setFrameAndIntervalSelected(firstIntervalNote, note2);
+                firstIntervalNote = null; // reset for next tuple
+            }
         };
         
-        final NotesTextPanelBase intervalNotes = new NotesTextPanelBase(playController, piano.config.isVertical);
-        playController.setViewBase(intervalNotes);
+        final NotesTextPanelBase intervalNotes = new NotesTextPanelBase(
+                intervalPlayController, 
+                piano.config.isVertical, 
+                false); // add controls to EAST
+        intervalPlayController.setViewBase(intervalNotes); // connect controller to view
         
-        buildNotesPanel(playController, intervalNotes);
+        buildNotesPanel(intervalPlayController, intervalNotes);
         
         this.autoCompose = new JButton("Auto-Compose");
         autoCompose.setToolTipText("Automatically Find Difference-Tone Intervals for Notes and Write Them into Textarea");
@@ -85,7 +117,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         autoCompose.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         intervalNotes.notesControlPanel.add(autoCompose);
 
-        final JCheckBox writeToIntervalsCheckbox = new JCheckBox("Write Intervals", true);
+        this.writeToIntervalsCheckbox = new JCheckBox("Write Intervals", true);
         writeToIntervalsCheckbox.setToolTipText("Write Intervals from Listselection to Textarea");
         intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
         writeToIntervalsCheckbox.setAlignmentX(JComponent.CENTER_ALIGNMENT);
@@ -96,7 +128,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             new DifferenceToneInversionsPiano.IntervalSelectionListener() {
                 @Override
                 public void intervalSelected(JComponent list, Point point, String ipnNoteName, DifferenceToneInversions.TonePair interval) {
-                    if (writeToIntervalsCheckbox.isSelected())
+                    if (writeToIntervalsCheckbox.isSelected() && writeToIntervalsCheckbox.isEnabled())
                         writeIntervalForMelody(list, point, ipnNoteName, interval);
                 }
             }
@@ -154,6 +186,9 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         final String upper = interval.upperTone().ipnName;
         final String lower = interval.lowerTone().ipnName;
         final String[] lengthNotations = getLengthNotation(list, point, ipnNoteName);
+        if (lengthNotations == null)
+            return; // ipnNoteName not found in melody
+        
         final boolean putInTie = (lengthNotations.length > 1);
         if (putInTie)
             intervalNotes.setPermanentNotesCheck(false);
@@ -186,40 +221,41 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             final MelodyFactory melodyFactory = newMelodyFactory();
             final Note[][] melodyNotes = melodyFactory.translate(melodyText);
             
-            final int occurrencePosition;
-            final String intervalsText = intervalNotes.notesText.getText();
+            final int occurrencePosition; // find the start index to search for ipnNoteName in melody
+            final String intervalsText = intervalNotes.notesText.getText(); // by checking how many intervals were written
             if (intervalsText.isEmpty()) {
-                occurrencePosition = 0;
+                occurrencePosition = 0; // no intervals were written yet
             }
-            else {
+            else { // get the last index of intervals
                 final Note[][] intervals = melodyFactory.translate(intervalsText);
                 occurrencePosition = intervals.length;
             }
             
             boolean inTie = false;
             final List<String> lengthList = new ArrayList<>();
+            // search for ipnNoteName in melodyNotes starting from occurrencePosition
             for (int i = occurrencePosition; i < melodyNotes.length; i++) {
                 final Note[] chord = melodyNotes[i];
                 final Note note = chord[0]; // there is just one note
-                if (note.isRest()) {
+                if (note.isRest()) { // jump over any rest, but copy it to intervals
                     writeSingleNote(intervalNotes, note.toString());
                 }
-                else {
-                    if (Boolean.TRUE.equals(note.connectionFlags.tied()))
+                else { // not a rest
+                    if (Boolean.TRUE.equals(note.connectionFlags.tied())) // a tie starts with TRUE
                         inTie = true;
                     
-                    if (note.ipnName.equals(ipnNoteName))
-                        lengthList.add(note.lengthNotation);
+                    if (note.ipnName.equals(ipnNoteName)) // collect any note within a tie
+                        lengthList.add(note.lengthNotation); // within a tie, the note remains the same
                     
-                    if (Boolean.FALSE.equals(note.connectionFlags.tied()))
+                    if (Boolean.FALSE.equals(note.connectionFlags.tied())) // a tie ends with FALSE
                         inTie = false;
                     
-                    if (inTie == false)
+                    if (inTie == false) // tie ended, or was not a tie
                         return lengthList.toArray(new String[lengthList.size()]);
                 }
             }
         }
-        return new String[] { MelodyFactory.DEFAULT_NOTE_LENGTH };
+        return null;
     }
     
     private DifferenceToneInversionsPiano getDifferenceToneInversionsPiano() {

@@ -27,14 +27,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
-import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.instrument.PianoWithSound;
+import fri.music.player.Note;
 import fri.music.swingutils.SizeUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
@@ -103,6 +104,18 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     /** Listen to interval selection in any list frame. */
     public void setIntervalSelectionListener(IntervalSelectionListener intervalSelectionListener) {
         this.intervalSelectionListener = intervalSelectionListener;
+    }
+    
+    /** Player wants to select a list line while playing. */
+    public void setFrameAndIntervalSelected(Note note1, Note note2) {
+        for (IntervalListFrame frame : getIntervalListFrames()) {
+            final DifferenceToneInversions.TonePair tonePair = frame.containsInterval(note1, note2);
+            if (tonePair != null) {
+                setFrameSelected(frame);
+                frame.selectItem(tonePair);
+                return;
+            }
+        }
     }
     
     
@@ -294,7 +307,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             }
             
             intervalListsPanel.add(frame, targetIndex);
-            SwingUtilities.invokeLater(() -> setFrameSelected(frame));
+            setFrameSelected(frame);
         }
         else {
             intervalListsPanel.remove(frame);
@@ -487,7 +500,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             SizeUtil.forceSize(this, new Dimension(190, INTERVAL_FRAME_HEIGHT));
         }
         
-        
         // methods called by outer class
         
         void scrollToVisible() {
@@ -517,6 +529,23 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             frameTitleBar.paintImmediately(frameTitleBar.getVisibleRect());
         }
         
+        DifferenceToneInversions.TonePair containsInterval(Note note1, Note note2) {
+            final ListModel<DifferenceToneInversions.TonePair> model = intervalList.getModel();
+            for (int i = 0; i < model.getSize(); i++) {
+                final DifferenceToneInversions.TonePair tonePair = model.getElementAt(i);
+                if ((tonePair.lowerTone().midiNumber == note1.midiNumber && 
+                            tonePair.upperTone().midiNumber == note2.midiNumber) ||
+                        (tonePair.lowerTone().midiNumber == note2.midiNumber && 
+                            tonePair.upperTone().midiNumber == note1.midiNumber))
+                    return tonePair;
+            }
+            return null;
+        }
+
+        void selectItem(DifferenceToneInversions.TonePair tonePair) {
+            intervalList.setSelectedValue(tonePair, true);
+        }
+
 
         private static class IntervalListCellRenderer implements ListCellRenderer<DifferenceToneInversions.TonePair>
         {
@@ -547,7 +576,13 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             }
             
             @Override
-            public Component getListCellRendererComponent(JList<? extends TonePair> list, TonePair tonePair, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(
+                    JList<? extends DifferenceToneInversions.TonePair> list, 
+                    DifferenceToneInversions.TonePair tonePair, 
+                    int index, 
+                    boolean isSelected, 
+                    boolean cellHasFocus)
+            {
                 intervalName.setText(tonePair.intervalName());
                 lowerNoteName.setText(tonePair.lowerTone() != null ? tonePair.lowerTone().ipnName : "");
                 upperNoteName.setText(tonePair.upperTone() != null ? tonePair.upperTone().ipnName : "");
