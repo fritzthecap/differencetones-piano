@@ -1,7 +1,10 @@
 
-- NotesPianoPlayer bug: Format button does not auto-break too long notes
-    across bar end.
-
+- When piano tuning parameters change, the composed intervals
+    must be calculated newly, but only when they were auto-composed.
+    
+- MelodyFactory should have a switch to disallow chords.
+    When disallowed, chords would be reported as error.
+    
 - Notes of intervals clicked in DifferenceToneInversionsPiano
     should be written into a second text-area,
     see (unfinished) NotesWithDifferenceToneInversionsPianoPlayerDemo.
@@ -63,9 +66,14 @@ Fixed Bugs:
         Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: 
         The midiNoteNumber 197 could not be found in Tones, 10 octaves, range C0(12) - C10(132)
         
-        Fixed by restricting the octave sliders to mutual maximum values.
+        DONE: by restricting the octave sliders to mutual maximum values.
 
     - Big problem: where does a triplet end?
         Every note of the triplet has a length and the triplet tag,
         but when there are two triplet groups in succession, where does the first triplet group end?
     
+    - NotesPianoPlayer bug: Format button does not auto-break too long notes
+        across bar end.
+        
+        DONE: exception is thrown in this case by MelodyFactory.
+
