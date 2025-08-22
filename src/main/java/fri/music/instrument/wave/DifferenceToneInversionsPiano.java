@@ -233,11 +233,11 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         // set the panel to an initial height as long as there are no frames in it, else panel would collapse
         intervalListsPanel.add(Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4));
         
-        this.sortIntervalFrames = new JCheckBox("Sort Frames by Pitch", true);
-        sortIntervalFrames.setToolTipText("Insert New Interval-Frames Sorted by Pitch");
+        this.sortIntervalFrames = new JCheckBox("Sort Lists by Pitch", true);
+        sortIntervalFrames.setToolTipText("Insert New Interval-List Frames Sorted by Pitch");
         
-        this.closeAllIntervalFrames = new JButton("Close All Frames");
-        closeAllIntervalFrames.setToolTipText("Close All Open Interval-Frames");
+        this.closeAllIntervalFrames = new JButton("Close All Lists");
+        closeAllIntervalFrames.setToolTipText("Close All Open Interval-List Frames");
         closeAllIntervalFrames.setEnabled(false);
         closeAllIntervalFrames.addActionListener(new ActionListener() {
             @Override

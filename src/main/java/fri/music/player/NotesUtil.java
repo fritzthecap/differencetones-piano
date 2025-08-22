@@ -8,6 +8,7 @@ import java.util.Arrays;
 public class NotesUtil
 {
     /**
+     * Converts given notes to a single-voiced melody.
      * @param notesArray the 2-dimensional array to be converted to a 1-dimensional array.
      * @return a Note array created from given array.
      * @throws IllegalArgumentException when a chord is contained in given NotesArray. 

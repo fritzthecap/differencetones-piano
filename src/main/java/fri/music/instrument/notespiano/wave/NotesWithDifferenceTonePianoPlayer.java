@@ -88,8 +88,8 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
                         e.getMessage()+
                         " Tuning "+differenceTonePiano.getSelectedTuning()+
                         ", deviation "+Math.round(differenceTonePiano.getDeviation() * 2.0 * 100.0)+
-                        ", bounds "+getDifferenceTonePiano().narrowestAllowedInterval()+
-                        " to "+getDifferenceTonePiano().widestAllowedInterval());
+                        ", bounds "+differenceTonePiano.narrowestAllowedInterval()+
+                        " to "+differenceTonePiano.widestAllowedInterval());
                 return null;
             }
         }
