@@ -159,9 +159,9 @@ public class TextAreaActions extends MouseAdapter
     }
     
     private void setActionsEnabled(JTextComponent textComponent) {
-        final boolean selectedText = textComponent.getSelectionStart() != textComponent.getSelectionEnd();
-        cut.setEnabled(selectedText);
-        copy.setEnabled(selectedText);
+        final boolean textIsSelected = textComponent.getSelectionStart() != textComponent.getSelectionEnd();
+        cut.setEnabled(textIsSelected);
+        copy.setEnabled(textIsSelected);
         
         final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         try {
@@ -175,7 +175,9 @@ public class TextAreaActions extends MouseAdapter
         undo.setEnabled(undoManager.canUndo());
         redo.setEnabled(undoManager.canRedo());
         
-        clear.setEnabled(textComponent.getDocument().getLength() > 0);
+        final boolean textExists = (textComponent.getDocument().getLength() > 0);
+        clear.setEnabled(textExists);
+        selectAll.setEnabled(textExists == true && textIsSelected == false);
     }
 
 
