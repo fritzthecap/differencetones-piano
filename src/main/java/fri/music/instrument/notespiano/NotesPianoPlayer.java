@@ -206,6 +206,7 @@ public class NotesPianoPlayer
             }
             catch (Exception e) {
                 view.error.setText(e.getMessage());
+                view.error.setCaretPosition(0); // scroll back to start of possibly long message
                 view.playButtons.setEnabled(false);
                 view.formatBars.setEnabled(false);
                 

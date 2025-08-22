@@ -30,6 +30,8 @@ class BarState
         
         if (matches(currentMillis, barDurationMilliseconds))
             currentMillis = 0;
+        else if (currentMillis > barDurationMilliseconds)
+            currentMillis = barDurationMilliseconds - currentMillis; // negative when exceeding bar end
     }
     
     /** @return true when currently being on the first beat of the bar. */
@@ -41,6 +43,11 @@ class BarState
     public boolean isBarHalf() {
         return isBarHalvable && // can be reliably divided into 2 parts
                 matches(currentMillis, barDurationMillisecondsHalf);
+    }
+
+    /** @return the (positive) excess amount when currently the bar was exceeded, else zero. */
+    public int isBarExceed() {
+        return (currentMillis < 0) ? (-currentMillis) : 0;
     }
 
     private boolean matches(int currentMillis, int limit) {

@@ -461,6 +461,10 @@ public class MelodyFactory
         public Integer getMultipletType() {
             return multipletType;
         }
+        @Override
+        public String toString() {
+            return Note.toString(ipnName, length);
+        }
     }
     
     /** Time signature, e.g. 3/4 or 4/4, can change during tune. */
@@ -510,6 +514,8 @@ public class MelodyFactory
         
         // increment barState when not in chord
         barState.add((firstChordNote == null) ? duration : 0);
+        if (barState.isBarExceed() != 0)
+            throw new IllegalArgumentException("Note "+melodyToken+" too long for "+currentTimeSignature+" bar, please break and tie it.");
         
         final Note.BeatInfo beatInfo;
         if (beatInfoRequired)
@@ -530,7 +536,7 @@ public class MelodyFactory
                     melodyToken.length,
                     beatInfo);
         }
-        else {
+        else { // normal tone, not a rest
             final Tone tone = toneSystem.forIpnName(melodyToken.ipnName);
             if (tone == null)
                 throw new IllegalArgumentException("Unknown note name: "+melodyToken.ipnName);
