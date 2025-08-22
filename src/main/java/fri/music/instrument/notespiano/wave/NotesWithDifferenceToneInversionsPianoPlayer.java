@@ -1,24 +1,35 @@
 package fri.music.instrument.notespiano.wave;
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import fri.music.differencetones.DifferenceToneInversions;
+import fri.music.differencetones.composer.AbstractComposer;
+import fri.music.differencetones.composer.DefaultComposer;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.notespiano.NotesTextPanelBase;
 import fri.music.instrument.notespiano.PlayControllerBase;
+import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
 import fri.music.player.Note;
+import fri.music.player.NotesUtil;
 import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.player.notelanguage.NoteConnections;
 
 public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlayer
 {
+    private PlayControllerBase playController;
     private NotesTextPanelBase intervalNotes;
+    private JButton autoCompose;
     
     public NotesWithDifferenceToneInversionsPianoPlayer(DifferenceToneInversionsPiano piano) {
         super(piano);
@@ -38,8 +49,16 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         return centerPanel;
     }
     
+    @Override
+    protected void enableUiOnReadNotes(Exception e) {
+        super.enableUiOnReadNotes(e);
+        
+        autoCompose.setEnabled(e == null && view().notesText.getDocument().getLength() > 0);
+    }
+    
+    
     private NotesTextPanelBase buildIntervalNotesView() {
-        final PlayControllerBase playController = new PlayControllerBase(this) {
+        this.playController = new PlayControllerBase(this) {
             /** Avoid opening interval frames when playing intervals. */
             @Override
             protected void aroundPlayEvent(boolean before, boolean isNoteOn) { // no Swing calls allowed here!
@@ -55,12 +74,30 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         
         buildNotesPanel(playController, intervalNotes);
         
+        this.autoCompose = new JButton("Auto-Compose");
+        autoCompose.setToolTipText("Automatically Find Difference-Tone Intervals for Notes and Write Them into Textarea");
+        autoCompose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                autoCompose();
+            }
+        });
+        autoCompose.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        intervalNotes.notesControlPanel.add(autoCompose);
+
+        final JCheckBox writeToIntervalsCheckbox = new JCheckBox("Write Intervals", true);
+        writeToIntervalsCheckbox.setToolTipText("Write Intervals from Listselection to Textarea");
+        intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
+        writeToIntervalsCheckbox.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        intervalNotes.notesControlPanel.add(writeToIntervalsCheckbox);
+        
         // listen to interval-selection in list-frames for writing notes into intervals text-area
         getDifferenceToneInversionsPiano().setIntervalSelectionListener(
             new DifferenceToneInversionsPiano.IntervalSelectionListener() {
                 @Override
                 public void intervalSelected(JComponent list, Point point, String ipnNoteName, DifferenceToneInversions.TonePair interval) {
-                    writeIntervalForMelody(list, point, ipnNoteName, interval);
+                    if (writeToIntervalsCheckbox.isSelected())
+                        writeIntervalForMelody(list, point, ipnNoteName, interval);
                 }
             }
         );
@@ -70,10 +107,41 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         scrollPane.setBorder(BorderFactory.createTitledBorder("Difference-Tone Intervals"));
         
         // initialize empty state
-        intervalNotes.formatBars.setEnabled(false);
         intervalNotes.playButtons.setEnabled(false);
+        intervalNotes.formatBars.setEnabled(false);
+        autoCompose.setEnabled(false);
         
         return intervalNotes;
+    }
+
+    
+    private void autoCompose() {
+        final Note[][] notesArray = readNotesFromTextAreaCatchExceptions(getPlayController(), view());
+        if (notesArray != null) {
+            final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceToneInversionsPiano();
+            final AbstractComposer composer = new DefaultComposer(
+                    differenceTonePiano.getWaveSoundChannel().getTones(),
+                    differenceTonePiano.narrowestAllowedInterval(),
+                    differenceTonePiano.widestAllowedInterval(),
+                    differenceTonePiano.getDeviation());
+            try {
+                intervalNotes.error.setText("");
+                
+                final Note[][] composedIntervals = composer.compose(NotesUtil.toSingleNotesArray(notesArray));
+                
+                final MelodyFactory melodyFactory = newMelodyFactory();
+                final String formatted = melodyFactory.formatBarLines(composedIntervals, false, false);
+                intervalNotes.notesText.setText(formatted);
+            }
+            catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain difference-tones
+                intervalNotes.error.setText(
+                        e.getMessage()+
+                        " Tuning "+differenceTonePiano.getSelectedTuning()+
+                        ", deviation "+Math.round(differenceTonePiano.getDeviation() * 2.0 * 100.0)+
+                        ", bounds "+differenceTonePiano.narrowestAllowedInterval()+
+                        " to "+differenceTonePiano.widestAllowedInterval());
+            }
+        }
     }
 
 

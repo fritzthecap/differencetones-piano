@@ -128,6 +128,14 @@ public class NotesPianoPlayer
             }
         });
         
+        view.timeSignatureChoice.addActionListener(new ActionListener() {
+            /** Time-signature change should uncover bar excess errors. */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                readNotesFromTextAreaCatchExceptions(playController, view);
+            }
+        });
+        
         view.writeToNotesCheckbox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -201,22 +209,31 @@ public class NotesPianoPlayer
         if (view.isPermanentNotesCheck() == true) {
             try {
                 final Note[][] notes = playController.readNotesFromTextArea(true);
-                view.error.setText(""); // no exception was thrown, so clear errors
+                enableUiOnReadNotes(null);
                 return notes;
             }
             catch (Exception e) {
-                view.error.setText(e.getMessage());
-                view.error.setCaretPosition(0); // scroll back to start of possibly long message
-                view.playButtons.setEnabled(false);
-                view.formatBars.setEnabled(false);
-                
-                if (e instanceof IllegalArgumentException == false)
-                    e.printStackTrace();
+                enableUiOnReadNotes(e);
             }
         }
         return null;
     }
     
+    /** Called when notes text or sound parameters change. */
+    protected void enableUiOnReadNotes(Exception e) {
+        if (e == null) {
+            view.error.setText(""); // no exception was thrown, so clear errors
+        }
+        else {
+            view.error.setText(e.getMessage());
+            view.error.setCaretPosition(0); // scroll back to start of possibly long message
+            view.playButtons.setEnabled(false);
+            view.formatBars.setEnabled(false);
+            
+            if (e instanceof IllegalArgumentException == false)
+                e.printStackTrace();
+        }
+    }
     
     /** Method called by NotesWritingMouseListener. */
     String noteLengthForMillis(int durationMillis) {
