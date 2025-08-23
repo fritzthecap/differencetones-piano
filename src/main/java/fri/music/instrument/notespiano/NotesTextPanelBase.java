@@ -26,6 +26,7 @@ public class NotesTextPanelBase extends JPanel
     public final JTextArea notesText;
     public final JTextComponent error;
     public final JPanel notesControlPanel;
+    public final TextAreaActions textAreaActions;
     
     protected final JPanel textAreaButtonsPanel;
     
@@ -37,6 +38,7 @@ public class NotesTextPanelBase extends JPanel
         // START build public fields
         final int ROWS = 9, COLUMNS = 20;
         this.notesText = new JTextArea(ROWS, COLUMNS);
+        this.textAreaActions = new TextAreaActions(notesText);
         
         this.error = new JTextField();
         this.playButtons = new PlayControlButtons(playController);
@@ -61,7 +63,6 @@ public class NotesTextPanelBase extends JPanel
     }
     
     private JComponent buildNotesTextArea(boolean addControlPanelToWest) {
-        notesText.addMouseListener(new TextAreaActions(notesText));
         notesText.setToolTipText("Write Notes to be Played on Piano, Context Actions via Right Mouse Click");
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
         notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes"));
@@ -80,7 +81,7 @@ public class NotesTextPanelBase extends JPanel
                         "Export to ABC",
                         notesText, // parent
                         new AbcExportComponent(notesText.getText()),
-                        null);
+                        new Dimension(720, 530));
             }
         });
         

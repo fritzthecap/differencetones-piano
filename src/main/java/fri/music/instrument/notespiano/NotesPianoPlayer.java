@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
 import java.util.Objects;
 import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -60,6 +62,9 @@ public class NotesPianoPlayer
                 buildCenterPanel(), // allocates view
                 BorderLayout.CENTER); // to CENTER, so that user can resize text-area
         
+        view().textAreaActions.contextMenu.addSeparator();
+        view().textAreaActions.contextMenu.add(buildLoadMenuItems());
+
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
             view().notesText.setText(melody); // triggers check via DocumentListener
             view().notesText.setCaretPosition(melody.length());
@@ -256,6 +261,23 @@ public class NotesPianoPlayer
     void playSingleNote(String noteWithLength) {
         final Note[][] note = newMelodyFactory().translate(new String[] { noteWithLength });
         new Player(new PianoKeyConnector(piano)).playSimultaneously(note[0]);
+    }
+    
+    // UI builder methods
+    
+    private JMenu buildLoadMenuItems() {
+        final JMenu menu = new JMenu("Load");
+        for (final NoteExamples.Melody melody : NoteExamples.MELODIES) {
+            final JMenuItem item = new JMenuItem(melody.title());
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    view().notesText.setText(melody.notes());
+                }
+            });
+            menu.add(item);
+        }
+        return menu;
     }
     
     // callback and helper methods

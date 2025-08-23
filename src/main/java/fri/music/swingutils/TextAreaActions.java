@@ -13,7 +13,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.event.UndoableEditEvent;
@@ -35,6 +34,8 @@ import javax.swing.undo.UndoManager;
  */
 public class TextAreaActions extends MouseAdapter
 {
+    public final JPopupMenu contextMenu;
+    
     private final Action cut;
     private final Action copy;
     private final Action paste;
@@ -43,7 +44,6 @@ public class TextAreaActions extends MouseAdapter
     private final Action redo;
     private final Action selectAll;
     private final UndoManager undoManager;
-    private final JPopupMenu contextMenu;
     
     /**
      * Attaches standard actions to given text-component.
@@ -53,6 +53,8 @@ public class TextAreaActions extends MouseAdapter
      * @param textComponent the text-component to add actions to.
      */
     public TextAreaActions(JTextComponent textComponent) {
+        textComponent.addMouseListener(this);
+        
         final ActionMap actionMap = textComponent.getActionMap();
         
         this.cut = actionMap.get(DefaultEditorKit.cutAction);
@@ -178,18 +180,5 @@ public class TextAreaActions extends MouseAdapter
         final boolean textExists = (textComponent.getDocument().getLength() > 0);
         clear.setEnabled(textExists);
         selectAll.setEnabled(textExists == true && textIsSelected == false);
-    }
-
-
-    public static void main(String[] args) {
-        javax.swing.JFrame frame = new javax.swing.JFrame();
-        javax.swing.JTextArea textArea = new javax.swing.JTextArea();
-        textArea.setText("abc\ndef\nghi\njkl\nmno\npqr\nstu\nvwx\nyz");
-        textArea.addMouseListener(new TextAreaActions(textArea));
-        frame.getContentPane().add(new javax.swing.JScrollPane(textArea));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(new java.awt.Dimension(400, 300));
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
     }
 }
