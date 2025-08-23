@@ -1,0 +1,72 @@
+package fri.music.instrument.notespiano;
+
+public interface NoteExamples
+{
+    public record Melody(String title, String notes)
+    {
+    }
+    
+    Melody PENTATONIC = new Melody("Pentatonic", """
+C4/4 D4/4 E4/4 G4/4
+A4/4 C5/4 A4/4 G4/4
+E4/4 D4/4 C4/4 D4/4
+E4/2 -/2
+""");
+    
+    Melody C_MAJOR_SCALE = new Melody("C Major Scale", """
+C4/4 D4/4 E4/4 F4/4 G4/4 A4/4 B4/4 C5/4
+D5/4 C5/4 B4/4 A4/4 G4/4 F4/4 E4/4 D4/4
+C4/2 -/2
+""");
+    
+    Melody A_MINOR_HARMONIC = new Melody("A Minor Harmonic", """
+A4/4 B4/4 C5/4 D5/4 E5/4 F5/4 G5/4 A5/4
+B5/4 A5/4 G5/4 F5/4 E5/4 D5/4 C5/4 B4/4
+A4/2 -/2
+""");
+    
+    Melody A_MINOR_MELODIC = new Melody("A Minor Melodic", """
+A4/4 B4/4 C5/4 D5/4 E5/4 F5/4 G#5/4 A5/4
+B5/4 A5/4 G#5/4 F5/4 E5/4 D5/4 C5/4 B4/4
+A4/2 -/2
+""");
+    
+    Melody CHROMATIC_SCALE = new Melody("Chromatic Scale", """
+C4/8 C#4/8 D4/8 D#4/8 E4/8 F4/8 F#4/8 G4/8 
+G#4/8 A4/8 A#4/8 B4/8 C5/8 B4/8 A#4/8 A4/8
+G#4/8 G4/8 F#4/8 F4/8 E4/8 D#4/8 D4/8 C#4/8
+C4/2 -/2
+""");
+
+    Melody AUGUSTIN = new Melody("Augustin", """
+3/4
+G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
+D4/4 G3/4 G3/4 E4/4 C4/4 C4/4
+G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
+D4/4 G3/4 G3/4 C4/2.
+""");
+    
+    Melody WHEN_THE_SAINTS = new Melody("When the Saints", """
+144
+-/2 -/8 G4/8 B4/8 C5/8 
+(D5/2 D5/8) G4/8 B4/8 C5/8
+(D5/2 D5/8) G4/8 B4/8 C5/8
+D5/4 B4/4 G4/4 B4/4
+A4/2 -/8 B4/8 B4/8 A4/8 
+G4/4. G4/8
+B4/4  D5/8 D5/8
+D5/8 (C5/4. C5/8) C5/8 B4/8 C5/8
+D5/4 B4/4 G4/4 A4/4
+G4/1 
+""");
+
+    Melody[] MELODIES = new Melody[] {
+            PENTATONIC,
+            C_MAJOR_SCALE,
+            A_MINOR_HARMONIC,
+            A_MINOR_MELODIC,
+            CHROMATIC_SCALE,
+            AUGUSTIN,
+            WHEN_THE_SAINTS
+        };
+}
