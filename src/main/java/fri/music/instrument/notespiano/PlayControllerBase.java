@@ -32,7 +32,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         this.notesPianoPlayer = notesPianoPlayer;
     }
     
-    public void setViewBase(NotesTextPanelBase view) {
+    public void setBaseView(NotesTextPanelBase view) {
         this.view = view;
     }
     

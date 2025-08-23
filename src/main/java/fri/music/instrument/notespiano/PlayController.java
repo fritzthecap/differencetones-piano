@@ -12,7 +12,7 @@ public class PlayController extends PlayControllerBase
     }
     
     void setView(NotesTextPanel view) {
-        super.setViewBase(view);
+        super.setBaseView(view);
         this.view = view;
     }
     
