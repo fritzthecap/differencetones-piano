@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.notespiano.wave.NotesWithDifferenceTonePianoPlayer;
+import fri.music.instrument.notespiano.NoteExamples;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.wavegenerator.SineWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
@@ -21,7 +22,7 @@ public class NotesWithDifferenceTonePianoPlayerDemo
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName);
         final WaveSoundChannel soundChannel = new SineWaveSoundChannel(null);
         final NotesPianoPlayer player = new NotesWithDifferenceTonePianoPlayer(new DifferenceToneForNotesPiano(config, soundChannel));
-        final JComponent playerPanel = player.getPlayer(NoteExamples.AUGUSTIN);
+        final JComponent playerPanel = player.getPlayer(NoteExamples.AUGUSTIN.notes());
         
         frame.addWindowListener(player.getWindowClosingListener());
         frame.add(playerPanel);
