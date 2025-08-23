@@ -15,7 +15,7 @@ public class DeviationComponent
         this.deviationSlider = buildDeviationSlider(doubleToDeviationPercent(defaultDeviation), isVertical);
     }
     
-    /** @return the current deviation value from slider as floating-point number 0..1. */
+    /** @return the current deviation value from slider as floating-point number from 0 to 0.5. */
     public double getDeviation() {
         return deviationPercentToDouble(getSlider().getValue());
     }
@@ -32,7 +32,7 @@ public class DeviationComponent
         final JSlider deviationSlider = new JSlider(0, 90, defaultDeviationPercent); // min, max, current
         deviationSlider.setBorder(BorderFactory.createTitledBorder(title));
         deviationSlider.setToolTipText(
-                "Allowed deviation for finding difference-tones, 100 being the middle between two semitones");
+                "Allowed deviation for finding difference-tones, 100 % being the middle between two semitones");
         deviationSlider.setOrientation(isVertical ? SwingConstants.VERTICAL : SwingConstants.HORIZONTAL);
         deviationSlider.setPaintLabels(true);
         deviationSlider.setMajorTickSpacing(10);

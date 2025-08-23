@@ -34,9 +34,11 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
         final JSlider deviationSlider = deviationComponent.getSlider();
         getControlPanel().add(deviationSlider, 4); // add after "Tuning" choice
         deviationSlider.addChangeListener(new ChangeListener() {
+            /** Must change playing keys according to deviation. */
             @Override
             public void stateChanged(ChangeEvent e) {
-                ((DifferenceToneMouseHandler) getMouseHandler()).reviseDifferenceTone();
+                if (deviationSlider.getValueIsAdjusting() == false)
+                    ((DifferenceToneMouseHandler) getMouseHandler()).reviseDifferenceTone();
             }
         });
         

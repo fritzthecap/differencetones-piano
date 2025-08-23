@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -117,6 +118,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             }
         }
     }
+
+    /** Player wants to clear all list selections before playing. */
+    public void clearIntervalFrameSelections() {
+        for (IntervalListFrame frame : getIntervalListFrames())
+            frame.intervalList.clearSelection();
+    }
     
     
     /** Overridden to listen to tuning changes. */
@@ -139,10 +146,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     @Override
     protected DeviationComponent newDeviationComponent(double deviation, boolean isVertical) {
         final DeviationComponent deviationComponent = super.newDeviationComponent(deviation, isVertical);
+        final JSlider deviationSlider = deviationComponent.getSlider();
         deviationComponent.getSlider().addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                tuningParametersHaveChanged();
+                if (deviationSlider.getValueIsAdjusting() == false)
+                    tuningParametersHaveChanged();
             }
         });
         return deviationComponent;
@@ -195,15 +204,15 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     /** Called by interval-list frame when an interval is clicked. */
-    void intervalSelected(IntervalListFrame activeFrame, Point point, DifferenceToneInversions.TonePair pair, boolean mouseDown) {
+    void intervalSelected(IntervalListFrame activeFrame, Point point, DifferenceToneInversions.TonePair interval, boolean mouseDown) {
         setFrameSelected(activeFrame);
         
         playNotesWithoutOpeningIntervalFrames(
-                new int[] { pair.lowerTone().midiNumber, pair.upperTone().midiNumber },
+                new int[] { interval.lowerTone().midiNumber, interval.upperTone().midiNumber },
                 mouseDown);
         
         if (mouseDown && intervalSelectionListener != null)
-            intervalSelectionListener.intervalSelected(activeFrame, point, activeFrame.ipnNoteName, pair);
+            intervalSelectionListener.intervalSelected(activeFrame, point, activeFrame.ipnNoteName, interval);
     }
 
     /** Called by interval-list frame when the title-bar of an interval is clicked. */
