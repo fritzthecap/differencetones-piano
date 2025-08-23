@@ -63,46 +63,13 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     
     
     private NotesTextPanelBase buildIntervalNotesView() {
-        this.intervalPlayController = new PlayControllerBase(this) {
-            private Note firstIntervalNote;
-            
-            @Override
-            protected void onEnableUiOnPlaying(boolean isStop) {
-                super.onEnableUiOnPlaying(isStop);
-                writeToIntervalsCheckbox.setEnabled(isStop);
-            }
-            
-            /** Avoid opening interval list frames for every interval tone when playing intervals. */
-            @Override
-            protected void aroundPlayEvent(boolean before, boolean isNoteOn) { // no Swing calls allowed here!
-                if (before && isNoteOn) // before turning on
-                    getIntervalFrameOpeningMouseHandler().setActive(false); // de-activate frame opener
-                else if (before == false && isNoteOn == false) // after turning off
-                    getIntervalFrameOpeningMouseHandler().setActive(true); // re-activate frame opener
-            }
-            
-            /** Select interval list item in frame when having two notes. */
-            @Override
-            protected void playOrStopNote(SoundChannel soundChannel, Note note, boolean noteOn) {
-                super.playOrStopNote(soundChannel, note, noteOn);
-                if (noteOn) // wait for two notes
-                    if (firstIntervalNote == null)
-                        firstIntervalNote = note;
-                    else
-                        selectListFrameLine(note);
-            }
-
-            private void selectListFrameLine(Note note2) {
-                getDifferenceToneInversionsPiano().setFrameAndIntervalSelected(firstIntervalNote, note2);
-                firstIntervalNote = null; // reset for next tuple
-            }
-        };
+        this.intervalPlayController = new IntervalPlayController(this) ;
         
         final NotesTextPanelBase intervalNotes = new NotesTextPanelBase(
                 intervalPlayController, 
                 piano.config.isVertical, 
                 false); // add controls to EAST
-        intervalPlayController.setViewBase(intervalNotes); // connect controller to view
+        intervalPlayController.setBaseView(intervalNotes); // connect controller to view
         
         buildNotesPanel(intervalPlayController, intervalNotes);
         
@@ -145,7 +112,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         
         return intervalNotes;
     }
-
+    
+    // callbacks
     
     private void autoCompose() {
         final Note[][] notesArray = readNotesFromTextAreaCatchExceptions(getPlayController(), view());
@@ -176,16 +144,15 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         }
     }
 
-
     private void writeIntervalForMelody(
-            JComponent list,
+            JComponent intervalList,
             Point point, 
             String ipnNoteName, 
             DifferenceToneInversions.TonePair interval)
     {
         final String upper = interval.upperTone().ipnName;
         final String lower = interval.lowerTone().ipnName;
-        final String[] lengthNotations = getLengthNotation(list, point, ipnNoteName);
+        final String[] lengthNotations = getLengthNotation(intervalList, point, ipnNoteName);
         if (lengthNotations == null)
             return; // ipnNoteName not found in melody
         
@@ -265,5 +232,64 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     private DifferenceToneInversionsPiano.DifferenceToneInversionsMouseHandler getIntervalFrameOpeningMouseHandler() {
         return (DifferenceToneInversionsPiano.DifferenceToneInversionsMouseHandler) 
                 getDifferenceToneInversionsPiano().getMouseHandler();
+    }
+    
+    
+    /** PlayController for the right-side interval text-area. */
+    private class IntervalPlayController extends PlayControllerBase
+    {
+        private Note firstIntervalNote;
+        
+        public IntervalPlayController(NotesPianoPlayer notesPianoPlayer) {
+            super(notesPianoPlayer);
+        }
+
+        @Override
+        public void reversePressed() {
+            reset();
+            super.reversePressed();
+        }
+        @Override
+        public void playPressed() {
+            reset();
+            super.playPressed();
+        }
+
+        /** Disable writeToIntervalsCheckbox while playing. */
+        @Override
+        protected void onEnableUiOnPlaying(boolean isStop) {
+            super.onEnableUiOnPlaying(isStop);
+            writeToIntervalsCheckbox.setEnabled(isStop);
+        }
+        
+        /** Avoid opening interval list frames when playing intervals. */
+        @Override
+        protected void aroundPlayEvent(boolean before, boolean isNoteOn) { // no Swing calls allowed here!
+            if (before && isNoteOn) // before turning on
+                getIntervalFrameOpeningMouseHandler().setActive(false); // de-activate frame opener
+            else if (before == false && isNoteOn == false) // after turning off
+                getIntervalFrameOpeningMouseHandler().setActive(true); // re-activate frame opener
+        }
+        
+        /** Select interval list item in frame when having two notes on playing. */
+        @Override
+        protected void playOrStopNote(SoundChannel soundChannel, Note note, boolean noteOn) {
+            super.playOrStopNote(soundChannel, note, noteOn);
+            if (noteOn) // wait for two notes
+                if (firstIntervalNote == null)
+                    firstIntervalNote = note;
+                else
+                    selectInterval(note);
+        }
+
+        private void selectInterval(Note secondIntervalNote) {
+            getDifferenceToneInversionsPiano().setFrameAndIntervalSelected(firstIntervalNote, secondIntervalNote);
+            firstIntervalNote = null; // reset for next tuple
+        }
+        
+        private void reset() {
+            getDifferenceToneInversionsPiano().clearIntervalFrameSelections();
+            firstIntervalNote = null;
+        }
     }
 }
