@@ -16,6 +16,39 @@ public final class TextUtil
         
         return true;
     }
+    
+    public static int getFirstNumber(String name) {
+        boolean inDigits = false;
+        int number = 0;
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (Character.isDigit(c)) {
+                inDigits = true;
+                number = number * 10 + (c - '0');
+            }
+            else if (inDigits)
+                return number;
+        }
+        return -1;
+    }
+
+    public static String getWithoutFirstNumber(String name) {
+        final StringBuilder sb = new StringBuilder();
+        boolean checkDigits = true;
+        boolean inDigits = false;
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (checkDigits && Character.isDigit(c)) {
+                inDigits = true;
+            }
+            else {
+                sb.append(c);
+                if (inDigits)
+                    checkDigits = false;
+            }
+        }
+        return sb.toString();
+    }
 
     private TextUtil() {} // do not instantiate
 }

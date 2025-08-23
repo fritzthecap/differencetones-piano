@@ -34,21 +34,12 @@ public class Tone implements Comparable<Tone>
         this.frequency = frequency;
         this.midiNumber = midiNumber;
         this.cent = cent;
-        
-        final String onlyDigits = ipnName.replaceAll("[^0-9\\-]", ""); // deletes all non-digits
-        int octave;
-        try {
-            octave = Integer.valueOf(onlyDigits);
-        }
-        catch (NumberFormatException e) { // happens on REST_SYMBOL
-            octave = 0;
-        }
-        this.ipnOctave = octave;
+        this.ipnOctave = TextUtil.getFirstNumber(ipnName);
     }
     
     public String ipnNameWithoutOctave() {
         if (ipnNameWithoutOctave == null)
-            ipnNameWithoutOctave = ipnName.replaceAll("[0-9\\-]", ""); // deletes all digits
+            ipnNameWithoutOctave = TextUtil.getWithoutFirstNumber(ipnName);
         return ipnNameWithoutOctave;
     }
     
