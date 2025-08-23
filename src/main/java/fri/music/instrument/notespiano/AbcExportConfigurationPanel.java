@@ -13,22 +13,13 @@ import javax.swing.SpinnerNumberModel;
 import fri.music.player.notelanguage.AbcExport;
 
 /**
- * Use it like this:
- * <pre>
-    final AbcExportConfigurationPanel configuration = new AbcExportConfigurationPanel();
-    final JButton exportButton = new JButton("Export to ABC");
-    exportButton.addActionListener(new ActionListener() { ... });
-    final JPanel exportButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-    exportButtonPanel.add(exportButton);
-    final JPanel configPanel = new JPanel(new BorderLayout());
-    configPanel.add(configuration.panel, BorderLayout.NORTH);
-    configPanel.add(exportButtonPanel, BorderLayout.SOUTH);
- * </pre>
+ * Contains ABC property fields for conversion.
  */
 public class AbcExportConfigurationPanel
 {
     /** The UI with configuration fields. */
-    public final JPanel panel;
+    public final JPanel topPanel;
+    public final JPanel fieldsPanel;
     
     private JSpinner songNumberField;
     private JTextField titleField;
@@ -40,14 +31,14 @@ public class AbcExportConfigurationPanel
 
     /** Get UI by using the public panel of this object. */
     public AbcExportConfigurationPanel() {
-        final JPanel fieldsPanel = new JPanel();
-        fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.PAGE_AXIS));
+        this.fieldsPanel = new JPanel();
+        fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
         buildFields(fieldsPanel);
         
         final JPanel layoutPanel = new JPanel(new BorderLayout());
         layoutPanel.add(fieldsPanel, BorderLayout.CENTER);
         
-        this.panel = layoutPanel;
+        this.topPanel = layoutPanel;
     }
 
     /**
@@ -74,7 +65,7 @@ public class AbcExportConfigurationPanel
         this.authorField = buildTextField("Composer", "The ABC 'C' Header Field");
         this.dateField = buildTextField("Date", "Will be added to Composer");
         dateField.setText("{date}");
-        this.keyAndClefField = buildTextField("Key and Clef", "The ABC 'K' Header Field, e.g. 'G treble' (Clef is optional)");
+        this.keyAndClefField = buildTextField("Key", "The ABC 'K' Header Field, e.g. 'G bass' (Clef is optional)");
         this.numberOfBarsPerLineField = buildNumberField("Number of Bars per ABC Note Line", 4, 1, 16, 1);
         
         panel.add(buildNumberFieldLayout("Song Number", songNumberField));
@@ -105,10 +96,5 @@ public class AbcExportConfigurationPanel
         layoutPanel.add(field);
         layoutPanel.setBorder(BorderFactory.createTitledBorder(title));
         return layoutPanel;
-        
-//        final JPanel layoutPanel = new JPanel(new BorderLayout());
-//        layoutPanel.add(field, BorderLayout.CENTER);
-//        layoutPanel.setBorder(BorderFactory.createTitledBorder(title));
-//        return layoutPanel;
     }
 }

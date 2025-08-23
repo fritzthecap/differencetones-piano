@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -24,6 +25,18 @@ import fri.music.swingutils.TextAreaActions;
  */
 public class AbcExportComponent extends JSplitPane
 {
+    private static final String HELP_TEXT = """
+            <html><body>
+            <ol>
+            <li>Fill in fields above</li>
+            <li>Click "Translate to ABC"</li>
+            <li>Select an ABC converter address</li>
+            <li>Open address in web-browser</li>
+            <li>Copy ABC text (Ctrl-A, Ctrl-C)</li>
+            <li>Paste text into web-browser field</li>
+            </ol>
+            </body></html>""";
+
     private static final String[] ABC_CONVERTER_URLS = new String[] {
             "https://www.abcjs.net/abcjs-editor",
             "https://michaeleskin.com/abctools/abctools.html",
@@ -43,8 +56,8 @@ public class AbcExportComponent extends JSplitPane
         final int COLUMNS = 24;
 
         final JTextArea abcTextarea = new JTextArea(ROWS, COLUMNS);
-        //abcText.setEditable(false);
-        abcTextarea.addMouseListener(new TextAreaActions(abcTextarea));
+        new TextAreaActions(abcTextarea); // adds itself as mouse-listener to textarea
+        abcTextarea.setToolTipText("The ABC Text Generated from Notes");
         
         final JScrollPane abcTextScrollPane = new JScrollPane(abcTextarea);
         abcTextScrollPane.setBorder(BorderFactory.createTitledBorder("ABC Text"));
@@ -53,7 +66,12 @@ public class AbcExportComponent extends JSplitPane
         
         final AbcExportConfigurationPanel configuration = new AbcExportConfigurationPanel();
         
-        final JButton exportButton = new JButton("Export");
+        final JLabel help = new JLabel(HELP_TEXT);
+        final JPanel helpPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        helpPanel.add(help);
+        configuration.fieldsPanel.add(helpPanel);
+        
+        final JButton exportButton = new JButton("Translate to ABC");
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -64,11 +82,11 @@ public class AbcExportComponent extends JSplitPane
         exportButtonPanel.add(exportButton);
         
         final JPanel configPanel = new JPanel(new BorderLayout());
-        configPanel.add(configuration.panel, BorderLayout.NORTH);
+        configPanel.add(configuration.topPanel, BorderLayout.NORTH);
         configPanel.add(exportButtonPanel, BorderLayout.SOUTH);
         
         final JComboBox<String> abcUrls = new JComboBox<>(ABC_CONVERTER_URLS);
-        abcUrls.setBorder(BorderFactory.createTitledBorder("Selecting an ABC Converter Copies its URL to System Clipboard"));
+        abcUrls.setBorder(BorderFactory.createTitledBorder("ABC Converters - Selection Copies Address to System Clipboard"));
         abcUrls.setToolTipText("Use Ctrl-V to Paste Selected URL in your Web-Browser's Addressline");
         abcUrls.addActionListener(new ActionListener() {
             @Override
@@ -89,9 +107,10 @@ public class AbcExportComponent extends JSplitPane
         setLeftComponent(configPanel);
         setRightComponent(textAreaAndUrlSelection);
         
+        // initially show text converted to ABC
         writeExportToTextarea(notesText, abcTextarea, configuration);
         
-        setResizeWeight(0.3);
+        setResizeWeight(0.28);
     }
     
     private void writeExportToTextarea(
@@ -104,17 +123,5 @@ public class AbcExportComponent extends JSplitPane
         final AbcExport exportToAbc = new AbcExport(notes);
         final String abc = exportToAbc.export(configuration.getExportToAbcConfiguration());
         abcText.setText(abc);
-    }
-    
-    
-    public static void main(String[] args) {
-        final String TEST_TEXT = "C4/4 D4/4 E4/4 F4/4 G4/4 A4/4 B4/4 C5/4";
-        final AbcExportComponent exportPanel = new AbcExportComponent(TEST_TEXT);
-        final javax.swing.JFrame frame = new javax.swing.JFrame("Export to ABC Notation");
-        frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(exportPanel);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
     }
 }

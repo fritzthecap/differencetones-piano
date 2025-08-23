@@ -54,7 +54,7 @@ public class ExportToAbcDemo
         exportButtonPanel.add(exportButton);
         
         final JPanel configPanel = new JPanel(new BorderLayout());
-        configPanel.add(configuration.panel, BorderLayout.NORTH);
+        configPanel.add(configuration.topPanel, BorderLayout.NORTH);
         configPanel.add(exportButtonPanel, BorderLayout.SOUTH);
                 
         final JPanel mainPanel = new JPanel();
