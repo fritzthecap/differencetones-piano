@@ -100,24 +100,30 @@ public abstract class AbstractComposer
         TonePair previousInterval = null;
         for (int i = 0; i < melody.length; i++) {
             final Note note = melody[i];
-            final Note previousNote = (i > 0) ? melody[i - 1] : null;
-            final int semitoneDistanceFromLowest = note.midiNumber - lowest.midiNumber;
-            
-            final TonePair bestInterval = mapNote(
-                        inversions,
-                        maximumSemitoneDistance,
-                        semitoneDistanceFromLowest,
-                        previousNote,
-                        previousInterval, 
-                        note,
-                        result);
+            final TonePair bestInterval;
+            if (note.isRest()) {
+                bestInterval = new TonePair();
+            }
+            else {
+                final Note previousNote = (i > 0) ? melody[i - 1] : null;
+                final int semitoneDistanceFromLowest = note.midiNumber - lowest.midiNumber;
+                
+                bestInterval = mapNote(
+                            inversions,
+                            maximumSemitoneDistance,
+                            semitoneDistanceFromLowest,
+                            previousNote,
+                            previousInterval, 
+                            note,
+                            result);
+            }
             result.put(new NoteWithIndex(note, i), previousInterval = bestInterval);
         }
         return result;
     }
 
     private Note[][] prepareResultArray(Note[] melody) {
-        return new Note[melody.length][2];
+        return new Note[melody.length][];
     }
 
     /** Puts Note objects into result, built from given tonePair and note. */
@@ -125,7 +131,14 @@ public abstract class AbstractComposer
         if (tonePair == null)
             throw new IllegalArgumentException("Note '"+note+"' at index "+resultIndex+" could not be mapped to an interval!");
         
-        result[resultIndex][0] = new Note(tonePair.lowerTone(), note);
-        result[resultIndex][1] = new Note(tonePair.upperTone(), note);
+        if (tonePair.isRest()) {
+            result[resultIndex] = new Note[1];
+            result[resultIndex][0] = note;
+        }
+        else {
+            result[resultIndex] = new Note[2];
+            result[resultIndex][0] = new Note(tonePair.lowerTone(), note);
+            result[resultIndex][1] = new Note(tonePair.upperTone(), note);
+        }
     }
 }

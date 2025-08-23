@@ -47,8 +47,8 @@ public class DifferenceToneInversions extends DifferenceTones
         // Find octave range of melody and calculate a subset of tones fitting to that range.
         final Tone[] sortedMelody = Arrays.copyOf(melody, melody.length);
         Arrays.sort(sortedMelody, (n1, n2) -> n1.midiNumber - n2.midiNumber);
-        final Tone lowest  = sortedMelody[0];
-        final Tone highest = sortedMelody[sortedMelody.length - 1];
+        final Tone lowest  = findNonRest(sortedMelody, true);
+        final Tone highest = findNonRest(sortedMelody, false);
         final int numberOfSemitones = highest.midiNumber - lowest.midiNumber;
         final double melodyOctaves = (double) numberOfSemitones / (double) ToneSystem.SEMITONES_PER_OCTAVE;
         
@@ -72,6 +72,19 @@ public class DifferenceToneInversions extends DifferenceTones
                 deviationTolerance
             )
         );
+    }
+
+    private static Tone findNonRest(Tone[] sortedMelody, boolean lowest) {
+        final int minimumIndex = 0;
+        final int maximumIndex = sortedMelody.length - 1;
+        final int startIndex = lowest ? minimumIndex : maximumIndex;
+        final int endIndex = lowest ? maximumIndex : minimumIndex;
+        for (int i = startIndex; i != endIndex; i += (lowest ? 1 : -1)) {
+            final Tone tone = sortedMelody[i];
+            if (tone.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
+                return tone;
+        }
+        throw new IllegalArgumentException("Only rests in melody?");
     }
 
 
@@ -116,14 +129,27 @@ public class DifferenceToneInversions extends DifferenceTones
     /** Representation of a difference-tone through two tones. */
     public record TonePair(Tone lowerTone, Tone upperTone)
     {
+        /** Rest constructor. */
+        public TonePair() {
+            this(null, null);
+        }
         public int semitoneDistance() {
+            if (isRest())
+                return 0;
             return upperTone.midiNumber - lowerTone.midiNumber;
         }
         public String intervalName() {
+            if (isRest())
+                return "NONE";
             return ToneSystem.intervalName(semitoneDistance());
+        }
+        public boolean isRest() {
+            return lowerTone == null;
         }
         @Override
         public final String toString() {
+            if (isRest())
+                return ToneSystem.REST_SYMBOL;
             return intervalName()+" "+lowerTone.ipnName+"-"+upperTone.ipnName;
         }
     }
