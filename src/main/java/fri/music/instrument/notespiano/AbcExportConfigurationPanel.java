@@ -65,7 +65,7 @@ public class AbcExportConfigurationPanel
         this.authorField = buildTextField("Composer", "The ABC 'C' Header Field");
         this.dateField = buildTextField("Date", "Will be added to Composer");
         dateField.setText("{date}");
-        this.keyAndClefField = buildTextField("Key", "The ABC 'K' Header Field, e.g. 'G bass' (Clef is optional)");
+        this.keyAndClefField = buildTextField("Key", "The ABC 'K' Header Field, e.g. 'G bass' (Clef is Optional)");
         this.numberOfBarsPerLineField = buildNumberField("Number of Bars per ABC Note Line", 4, 1, 16, 1);
         
         panel.add(buildNumberFieldLayout("Song Number", songNumberField));
