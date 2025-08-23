@@ -370,7 +370,7 @@ public class JustIntonationChecker
             final String lowerNote = chromaticNoteNames.get(lowerIndex);
             
             final boolean CHECK_ALL_SEMITONES = false;
-            if (CHECK_ALL_SEMITONES || (lowerNote.endsWith("#") == false)) { // check only white keys
+            if (CHECK_ALL_SEMITONES || (lowerNote.charAt(lowerNote.length() - 1) != ToneSystem.SHARP_CHAR)) { // check only white keys
                 final int lowerOctave = lowerIndex / noteNamesSize;
                 
                 int semitoneDistance = 2;

@@ -248,7 +248,7 @@ public class SliderPanel
     }
 
     private JLabel createLabel(Tone tone) {
-        final JLabel label = new JLabel(tone.ipnName.contains("#") ? "^" : tone.ipnName) { // \u2022 \u2B27
+        final JLabel label = new JLabel(tone.ipnName.indexOf(ToneSystem.SHARP_CHAR) > 0 ? "^" : tone.ipnName) { // \u2022 \u2B27
             /** Keep labels enabled and thus readable. */
             @Override
             public void setEnabled(boolean enabled) {

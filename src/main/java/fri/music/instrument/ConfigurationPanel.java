@@ -188,7 +188,7 @@ public class ConfigurationPanel
         octaves.addChangeListener(octavesListener);
         
         final List<String> ipnBaseNamesList = Stream.of(ToneSystem.IPN_BASE_NAMES)
-            .filter(ipnName -> ipnName.contains("#") == false)
+            .filter(ipnName -> ipnName.indexOf(ToneSystem.SHARP_CHAR) < 0)
             .collect(Collectors.toList());
         final String[] ipnBaseNames = ipnBaseNamesList.toArray(new String[ipnBaseNamesList.size()]);
         this.lowestToneBaseName = new SmartComboBox(ipnBaseNames);

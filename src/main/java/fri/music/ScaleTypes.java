@@ -89,7 +89,7 @@ public final class ScaleTypes
     public static String scaleName(String lowestScaleToneIpnName) {
         if (lowestScaleToneIpnName == null)
             lowestScaleToneIpnName = "C";
-        else if (lowestScaleToneIpnName.indexOf('#') > 0 || lowestScaleToneIpnName.indexOf('b') > 0) // no flat/sharp allowed
+        else if (lowestScaleToneIpnName.indexOf(ToneSystem.SHARP_CHAR) > 0 || lowestScaleToneIpnName.indexOf('b') > 0) // no flat/sharp allowed
             throw new IllegalArgumentException("Augmented tones are not scale start tones: "+lowestScaleToneIpnName);
         
         for (Map.Entry<String,String> scaleEntry : scaleToStartNote.entrySet())
@@ -197,7 +197,7 @@ public final class ScaleTypes
                     octaveCorrection++;
             }
             else { // black key
-                noteBaseName = noteBaseName+"#";
+                noteBaseName = noteBaseName + ToneSystem.SHARP_CHAR;
             }
         }
         final String octavePostfix = ""+(octaveOfScaleStart + octaveCorrection);

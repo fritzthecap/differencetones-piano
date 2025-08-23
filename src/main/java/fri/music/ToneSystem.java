@@ -17,6 +17,9 @@ public interface ToneSystem
     /** The 12 base-names of tones (without octave number), starting with "C", ending with "B", sharp accent is "#". */
     String[] IPN_BASE_NAMES = new String[] 
             { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+    
+    /** The IPN character used to raise a note by a semi-tone. */
+    char SHARP_CHAR = '#';
 
     /** The symbol to be used for a rest. */
     String REST_SYMBOL = "-";
