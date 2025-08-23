@@ -135,6 +135,14 @@ public class AbcExport
     }
     
     
+    private static final String ABC_DOT = ">";
+    private static final String ABC_CHORD_OPEN = "[";
+    private static final String ABC_CHORD_CLOSE = "]";
+    private static final String ABC_SLUR_OPEN = "(";
+    private static final String ABC_SLUR_CLOSE = ")";
+    private static final String ABC_TIE = "-";
+    private static final String ABC_BAR = "|";
+    
     private final Note[][] notes;
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
@@ -182,7 +190,7 @@ public class AbcExport
             
             final boolean barStart = (i > 0 && firstNote.emphasized);
             if (barStart) {
-                result.append("|");
+                result.append(ABC_BAR);
                 barCount++;
             }
             
@@ -204,7 +212,7 @@ public class AbcExport
             
             final boolean moreThanOneNote = (chord.length > 1);
             if (moreThanOneNote)
-                result.append("[");
+                result.append(ABC_CHORD_OPEN);
             
             if (firstNote.connectionFlags.multiplet() == Boolean.TRUE) {
                 if (inMultiplet == false) { // multiplet start
@@ -217,16 +225,22 @@ public class AbcExport
             }
             
             final boolean isDotted = isDotted(firstNote.lengthNotation);
-            final String length = getAbcDottedLength(wasDotted, firstNote, isDotted);
+            final String length = moreThanOneNote
+                    ? getAbcDottedLength(wasDotted, firstNote, false) // do not yet append ">"
+                    : getAbcDottedLength(wasDotted, firstNote, isDotted);
             wasDotted = isDotted;
             
+            // chord notes loop
             writeChordNotes(result, isFlatKey, chord, length);
             
-            if (moreThanOneNote)
-                result.append("]");
+            if (moreThanOneNote) {
+                result.append(ABC_CHORD_CLOSE);
+                if (isDotted)
+                    result.append(ABC_DOT); // abc dot
+            }
             
             if (Boolean.TRUE.equals(lastNote.connectionFlags.tied()))
-                result.append("-");
+                result.append(ABC_TIE);
             
             inSlur = detectSlurEnd(result, inSlur, lastNote);
             
@@ -297,9 +311,11 @@ public class AbcExport
         timeSignature = firstNote.beatInfo.timeSignature(); // pick up new one
         
         if (barStart == false)
-            result.append("|");
-        final String escape = gotoNextLine ? "" : "\\";
+            result.append(ABC_BAR);
+        
+        final String escape = gotoNextLine ? "" : "\\"; // escape backslash when going to next ABC text line
         result.append(escape+TextUtil.NEWLINE);
+        
         result.append("M:"+timeSignature); // no space allowed here in mid-tune!
         if (gotoNextLine == false)
             result.append(TextUtil.NEWLINE);
@@ -328,14 +344,14 @@ public class AbcExport
     
     private String getAbcDottedLength(boolean wasDotted, Note firstNote, boolean isDotted) {
         return wasDotted
-                ? toAbcDoubleLength(firstNote.lengthNotation, isDotted)
+                ? toAbcDoubleLength(firstNote.lengthNotation, isDotted) // abc shortens a ">" follower note, thus double it
                 : toAbcLength(firstNote.lengthNotation, isDotted);
     }
 
     private boolean detectSlurStart(StringBuilder result, boolean inSlur, Note firstNote) {
         final boolean slurStart = (inSlur == false) && Boolean.TRUE.equals(firstNote.connectionFlags.slurred());
         if (slurStart) {
-            result.append("(");
+            result.append(ABC_SLUR_OPEN);
             inSlur = true;
         }
         return inSlur;
@@ -344,7 +360,7 @@ public class AbcExport
     private boolean detectSlurEnd(StringBuilder result, boolean inSlur, Note lastNote) {
         final boolean slurEnd = (inSlur == true) && Boolean.FALSE.equals(lastNote.connectionFlags.slurred());
         if (slurEnd) {
-            result.append(")");
+            result.append(ABC_SLUR_CLOSE);
             inSlur = false;
         }
         return inSlur;
@@ -382,22 +398,22 @@ public class AbcExport
     }
     
     private String toAbcLength(String lengthNotation, boolean isDotted) {
-        lengthNotation = stripLengthToNumber(lengthNotation, isDotted);
+        lengthNotation = stripLengthToNumber(lengthNotation);
         return editDottedLength(lengthNotation, isDotted);
     }
     
     private String toAbcDoubleLength(String lengthNotation, boolean isDotted) {
-        lengthNotation = stripLengthToNumber(lengthNotation, isDotted);
+        lengthNotation = stripLengthToNumber(lengthNotation);
         lengthNotation = Integer.toString(Integer.valueOf(lengthNotation) / 2);
         return editDottedLength(lengthNotation, isDotted);
     }
     
     private String editDottedLength(String lengthNotation, boolean isDotted) {
-        return lengthNotation + (isDotted ? ">" : ""); // "broken rhythm" marker, also affects the following note!
+        return lengthNotation + (isDotted ? ABC_DOT : ""); // "broken rhythm" marker, also affects the following note!
     }
     
-    private String stripLengthToNumber(String lengthNotation, boolean isDotted) {
-        if (isDotted)
+    private String stripLengthToNumber(String lengthNotation) {
+        if (lengthNotation.endsWith(Note.DOTTED_SYMBOL))
             lengthNotation = lengthNotation.substring(0, lengthNotation.length() - Note.DOTTED_SYMBOL.length());
         
         final int multipletSeparatorIndex = lengthNotation.indexOf(Note.MULTIPLET_SEPARATOR);

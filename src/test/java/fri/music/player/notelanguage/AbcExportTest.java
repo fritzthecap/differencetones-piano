@@ -180,6 +180,24 @@ D/4 G,/4 G,/4 | C/2> ||""";
         runTest(METER_CHANGE_NOTES, expected);
     }
     
+    ////////////////////////////////////////////////////////////////////////////
+    
+    @Test
+    void severalDottedChords() {
+        final String DOTTED_CHORDS = """
+6/4
+[E5/4. C6/4.] [E5/4. C6/4.] [E5/4. C6/4.] [E5/4. C6/4.]""";
+        
+        final String expected = """
+X: 1
+M: 6/4
+Q: 1/4=120
+L: 1/1
+K: C
+[e/4 c'/4]> [e/2 c'/2]> [e/2 c'/2]> [e/2 c'/2]> ||""";
+        
+        runTest(DOTTED_CHORDS, expected);
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     
