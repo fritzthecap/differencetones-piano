@@ -56,7 +56,7 @@ public class NotesWritingMouseListener extends MouseKeyAdapter
     public void mousePressed(MouseEvent e) {
         key = getKey(e);
         
-        if (showPopupMenu(e) == false) // is left mouse button
+        if (showContextMenu(e) == false) // is left mouse button
             startMillis = System.currentTimeMillis();
     }
     
@@ -65,7 +65,7 @@ public class NotesWritingMouseListener extends MouseKeyAdapter
         if (key == null || popup.isShowing()) // was a mouse drag
             return;
         
-        if (showPopupMenu(e) == false) // is left mouse button
+        if (showContextMenu(e) == false) // is left mouse button
             calculateAndWriteNote();
     }
     
@@ -90,7 +90,7 @@ public class NotesWritingMouseListener extends MouseKeyAdapter
      * Recommended way to display a context-menu <b>platform-independently</b>
      * is to do it on both mouse-press and mouse-release events.
      */
-    private boolean showPopupMenu(MouseEvent e) {
+    private boolean showContextMenu(MouseEvent e) {
         final boolean isPopupEvent = (active && e.isPopupTrigger());
         if (isPopupEvent)
             popup.show(getKey(e), e.getX(), e.getY());
