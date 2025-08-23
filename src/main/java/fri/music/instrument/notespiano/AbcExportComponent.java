@@ -28,7 +28,7 @@ public class AbcExportComponent extends JSplitPane
     private static final String HELP_TEXT = """
             <html><body>
             <ol>
-            <li>Fill in fields above</li>
+            <li>Fill in fields below</li>
             <li>Click "Translate to ABC"</li>
             <li>Select an ABC converter address</li>
             <li>Open address in web-browser</li>
@@ -69,7 +69,7 @@ public class AbcExportComponent extends JSplitPane
         final JLabel help = new JLabel(HELP_TEXT);
         final JPanel helpPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         helpPanel.add(help);
-        configuration.fieldsPanel.add(helpPanel);
+        configuration.fieldsPanel.add(helpPanel, 0); // put help text on top of fields
         
         final JButton exportButton = new JButton("Translate to ABC");
         exportButton.addActionListener(new ActionListener() {
