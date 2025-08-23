@@ -2,18 +2,6 @@ package fri.music.demos;
 
 public interface NoteExamples
 {
-    String C_MAJOR_SCALE = """
-C4/4 D4/4 E4/4 F4/4 G4/4 A4/4 B4/4 C5/4
-""";
-            
-    String A_MINOR_SCALE = """
-A4/4 B4/4 C5/4 D5/4 E5/4 F5/4 G5/4 A5/4
-""";
-            
-    String CHROMATIC_SCALE = """
-C4/4 C#4/4 D4/4 D#4/4 E4/4 F4/4 F#4/4 G4/4 G#4/4 A4/4 A#4/4 B4/4 C5/4
-""";
-            
     String CHORDS = """
 [ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ] 
 [ C4/8 E4 G4 ] A4/8 C5/8 [ A4/8 F4 ]
@@ -22,28 +10,11 @@ C4/4 C#4/4 D4/4 D#4/4 E4/4 F4/4 F#4/4 G4/4 G#4/4 A4/4 A#4/4 B4/4 C5/4
 C4/2
 """;
         
-    String AUGUSTIN = """
-3/4
-G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
-D4/4 G3/4 G3/4 E4/4 C4/4 C4/4
-G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
-D4/4 G3/4 G3/4 C4/2.
+    String CHORDS_2 = """
+[ E4/4 G4 C5 ] [ F4/4 A4 C5 ] [ D4/4 G4 B4 ] [ C4/4 E4 G4 C5 ]
+[ D4/4 F4 A4 ] [ D4/4 F#4 A4 ] [ D4/4 G4 B4 ] [ C4/4 E4 G4 C5 ]
 """;
-        
-    String WHEN_THE_SAINTS_GO_MARCHING = """
-144
--/2 -/8 G4/8 B4/8 C5/8 
-(D5/2 D5/8) G4/8 B4/8 C5/8
-(D5/2 D5/8) G4/8 B4/8 C5/8
-D5/4 B4/4 G4/4 B4/4
-A4/2 -/8 B4/8 B4/8 A4/8 
-G4/4. G4/8
-B4/4  D5/8 D5/8
-D5/8 (C5/4. C5/8) C5/8 B4/8 C5/8
-D5/4 B4/4 G4/4 A4/4
-G4/1 
-""";
-        
+    
     String ENTLEIN = """
 C4/8 D4/8 E4/8 F4/8 G4/4 G4/4
 A4/8 A4/8 A4/8 A4/8 G4/2
