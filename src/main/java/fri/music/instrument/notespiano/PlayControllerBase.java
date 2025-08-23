@@ -71,6 +71,12 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         gotoStartOrEnd(false);
     }
     
+    protected boolean isPlaying() {
+        synchronized (playerLock) {
+            return player != null;
+        }
+    }
+    
     /**
      * Enables to catch a note when starting or stopping it by override.
      * @param soundChannel the pianoKeyConnector.

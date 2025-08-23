@@ -130,7 +130,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 final Note[][] composedIntervals = composer.compose(NotesUtil.toSingleNotesArray(notesArray));
                 
                 final MelodyFactory melodyFactory = newMelodyFactory();
-                final String formatted = melodyFactory.formatBarLines(composedIntervals, false, false);
+                final String formatted = melodyFactory.formatBarLines(composedIntervals, true, true);
                 intervalNotes.notesText.setText(formatted);
             }
             catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain difference-tones
@@ -244,11 +244,13 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             super(notesPianoPlayer);
         }
 
+        /** Overridden to clear all list selections. */
         @Override
         public void reversePressed() {
             reset();
             super.reversePressed();
         }
+        /** Overridden to clear all list selections. */
         @Override
         public void playPressed() {
             reset();
@@ -288,7 +290,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         }
         
         private void reset() {
-            getDifferenceToneInversionsPiano().clearIntervalFrameSelections();
+            if (isPlaying() == false)
+                getDifferenceToneInversionsPiano().clearIntervalFrameSelections();
             firstIntervalNote = null;
         }
     }
