@@ -29,7 +29,7 @@ public final class TextUtil
             else if (inDigits)
                 return number;
         }
-        return -1;
+        return inDigits ? number : -1;
     }
 
     public static String getWithoutFirstNumber(String name) {
