@@ -10,7 +10,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
-import fri.music.player.notelanguage.AbcExport;
+import fri.music.player.notelanguage.abc.AbcExport;
 
 /**
  * Contains ABC property fields for conversion.

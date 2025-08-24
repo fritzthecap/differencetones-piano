@@ -16,8 +16,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import fri.music.player.Note;
-import fri.music.player.notelanguage.AbcExport;
 import fri.music.player.notelanguage.MelodyFactory;
+import fri.music.player.notelanguage.abc.AbcExport;
 import fri.music.swingutils.TextAreaActions;
 
 /**
