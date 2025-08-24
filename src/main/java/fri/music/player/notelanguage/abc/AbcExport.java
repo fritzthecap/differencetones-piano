@@ -1,31 +1,15 @@
-package fri.music.player.notelanguage;
+package fri.music.player.notelanguage.abc;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import fri.music.TextUtil;
-import fri.music.ToneSystem;
 import fri.music.player.Note;
+import fri.music.player.notelanguage.MelodyFactory;
 
 /**
  * Exports MelodyFactory notation to ABC notation.
- * <pre>
-     IPN = ABC note-name and octave
-     C0 = C,,,, 
-     ...
-     C2 = C,,
-     C3 = C,
-     C4 = C D E F G A B 
-     C5 = c d e f g a b
-     C6 = c'
-     C7 = c''
-     ...
-     C9 = c''''
-     C10 = c'''''
- * </pre>
  * Result can be tried out on
  * <ul>
  *  <li>https://www.abcjs.net/abcjs-editor</li>
@@ -55,87 +39,38 @@ public class AbcExport
         public Configuration() {
             this(null, null, "C");
         }
+        public Configuration(String keyAndClef) {
+            this(null, null, keyAndClef);
+        }
         public Configuration(String title, String author, String keyAndClef) {
             this(1, title, null, author, null, keyAndClef, 4);
         }
         
         /** @return true when the tune's key is F, Bb, Eb, Ab, ... Db, else false. */
         public boolean isFlatKey() {
+            if (keyAndClef == null)
+                return false;
             if (keyAndClef.startsWith("F"))
                 return true;
             if (keyAndClef.length() > 1 && keyAndClef.charAt(1) == 'b')
                 return true;
             return false;
         }
-    }
-    
-    
-    private static final Map<String,String> IPN_NOTE_TO_ABC_FLAT = new HashMap<>();
-    private static final Map<String,String> IPN_NOTE_TO_ABC_SHARP = new HashMap<>();
-    
-    static {
-        buildIpnToAbcNameMapping();
-    }
-    
-    private static void buildIpnToAbcNameMapping() {
-        final String ABC_REST = "z";
-        IPN_NOTE_TO_ABC_SHARP.put(ToneSystem.REST_SYMBOL, ABC_REST);
-        IPN_NOTE_TO_ABC_FLAT.put(ToneSystem.REST_SYMBOL, ABC_REST);
         
-        for (int octave = ToneSystem.LOWEST_OCTAVE; octave < ToneSystem.MAXIMUM_OCTAVES; octave++) {
-            if (octave < 0)
-                throw new IllegalArgumentException("Can not process octave < 0!");
+        /** @return the upper-case key without optional clef. */
+        public String getKey() {
+            final String trimmed = (keyAndClef != null) ? keyAndClef.trim() : "";
+            if (trimmed.length() <= 0)
+                return "C";
             
-            for (int i = 0; i < ToneSystem.IPN_BASE_NAMES.length; i++) {
-                final String ipnName = ToneSystem.IPN_BASE_NAMES[i];
-                final String ipnNameWithoutAccent = getIpnNameWithoutAccent(ipnName);
-                
-                final String abcOctave = getAbcOctave(octave);
-                final String abcName = toAbcName(ipnNameWithoutAccent, octave);
-                final String abcNameWithOctave = abcName + abcOctave;
-                
-                final boolean accented = (ToneSystem.IPN_BASE_NAMES[i].length() != ipnNameWithoutAccent.length());
-                final String ipnNameWithOctave = ipnName + octave;
-                if (accented) {
-                    IPN_NOTE_TO_ABC_SHARP.put(ipnNameWithOctave, "^" + abcNameWithOctave);
-                    
-                    if (i < ToneSystem.IPN_BASE_NAMES.length - 1) { // not yet at "B"
-                        final String ipnForFlat = getIpnNameWithoutAccent(ToneSystem.IPN_BASE_NAMES[i + 1]); // "B"
-                        final String abcForFlat = toAbcName(ipnForFlat, octave);
-                        final String abcNameWithOctaveFlat = "_" + abcForFlat + abcOctave;
-                        IPN_NOTE_TO_ABC_FLAT.put(ipnNameWithOctave, abcNameWithOctaveFlat);
-                    }
-                }
-                else {
-                    IPN_NOTE_TO_ABC_SHARP.put(ipnNameWithOctave, abcNameWithOctave);
-                    IPN_NOTE_TO_ABC_FLAT.put(ipnNameWithOctave, abcNameWithOctave);
-                }
-            }
+            final int spaceIndex = trimmed.indexOf(' ');
+            final String key = (spaceIndex > 0) ? trimmed.substring(0, spaceIndex) : trimmed;
+            return key.toUpperCase();
         }
     }
     
-    private static String getIpnNameWithoutAccent(String ipnName) {
-        if (ipnName.endsWith("#"))
-            return ipnName.substring(0, ipnName.length() - "#".length());
-        return ipnName;
-    }
     
-    private static String toAbcName(String ipnNameWithoutAccent, int octave) {
-        if (octave < 5)
-            return ipnNameWithoutAccent; // already in upper case
-        return ipnNameWithoutAccent.toLowerCase();
-    }
-    
-    private static String getAbcOctave(int octave) {
-        if (octave < 4)
-            return ",".repeat(4 - octave); // ABC octave down symbol
-        else if (octave > 5)
-            return "'".repeat(octave - 5); // ABC octave up symbol
-        return "";
-    }
-    
-    
-    private static final String ABC_DOT = ">";
+    private static final String ABC_DOT = ">"; // "broken rhythm" marker, also affects the following note!
     private static final String ABC_CHORD_OPEN = "[";
     private static final String ABC_CHORD_CLOSE = "]";
     private static final String ABC_SLUR_OPEN = "(";
@@ -143,8 +78,11 @@ public class AbcExport
     private static final String ABC_TIE = "-";
     private static final String ABC_BAR = "|";
     
+    
     private final Note[][] notes;
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    
+    private AbcKeyToAccidentalsMap keyToAccidentalsMap;
     
     /** Constructor of an exporter for different export-configurations from text. */
     public AbcExport(String notes, MelodyFactory melodyFactory) {
@@ -168,13 +106,14 @@ public class AbcExport
      * @param configuration the configuration of the ABC header.
      * @return a text with ABC notation of given notes.
      */
-    public String export(Configuration configuration) {
+    public synchronized String export(Configuration configuration) {
         if (configuration == null) // get a default
             configuration = new Configuration();
         
+        this.keyToAccidentalsMap = new AbcKeyToAccidentalsMap(configuration);
+        
         final StringBuilder result = new StringBuilder();
         final int numberOfBarsPerLine = Math.max(configuration.numberOfBarsPerLine(), 1);
-        final boolean isFlatKey = configuration.isFlatKey();
         
         String timeSignature = writeHeader(configuration, result);
         int barCount = 0;
@@ -186,12 +125,13 @@ public class AbcExport
             final Note[] chord = notes[i];
             final Note firstNote = chord[0];
             final Note lastNote = chord[chord.length - 1];
-            final Note nextNote = (i < notes.length - 1) ? notes[i + 1][0] : null;
+            final Note nextFirstNote = (i < notes.length - 1) ? notes[i + 1][0] : null;
             
             final boolean barStart = (i > 0 && firstNote.emphasized);
             if (barStart) {
                 result.append(ABC_BAR);
                 barCount++;
+                keyToAccidentalsMap.barStart(); // no more need to resolve accents in a new bar
             }
             
             final boolean gotoNextLine = (barCount == numberOfBarsPerLine);
@@ -214,7 +154,7 @@ public class AbcExport
             if (moreThanOneNote)
                 result.append(ABC_CHORD_OPEN);
             
-            if (firstNote.connectionFlags.multiplet() == Boolean.TRUE) {
+            if (firstNote.connectionFlags.multiplet() == Boolean.TRUE) { // triplet or other
                 if (inMultiplet == false) { // multiplet start
                     result.append("("+firstNote.connectionFlags.multipletType()+" ");
                     inMultiplet = true;
@@ -225,18 +165,17 @@ public class AbcExport
             }
             
             final boolean isDotted = isDotted(firstNote.lengthNotation);
-            final String length = moreThanOneNote
-                    ? getAbcDottedLength(wasDotted, firstNote, false) // do not yet append ">"
-                    : getAbcDottedLength(wasDotted, firstNote, isDotted);
+            // do not yet append ">" when more than one note is in chord
+            final boolean makeDotted = moreThanOneNote ? false : isDotted;
+            final String length = getAbcDottedLength(wasDotted, firstNote, makeDotted);
             wasDotted = isDotted;
             
-            // chord notes loop
-            writeChordNotes(result, isFlatKey, chord, length);
+            writeChordNotes(result, chord, length); // chord notes write loop
             
             if (moreThanOneNote) {
                 result.append(ABC_CHORD_CLOSE);
-                if (isDotted)
-                    result.append(ABC_DOT); // abc dot
+                if (isDotted) // the ">" was not appended, do it now after all chord notes
+                    result.append(ABC_DOT);
             }
             
             if (Boolean.TRUE.equals(lastNote.connectionFlags.tied()))
@@ -244,13 +183,12 @@ public class AbcExport
             
             inSlur = detectSlurEnd(result, inSlur, lastNote);
             
-            finish(result, lastNote, moreThanOneNote, nextNote);
+            finish(result, lastNote, moreThanOneNote, nextFirstNote);
         }
         
         result.append("||");
         return result.toString();
     }
-
     
     private String writeHeader(Configuration configuration, StringBuilder result) {
         appendLine(result, "X: "+(configuration.songNumber() != null ? configuration.songNumber() : 1));
@@ -286,6 +224,47 @@ public class AbcExport
         
         return timeSignature;
     }
+    
+    private void writeChordNotes(StringBuilder result, Note[] chord, String length) {
+        for (final Note note : chord) { // single notes, mostly just one
+            final String adjustedAbcNoteName = keyToAccidentalsMap.getAdjustedNote(note.ipnName);
+            
+            result.append(adjustedAbcNoteName);
+            result.append("/"+length);
+            
+            if (isEighthOrShorter(length) == false && note != chord[chord.length - 1])
+                result.append(" ");
+        }
+    }
+    
+    private void finish(StringBuilder result, Note firstNote, boolean moreThanOneNoteInChord, Note nextFirstNote) {
+        final boolean isEighthOrShorter = isEighthOrShorter(firstNote.lengthNotation);
+        final boolean nextIsEighthOrShorter = (nextFirstNote != null && isEighthOrShorter(nextFirstNote.lengthNotation));
+        final boolean barEnd = (nextFirstNote == null || nextFirstNote.emphasized);
+        final boolean endOfMultiplet = 
+                (firstNote.connectionFlags.multiplet() == Boolean.FALSE);
+        final boolean beforeMultiplet = 
+                (firstNote.connectionFlags.multiplet() == null &&
+                 nextFirstNote != null && nextFirstNote.connectionFlags.multiplet() == Boolean.TRUE);
+        final boolean isRest = firstNote.isRest() || (nextFirstNote != null && nextFirstNote.isRest());
+        
+        if (isEighthOrShorter && 
+                nextIsEighthOrShorter && 
+                barEnd == false && 
+                endOfMultiplet == false &&
+                beforeMultiplet == false &&
+                isRest == false)
+        {
+            if (moreThanOneNoteInChord == false) // no ` inside a chord ...
+                result.append('`');
+            // ... else create beam by leaving out space
+        }
+        else { // longer than eighth, separate by space for readability
+            result.append(' ');
+        }
+    }
+
+    // helper methods
     
     private boolean nonEmpty(String s) {
         return s != null && s.trim().length() > 0;
@@ -323,25 +302,6 @@ public class AbcExport
         return timeSignature;
     }
     
-    private void writeChordNotes(StringBuilder result, boolean isFlatKey, Note[] chord, String length) {
-        for (Note note : chord) { // single notes, mostly just one
-            final String noteName;
-            if (isFlatKey)
-                noteName = IPN_NOTE_TO_ABC_FLAT.get(note.ipnName);
-            else
-                noteName = IPN_NOTE_TO_ABC_SHARP.get(note.ipnName);
-            
-            if (noteName == null)
-                throw new IllegalArgumentException("No ABC mapping found for IPN-name '"+note.ipnName+"'");
-            
-            result.append(noteName);
-            result.append("/"+length);
-            
-            if (isEighthOrShorter(length) == false && note != chord[chord.length - 1])
-                result.append(" ");
-        }
-    }
-    
     private String getAbcDottedLength(boolean wasDotted, Note firstNote, boolean isDotted) {
         return wasDotted
                 ? toAbcDoubleLength(firstNote.lengthNotation, isDotted) // abc shortens a ">" follower note, thus double it
@@ -366,33 +326,6 @@ public class AbcExport
         return inSlur;
     }
 
-    private void finish(StringBuilder result, Note firstNote, boolean moreThanOneNoteInChord, Note nextNote) {
-        final boolean isEighthOrShorter = isEighthOrShorter(firstNote.lengthNotation);
-        final boolean nextIsEighthOrShorter = (nextNote != null && isEighthOrShorter(nextNote.lengthNotation));
-        final boolean barEnd = (nextNote == null || nextNote.emphasized);
-        final boolean endOfMultiplet = 
-                (firstNote.connectionFlags.multiplet() == Boolean.FALSE);
-        final boolean beforeMultiplet = 
-                (firstNote.connectionFlags.multiplet() == null &&
-                 nextNote != null && nextNote.connectionFlags.multiplet() == Boolean.TRUE);
-        final boolean isRest = firstNote.isRest() || (nextNote != null && nextNote.isRest());
-        
-        if (isEighthOrShorter && 
-                nextIsEighthOrShorter && 
-                barEnd == false && 
-                endOfMultiplet == false &&
-                beforeMultiplet == false &&
-                isRest == false)
-        {
-            if (moreThanOneNoteInChord == false) // no ` inside a chord ...
-                result.append('`');
-            // ... else create beam by leaving out space
-        }
-        else { // longer than eighth, separate by space for readability
-            result.append(' ');
-        }
-    }
-
     private boolean isDotted(String lengthNotation) {
         return lengthNotation.endsWith(Note.DOTTED_SYMBOL);
     }
@@ -409,7 +342,7 @@ public class AbcExport
     }
     
     private String editDottedLength(String lengthNotation, boolean isDotted) {
-        return lengthNotation + (isDotted ? ABC_DOT : ""); // "broken rhythm" marker, also affects the following note!
+        return lengthNotation + (isDotted ? ABC_DOT : "");
     }
     
     private String stripLengthToNumber(String lengthNotation) {
