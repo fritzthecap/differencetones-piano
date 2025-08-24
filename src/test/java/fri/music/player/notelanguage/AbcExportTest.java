@@ -216,7 +216,12 @@ M: 4/4
 Q: 1/4=120
 L: 1/1
 K: D
-[A/8=f/8][^G/8f/8][B/8g/8][^A/8g/8][c/8a/8][=c/8a/8][^d/8b/8][=d/8b/8] | [=f/8c'/8][e/8c'/8][g/8^d'/8][^f/8d'/8][a/8=f'/8][^f/8d'/8][g/8d'/8][e/8c'/8] | [=f/8c'/8][d/8b/8][^d/8b/8][=c/8a/8][^c/8a/8][^A/8g/8][B/8g/8][^G/8f/8] | [A/2 =f/2] z/2 ||""";
+[A/8=f/8][^G/8f/8][B/8g/8][^A/8g/8][c/8a/8][=c/8a/8][^d/8b/8][=d/8b/8] | \
+[=f/8c'/8][e/8c'/8][g/8^d'/8][^f/8d'/8][a/8=f'/8][^f/8d'/8][g/8d'/8][e/8c'/8] | \
+[=f/8c'/8][d/8b/8][^d/8b/8][=c/8a/8][^c/8a/8][^A/8g/8][B/8g/8][^G/8f/8] | \
+[A/2 =f/2] z/2 ||""";
+        // Added backslashes to escape newlines to have readable bars like above. 
+        // The ABC text actually has no newlines.
 
         final AbcExport.Configuration configuration = new AbcExport.Configuration("D");
         runTest(INTERVALS_WITH_ACCIDENTALS, expected, configuration);
