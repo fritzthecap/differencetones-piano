@@ -1,5 +1,6 @@
 package fri.music.swingutils;
 
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -13,6 +14,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.JComponent;
+import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -40,11 +42,14 @@ public class TextAreaActions extends MouseAdapter
     private final Action cut;
     private final Action copy;
     private final Action paste;
-    private final Action clear;
     private final Action undo;
     private final Action redo;
     private final Action selectAll;
+    private final Action clear;
+    private final Action fontBigger;
+    private final Action fontSmaller;
     private final UndoManager undoManager;
+    private float fontSize = -1f;
     
     /**
      * Attaches standard actions to given text-component.
@@ -67,9 +72,11 @@ public class TextAreaActions extends MouseAdapter
         this.selectAll = actionMap.get(DefaultEditorKit.selectAllAction);
         selectAll.putValue(Action.NAME, "Select (Ctrl-A)");
         
+        final Keymap keymap = JTextComponent.addKeymap("TextAreaActions-KeyBindings", textComponent.getKeymap());
+
         this.undoManager = new UndoManager();
         undoManager.setLimit(300);
-        final Action[] undoRedo = addUndoManagement(textComponent, undoManager);
+        final Action[] undoRedo = addUndoManagement(textComponent, undoManager, keymap);
         this.undo = undoRedo[0]; // Ctrl-z
         this.redo = undoRedo[1]; // Ctrl-y
         
@@ -81,6 +88,13 @@ public class TextAreaActions extends MouseAdapter
         };
         clear.putValue(Action.NAME, "Clear");
         
+        final Action[] fontActions = addFontMagnifier(textComponent, keymap);
+        this.fontBigger = fontActions[0];
+        this.fontSmaller = fontActions[1];
+        final JMenu fontMenu = new JMenu("Font");
+        fontMenu.add(fontBigger);
+        fontMenu.add(fontSmaller);
+        
         this.contextMenu = new JPopupMenu();
         contextMenu.add(cut);
         contextMenu.add(copy);
@@ -91,6 +105,8 @@ public class TextAreaActions extends MouseAdapter
         contextMenu.addSeparator();
         contextMenu.add(selectAll);
         contextMenu.add(clear);
+        contextMenu.addSeparator();
+        contextMenu.add(fontMenu);
         
         // we need to listen to any key for enabling actions
         textComponent.addKeyListener(new KeyAdapter() {
@@ -119,15 +135,13 @@ public class TextAreaActions extends MouseAdapter
      * Adds an UndoManager and key bindings Ctrl-Z (undo) and Ctrl-Y (redo) to given textarea.
      * @return the two created actions (undo and redo) that can be used for buttons.
      */
-    private Action[] addUndoManagement(JTextComponent textComponent, UndoManager undoManager)   {
+    private Action[] addUndoManagement(JTextComponent textComponent, UndoManager undoManager, Keymap keymap)   {
         textComponent.getDocument().addUndoableEditListener(new UndoableEditListener()   {
             @Override
             public void undoableEditHappened(UndoableEditEvent e) {
                 undoManager.addEdit(e.getEdit());
             }
         });
-
-        final Keymap keymap = JTextComponent.addKeymap("TextArea-Undo-Redo-Bindings", textComponent.getKeymap());
 
         final Action undo = new AbstractAction("Undo (Ctrl-Z)")  {
             @Override
@@ -150,6 +164,28 @@ public class TextAreaActions extends MouseAdapter
         textComponent.setKeymap(keymap);
         
         return new Action[] { undo, redo };
+    }
+    
+    private Action[] addFontMagnifier(final JTextComponent textComponent, Keymap keymap)   {
+        final Action fontBigger = new AbstractAction("+ (Ctrl-Plus)") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                magnifyFont(true, textComponent);
+            }
+        };
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK);
+        keymap.addActionForKeyStroke(key, fontBigger);
+        
+        final Action fontSmaller = new AbstractAction("- (Ctrl-Minus)") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                magnifyFont(false, textComponent);
+            }
+        };
+        key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK);
+        keymap.addActionForKeyStroke(key, fontSmaller);
+        
+        return new Action[] { fontBigger, fontSmaller };
     }
     
     private boolean showContextMenu(MouseEvent e) {
@@ -184,5 +220,17 @@ public class TextAreaActions extends MouseAdapter
         final boolean textExists = (textComponent.getDocument().getLength() > 0);
         clear.setEnabled(textExists);
         selectAll.setEnabled(textExists == true && textIsSelected == false);
+    }
+
+    private void magnifyFont(boolean bigger, JTextComponent textComponent) {
+        final Font font = textComponent.getFont();
+        if (fontSize <= 0)
+            fontSize = font.getSize2D();
+        else if (fontSize <= 8 & bigger == false || fontSize >= 28 & bigger == true)
+            return; // is no more readable
+        
+        fontSize += bigger ? +2 : -2;
+        final Font newFont = font.deriveFont(fontSize);
+        textComponent.setFont(newFont);
     }
 }
