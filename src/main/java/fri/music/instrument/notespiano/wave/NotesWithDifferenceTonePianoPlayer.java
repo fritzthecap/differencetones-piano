@@ -7,6 +7,7 @@ import javax.swing.JComponent;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
+import fri.music.instrument.notespiano.PlayController;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.player.Note;
 import fri.music.player.NotesUtil;
@@ -67,6 +68,14 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         getDifferenceTonePiano().setTuningControlsEnabled(isStop);
         convertToDifferenceTones.setEnabled(isStop);
         getDifferenceTonePiano().setDifferenceToneParametersEnabled(isStop);
+    }
+    
+    /** Overridden to disallow chords. */
+    @Override
+    protected PlayController newPlayController() {
+        final PlayController playController = super.newPlayController();
+        playController.setDisallowChords(true);
+        return playController;
     }
     
     /** Overridden to alternatively generate difference-tone intervals when playing. */

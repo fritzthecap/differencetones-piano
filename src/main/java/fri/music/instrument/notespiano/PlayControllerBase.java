@@ -28,12 +28,19 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     
     private SoundChannel pianoKeyConnector;
     
+    private boolean disallowChords; // false by Java default
+    
     public PlayControllerBase(NotesPianoPlayer notesPianoPlayer) {
         this.notesPianoPlayer = notesPianoPlayer;
     }
     
     public void setBaseView(NotesTextPanelBase view) {
         this.view = view;
+    }
+    
+    /** This call configures used MelodyFactory.*/
+    public void setDisallowChords(boolean disallowChords) {
+        this.disallowChords = disallowChords;
     }
     
     // interface PlayControlButtons.Listener
@@ -71,7 +78,8 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         gotoStartOrEnd(false);
     }
     
-    protected boolean isPlaying() {
+    /** @return true when this controller is playing music. */
+    protected final boolean isPlaying() {
         synchronized (playerLock) {
             return player != null;
         }
@@ -119,6 +127,8 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         }
         else { // parse notes
             final MelodyFactory melodyFactory = notesPianoPlayer.newMelodyFactory();
+            melodyFactory.setDisallowChords(disallowChords);
+            
             notes = melodyFactory.translate(notesString); // throws exceptions
             checkNotesRange(notes); // throws exceptions
             

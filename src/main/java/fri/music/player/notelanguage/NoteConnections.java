@@ -59,6 +59,10 @@ public class NoteConnections
     private final boolean chordEnd;
     
     NoteConnections(String melodyToken) {
+        this(melodyToken, false);
+    }
+    
+    NoteConnections(String melodyToken, boolean disallowChords) {
         NoteConnection noteConnection;
         noteConnection = new NoteConnection(melodyToken, SLUR_START_SYMBOL);
         this.slurStart = noteConnection.exists;
@@ -72,6 +76,9 @@ public class NoteConnections
         this.chordStart = noteConnection.exists;
         noteConnection = new NoteConnection(noteConnection.editedToken, CHORD_END_SYMBOL);
         this.chordEnd = noteConnection.exists;
+        
+        if (disallowChords && (chordStart || chordEnd))
+            throw new IllegalArgumentException("Chords are not allowed in this area: "+melodyToken);
         
         if (chordStart && chordEnd)
             throw new IllegalArgumentException("A chord must contain more than one note: "+melodyToken);

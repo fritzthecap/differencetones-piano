@@ -73,6 +73,8 @@ public class MelodyFactory
     private String timeSignatureOnTop;
     private Integer tempoOnTop;
     
+    private boolean disallowChords; // false by Java default
+    
     /** Factory with default settings. */
     public MelodyFactory() {
         this(null, null, null, null, null);
@@ -134,6 +136,11 @@ public class MelodyFactory
         checkValidBeatsPerMinute(this.beatsPerMinute);
         
         calculateBeatDurationMilliseconds();
+    }
+    
+    /** When this is disallowed (is not by default), chord symbols would cause a syntax error. */
+    public void setDisallowChords(boolean disallowChords) {
+        this.disallowChords = disallowChords;
     }
     
     /**
@@ -369,7 +376,7 @@ public class MelodyFactory
 
     
     private InputToken newInputToken(String melodyToken, String firstChordNoteLength) {
-        final NoteConnections noteConnections = new NoteConnections(melodyToken);
+        final NoteConnections noteConnections = new NoteConnections(melodyToken, disallowChords);
         
         final MelodyToken noteAndLength = splitByDurationSeparator(noteConnections.melodyToken);
         
