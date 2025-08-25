@@ -15,6 +15,7 @@ import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.DefaultEditorKit;
@@ -152,6 +153,9 @@ public class TextAreaActions extends MouseAdapter
     }
     
     private boolean showContextMenu(MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e))
+            ((JComponent) e.getSource()).requestFocus(); // else right click would not focus text-area!
+        
         final boolean isPopupEvent = e.isPopupTrigger();
         if (isPopupEvent) {
             setActionsEnabled((JTextComponent) e.getSource());
