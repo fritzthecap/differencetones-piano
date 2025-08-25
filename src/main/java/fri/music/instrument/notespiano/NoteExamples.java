@@ -2,8 +2,11 @@ package fri.music.instrument.notespiano;
 
 public interface NoteExamples
 {
-    public record Melody(String title, String notes)
+    public record Melody(String title, boolean isSong, String notes)
     {
+        public Melody(String title, String notes) {
+            this(title, false, notes);
+        }
     }
     
     Melody PENTATONIC = new Melody("Pentatonic", """
@@ -38,7 +41,7 @@ G#4/8 G4/8 F#4/8 F4/8 E4/8 D#4/8 D4/8 C#4/8
 C4/2 -/2
 """);
 
-    Melody AUGUSTIN = new Melody("Augustin", """
+    Melody AUGUSTIN = new Melody("Augustin", true, """
 3/4
 G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
 D4/4 G3/4 G3/4 E4/4 C4/4 C4/4
@@ -46,7 +49,7 @@ G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
 D4/4 G3/4 G3/4 C4/2.
 """);
     
-    Melody WHEN_THE_SAINTS = new Melody("When the Saints", """
+    Melody WHEN_THE_SAINTS = new Melody("When the Saints", true, """
 144
 -/2 -/8 G4/8 B4/8 C5/8 
 (D5/2 D5/8) G4/8 B4/8 C5/8

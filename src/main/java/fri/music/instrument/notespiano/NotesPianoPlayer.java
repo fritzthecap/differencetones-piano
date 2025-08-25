@@ -20,7 +20,7 @@ import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
 
 /**
- * A notes area that can play user-editable notes on a given piano.
+ * A notes area that can play user-edited notes on a given piano.
  * It uses a constructor-given piano to play the entered notes, thus
  * it is called "Player" and not "Piano", although it displays a piano.
  * <p/>
@@ -107,7 +107,7 @@ public class NotesPianoPlayer
     }
 
     /** @return a new MelodyFactory with current parameters from UI. */
-    protected final MelodyFactory newMelodyFactory() {
+    protected MelodyFactory newMelodyFactory() {
         final Integer[] timeSignature = timeSignatureParts();
         return new MelodyFactory(
                 null,
@@ -266,8 +266,13 @@ public class NotesPianoPlayer
     // UI builder methods
     
     private JMenu buildLoadMenuItems() {
-        final JMenu menu = new JMenu("Load");
+        final JMenu menu = new JMenu("Load Examples");
+        boolean songSeparator = false;
         for (final NoteExamples.Melody melody : NoteExamples.MELODIES) {
+            if (melody.isSong() && songSeparator == false) {
+                songSeparator = true;
+                menu.addSeparator();
+            }
             final JMenuItem item = new JMenuItem(melody.title());
             item.addActionListener(new ActionListener() {
                 @Override
@@ -285,10 +290,13 @@ public class NotesPianoPlayer
     private void formatNotes(PlayControllerBase playController, NotesTextPanelBase view) {
         final Note[][] notes = readNotesFromTextAreaCatchExceptions(playController, view);
         if (notes != null) {
+            final boolean isIntervalsView = (view() != view); // not "Notes" view
             final String formatted = newMelodyFactory().formatBarLines(
                     notes, 
-                    view().tempoSpinner.isEnabled() == false, // write tempo and bar only when it was written in text
-                    view().timeSignatureChoice.isEnabled() == false);
+                    // write tempo and bar only when it was written in text,
+                    // or when the view is intervals-view
+                    isIntervalsView || view().tempoSpinner.isEnabled() == false,
+                    isIntervalsView || view().timeSignatureChoice.isEnabled() == false);
             view.notesText.setText(formatted);
             view.notesText.requestFocus();
         }
