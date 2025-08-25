@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -26,6 +25,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -63,7 +63,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     
     private JComponent pianoPanel;
     private JPanel intervalListsPanel;
-    private JPanel mainContainer;
+    private JPanel listsContainer;
     private JPanel centerPanel;
     private JButton closeAllIntervalFrames;
     private JCheckBox sortIntervalFrames;
@@ -85,7 +85,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         this.pianoKeyConnector = new PianoKeyConnector(this);
         
-        pianoPanel.add(buildUi(), BorderLayout.CENTER);
+        this.listsContainer = buildUi();
+        pianoPanel.add(listsContainer, BorderLayout.CENTER);
         
         return this.pianoPanel = pianoPanel;
     }
@@ -93,11 +94,18 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     /** Overridden to dynamically provide a panel for adding to <code>BorderLayout.CENTER</code>. */
     @Override
     public JComponent getPanelWithFreeCenter() {
-        getKeyboard();
+        getKeyboard(); // make sure keyboard was built
         
         if (this.centerPanel == null) {
             this.centerPanel = new JPanel(new BorderLayout());
-            mainContainer.add(centerPanel, 0);
+            pianoPanel.remove(listsContainer);
+            
+            final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+            splitPane.setLeftComponent(centerPanel); // upper
+            splitPane.setRightComponent(listsContainer); // lower
+            splitPane.setResizeWeight(0.5);
+            
+            pianoPanel.add(splitPane, BorderLayout.CENTER);
         }
         return centerPanel;
     }
@@ -225,29 +233,18 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     // UI builder methods
     
     private JPanel buildUi() {
-        buildControls();
-        final JPanel listsContainer = buildIntervalListsContainer();
-
-        this.mainContainer = new JPanel();
-        final BoxLayout mainLayout = new BoxLayout(mainContainer, BoxLayout.Y_AXIS);
-        mainContainer.setLayout(mainLayout);
-        
-        mainContainer.add(listsContainer);
-        return mainContainer;
-    }
-
-    private void buildControls() {
-        final ActionListener rangeChangeListener = new ActionListener() {
+        addIntervalRangeActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 tuningParametersHaveChanged();
             }
-        };
-        addIntervalRangeActionListener(rangeChangeListener);
+        });
+        
+        return buildIntervalListsContainer();
     }
-    
+
     private JPanel buildIntervalListsContainer() {
-        final FlowLayout layout = new FlowLayout(FlowLayout.LEFT); // arrange frames from left to right
+        final FlowLayout layout = new FlowLayout(FlowLayout.LEADING);
         layout.setHgap(0);
         this.intervalListsPanel = new JPanel(layout);
         intervalListsPanel.setToolTipText(
@@ -269,13 +266,11 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         });
         
         final JToolBar intervalListsToolbar = new JToolBar();
-        //intervalListsToolbar.add(Box.createHorizontalGlue()); // for right alignment
         intervalListsToolbar.add(sortIntervalFrames);
         intervalListsToolbar.add(closeAllIntervalFrames);
         
         final JPanel intervalListsContainer = new JPanel(new BorderLayout());
         final JScrollPane intervalListsScrollPane = new JScrollPane(intervalListsPanel);
-        intervalListsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         intervalListsScrollPane.setBorder(BorderFactory.createTitledBorder(
                 "Lists of Intervals Generating a Tone as Difference-Tone"));
         intervalListsContainer.add(intervalListsScrollPane, BorderLayout.CENTER);
