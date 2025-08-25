@@ -203,6 +203,27 @@ K: C
     ////////////////////////////////////////////////////////////////////////////
     
     @Test
+    void accidentals() {
+        final String INTERVALS_WITH_ACCIDENTALS = """
+C#5/8 C5/8 C#5/8 C5/8 C#5/8 C5/8 C#5/8 D5/8 
+D#5/8 E5/8 D#5/8 D5/8 C#5/8 C5/8 C#5/8 D#5/8
+E5/8 D5/8 C#5/8 D#5/8 E5/2""";
+    
+        final String expected = """
+X: 1
+M: 4/4
+Q: 1/4=120
+L: 1/1
+K: A
+c/8`=c/8`^c/8`=c/8`^c/8`=c/8`^c/8`d/8 | ^d/8`e/8`d/8`=d/8`c/8`=c/8`^c/8`^d/8 | e/8`d/8`c/8`^d/8 e/2 ||""";
+
+        final AbcExport.Configuration configuration = new AbcExport.Configuration("A");
+        runTest(INTERVALS_WITH_ACCIDENTALS, expected, configuration);
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
+    
+    @Test
     void lotsOfAccidentals() {
         final String INTERVALS_WITH_ACCIDENTALS = """
 [A4/8 F5/8] [G#4/8 F5/8] [B4/8 G5/8] [A#4/8 G5/8] [C#5/8 A5/8] [C5/8 A5/8] [D#5/8 B5/8] [D5/8 B5/8]

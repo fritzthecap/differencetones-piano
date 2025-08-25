@@ -269,18 +269,24 @@ public class AbcKeyToAccidentalsMap
             String corrected = null;
             if (hasAccidental) { // check if there was a preceding resolve
                 Iterator<String> iterator = precedingNotInScaleResolved.iterator();
-                while (corrected == null && iterator.hasNext())
-                    if (isOnSameNoteline(iterator.next(), ipnNoteName, isFlatKey == false))
+                while (corrected == null && iterator.hasNext()) {
+                    if (isOnSameNoteline(iterator.next(), ipnNoteName, isFlatKey == false)) {
                         corrected = abcNoteName; // leave its accidental
+                        iterator.remove(); // must not be there anymore
+                    }
+                }
                 
                 if (corrected == null && accidentalDefinedByKeyOfTune(ipnNoteName))
                     abcNoteName = removeAccidental(abcNoteName);
             }
             else { // has no accidental, check if there was an accidental before
                 Iterator<String> iterator = precedingNotInScaleWithAccidental.iterator();
-                while (corrected == null && iterator.hasNext())
-                    if (isOnSameNoteline(iterator.next(), ipnNoteName, isFlatKey == true))
+                while (corrected == null && iterator.hasNext()) {
+                    if (isOnSameNoteline(iterator.next(), ipnNoteName, isFlatKey == true)) {
                         corrected = resolveAccidental(abcNoteName);
+                        iterator.remove(); // must not be there anymore
+                    }
+                }
             }
             
             if (corrected != null)
