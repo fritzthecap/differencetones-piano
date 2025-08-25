@@ -14,7 +14,7 @@ public class NotesPianoPlayerDemo
         final int octaves = 7;
         final String lowestToneIpnName = "C2";
         
-        final JFrame frame = new JFrame("Write Notes with Piano and Let Play Them ("+octaves+" Octaves)");
+        final JFrame frame = new JFrame("Write Notes with Piano and Hear Them");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         final PianoWithSound.Configuration config = new PianoWithSound.Configuration(
