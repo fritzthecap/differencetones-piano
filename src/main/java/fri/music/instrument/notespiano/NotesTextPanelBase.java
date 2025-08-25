@@ -55,9 +55,11 @@ public class NotesTextPanelBase extends JPanel
         add(notesControlPanel, pianoIsVertical ? BorderLayout.NORTH : addControlPanelToWest ? BorderLayout.WEST : BorderLayout.EAST);
     }
     
+    /** @return whether permanentNotesCheck is ON. */
     public boolean isPermanentNotesCheck() {
         return permanentNotesCheck;
     }
+    /** When writing two notes that are tied it is useful to temporarily disable the syntax check (open tie). */
     public void setPermanentNotesCheck(boolean active) {
         this.permanentNotesCheck = active;
     }

@@ -253,7 +253,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         intervalListsPanel.add(Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4));
         
         this.sortIntervalFrames = new JCheckBox("Sort Lists by Pitch", true);
-        sortIntervalFrames.setToolTipText("Insert New Interval-List Frames Sorted by Pitch");
+        sortIntervalFrames.setToolTipText("Insert New Interval-List Frames Sorted by Difference-Tone Pitch");
         
         this.closeAllIntervalFrames = new JButton("Close All Lists");
         closeAllIntervalFrames.setToolTipText("Close All Open Interval-List Frames");
@@ -475,7 +475,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             frameCloseButton.setToolTipText("Close List");
             
             this.frameTitle = new JLabel(ipnNoteName, JLabel.CENTER);
-            frameTitle.setToolTipText("Intervals Generating "+ipnNoteName);
+            frameTitle.setToolTipText("All Difference-Tone Intervals Generating "+ipnNoteName);
             frameTitle.addMouseListener(frameSelectionListener);
             frameTitle.addMouseListener(new MouseAdapter() {
                 @Override
