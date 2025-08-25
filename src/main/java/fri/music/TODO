@@ -1,22 +1,18 @@
 
  - Add option to open every note in left-side text area 
     as interval-frame, even when it already exists.
+    This would enable to choose intervals going from left to right for
+    every note of the melody.
     This must be disabled when "Sort Lists by Pitch" is active.
     A tooltip should warn about too many frames.
     
-- Notes of intervals clicked in DifferenceToneInversionsPiano
-    should be written into a second text-area,
-    see (unfinished) NotesWithDifferenceToneInversionsPianoPlayerDemo.
-    The second text-area should also have player controls.
-    Maybe open another piano-window for that?
-    Target would be to support difference-tone composing.
-    
-    The export to ABC would require two voices, the lower one with the tune,
+- The export to ABC would require two voices, the lower one with the tune,
     the upper one with its difference tone intervals.
 
 - Support double dots. Count number of dots at end of note instead of making a boolean.
+    Consider this! Double dots are cryptography, rather force writing rests!
 
-- For NotesPianoPlayer and sub-classes there should be a ConfigurationPanel.
+- For NotesPianoPlayer and sub-classes there should be a UI-ConfigurationPanel.
     
 - The titles of demo apps should be also visible when running
     pianos from ConfigurationPanel.
@@ -51,6 +47,7 @@
     "Try out Wave Generators" (WavePianoDemo, PianoConfiguration), 
     TODO: there is more!
 
+==============================
 
 Fixed Bugs:
 
