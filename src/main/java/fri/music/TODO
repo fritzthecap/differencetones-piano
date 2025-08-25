@@ -1,17 +1,8 @@
 
-- Bug: when a note was sharp or flat, and the next is not,
-    in ABC it must be resolved, else it will be regarded as sharp or flat too.
-    
-    REPRODUCTION: load AUGUSTIN, Auto-Compose, Export to ABC -> 
-        Intervals with accented notes change to non-accented, 
-        but accented notes are not resolved 
-        
-    Note: translation to ABC mappings must be reimplemented with regard to key.
-
-- Bug: "Format Notes" removes tempo amd bar in intervals text area.
-    
-- MelodyFactory should have a switch to disallow chords.
-    When disallowed, chords would be reported as error.
+ - Add option to open every note in left-side text area 
+    as interval-frame, even when it already exists.
+    This must be disabled when "Sort Lists by Pitch" is active.
+    A tooltip should warn about too many frames.
     
 - Notes of intervals clicked in DifferenceToneInversionsPiano
     should be written into a second text-area,
