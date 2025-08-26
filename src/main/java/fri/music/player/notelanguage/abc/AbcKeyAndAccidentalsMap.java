@@ -11,8 +11,9 @@ import fri.music.TextUtil;
 import fri.music.ToneSystem;
 
 /**
- * Manages the accidentals (#, b) of notes in ABC notation
- * according to a key (C, Bb, Hm, ...).
+ * Manages the mapping of notes from IPN-notation to ABC,
+ * and accidentals (#, b) of notes in ABC notation
+ * according to some key like D, Bb, Hm, ... (not IPN-naming!).
  * <pre>
      IPN = ABC note-name and octave
      C0 = C,,,, 
@@ -28,7 +29,7 @@ import fri.music.ToneSystem;
      C10 = c'''''
  * </pre>
  */
-public class AbcKeyToAccidentalsMap
+public class AbcKeyAndAccidentalsMap
 {
     private static final String ABC_NATURAL = "="; // resolution of some preceding accidental
     private static final String ABC_SHARP = "^";
@@ -249,7 +250,7 @@ public class AbcKeyToAccidentalsMap
     private final Set<String> precedingNotInScaleWithAccidental = new HashSet<>();
     private final Set<String> precedingNotInScaleResolved = new HashSet<>();
     
-    public AbcKeyToAccidentalsMap(AbcExport.Configuration configuration) {
+    public AbcKeyAndAccidentalsMap(AbcExport.Configuration configuration) {
         this.keyOfTune = configuration.getKey();
         this.isFlatKey = configuration.isFlatKey();
         this.ipnNamesNotInScale = KEY_TO_NOTES_NOT_IN_KEY.get(keyOfTune);

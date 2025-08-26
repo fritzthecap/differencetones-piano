@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import fri.music.TextUtil;
+import fri.music.ToneSystem;
 import fri.music.player.Note;
 import fri.music.player.notelanguage.MelodyFactory;
 
@@ -46,26 +47,34 @@ public class AbcExport
             this(1, title, null, author, null, keyAndClef, 4);
         }
         
-        /** @return true when the tune's key is F, Bb, Eb, Ab, ... Db, else false. */
-        public boolean isFlatKey() {
-            if (keyAndClef == null)
-                return false;
-            if (keyAndClef.startsWith("F"))
-                return true;
-            if (keyAndClef.length() > 1 && keyAndClef.charAt(1) == 'b')
-                return true;
-            return false;
-        }
-        
-        /** @return the upper-case key without optional clef. */
+        /** @return the keyOfTune like needed in AbcKeyToAccidentalsMap, without optional clef. */
         public String getKey() {
             final String trimmed = (keyAndClef != null) ? keyAndClef.trim() : "";
             if (trimmed.length() <= 0)
                 return "C";
             
             final int spaceIndex = trimmed.indexOf(' ');
-            final String key = (spaceIndex > 0) ? trimmed.substring(0, spaceIndex) : trimmed;
-            return key;
+            String key = (spaceIndex > 0) ? trimmed.substring(0, spaceIndex) : trimmed;
+            if (key.length() >= 2) {
+                char firstChar = Character.toUpperCase(key.charAt(0));
+                char secondChar = key.charAt(1);
+                if (secondChar == 'B')
+                    secondChar = 'b';
+                if (secondChar != '#' && secondChar != 'b') // ABC-names like "F#m" or "Ab"
+                    throw new IllegalArgumentException("Key of tune is invalid: "+key);
+                return "" + firstChar + secondChar + key.substring(2);
+            }
+            return key.toUpperCase();
+        }
+        
+        /** @return true when the tune's key is F, Bb, Eb, Ab, ... Db, else false. */
+        public boolean isFlatKey() {
+            final String key = getKey();
+            if (key.startsWith("F") && (key.length() == 1 || key.charAt(1) != '#')) // ABC-names like "F#m" or "Ab"
+                return true;
+            if (key.length() > 1 && key.charAt(1) == 'b')
+                return true;
+            return false;
         }
     }
     
@@ -82,7 +91,7 @@ public class AbcExport
     private final Note[][] notes;
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
-    private AbcKeyToAccidentalsMap keyToAccidentalsMap;
+    private AbcKeyAndAccidentalsMap keyToAccidentalsMap;
     
     /** Constructor of an exporter for different export-configurations from text. */
     public AbcExport(String notes, MelodyFactory melodyFactory) {
@@ -96,13 +105,13 @@ public class AbcExport
             throw new IllegalArgumentException("Can not export empty notes!");
         
         if (notes[0][0].beatInfo == null || notes[0][0].beatInfo.timeSignature() == null)
-            throw new IllegalArgumentException("First note is expected to carry time-signature!");
+            throw new IllegalArgumentException("First note is expected to carry time-signature and tempo!");
             
         this.notes = notes;
     }
     
     /**
-     * Export constructor notes with given header configuration.
+     * Exports notes given in constructor according to given header configuration.
      * @param configuration the configuration of the ABC header.
      * @return a text with ABC notation of given notes.
      */
@@ -110,7 +119,7 @@ public class AbcExport
         if (configuration == null) // get a default
             configuration = new Configuration();
         
-        this.keyToAccidentalsMap = new AbcKeyToAccidentalsMap(configuration);
+        this.keyToAccidentalsMap = new AbcKeyAndAccidentalsMap(configuration);
         
         final StringBuilder result = new StringBuilder();
         final int numberOfBarsPerLine = Math.max(configuration.numberOfBarsPerLine(), 1);
