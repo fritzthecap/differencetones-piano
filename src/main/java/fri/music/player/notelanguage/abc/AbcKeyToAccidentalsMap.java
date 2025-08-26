@@ -246,8 +246,9 @@ public class AbcKeyToAccidentalsMap
     }
 
     public String getAdjustedNote(String ipnNoteName) {
-        String abcNoteName = getAbsolutelyMappedAbcNote(ipnNoteName); // keyOfTune not considered yet
-        final boolean hasAccidental = hasAccidental(abcNoteName);
+        final String absoluteAbcName = getAbsolutelyMappedAbcNote(ipnNoteName); // accidentals set by keyOfTune not considered yet
+        final boolean hasAccidental = hasAccidental(absoluteAbcName);
+        String abcName = absoluteAbcName;
         
         if (isIn(ipnNamesNotInScale, ipnNoteName)) { // is NOT in scale, e.g. F# in key of C, or F in Key of D
             if (hasAccidental) {
@@ -255,45 +256,47 @@ public class AbcKeyToAccidentalsMap
                 if (alreadyAdded == false)
                     precedingNotInScaleWithAccidental.add(ipnNoteName); // remember it for removing accidental from followers
                 else // remove accidental from follower
-                    abcNoteName = removeAccidental(abcNoteName);
+                    abcName = removeAccidental(absoluteAbcName);
             }
             else if (wouldBeAlteredByKeyOfTune(ipnNoteName)) { // B in key of F would be Bb, or F in key of G would be F#
                 final boolean alreadyAdded = precedingNotInScaleResolved.contains(ipnNoteName);
                 if (alreadyAdded == false) {
                     precedingNotInScaleResolved.add(ipnNoteName); // remember it for sparing followers
-                    abcNoteName = ABC_NATURAL + abcNoteName; // add accidental-resolver to first
+                    abcName = ABC_NATURAL + absoluteAbcName; // add accidental-resolver to first
                 }
             }
         }
-        else { // IS in scale of keyOfTune
+        else { // IS in scale of keyOfTune, but may carry redundant accidental
             String adjusted = null;
-            if (hasAccidental) { // check if there was a preceding resolve
-                Iterator<String> iterator = precedingNotInScaleResolved.iterator();
+            if (hasAccidental) { // HAS accidental, check if there was a preceding resolve
+                final Iterator<String> iterator = precedingNotInScaleResolved.iterator();
+                final boolean searchUpwards = (isFlatKey == false);
                 while (adjusted == null && iterator.hasNext()) {
-                    if (isOnSameNoteline(iterator.next(), ipnNoteName, isFlatKey == false)) {
-                        adjusted = abcNoteName; // leave its accidental
+                    if (isOnSameNoteline(iterator.next(), ipnNoteName, searchUpwards)) {
+                        adjusted = absoluteAbcName; // leave its accidental
                         iterator.remove(); // accidental is active again, remove preceding resolve
                     }
                 }
                 
                 if (adjusted == null && accidentalIsDefinedByKeyOfTune(ipnNoteName))
-                    adjusted = removeAccidental(abcNoteName);
+                    adjusted = removeAccidental(absoluteAbcName);
             }
-            else { // has no accidental, check if there was an accidental before
-                Iterator<String> iterator = precedingNotInScaleWithAccidental.iterator();
+            else { // has NO accidental, check if there was an accidental before
+                final Iterator<String> iterator = precedingNotInScaleWithAccidental.iterator();
+                final boolean searchUpwards = (isFlatKey == true);
                 while (adjusted == null && iterator.hasNext()) {
-                    if (isOnSameNoteline(iterator.next(), ipnNoteName, isFlatKey == true)) {
-                        adjusted = resolveAccidental(abcNoteName);
+                    if (isOnSameNoteline(iterator.next(), ipnNoteName, searchUpwards)) {
+                        adjusted = resolveAccidental(absoluteAbcName);
                         iterator.remove(); // accidental is resolved, remove predecessor carrying accidental
                     }
                 }
             }
             
             if (adjusted != null)
-                abcNoteName = adjusted;
+                abcName = adjusted;
         }
         
-        return abcNoteName;
+        return abcName;
     }
 
     private String getAbsolutelyMappedAbcNote(String ipnNoteName) {
