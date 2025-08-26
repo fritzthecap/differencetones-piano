@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import fri.music.TextUtil;
-import fri.music.ToneSystem;
 import fri.music.player.Note;
 import fri.music.player.notelanguage.MelodyFactory;
 

@@ -5,14 +5,13 @@
     every note of the melody.
     This must be disabled when "Sort Lists by Pitch" is active.
     A tooltip should warn about too many frames.
+    Maybe allow to detach the list frames panel to a modeless sizable dialog
+    and arrange them left to right in lines.
     
 - The export from NotesWithDifferenceToneInversionsPianoPlayer 
     to ABC would require two voices, the lower one with the tune,
     the upper one with its difference tone intervals.
 
-- Support double dots. Count number of dots at end of note instead of making a boolean.
-    Consider this! Double dots are cryptography, rather force writing rests!
-    
 - The titles of demo apps should be also visible when running
     pianos from ConfigurationPanel.
     A "Help" button in configuration panel should document the 
@@ -24,9 +23,6 @@
     Difference tones in different tunings (DifferenceToneDemo)
     Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
     
-- Must be able to load and save melodies (from/to files, or predefined String resources) 
-    in NotesPiano.
-
 - Documentation UI, leading through different topics.
     This should be in foreground initially, but can be made optional
     for all introduction-dialogs through a checkbox "Never show introductions".
