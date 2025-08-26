@@ -65,7 +65,7 @@ public class AbcExport
             
             final int spaceIndex = trimmed.indexOf(' ');
             final String key = (spaceIndex > 0) ? trimmed.substring(0, spaceIndex) : trimmed;
-            return key.toUpperCase();
+            return key;
         }
     }
     

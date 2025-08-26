@@ -209,7 +209,7 @@ C#5/8 C5/8 C5/8 C#5/8 C#5/8 C5/8 C#5/8 D5/8
 D#5/8 E5/8 D#5/8 D5/8 C#5/8 C5/8 C#5/8 D#5/8
 E5/8 D5/8 C#5/8 D#5/8 E5/2""";
     
-        final String expected = """
+        final String expectedInSharpKey = """
 X: 1
 M: 4/4
 Q: 1/4=120
@@ -217,8 +217,19 @@ L: 1/1
 K: A
 c/8`=c/8`c/8`^c/8`c/8`=c/8`^c/8`d/8 | ^d/8`e/8`d/8`=d/8`c/8`=c/8`^c/8`^d/8 | e/8`d/8`c/8`^d/8 e/2 ||""";
 
-        final AbcExport.Configuration configuration = new AbcExport.Configuration("A");
-        runTest(INTERVALS_WITH_ACCIDENTALS, expected, configuration);
+        final AbcExport.Configuration configurationInSharpKey = new AbcExport.Configuration("A");
+        runTest(INTERVALS_WITH_ACCIDENTALS, expectedInSharpKey, configurationInSharpKey);
+        
+        final String expectedInFlatKey = """
+X: 1
+M: 4/4
+Q: 1/4=120
+L: 1/1
+K: Eb
+_d/8`c/8`c/8`d/8`d/8`c/8`d/8`=d/8 | e/8`=e/8`_e/8`d/8`_d/8`c/8`d/8`e/8 | =e/8`d/8`_d/8`_e/8 =e/2 ||""";
+
+        final AbcExport.Configuration configurationInFlatKey = new AbcExport.Configuration("Eb");
+        runTest(INTERVALS_WITH_ACCIDENTALS, expectedInFlatKey, configurationInFlatKey);
     }
     
     ////////////////////////////////////////////////////////////////////////////

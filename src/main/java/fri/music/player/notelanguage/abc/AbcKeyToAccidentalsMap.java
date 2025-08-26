@@ -204,6 +204,26 @@ public class AbcKeyToAccidentalsMap
     }
     
     /**
+     * Get accidentals for any keyOfTune from KEY_TO_NOTES_WITH_ACCIDENTALS: 
+     * when isFlatKey is false, returns "G#" for "G", else "F#" for "G".
+     * Thus it searches the next semi-tone in different directions.
+     */
+    private String skipNote(boolean isFlatKey, String ipnBaseName) {
+        for (int i = 0; i < ToneSystem.IPN_BASE_NAMES.length; i++) {
+            if (ToneSystem.IPN_BASE_NAMES[i].equals(ipnBaseName)) {
+                int skipIndex = isFlatKey ? (i - 1) : (i + 1);
+                if (skipIndex < 0)
+                    skipIndex = ToneSystem.IPN_BASE_NAMES.length - 1;
+                else if (skipIndex >= ToneSystem.IPN_BASE_NAMES.length)
+                    skipIndex = 0;
+                return ToneSystem.IPN_BASE_NAMES[skipIndex];
+            }
+        }
+        throw new IllegalArgumentException("Can not skip '"+ipnBaseName+"' for finding accidentals of "+(isFlatKey ? "flat" : "sharp")+" key");
+    }
+
+    
+    /**
      * Key of tune can be base tone with scale-type: C, Hm, Gb, Bbm, ...
      */
     private final String keyOfTune;
@@ -235,7 +255,7 @@ public class AbcKeyToAccidentalsMap
         this.ipnNamesNotInScale = KEY_TO_NOTES_NOT_IN_KEY.get(keyOfTune);
         this.namesThatWouldGetAccidentals = KEY_TO_NOTES_WITH_ACCIDENTALS.get(keyOfTune);
         this.accidentalsDefinedByKey = namesThatWouldGetAccidentals.stream()
-                .map(name -> name + ToneSystem.SHARP_CHAR) // replace "F" by "F#"
+                .map(name -> skipNote(isFlatKey, name))
                 .toList();
     }
     
