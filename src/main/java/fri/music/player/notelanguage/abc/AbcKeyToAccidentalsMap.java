@@ -249,7 +249,7 @@ public class AbcKeyToAccidentalsMap
         String abcNoteName = getAbsolutelyMappedAbcNote(ipnNoteName); // keyOfTune not considered yet
         final boolean hasAccidental = hasAccidental(abcNoteName);
         
-        if (isIn(ipnNamesNotInScale, ipnNoteName)) { // e.g. F# in key of C
+        if (isIn(ipnNamesNotInScale, ipnNoteName)) { // is NOT in scale, e.g. F# in key of C, or F in Key of D
             if (hasAccidental) {
                 final boolean alreadyAdded = precedingNotInScaleWithAccidental.contains(ipnNoteName);
                 if (alreadyAdded == false)
@@ -257,7 +257,7 @@ public class AbcKeyToAccidentalsMap
                 else // remove accidental from follower
                     abcNoteName = removeAccidental(abcNoteName);
             }
-            else if (wouldGetAccidentalByKeyOfTune(ipnNoteName)) { // e.g. B in key of F, or F in key of G
+            else if (wouldBeAlteredByKeyOfTune(ipnNoteName)) { // B in key of F would be Bb, or F in key of G would be F#
                 final boolean alreadyAdded = precedingNotInScaleResolved.contains(ipnNoteName);
                 if (alreadyAdded == false) {
                     precedingNotInScaleResolved.add(ipnNoteName); // remember it for sparing followers
@@ -265,32 +265,32 @@ public class AbcKeyToAccidentalsMap
                 }
             }
         }
-        else { // is in scale of keyOfTune
-            String corrected = null;
+        else { // IS in scale of keyOfTune
+            String adjusted = null;
             if (hasAccidental) { // check if there was a preceding resolve
                 Iterator<String> iterator = precedingNotInScaleResolved.iterator();
-                while (corrected == null && iterator.hasNext()) {
+                while (adjusted == null && iterator.hasNext()) {
                     if (isOnSameNoteline(iterator.next(), ipnNoteName, isFlatKey == false)) {
-                        corrected = abcNoteName; // leave its accidental
-                        iterator.remove(); // must not be there anymore
+                        adjusted = abcNoteName; // leave its accidental
+                        iterator.remove(); // accidental is active again, remove preceding resolve
                     }
                 }
                 
-                if (corrected == null && accidentalDefinedByKeyOfTune(ipnNoteName))
-                    abcNoteName = removeAccidental(abcNoteName);
+                if (adjusted == null && accidentalIsDefinedByKeyOfTune(ipnNoteName))
+                    adjusted = removeAccidental(abcNoteName);
             }
             else { // has no accidental, check if there was an accidental before
                 Iterator<String> iterator = precedingNotInScaleWithAccidental.iterator();
-                while (corrected == null && iterator.hasNext()) {
+                while (adjusted == null && iterator.hasNext()) {
                     if (isOnSameNoteline(iterator.next(), ipnNoteName, isFlatKey == true)) {
-                        corrected = resolveAccidental(abcNoteName);
-                        iterator.remove(); // must not be there anymore
+                        adjusted = resolveAccidental(abcNoteName);
+                        iterator.remove(); // accidental is resolved, remove predecessor carrying accidental
                     }
                 }
             }
             
-            if (corrected != null)
-                abcNoteName = corrected;
+            if (adjusted != null)
+                abcNoteName = adjusted;
         }
         
         return abcNoteName;
@@ -309,11 +309,11 @@ public class AbcKeyToAccidentalsMap
         return abcNoteName;
     }
 
-    private boolean wouldGetAccidentalByKeyOfTune(String ipnNoteName) {
+    private boolean wouldBeAlteredByKeyOfTune(String ipnNoteName) {
         return isIn(namesThatWouldGetAccidentals, ipnNoteName);
     }
     
-    private boolean accidentalDefinedByKeyOfTune(String ipnNoteName) {
+    private boolean accidentalIsDefinedByKeyOfTune(String ipnNoteName) {
         return isIn(accidentalsDefinedByKey, ipnNoteName);
     }
     
