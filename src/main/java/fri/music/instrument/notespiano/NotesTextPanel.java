@@ -75,7 +75,7 @@ public class NotesTextPanel extends NotesTextPanelBase
         tempoLayoutPanel.add(tempoSpinner, pianoIsVertical ? BorderLayout.WEST : BorderLayout.NORTH);
         tempoLayoutPanel.setBorder(BorderFactory.createTitledBorder("Tempo"));
         
-        writeToNotesCheckbox.setToolTipText("Write Notes from Piano to Textarea");
+        writeToNotesCheckbox.setToolTipText("Write Notes from Piano to Textarea at Cursor Position");
         
         tempoLayoutPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(tempoLayoutPanel);
