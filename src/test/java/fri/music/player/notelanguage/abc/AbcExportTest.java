@@ -1,9 +1,9 @@
-package fri.music.player.notelanguage;
+package fri.music.player.notelanguage.abc;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import fri.music.player.Note;
-import fri.music.player.notelanguage.abc.AbcExport;
+import fri.music.player.notelanguage.MelodyFactory;
 
 class AbcExportTest
 {

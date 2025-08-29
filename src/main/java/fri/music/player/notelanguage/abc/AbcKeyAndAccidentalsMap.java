@@ -348,21 +348,39 @@ public class AbcKeyAndAccidentalsMap
         return abcName;
     }
 
-    private String getAbsolutelyMappedAbcNote(String ipnNoteName) {
-        final String abcNoteName;
+    private String getAbsolutelyMappedAbcNote(String ipnName) {
+        final String abcName;
         if (isFlatKey)
-            abcNoteName = IPN_NOTE_TO_ABC_FLAT.get(ipnNoteName);
+            if ((keyOfTune.equals("Gb") || keyOfTune.equals("Ebm")) && ipnName.startsWith("B"))
+                abcName = makeCFlat(TextUtil.getFirstNumber(ipnName), IPN_NOTE_TO_ABC_FLAT);
+            else
+                abcName = IPN_NOTE_TO_ABC_FLAT.get(ipnName);
         else
-            abcNoteName = IPN_NOTE_TO_ABC_SHARP.get(ipnNoteName);
+            if ((keyOfTune.equals("F#") || keyOfTune.equals("D#m")) && ipnName.startsWith("F") && ipnName.charAt(1) != ToneSystem.SHARP_CHAR)
+                abcName = makeESharp(TextUtil.getFirstNumber(ipnName), IPN_NOTE_TO_ABC_SHARP);
+            else
+                abcName = IPN_NOTE_TO_ABC_SHARP.get(ipnName);
         
-        if (abcNoteName == null)
-            throw new IllegalArgumentException("No ABC mapping found for IPN-name '"+ipnNoteName+"'");
+        if (abcName == null)
+            throw new IllegalArgumentException("No ABC mapping found for IPN-name '"+ipnName+"'");
         
-        return abcNoteName;
+        return abcName;
     }
 
-    private boolean wouldBeAlteredByKeyOfTune(String ipnNoteName) {
-        return isIn(namesThatWouldGetAccidentals, ipnNoteName);
+    private String makeCFlat(int octave, Map<String, String> ipnToAbcMap) {
+        final String higherIpnName = "C" + (octave + 1); // "Cb" always makes octave jump
+        final String higherAbcName = ipnToAbcMap.get(higherIpnName);
+        return ABC_FLAT + higherAbcName;
+    }
+
+    private String makeESharp(int octave, Map<String,String> ipnToAbcMap) {
+        final String lowerIpnName = "E" + octave; // "E#" never makes octave jump
+        final String lowerAbcName = ipnToAbcMap.get(lowerIpnName);
+        return ABC_SHARP + lowerAbcName;
+    }
+
+    private boolean wouldBeAlteredByKeyOfTune(String ipnName) {
+        return isIn(namesThatWouldGetAccidentals, ipnName);
     }
     
     private boolean accidentalIsDefinedByKeyOfTune(String ipnNoteName) {
@@ -370,9 +388,9 @@ public class AbcKeyAndAccidentalsMap
     }
     
     /** Searches an IPN name like "F#4" in a list with names like "F", "F#", .... (comparison without octave). */
-    private boolean isIn(List<String> names, String name) {
-        final String nameWithoutOctave = TextUtil.getWithoutFirstNumber(name);
-        return names.contains(nameWithoutOctave);
+    private boolean isIn(List<String> ipnNames, String ipnName) {
+        final String nameWithoutOctave = TextUtil.getWithoutFirstNumber(ipnName);
+        return ipnNames.contains(nameWithoutOctave);
     }
 
     /** @return true if their octaves are the same and the given notes would be on same note line according to isFlatKey. */
