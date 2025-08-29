@@ -62,6 +62,22 @@ D5/8 (C5/4. C5/8) C5/8 B4/8 C5/8
 D5/4 B4/4 G4/4 A4/4
 G4/1 
 """);
+    
+    Melody BLUES = new Melody("Blues", true, """
+C4 E4 G4 E4
+F4 A4 C5 A4
+C4 E4 G4 A4
+A#4 A4 G4 E4
+F4 A4 C5 A4
+D5 C5 A4 F4
+C4 E4 G4 E4
+A4 G4 E4 C4
+G4 B4 D5 B4
+F4 A4 C5 A4
+C4 E4 G4 A#4
+G4 D4 G3 G3
+""");
+
 
     Melody[] MELODIES = new Melody[] {
             PENTATONIC,
@@ -70,6 +86,7 @@ G4/1
             A_MINOR_MELODIC,
             CHROMATIC_SCALE,
             AUGUSTIN,
-            WHEN_THE_SAINTS
+            WHEN_THE_SAINTS,
+            BLUES
         };
 }
