@@ -12,6 +12,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -20,6 +22,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -37,12 +40,14 @@ import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.instrument.PianoWithSound;
 import fri.music.player.Note;
+import fri.music.swingutils.DialogUtil;
+import fri.music.swingutils.FlowLayoutForScrollPane;
 import fri.music.swingutils.SizeUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
  * A piano that displays a list of intervals that can generate
- * the tone you just clicked on the piano keyboard as difference-tone.
+ * a tone (that you just clicked on the piano keyboard) as difference-tone.
  * Clicking one of the intervals will play the interval and mark the
  * difference-tone on the piano keyboard.
  */
@@ -60,13 +65,17 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     private static final int INTERVAL_FRAME_HEIGHT = 160;
+    private static final String INTERVAL_LISTS_TITLE = "Lists of Intervals Generating a Tone as Difference-Tone";
     
     private JComponent pianoPanel;
-    private JPanel intervalListsPanel;
-    private JPanel listsContainer;
+    private JPanel intervalListsPanel; // contains all interval lists
+    private JScrollPane intervalListsScrollPane;
+    private JPanel listsContainer; // contains intervalListsScrollPane and its toolbar
     private JPanel centerPanel;
     private JButton closeAllIntervalFrames;
+    private JButton detachIntervalFrames;
     private JCheckBox sortIntervalFrames;
+    private JCheckBox reuseOpenFrames;
     private PianoKeyConnector pianoKeyConnector;
     private DifferenceToneInversions differenceToneInversions;
     
@@ -176,10 +185,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     /** Called when user clicks a piano key, opens an interval list for the key when not already existing. */
     void addIntervalListFrame(String ipnNoteName, int midiNoteNumber) {
         // avoid duplicate frames
-        for (IntervalListFrame frame : getIntervalListFrames()) {
-            if (frame.ipnNoteName.equals(ipnNoteName)) {
-                setFrameSelected(frame);
-                return;
+        if (reuseOpenFrames.isSelected()) {
+            for (IntervalListFrame frame : getIntervalListFrames()) {
+                if (frame.ipnNoteName.equals(ipnNoteName)) {
+                    setFrameSelected(frame);
+                    return; // do not add a new one
+                }
             }
         }
         
@@ -253,7 +264,17 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         intervalListsPanel.add(Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4));
         
         this.sortIntervalFrames = new JCheckBox("Sort Lists by Pitch", true);
-        sortIntervalFrames.setToolTipText("Insert New Interval-List Frames Sorted by Difference-Tone Pitch");
+        sortIntervalFrames.setToolTipText("Insert New Interval-Lists Sorted by Difference-Tone Pitch");
+        
+        this.reuseOpenFrames = new JCheckBox("Reuse Open Lists", true);
+        reuseOpenFrames.setToolTipText("When OFF, Every Note Will Have Its Own Interval List");
+        reuseOpenFrames.addActionListener(new ActionListener() {
+            /** Switching off reuse of open lists  makes sortIntervalFrames useless. */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sortIntervalFrames.setEnabled(reuseOpenFrames.isSelected());
+            }
+        });
         
         this.closeAllIntervalFrames = new JButton("Close All Lists");
         closeAllIntervalFrames.setToolTipText("Close All Open Interval-List Frames");
@@ -265,18 +286,33 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             }
         });
         
+        this.detachIntervalFrames = new JButton("Detach Lists");
+        detachIntervalFrames.setToolTipText("Detach Interval-List Frames into Separate Window");
+        detachIntervalFrames.setEnabled(false);
+        detachIntervalFrames.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                detachIntervalFrames();
+            }
+        });
+        
         final JToolBar intervalListsToolbar = new JToolBar();
         intervalListsToolbar.add(sortIntervalFrames);
+        intervalListsToolbar.add(reuseOpenFrames);
+        intervalListsToolbar.add(detachIntervalFrames);
         intervalListsToolbar.add(closeAllIntervalFrames);
         
-        final JPanel intervalListsContainer = new JPanel(new BorderLayout());
-        final JScrollPane intervalListsScrollPane = new JScrollPane(intervalListsPanel);
-        intervalListsScrollPane.setBorder(BorderFactory.createTitledBorder(
-                "Lists of Intervals Generating a Tone as Difference-Tone"));
-        intervalListsContainer.add(intervalListsScrollPane, BorderLayout.CENTER);
-        intervalListsContainer.add(intervalListsToolbar, BorderLayout.SOUTH);
+        this.listsContainer = new JPanel(new BorderLayout());
+        addIntervalListsToInternalScrollPane();
+        listsContainer.add(intervalListsToolbar, BorderLayout.SOUTH);
         
-        return intervalListsContainer;
+        return listsContainer;
+    }
+
+    private void addIntervalListsToInternalScrollPane() {
+        this.intervalListsScrollPane = new JScrollPane(intervalListsPanel);
+        intervalListsScrollPane.setBorder(BorderFactory.createTitledBorder(INTERVAL_LISTS_TITLE));
+        listsContainer.add(intervalListsScrollPane, BorderLayout.CENTER);
     }
     
     // callback helpers
@@ -293,7 +329,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             if (ToneSystem.MINOR_SECOND.equals(narrowestAllowedInterval()) == false &&
                     ToneSystem.MAJOR_SEVENTH.equals(widestAllowedInterval()) == false)
                 differenceToneInversions.removeDissonant(false);
-                // removing dissonant on minor-second would make choosing minor-second useless!
+                // removing dissonants on minor-second would make choosing minor-second useless!
         }
         return differenceToneInversions;
     }
@@ -302,7 +338,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         if (isAdd) {
             final List<IntervalListFrame> frames = getIntervalListFrames(); 
             int targetIndex = 0;
-            if (sortIntervalFrames.isSelected()) { // sort in new frame
+            if (sortIntervalFrames.isEnabled() && sortIntervalFrames.isSelected()) { // sort in new frame
                 while (targetIndex < frames.size() && frames.get(targetIndex).midiNoteNumber < frame.midiNoteNumber)
                     targetIndex++;
             }
@@ -321,7 +357,9 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     private void refreshFramesContainer() {
-        closeAllIntervalFrames.setEnabled(getIntervalListFrames().size() > 0);
+        final boolean listFramesExist = (getIntervalListFrames().size() > 0);
+        closeAllIntervalFrames.setEnabled(listFramesExist);
+        detachIntervalFrames.setEnabled(listFramesExist);
 
         intervalListsPanel.revalidate(); // refresh layout
         intervalListsPanel.repaint(); // refresh UI
@@ -343,7 +381,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     
     private void closeAllIntervalFrames() {
         for (IntervalListFrame framePanel : getIntervalListFrames())
-            intervalListsPanel.remove(framePanel);
+            framePanel.getParent().remove(framePanel);
         
         refreshFramesContainer();
     }
@@ -355,6 +393,44 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 list.add((IntervalListFrame) c);
         return list;
     }
+    
+    private void detachIntervalFrames() {
+        if (intervalListsScrollPane == null)
+            return; // dialog is open
+        
+        listsContainer.remove(intervalListsScrollPane);
+        intervalListsScrollPane.setViewportView(null);
+        intervalListsScrollPane = null;
+        listsContainer.revalidate();
+        listsContainer.repaint();
+        
+        intervalListsPanel.setLayout(new FlowLayoutForScrollPane(FlowLayout.LEADING));
+        final JScrollPane flowingScrollPane = new JScrollPane(intervalListsPanel);
+        
+        final JDialog dialog = DialogUtil.showModelessDialog(INTERVAL_LISTS_TITLE, listsContainer, flowingScrollPane, null);
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                detachIntervalFrames.setEnabled(true);
+                
+                intervalListsPanel.getParent().remove(intervalListsPanel);
+                flowingScrollPane.setViewportView(null);
+                
+                intervalListsPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
+                addIntervalListsToInternalScrollPane();
+                listsContainer.revalidate();
+                listsContainer.repaint();
+            }
+            @Override
+            public void windowClosed(WindowEvent e) {
+                System.err.println("window is closed!");
+            }
+        });
+        
+        detachIntervalFrames.setEnabled(false);
+    }
+    
+
     
     private void ignoreMouseEvents(boolean ignore) {
         final DifferenceToneInversionsMouseHandler mouseHandler = (DifferenceToneInversionsMouseHandler) getMouseHandler();

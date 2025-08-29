@@ -48,8 +48,9 @@ public class DialogUtil
      * @param componentToShow the panel to render.
      * @param parent the parent Component to show over.
      * @param size the wanted size of the dialog.
+     * @return the created dialog window.
      */
-    public static void showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size) {
+    public static JDialog showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size) {
         final Window window = SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
         final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
         dialog.getContentPane().add(new JScrollPane(componentToShow));
@@ -74,6 +75,8 @@ public class DialogUtil
         dialog.setSize(size);
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
+        
+        return dialog;
     }
 
 
