@@ -1,14 +1,4 @@
 
- - Add option to open every note in left-side text area 
-    as interval-frame, even when it already exists.
-    This would enable to choose intervals going from left to right for
-    every note of the melody.
-    This must be disabled when "Sort Lists by Pitch" is active.
-    A tooltip should warn about too many frames.
-    Maybe allow to detach the list frames panel to a modeless sizable dialog
-    and arrange them left to right in lines like FlowLayout provides.
-    PROBLEM: FlowLayout does not work together with JScrollPane!
-    
 - The export from NotesWithDifferenceToneInversionsPianoPlayer 
     to ABC would require two voices, the lower one with the tune,
     the upper one with its difference tone intervals.
