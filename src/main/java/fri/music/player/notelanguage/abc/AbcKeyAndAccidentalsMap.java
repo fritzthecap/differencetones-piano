@@ -1,12 +1,14 @@
 package fri.music.player.notelanguage.abc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import fri.music.TextUtil;
 import fri.music.ToneSystem;
 
@@ -35,11 +37,22 @@ public class AbcKeyAndAccidentalsMap
     private static final String ABC_SHARP = "^";
     private static final String ABC_FLAT = "_";
 
+    // fields for buildIpnToAbcNameMapping()
     private static final Map<String,String> IPN_NOTE_TO_ABC_FLAT = new HashMap<>();
     private static final Map<String,String> IPN_NOTE_TO_ABC_SHARP = new HashMap<>();
     
+    // fields for buildKeyToNotesNotInKeyMapping()
+    private static final String[] POSSIBLE_SHARP_KEYS =       new String[] { "C",  "G",  "D",  "A",   "E",   "B",   "F#" };
+    private static final String[] POSSIBLE_MINOR_SHARP_KEYS = new String[] { "Am", "Em", "Bm", "F#m", "C#m", "G#m", "D#m" };
+    private static final String[] POSSIBLE_FLAT_KEYS =        new String[] { "F",  "Bb", "Eb", "Ab",  "Db",  "Gb" };
+    private static final String[] POSSIBLE_MINOR_FLAT_KEYS =  new String[] { "Dm", "Gm", "Cm", "Fm",  "Bbm", "Ebm" };
+
+    private static final Map<String,List<String>> KEY_TO_NOTES_NOT_IN_KEY = new HashMap<>();
+    private static final Map<String,List<String>> KEY_TO_NOTES_WITH_ACCIDENTALS = new HashMap<>();
+    
     static {
         buildIpnToAbcNameMapping();
+        buildKeyToNotesNotInKeyMapping();
     }
     
     private static void buildIpnToAbcNameMapping() {
@@ -99,44 +112,19 @@ public class AbcKeyAndAccidentalsMap
         return "";
     }
     
-
-    private static final Map<String,List<String>> KEY_TO_NOTES_NOT_IN_KEY = new HashMap<>();
-    private static final Map<String,List<String>> KEY_TO_NOTES_WITH_ACCIDENTALS = new HashMap<>();
-    
-    static {
-        buildKeyToNotesNotInKeyMapping();
-    }
     
     private static void buildKeyToNotesNotInKeyMapping() {
-        final String[] POSSIBLE_SHARP_KEYS =       new String[] { "C",  "G",  "D",  "A",   "E",   "B",   "F#" };
-        final String[] POSSIBLE_MINOR_SHARP_KEYS = new String[] { "Am", "Em", "Bm", "F#m", "C#m", "G#m", "D#m" };
-        final String[] POSSIBLE_FLAT_KEYS =        new String[] { "F",  "Bb", "Eb", "Ab",  "Db",  "Gb" };
-        final String[] POSSIBLE_MINOR_FLAT_KEYS =  new String[] { "Dm", "Gm", "Cm", "Fm",  "Bbm", "Ebm" };
-        
-        final String[] ALL_POSSIBLE_KEYS = new String[
-                POSSIBLE_SHARP_KEYS.length + 
-                POSSIBLE_MINOR_SHARP_KEYS.length + 
-                POSSIBLE_FLAT_KEYS.length + 
-                POSSIBLE_MINOR_FLAT_KEYS.length];
-        
-        System.arraycopy(
-                POSSIBLE_SHARP_KEYS, 0, 
-                ALL_POSSIBLE_KEYS, 0, 
-                POSSIBLE_SHARP_KEYS.length);
-        System.arraycopy(
-                POSSIBLE_MINOR_SHARP_KEYS, 0, 
-                ALL_POSSIBLE_KEYS, POSSIBLE_SHARP_KEYS.length, 
-                POSSIBLE_MINOR_SHARP_KEYS.length);
-        System.arraycopy(
-                POSSIBLE_FLAT_KEYS, 0, 
-                ALL_POSSIBLE_KEYS, POSSIBLE_SHARP_KEYS.length + POSSIBLE_MINOR_SHARP_KEYS.length, 
-                POSSIBLE_FLAT_KEYS.length);
-        System.arraycopy(
-                POSSIBLE_MINOR_FLAT_KEYS, 0, 
-                ALL_POSSIBLE_KEYS, POSSIBLE_SHARP_KEYS.length + POSSIBLE_MINOR_SHARP_KEYS.length + POSSIBLE_FLAT_KEYS.length, 
-                POSSIBLE_MINOR_FLAT_KEYS.length);
-        
-        for (final String key : ALL_POSSIBLE_KEYS) {
+        final String[] allPossibleKeys = Stream
+                .concat(
+                    Stream.concat(
+                        Arrays.stream(POSSIBLE_SHARP_KEYS), 
+                        Arrays.stream(POSSIBLE_MINOR_SHARP_KEYS)),
+                    Stream.concat(
+                        Arrays.stream(POSSIBLE_FLAT_KEYS),
+                        Arrays.stream(POSSIBLE_MINOR_FLAT_KEYS)))
+                .toArray(String[]::new);
+
+        for (final String key : allPossibleKeys) {
             if (key.equals("C") || key.equals("Am"))
                 KEY_TO_NOTES_NOT_IN_KEY.put(key, buildList("C#", "D#", "F#", "G#", "A#"));
             else if (key.equals("G") || key.equals("Em"))
@@ -165,7 +153,7 @@ public class AbcKeyAndAccidentalsMap
                 throw new IllegalArgumentException("Can not build KEY_TO_NOTES_NOT_IN_KEY with unknown key: "+key);
         }
         
-        for (final String key : ALL_POSSIBLE_KEYS) {
+        for (final String key : allPossibleKeys) {
             if (key.equals("C") || key.equals("Am"))
                 KEY_TO_NOTES_WITH_ACCIDENTALS.put(key, buildList());
             else if (key.equals("G") || key.equals("Em"))
@@ -209,7 +197,7 @@ public class AbcKeyAndAccidentalsMap
      * when isFlatKey is false, returns "G#" for "G", else "F#" for "G".
      * Thus it searches the next semi-tone in different directions.
      */
-    private String skipNote(boolean isFlatKey, String ipnBaseName) {
+    private static String skipNote(boolean isFlatKey, String ipnBaseName) {
         for (int i = 0; i < ToneSystem.IPN_BASE_NAMES.length; i++) {
             if (ToneSystem.IPN_BASE_NAMES[i].equals(ipnBaseName)) {
                 int skipIndex = isFlatKey ? (i - 1) : (i + 1);
@@ -223,6 +211,33 @@ public class AbcKeyAndAccidentalsMap
         throw new IllegalArgumentException("Can not skip '"+ipnBaseName+"' for finding accidentals of "+(isFlatKey ? "flat" : "sharp")+" key");
     }
 
+    /** @return the keyOfTune without optional clef. */
+    private static String getKey(String keyAndClef) {
+        final String trimmed = (keyAndClef != null) ? keyAndClef.trim() : "";
+        if (trimmed.length() <= 0)
+            return "C";
+        
+        final int spaceIndex = trimmed.indexOf(' ');
+        final String key = (spaceIndex > 0) ? trimmed.substring(0, spaceIndex) : trimmed;
+        if (key.length() <= 1)
+            return key.toUpperCase();
+        
+        char firstChar = Character.toUpperCase(key.charAt(0));
+        char secondChar = key.charAt(1);
+        if (secondChar != '#' && secondChar != 'b' && secondChar != 'm') // ABC-names like "Ab", "Gm", "F#m" 
+            throw new IllegalArgumentException("Unknown key of tune: "+key);
+        
+        return "" + firstChar + secondChar + key.substring(2);
+    }
+    
+    /** @return true when the tune's key is F, Bb, Eb, Ab, ... Db, Dm, Gm, Cm, Fm, Bbm, else false. */
+    private static boolean isFlatKey(String keyAndClef) {
+        final String key = getKey(keyAndClef);
+        return Stream
+            .concat(Arrays.stream(POSSIBLE_FLAT_KEYS), Arrays.stream(POSSIBLE_MINOR_FLAT_KEYS))
+            .anyMatch(s -> s.equals(key));
+    }
+    
     
     /**
      * Key of tune can be base tone with scale-type: C, Hm, Gb, Bbm, ...
@@ -250,9 +265,16 @@ public class AbcKeyAndAccidentalsMap
     private final Set<String> precedingNotInScaleWithAccidental = new HashSet<>();
     private final Set<String> precedingNotInScaleResolved = new HashSet<>();
     
-    public AbcKeyAndAccidentalsMap(AbcExport.Configuration configuration) {
-        this.keyOfTune = configuration.getKey();
-        this.isFlatKey = configuration.isFlatKey();
+    /**
+     * Keeps track of accidentals.
+     * Call <code>getAdjustedNote()</code> for each note of the IPN-melody.
+     * @param keyAndClef the key of the melody, one of POSSIBLE_*_KEYS, 
+     *      optionally containing a space-separated clef postfix.
+     */
+    public AbcKeyAndAccidentalsMap(String keyAndClef) {
+        this.keyOfTune = getKey(keyAndClef);
+        this.isFlatKey = isFlatKey(keyAndClef);
+        
         this.ipnNamesNotInScale = KEY_TO_NOTES_NOT_IN_KEY.get(keyOfTune);
         this.namesThatWouldGetAccidentals = KEY_TO_NOTES_WITH_ACCIDENTALS.get(keyOfTune);
         this.accidentalsDefinedByKey = namesThatWouldGetAccidentals.stream()
@@ -266,6 +288,12 @@ public class AbcKeyAndAccidentalsMap
         precedingNotInScaleResolved.clear();
     }
 
+    /**
+     * Adjusts the given note to have the correct ABC accidental according to 
+     * preceding notes and bar-start.
+     * @param ipnNoteName the note to turn into an ABC note according to current melody state.
+     * @return the ABC-note with correct accidental for given IPN-note.
+     */
     public String getAdjustedNote(String ipnNoteName) {
         final String absoluteAbcName = getAbsolutelyMappedAbcNote(ipnNoteName); // accidentals set by keyOfTune not considered yet
         final boolean hasAccidental = hasAccidental(absoluteAbcName);

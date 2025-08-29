@@ -45,36 +45,6 @@ public class AbcExport
         public Configuration(String title, String author, String keyAndClef) {
             this(1, title, null, author, null, keyAndClef, 4);
         }
-        
-        /** @return the keyOfTune like needed in AbcKeyToAccidentalsMap, without optional clef. */
-        public String getKey() {
-            final String trimmed = (keyAndClef != null) ? keyAndClef.trim() : "";
-            if (trimmed.length() <= 0)
-                return "C";
-            
-            final int spaceIndex = trimmed.indexOf(' ');
-            String key = (spaceIndex > 0) ? trimmed.substring(0, spaceIndex) : trimmed;
-            if (key.length() >= 2) {
-                char firstChar = Character.toUpperCase(key.charAt(0));
-                char secondChar = key.charAt(1);
-                if (secondChar == 'B')
-                    secondChar = 'b';
-                if (secondChar != '#' && secondChar != 'b') // ABC-names like "F#m" or "Ab"
-                    throw new IllegalArgumentException("Key of tune is invalid: "+key);
-                return "" + firstChar + secondChar + key.substring(2);
-            }
-            return key.toUpperCase();
-        }
-        
-        /** @return true when the tune's key is F, Bb, Eb, Ab, ... Db, else false. */
-        public boolean isFlatKey() {
-            final String key = getKey();
-            if (key.startsWith("F") && (key.length() == 1 || key.charAt(1) != '#')) // ABC-names like "F#m" or "Ab"
-                return true;
-            if (key.length() > 1 && key.charAt(1) == 'b')
-                return true;
-            return false;
-        }
     }
     
     
@@ -118,7 +88,7 @@ public class AbcExport
         if (configuration == null) // get a default
             configuration = new Configuration();
         
-        this.keyToAccidentalsMap = new AbcKeyAndAccidentalsMap(configuration);
+        this.keyToAccidentalsMap = new AbcKeyAndAccidentalsMap(configuration.keyAndClef());
         
         final StringBuilder result = new StringBuilder();
         final int numberOfBarsPerLine = Math.max(configuration.numberOfBarsPerLine(), 1);
