@@ -6,7 +6,8 @@
     This must be disabled when "Sort Lists by Pitch" is active.
     A tooltip should warn about too many frames.
     Maybe allow to detach the list frames panel to a modeless sizable dialog
-    and arrange them left to right in lines.
+    and arrange them left to right in lines like FlowLayout provides.
+    PROBLEM: FlowLayout does not work together with JScrollPane!
     
 - The export from NotesWithDifferenceToneInversionsPianoPlayer 
     to ABC would require two voices, the lower one with the tune,
