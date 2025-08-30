@@ -35,8 +35,8 @@ public class FlowLayoutForScrollPane extends FlowLayout
     /**
      * Returns the minimum or preferred dimension needed to layout the target container.
      * @param target    parent Component to get layout size for
-     * @param preferred should preferred size be calculated
-     * @return the dimension to layout the target container
+     * @param preferred true for preferred size calculation, false for minimum size
+     * @return the target dimension for the given container
      */
     private Dimension layoutSize(Container target, boolean preferred) {
         synchronized (target.getTreeLock()) {
