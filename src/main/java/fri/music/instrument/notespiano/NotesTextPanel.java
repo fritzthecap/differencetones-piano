@@ -10,10 +10,15 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.text.JTextComponent;
+import fri.music.ToneSystem;
 import fri.music.player.Note;
 import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.SmartComboBox;
@@ -22,12 +27,24 @@ import fri.music.swingutils.SmartPanel;
 /** Full view of NotesPianoPlayer with time-signature and tempo controls. */
 public class NotesTextPanel extends NotesTextPanelBase
 {
+    /** Transposers listen via this interface for user commands. */
+    public interface TransposeListener
+    {
+        /** User triggered the transpose-command described by parameters. */
+        void transpose(String intervalName, boolean upwards, JTextComponent textArea);
+    }
+    
     public final JSpinner tempoSpinner;
     public final JComboBox<String> timeSignatureChoice;
     public final JCheckBox writeToNotesCheckbox;
+    public final JButton transposeMenu;
     
-    NotesTextPanel(PlayController playController, boolean pianoIsVertical) {
+    private final TransposeListener transposeListener;
+    
+    public NotesTextPanel(PlayController playController, boolean pianoIsVertical, TransposeListener transposeListener) {
         super(playController, pianoIsVertical, true);
+        
+        this.transposeListener = transposeListener;
         
         // START build public fields
         final String[] timeSignatures = new String[] {
@@ -43,12 +60,18 @@ public class NotesTextPanel extends NotesTextPanelBase
         this.tempoSpinner = new JSpinner(tempoModel);
         
         this.writeToNotesCheckbox = new JCheckBox("Write Notes", false);
+        
+        if (transposeListener != null)
+            this.transposeMenu = buildTransposeMenu();
+        else
+            this.transposeMenu = null;
+
         // END build public fields
         
         buildNotesControlPanel(pianoIsVertical);
         
         final JButton help = new JButton("Help");
-        help.setToolTipText("Notes Text Syntax Documentation");
+        help.setToolTipText("Notes Syntax Documentation");
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -83,11 +106,54 @@ public class NotesTextPanel extends NotesTextPanelBase
         timeLayoutPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(timeLayoutPanel);
         
+        if (transposeMenu != null) {
+            transposeMenu.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            notesControlPanel.add(pianoIsVertical ? Box.createHorizontalStrut(6) : Box.createVerticalStrut(6));
+            notesControlPanel.add(transposeMenu);
+        }
+        
         notesControlPanel.add(pianoIsVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
         
         writeToNotesCheckbox.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(writeToNotesCheckbox);
     }
+    
+    private JButton buildTransposeMenu() {
+        final JPopupMenu popupMenu = new JPopupMenu();
+        
+        final JMenu upMenu = new JMenu("Up");
+        popupMenu.add(upMenu);
+        final JMenu downMenu = new JMenu("Down");
+        popupMenu.add(downMenu);
+        
+        for (int i = 1; i < ToneSystem.INTERVAL_NAMES.length; i++) { // 1: spare UNISON
+            upMenu.add(buildTransposeMenuItem(ToneSystem.INTERVAL_NAMES[i], true));
+            downMenu.add(buildTransposeMenuItem(ToneSystem.INTERVAL_NAMES[i], false));
+        }
+        
+        final JButton popupButton = new JButton("Transpose  \u25B8");
+        popupButton.setToolTipText("Shift All Notes to Another Pitch");
+        popupButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                popupMenu.show(popupButton, popupButton.getWidth() / 2, popupButton.getHeight() / 2);
+            }
+        });
+        
+        return popupButton;
+    }
+
+    private JMenuItem buildTransposeMenuItem(final String intervalName, final boolean upwards) {
+        final JMenuItem item = new JMenuItem(intervalName);
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                transposeListener.transpose(intervalName, upwards, notesText);
+            }
+        });
+        return item;
+    }
+    
     
     /** Help taken from JavaDoc of MelodyFactory class. */
     private static final String NOTES_EDIT_HELP = """
@@ -171,7 +237,7 @@ even across bars.
 <h2>Editor Actions</h2>
 <p>
 With right mouse click you can open a context-menu that provides
-visible representations for following actions on text-area:
+some useful text-area actions:
 </p>
 <ul>
 <li><b>Ctrl-x</b> for "Cut" selection</li>
@@ -179,6 +245,7 @@ visible representations for following actions on text-area:
 <li><b>Ctrl-v</b> for "Paste" at caret position</li>
 <li><b>Ctrl-z</b> for "Undo" last action</li>
 <li><b>Ctrl-y</b> for "Redo" last "Undo"</li>
+<li><b>Ctrl-a</b> for "Select All" text</li>
 </ul>
 </body>
 </html>

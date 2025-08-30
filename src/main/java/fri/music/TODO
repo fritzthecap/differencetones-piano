@@ -38,6 +38,18 @@
 
 Fixed Bugs:
 
+- Bug WrapLayout: 
+    - add 1 list frame by clicking onto C 
+    - detach dialog
+    - resize the dialog to have just one column, 
+        vertical scrollbar must be showing,
+        horizontal scrollbar must NOT be showing
+    - add another frame by clicking onto D
+    => a second scrollbar is showing to the left of the original one.
+    DONE: you must call revalidate() on the scrollpane's parent, then it works.
+          Could not replace the vertical strut (heightHolder) by setPreferredSize(),
+          then scrollbars would never show!
+    
     - Bug NotesWithDifferenceTonePianoPlayer: LIMIT_17, FOURTH-FIFTH, deviation 76 %.
         A4 and D#5 should generate G3, but no difference tone appears on piano.
         

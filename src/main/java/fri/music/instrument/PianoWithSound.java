@@ -325,7 +325,7 @@ public class PianoWithSound extends Piano
     }
 
     /** @return the sound channel given to constructor. Can be overridden. */
-    protected SoundChannel getSoundChannel() {
+    public SoundChannel getSoundChannel() {
         return soundChannel;
     }
     

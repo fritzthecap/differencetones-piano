@@ -151,7 +151,7 @@ public class Note extends Tone
         this.beatInfo = (beatInfo != null) ? beatInfo : new BeatInfo(null, null);
     }
     
-    /** A clone with same IPN-name and frequency but different duration and connection flags. */
+    /** A clone with different duration, connection flags and length. */
     public Note(Note note, int durationMilliseconds, ConnectionFlags connectionFlags, String lengthNotation) {
         super(
             note.ipnName, 
@@ -164,6 +164,22 @@ public class Note extends Tone
         this.emphasized = note.emphasized;
         this.connectionFlags = (connectionFlags != null) ? connectionFlags : new ConnectionFlags();
         this.lengthNotation = lengthNotation;
+        this.beatInfo = note.beatInfo;
+    }
+    
+    /** A transpose-clone with different IPN-name, frequency, midiNumber and cent. */
+    public Note(Note note, String ipnName, double frequency, int midiNumber, int cent) {
+        super(
+            ipnName, 
+            frequency, 
+            midiNumber, 
+            cent);
+        
+        this.durationMilliseconds = note.durationMilliseconds;
+        this.volume = note.volume;
+        this.emphasized = note.emphasized;
+        this.connectionFlags = note.connectionFlags;
+        this.lengthNotation = note.lengthNotation;
         this.beatInfo = note.beatInfo;
     }
     

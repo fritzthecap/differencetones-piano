@@ -13,11 +13,18 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
+import fri.music.EqualTemperament;
+import fri.music.SoundChannel;
+import fri.music.Tone;
+import fri.music.ToneSystem;
+import fri.music.Tones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
+import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
  * A notes area that can play user-edited notes on a given piano.
@@ -27,7 +34,7 @@ import fri.music.player.notelanguage.MelodyFactory;
  * It installs an additional mouse-listener to the keyboard that writes
  * clicked notes from keyboard to the "Notes" text-area.
  */
-public class NotesPianoPlayer
+public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
 {
     /** The piano obtained from constructor. */
     protected final PianoWithSound piano;
@@ -90,6 +97,64 @@ public class NotesPianoPlayer
         return piano.getWindowClosingListener();
     }
     
+    /**
+     * Transposes given textArea.
+     * @param intervalName one of ToneSystem.INTERVAL_NAMES.
+     * @param upwards true for transposing higher, false for lower.
+     * @param textArea the holder of the text to transpose.
+     */
+    @Override
+    public void transpose(String intervalName, boolean upwards, JTextComponent textArea) {
+        try {
+            transpose(intervalName, upwards, textArea, false);
+        }
+        catch (Exception e) {
+            view().error.setText(e.getMessage());
+        }
+    }
+    
+    protected final void transpose(String intervalName, boolean upwards, JTextComponent textArea, boolean forceWriteTempoAndBar) {
+        final String notesText = textArea.getText();
+        final MelodyFactory melodyFactory = newMelodyFactory();
+        final Note[][] notes = melodyFactory.translate(notesText);
+        
+        final SoundChannel soundChannel = piano.getSoundChannel();
+        final Tone[] tonesArray = (soundChannel instanceof WaveSoundChannel)
+                ? ((WaveSoundChannel) soundChannel).getTones()
+                : new EqualTemperament().tones();
+        final Tones tones = new Tones(tonesArray);
+
+        final Note[][] transposedNotes = new Note[notes.length][];
+        
+        for (int i = 0; i < notes.length; i++) {
+            Note[] chord = notes[i];
+            final Note[] transposedChord = new Note[chord.length];
+            
+            for (int j = 0; j < chord.length; j++) {
+                final Note note = chord[j];
+                final Note transposedNote;
+                
+                if (note.isRest() == false) {
+                    final int semitoneSteps = ToneSystem.semitoneSteps(intervalName);
+                    final int newMidiNumber = note.midiNumber + (upwards ? +semitoneSteps : -semitoneSteps);
+                    final Tone newTone = tones.forMidiNoteNumber(newMidiNumber);
+                    if (newTone == null)
+                        throw new IllegalArgumentException("Note is out of range: "+note);
+                    
+                    transposedNote = new Note(note, newTone.ipnName, newTone.frequency, newTone.midiNumber, newTone.cent);
+                }
+                else {
+                    transposedNote = note;
+                }
+                transposedChord[j] = transposedNote;
+            }
+            transposedNotes[i] = transposedChord;
+        }
+        
+        final String newText = formatNotes(transposedNotes, melodyFactory, forceWriteTempoAndBar);
+        textArea.setText(newText);
+    }
+    
     
     /** Factory method for customized PlayController classes. */
     protected PlayController newPlayController() {
@@ -120,7 +185,7 @@ public class NotesPianoPlayer
     
     /** @return the notes panel in CENTER, to be overridden for other components. */
     protected JComponent buildCenterPanel() {
-        this.view = new NotesTextPanel(playController, piano.config.isVertical);
+        this.view = new NotesTextPanel(playController, piano.config.isVertical, this);
         playController.setView(view);
         
         buildNotesPanel(playController, view);
@@ -150,6 +215,7 @@ public class NotesPianoPlayer
         
         return this.view;
     }
+    
     
     // methods needed in sub-classes
     
@@ -290,16 +356,20 @@ public class NotesPianoPlayer
     private void formatNotes(PlayControllerBase playController, NotesTextPanelBase view) {
         final Note[][] notes = readNotesFromTextAreaCatchExceptions(playController, view);
         if (notes != null) {
-            final boolean isIntervalsView = (view() != view); // not "Notes" view
-            final String formatted = newMelodyFactory().formatBarLines(
-                    notes, 
-                    // write tempo and bar only when it was written in text,
-                    // or when the view is intervals-view
-                    isIntervalsView || view().tempoSpinner.isEnabled() == false,
-                    isIntervalsView || view().timeSignatureChoice.isEnabled() == false);
+            // forceWriteTempoAndBar when the view is not the "Notes" view (then it is intervals view)
+            final boolean forceWriteTempoAndBar = (view() != view);
+            final String formatted = formatNotes(notes, newMelodyFactory(), forceWriteTempoAndBar);
             view.notesText.setText(formatted);
             view.notesText.requestFocus();
         }
+    }
+    
+    private String formatNotes(Note[][] notes, MelodyFactory melodyFactory, boolean forceWriteTempoAndBar) {
+        return melodyFactory.formatBarLines(
+                notes, 
+                // write tempo and bar only when it was written in text, or when forceWriteTempoAndBar
+                forceWriteTempoAndBar || view().tempoSpinner.isEnabled() == false,
+                forceWriteTempoAndBar || view().timeSignatureChoice.isEnabled() == false);
     }
     
     private Integer[] timeSignatureParts() {

@@ -20,6 +20,7 @@ public class PlayController extends PlayControllerBase
     protected void onEmptyNotes() {
         view.timeSignatureChoice.setEnabled(true); // let user choose tempo and bar-type
         view.tempoSpinner.setEnabled(true);
+        view.transposeMenu.setEnabled(false);
     }
     
     @Override
@@ -40,16 +41,20 @@ public class PlayController extends PlayControllerBase
         else {
             view.tempoSpinner.setEnabled(true);
         }
+        
+        view.transposeMenu.setEnabled(true);
     }
 
     @Override
     protected void onStartPlayer() {
         view.timeSignatureChoice.setEnabled(false);
         view.tempoSpinner.setEnabled(false);
+        view.transposeMenu.setEnabled(false);
     }
     
     @Override
     protected void onEnableUiOnPlaying(boolean isStop) {
         view.writeToNotesCheckbox.setEnabled(isStop);
+        view.transposeMenu.setEnabled(isStop);
     }
 }
