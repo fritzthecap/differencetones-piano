@@ -70,26 +70,45 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     private static final String INTERVAL_LISTS_TITLE = "Lists of Intervals Generating a Tone as Difference-Tone";
     
     private JComponent pianoPanel;
-    private JPanel intervalListsPanel; // contains all interval lists
+    
+    /** Contains all interval lists. */
+    private JPanel intervalListsPanel;
+    /** Workaround to have an initial height in intervalListsPanel, it would collapse when empty. */
     private Component initialHeightHolder;
+    /** The scroll pane for intervalListsPanel. */
     private JScrollPane listsScrollPane;
-    private JPanel listsContainer; // contains intervalListsScrollPane and its toolbar
+    /** The container of the scroll pane for intervalListsPanel, also containing the toolbar. */
+    private JPanel listsContainer;
+    /** Retain last dialog size. */
     private Dimension dialogSize;
+    /** Retain last dialog location. */
     private Point dialogLocation;
+    
+    /** Layout that can be used to add another center component. */
     private JPanel centerPanel;
+    
     private JButton closeAllIntervalFrames;
     private JButton detachIntervalFrames;
     private JCheckBox sortIntervalFrames;
     private JCheckBox reuseOpenFrames;
+    
+    /** Plays difference-tone intervals. */
     private PianoKeyConnector pianoKeyConnector;
+    /** Difference-tone inversions cache. */
     private DifferenceToneInversions differenceToneInversions;
     
+    /** Clients can listen to click on (or selection of) difference-tone intervals. */
     private IntervalSelectionListener intervalSelectionListener;
     
-    public DifferenceToneInversionsPiano(PianoWithSound.Configuration config, WaveSoundChannel soundChannel) {
-        super(config, soundChannel);
+    /**
+     * @param configuration the piano design configuration.
+     * @param soundChannel the sound player of the piano.
+     */
+    public DifferenceToneInversionsPiano(PianoWithSound.Configuration configuration, WaveSoundChannel soundChannel) {
+        super(configuration, soundChannel);
     }
     
+    /** @return the main UI of this class, cached object-bound singleton. */
     @Override
     public JComponent getKeyboard() {
         if (this.pianoPanel != null)
@@ -326,10 +345,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
 
     private void setLayoutToIntervalListsPanel(boolean forDetachedDialog) {
         final FlowLayout layout = forDetachedDialog
-                ? new FlowLayoutForScrollPane(FlowLayout.LEADING)
-                : new FlowLayout(FlowLayout.LEADING);
-        layout.setHgap(0);
-        layout.setVgap(0);
+                ? new FlowLayoutForScrollPane(FlowLayout.LEADING, 0, 0)
+                : new FlowLayout(FlowLayout.LEADING, 0, 0);
         intervalListsPanel.setLayout(layout);
     }
     
@@ -371,15 +388,15 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             intervalListsPanel.remove(frame);
         }
         
-        refreshIntervalListsPanel();
+        refreshListsContainer();
     }
     
-    private void refreshIntervalListsPanel() {
+    private void refreshListsContainer() {
         final boolean listFramesExist = (getIntervalListFrames().size() > 0);
         closeAllIntervalFrames.setEnabled(listFramesExist);
         detachIntervalFrames.setEnabled(listFramesExist);
         
-        listsScrollPane.getParent().revalidate();
+        listsScrollPane.getParent().revalidate(); // do NOT use listsContainer here, as lists my be in dialog!
         listsScrollPane.getParent().repaint();
     }
     
@@ -391,14 +408,14 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             framePanel.fillList(
                 getDifferenceToneInversions().getIntervalsGenerating(framePanel.ipnNoteName));
 
-        refreshIntervalListsPanel();
+        refreshListsContainer();
     }
     
     private void closeAllIntervalFrames() {
         for (IntervalListFrame framePanel : getIntervalListFrames())
             framePanel.getParent().remove(framePanel);
         
-        refreshIntervalListsPanel();
+        refreshListsContainer();
     }
 
     private List<IntervalListFrame> getIntervalListFrames() {
@@ -442,7 +459,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 dialogLocation = dialog.getLocation();
                 
                 addIntervalListsToInternalScrollPane();
-                refreshIntervalListsPanel();
+                refreshListsContainer();
             }
             @Override
             public void windowClosed(WindowEvent e) {
