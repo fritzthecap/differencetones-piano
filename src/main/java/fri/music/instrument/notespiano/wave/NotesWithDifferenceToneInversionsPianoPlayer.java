@@ -12,6 +12,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.text.JTextComponent;
 import fri.music.SoundChannel;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.composer.AbstractComposer;
@@ -77,6 +78,13 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         return playController;
     }
     
+    @Override
+    public void transpose(String intervalName, boolean upwards, JTextComponent textArea) {
+        super.transpose(intervalName, upwards, textArea);
+        
+        if (intervalNotes.notesText.getDocument().getLength() > 0)
+            transpose(intervalName, upwards, intervalNotes.notesText, true);
+    }
     
     private NotesTextPanelBase buildIntervalNotesView() {
         this.intervalPlayController = new IntervalPlayController(this);
