@@ -112,11 +112,11 @@ public class NotesTextPanelBase extends JPanel
         
         playButtons.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(playButtons);
-        notesControlPanel.add(Box.createRigidArea(new Dimension(1, 8))); // space to next button
+        notesControlPanel.add(Box.createRigidArea(new Dimension(1, 6))); // space to next button
         
         formatBars.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         notesControlPanel.add(formatBars);
-        notesControlPanel.add(Box.createRigidArea(new Dimension(1, 6))); // space to other control fields
+        notesControlPanel.add(Box.createRigidArea(new Dimension(1, 2))); // space to other control fields
         
         return notesControlPanel;
     }

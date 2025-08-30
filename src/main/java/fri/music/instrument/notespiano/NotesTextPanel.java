@@ -86,17 +86,17 @@ public class NotesTextPanel extends NotesTextPanelBase
     }
     
     private void buildNotesControlPanel(boolean pianoIsVertical) {
+        tempoSpinner.setToolTipText("Beats Per Minute, a Beat being the Divisor of Bar");
+        final JPanel tempoLayoutPanel = new SmartPanel(new BorderLayout()); // without this panel, field would be sized vertically
+        tempoLayoutPanel.add(tempoSpinner, pianoIsVertical ? BorderLayout.WEST : BorderLayout.NORTH);
+        tempoLayoutPanel.setBorder(BorderFactory.createTitledBorder("Tempo"));
+        
         timeSignatureChoice.setToolTipText("Time Signature, or Bar Type");
         timeSignatureChoice.setEditable(true);
         timeSignatureChoice.setPreferredSize(new Dimension(60, 24)); // else much too wide when editable
         final JPanel timeLayoutPanel = new SmartPanel(new BorderLayout());
         timeLayoutPanel.add(timeSignatureChoice, pianoIsVertical ? BorderLayout.WEST : BorderLayout.NORTH);
         timeLayoutPanel.setBorder(BorderFactory.createTitledBorder("Bar"));
-        
-        tempoSpinner.setToolTipText("Beats Per Minute, a Beat being the Divisor of Bar");
-        final JPanel tempoLayoutPanel = new SmartPanel(new BorderLayout()); // without this panel, field would be sized vertically
-        tempoLayoutPanel.add(tempoSpinner, pianoIsVertical ? BorderLayout.WEST : BorderLayout.NORTH);
-        tempoLayoutPanel.setBorder(BorderFactory.createTitledBorder("Tempo"));
         
         writeToNotesCheckbox.setToolTipText("Write Notes from Piano to Textarea at Cursor Position");
         
@@ -108,7 +108,7 @@ public class NotesTextPanel extends NotesTextPanelBase
         
         if (transposeMenu != null) {
             transposeMenu.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-            notesControlPanel.add(pianoIsVertical ? Box.createHorizontalStrut(6) : Box.createVerticalStrut(6));
+            notesControlPanel.add(Box.createRigidArea(new Dimension(1, 4))); // space to other control fields
             notesControlPanel.add(transposeMenu);
         }
         
