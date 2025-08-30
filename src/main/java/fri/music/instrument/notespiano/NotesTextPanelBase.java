@@ -42,7 +42,7 @@ public class NotesTextPanelBase extends JPanel
         
         this.error = new JTextField();
         this.playButtons = new PlayControlButtons(playController);
-        this.formatBars = new JButton("Format Notes");
+        this.formatBars = new JButton("Format");
         
         this.textAreaButtonsPanel = new JPanel();
         
@@ -74,7 +74,7 @@ public class NotesTextPanelBase extends JPanel
         error.setEditable(false);
         error.setForeground(Color.RED);
         
-        final JButton abcExport = new JButton("Export to ABC");
+        final JButton abcExport = new JButton("ABC Export");
         abcExport.setToolTipText("Convert Notes Text to ABC Notation");
         abcExport.addActionListener(new ActionListener() {
             @Override
