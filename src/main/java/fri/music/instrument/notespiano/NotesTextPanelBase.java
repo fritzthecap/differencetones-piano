@@ -83,7 +83,8 @@ public class NotesTextPanelBase extends JPanel
                         "Export to ABC",
                         notesText, // parent
                         new AbcExportComponent(notesText.getText()),
-                        new Dimension(720, 530));
+                        new Dimension(720, 530),
+                        null);
             }
         });
         

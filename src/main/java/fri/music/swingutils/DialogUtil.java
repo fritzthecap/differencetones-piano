@@ -2,6 +2,7 @@ package fri.music.swingutils;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -28,7 +29,7 @@ public class DialogUtil
      * @param size optional, the dimension when different from 600 x 460.
      */
     public static void showModelessHtmlDialog(String title, Component parent, String htmlText, Dimension size) {
-        showModelessDialog(title, parent, buildHtmlTextPane(htmlText), size);
+        showModelessDialog(title, parent, buildHtmlTextPane(htmlText), size, null);
     }
 
     /**
@@ -39,7 +40,7 @@ public class DialogUtil
      * @param size optional, the dimension when different from 600 x 460.
      */
     public static void showModelessTextDialog(String title, Component parent, String plainText, Dimension size) {
-        showModelessDialog(title, parent, buildPlainTextArea(plainText), size);
+        showModelessDialog(title, parent, buildPlainTextArea(plainText), size, null);
     }
 
     /**
@@ -50,7 +51,7 @@ public class DialogUtil
      * @param size the wanted size of the dialog.
      * @return the created dialog window.
      */
-    public static JDialog showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size) {
+    public static JDialog showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size, Point location) {
         final Window window = SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
         final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
         dialog.getContentPane().add(new JScrollPane(componentToShow));
@@ -69,11 +70,13 @@ public class DialogUtil
         dialog.addKeyListener(escapeListener);
         dialog.setFocusable(true); // else no ESCAPE
         
-        if (size == null)
-            size = new Dimension(660, 460);
+        dialog.setSize(size != null ? size : new Dimension(660, 460));
         
-        dialog.setSize(size);
-        dialog.setLocationRelativeTo(parent);
+        if (location == null)
+            dialog.setLocationRelativeTo(parent);
+        else
+            dialog.setLocation(location);
+        
         dialog.setVisible(true);
         
         return dialog;

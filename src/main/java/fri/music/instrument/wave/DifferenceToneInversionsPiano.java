@@ -64,13 +64,18 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         void intervalSelected(JComponent list, Point point, String ipnNoteName, DifferenceToneInversions.TonePair interval);
     }
     
+    private static final int INTERVAL_FRAME_WIDTH = 190;
     private static final int INTERVAL_FRAME_HEIGHT = 160;
+    
     private static final String INTERVAL_LISTS_TITLE = "Lists of Intervals Generating a Tone as Difference-Tone";
     
     private JComponent pianoPanel;
     private JPanel intervalListsPanel; // contains all interval lists
-    private JScrollPane intervalListsScrollPane;
+    private Component initialHeightHolder;
+    private JScrollPane listsScrollPane;
     private JPanel listsContainer; // contains intervalListsScrollPane and its toolbar
+    private Dimension dialogSize;
+    private Point dialogLocation;
     private JPanel centerPanel;
     private JButton closeAllIntervalFrames;
     private JButton detachIntervalFrames;
@@ -255,13 +260,13 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     private JPanel buildIntervalListsContainer() {
-        final FlowLayout layout = new FlowLayout(FlowLayout.LEADING);
-        layout.setHgap(0);
-        this.intervalListsPanel = new JPanel(layout);
+        this.intervalListsPanel = new JPanel();
         intervalListsPanel.setToolTipText(
                 "Press a keyboard-key to display all intervals that can generate it as difference-tone");
         // set the panel to an initial height as long as there are no frames in it, else panel would collapse
-        intervalListsPanel.add(Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4));
+        //intervalListsPanel.setPreferredSize(new Dimension(0, INTERVAL_FRAME_HEIGHT + 4));
+        this.initialHeightHolder = Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4);
+        intervalListsPanel.add(initialHeightHolder);
         
         this.sortIntervalFrames = new JCheckBox("Sort Lists by Pitch", true);
         sortIntervalFrames.setToolTipText("Insert New Interval-Lists Sorted by Difference-Tone Pitch");
@@ -310,16 +315,29 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     private void addIntervalListsToInternalScrollPane() {
-        this.intervalListsScrollPane = new JScrollPane(intervalListsPanel);
-        intervalListsScrollPane.setBorder(BorderFactory.createTitledBorder(INTERVAL_LISTS_TITLE));
-        listsContainer.add(intervalListsScrollPane, BorderLayout.CENTER);
+        setLayoutToIntervalListsPanel(false);
+        
+        if (this.listsScrollPane == null)
+            this.listsScrollPane = new JScrollPane(intervalListsPanel);
+
+        listsScrollPane.setBorder(BorderFactory.createTitledBorder(INTERVAL_LISTS_TITLE));
+        listsContainer.add(listsScrollPane, BorderLayout.CENTER);
+    }
+
+    private void setLayoutToIntervalListsPanel(boolean forDetachedDialog) {
+        final FlowLayout layout = forDetachedDialog
+                ? new FlowLayoutForScrollPane(FlowLayout.LEADING)
+                : new FlowLayout(FlowLayout.LEADING);
+        layout.setHgap(0);
+        layout.setVgap(0);
+        intervalListsPanel.setLayout(layout);
     }
     
     // callback helpers
     
     private DifferenceToneInversions getDifferenceToneInversions() {
-        if (differenceToneInversions == null) { // will be set to null on any parameter change
-            differenceToneInversions = new DifferenceToneInversions(
+        if (this.differenceToneInversions == null) { // will be set to null on any parameter change
+            this.differenceToneInversions = new DifferenceToneInversions(
                     new DifferenceToneInversions.Configuration(
                         getWaveSoundChannel().getTones(),
                         ToneSystem.semitoneSteps(narrowestAllowedInterval()),
@@ -328,10 +346,10 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 );
             if (ToneSystem.MINOR_SECOND.equals(narrowestAllowedInterval()) == false &&
                     ToneSystem.MAJOR_SEVENTH.equals(widestAllowedInterval()) == false)
-                differenceToneInversions.removeDissonant(false);
+                this.differenceToneInversions.removeDissonant(false);
                 // removing dissonants on minor-second would make choosing minor-second useless!
         }
-        return differenceToneInversions;
+        return this.differenceToneInversions;
     }
 
     private void addOrRemoveIntervalListFrame(final IntervalListFrame frame, boolean isAdd) {
@@ -353,37 +371,34 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             intervalListsPanel.remove(frame);
         }
         
-        refreshFramesContainer();
+        refreshIntervalListsPanel();
     }
     
-    private void refreshFramesContainer() {
+    private void refreshIntervalListsPanel() {
         final boolean listFramesExist = (getIntervalListFrames().size() > 0);
         closeAllIntervalFrames.setEnabled(listFramesExist);
         detachIntervalFrames.setEnabled(listFramesExist);
-
-        intervalListsPanel.revalidate(); // refresh layout
-        intervalListsPanel.repaint(); // refresh UI
+        
+        listsScrollPane.getParent().revalidate();
+        listsScrollPane.getParent().repaint();
     }
     
     /** Calculated difference-tone inversions are not valid anymore, replace or remove them. */
     private void tuningParametersHaveChanged() {
-        differenceToneInversions = null;
+        this.differenceToneInversions = null; // force new calculation by getDifferenceToneInversions()
         
-        for (IntervalListFrame framePanel : getIntervalListFrames()) {
-            final List<DifferenceToneInversions.TonePair> intervals = 
-                    getDifferenceToneInversions().getIntervalsGenerating(framePanel.ipnNoteName);
+        for (IntervalListFrame framePanel : getIntervalListFrames())
+            framePanel.fillList(
+                getDifferenceToneInversions().getIntervalsGenerating(framePanel.ipnNoteName));
 
-            framePanel.fillList(intervals);
-        }
-        
-        refreshFramesContainer();
+        refreshIntervalListsPanel();
     }
     
     private void closeAllIntervalFrames() {
         for (IntervalListFrame framePanel : getIntervalListFrames())
             framePanel.getParent().remove(framePanel);
         
-        refreshFramesContainer();
+        refreshIntervalListsPanel();
     }
 
     private List<IntervalListFrame> getIntervalListFrames() {
@@ -395,31 +410,39 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     private void detachIntervalFrames() {
-        if (intervalListsScrollPane == null)
-            return; // dialog is open
+        if (detachIntervalFrames.isEnabled() == false)
+            return; // dialog is showing
         
-        listsContainer.remove(intervalListsScrollPane);
-        intervalListsScrollPane.setViewportView(null);
-        intervalListsScrollPane = null;
-        listsContainer.revalidate();
+        if (dialogSize == null) {
+            final Dimension listsContainerSize = listsContainer.getSize();
+            dialogSize = new Dimension(
+                    listsContainerSize.width + 20, // let it protrude a little so that it is visible
+                    listsContainerSize.height + 16);
+        }
+        
+        listsContainer.remove(listsScrollPane);
+        listsContainer.revalidate(); // make it visibly empty
         listsContainer.repaint();
         
-        intervalListsPanel.setLayout(new FlowLayoutForScrollPane(FlowLayout.LEADING));
-        final JScrollPane flowingScrollPane = new JScrollPane(intervalListsPanel);
+        listsScrollPane.setBorder(null); // no titled border within titled dialog
+        intervalListsPanel.remove(initialHeightHolder); // not needed any more
         
-        final JDialog dialog = DialogUtil.showModelessDialog(INTERVAL_LISTS_TITLE, listsContainer, flowingScrollPane, null);
+        setLayoutToIntervalListsPanel(true);
+        final JDialog dialog = DialogUtil.showModelessDialog(
+                INTERVAL_LISTS_TITLE,
+                listsContainer,
+                listsScrollPane,
+                dialogSize,
+                dialogLocation);
+        
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                detachIntervalFrames.setEnabled(true);
+                dialogSize = dialog.getSize(); // remember for next launch
+                dialogLocation = dialog.getLocation();
                 
-                intervalListsPanel.getParent().remove(intervalListsPanel);
-                flowingScrollPane.setViewportView(null);
-                
-                intervalListsPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
                 addIntervalListsToInternalScrollPane();
-                listsContainer.revalidate();
-                listsContainer.repaint();
+                refreshIntervalListsPanel();
             }
             @Override
             public void windowClosed(WindowEvent e) {
@@ -577,7 +600,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             
             fillList(intervals); // put data into list
             
-            SizeUtil.forceSize(this, new Dimension(190, INTERVAL_FRAME_HEIGHT));
+            SizeUtil.forceSize(this, new Dimension(INTERVAL_FRAME_WIDTH, INTERVAL_FRAME_HEIGHT));
         }
         
         // methods called by outer class
