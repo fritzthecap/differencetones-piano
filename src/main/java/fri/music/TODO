@@ -1,15 +1,7 @@
 
 - "Help" button in NotesWithDifferenceToneInversionsPianoPlayer
     bottom left before "Sort Lists" checkbox.
-    
-- The export from NotesWithDifferenceToneInversionsPianoPlayer 
-    to ABC would require two voices, the lower one with the tune,
-    the upper one with its difference tone intervals.
-
-- It must be possible to write intervals even when there is no melody
-    in left side text area, in case the "Write Intervals" box is checked.
-    Mind that when a melody is present, only intervals matching the melody
-    can be written, this is checked internally at
+    Revise help text for notes area.
     
 - The titles of demo apps should be also visible when running
     pianos from ConfigurationPanel.
