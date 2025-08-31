@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import fri.music.player.Note;
 import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.player.notelanguage.abc.AbcExport;
 import fri.music.swingutils.TextAreaActions;
@@ -133,20 +132,20 @@ public class AbcExportComponent extends JSplitPane
     }
     
     private void writeExportToTextarea(String notesText, JTextArea abcText, AbcExportConfigurationPanel configuration) {
-        final Note[][] notes = melodyFactory.translate(notesText);
-        final String abc = export(configuration.getExportToAbcConfiguration(), notes);
+        final String abc = export(configuration.getExportToAbcConfiguration(), notesText);
         abcText.setText(abc);
     }
 
     /**
      * Performs the export. To be overridden for combination with melody.
      * @param configuration the ABC header data.
-     * @param notes the notes to convert to ABC.
+     * @param notesText the notes to convert to ABC.
      * @return the ABC text to put into local text-area.
      */
-    protected String export(AbcExport.Configuration configuration, final Note[][] notes) {
+    protected String export(AbcExport.Configuration configuration, String notesText) {
         final AbcExport abcExport = new AbcExport(
-                notes, 
+                melodyFactory.translate(notesText), 
+                (includeMelody != null) ? melodyFactory.tuning : null,
                 melodyFactory.getBeatsPerMinute(),
                 melodyFactory.getBeatsPerBar(),
                 melodyFactory.getBeatType());

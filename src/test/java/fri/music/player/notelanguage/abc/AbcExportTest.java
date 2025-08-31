@@ -281,6 +281,7 @@ K: D
         
         final AbcExport exporter = new AbcExport(
                 notes, 
+                null,
                 melodyFactory.getBeatsPerMinute(),
                 melodyFactory.getBeatsPerBar(),
                 melodyFactory.getBeatType());

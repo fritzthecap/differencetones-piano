@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
+import javax.swing.SwingUtilities;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
@@ -67,7 +68,7 @@ public class TuningComponent
         if (initialTuning != null)
             tuningChoice.setSelectedIndex(getInitiallySelectedIndex(initialTuning, tuningNames));
         
-        tuningChoice.addActionListener(new ActionListener() {
+        final ActionListener actionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 final String name = (String) tuningChoice.getSelectedItem();
@@ -79,7 +80,10 @@ public class TuningComponent
                 if (listener != null)
                     listener.tuningChanged(toneSystem);
             }
-        });
+        };
+        tuningChoice.addActionListener(actionListener);
+        
+        SwingUtilities.invokeLater(() -> actionListener.actionPerformed(null)); // let callers initialize first
         
         return this.tuningChoice = tuningChoice;
     }

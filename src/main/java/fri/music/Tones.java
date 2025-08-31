@@ -22,10 +22,6 @@ public class Tones
     private final Map<Integer,Tone> midiNumbersToTones;
     private final Map<Double,Tone> frequenciesToTones;
     
-    public Tones() {
-        this(null);
-    }
-    
     public Tones(Tone[] tones) {
         this.tones = (tones == null) ? new EqualTemperament().tones() : tones;
         

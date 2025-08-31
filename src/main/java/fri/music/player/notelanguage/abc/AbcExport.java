@@ -36,13 +36,10 @@ public class AbcExport
             int numberOfBarsPerLine)
     {
         public Configuration() {
-            this(null, null, "C");
+            this("C");
         }
         public Configuration(String keyAndClef) {
-            this(null, null, keyAndClef);
-        }
-        public Configuration(String title, String author, String keyAndClef) {
-            this(1, title, null, author, null, keyAndClef, 4);
+            this(1, null, null, null, null, keyAndClef, 4);
         }
     }
     
@@ -58,18 +55,20 @@ public class AbcExport
     
     private final Note[][] notes;
     private final int beatsPerMinute, beatsPerBar, beatType;
+    private final String tuning;
     
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
     private AbcKeyAndAccidentalsMap keyToAccidentalsMap;
     
     /** Constructor of an exporter for different export-configurations from parsed notes. */
-    public AbcExport(Note[][] notes, int beatsPerMinute, int beatsPerBar, int beatType) {
+    public AbcExport(Note[][] notes, String tuning, int beatsPerMinute, int beatsPerBar, int beatType) {
         Objects.requireNonNull(notes);
         if (notes.length <= 0 || notes[0].length <= 0)
             throw new IllegalArgumentException("Can not export empty notes!");
         
         this.notes = notes;
+        this.tuning = tuning;
         this.beatsPerMinute = beatsPerMinute;
         this.beatsPerBar = beatsPerBar;
         this.beatType = beatType;
@@ -184,6 +183,9 @@ public class AbcExport
         else if (nonEmpty(date))
             appendLine(result, "C: "+date);
         
+        if (tuning != null)
+            appendLine(result, "P: "+tuning);
+
         final Note firstNote = notes[0][0];
         final String timeSignature = getTimeSignature(firstNote.beatInfo);
         

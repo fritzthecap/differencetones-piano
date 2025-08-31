@@ -74,6 +74,13 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         void intervalSelected(String ipnNoteName, DifferenceToneInversions.TonePair interval);
     }
     
+    /** Listeners get notified when tuning, deviation or interval range changed. */
+    public interface TuningParametersChangeListener
+    {
+        /** A tuning parameter has changed. */
+        void tuningParametersChanged();
+    }
+    
     private static final int INTERVAL_FRAME_WIDTH = 190;
     private static final int INTERVAL_FRAME_HEIGHT = 160;
     
@@ -109,6 +116,10 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     
     /** Clients can listen to click on (or selection of) difference-tone intervals. */
     private IntervalSelectionListener intervalSelectionListener;
+    
+    private TuningParametersChangeListener tuningParametersChangeListener;
+    
+    private ToneSystem selectedToneSystem;
     
     /**
      * @param configuration the piano design configuration.
@@ -153,9 +164,18 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return centerPanel;
     }
     
+    public ToneSystem getToneSystem() {
+        return selectedToneSystem;
+    }
+    
     /** Listen to interval selection in any list frame. */
     public void setIntervalSelectionListener(IntervalSelectionListener intervalSelectionListener) {
         this.intervalSelectionListener = intervalSelectionListener;
+    }
+    
+    /** Listen to changes in any tuning parameters. */
+    public void setTuningParametersChangeListener(TuningParametersChangeListener tuningParametersChangeListener) {
+        this.tuningParametersChangeListener = tuningParametersChangeListener;
     }
     
     /** Player wants to select a list line while playing. */
@@ -183,6 +203,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         final TuningComponent.Listener listener = new TuningComponent.Listener() {
             @Override
             public void tuningChanged(ToneSystem toneSystem) {
+                selectedToneSystem = toneSystem;
                 tuningParametersHaveChanged();
             }
         };
@@ -264,7 +285,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 new int[] { interval.lowerTone().midiNumber, interval.upperTone().midiNumber },
                 mouseDown);
         
-        if (mouseDown && intervalSelectionListener != null)
+        if (intervalSelectionListener != null && mouseDown)
             intervalSelectionListener.intervalSelected(activeFrame.ipnNoteName, interval);
     }
 
@@ -401,7 +422,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         }
         
         final boolean listFramesExistAfter = refreshListsContainer();
-        if (listFramesExistBefore != listFramesExistAfter)
+        if (intervalSelectionListener != null && listFramesExistBefore != listFramesExistAfter)
             intervalSelectionListener.intervalsAvailable(listFramesExistAfter);
     }
     
@@ -425,6 +446,9 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 getDifferenceToneInversions().getIntervalsGenerating(framePanel.ipnNoteName));
 
         refreshListsContainer();
+        
+        if (tuningParametersChangeListener != null)
+            tuningParametersChangeListener.tuningParametersChanged();
     }
     
     private void closeAllIntervalFrames() {

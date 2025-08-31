@@ -9,6 +9,14 @@ public interface NoteExamples
         }
     }
     
+    Melody C_CHORD = new Melody("C Major Chord", """
+C4/4 E4/4 G4/4 E4/4 C4/2 -/2
+""");
+    
+    Melody AM_CHORD = new Melody("A Minor Chord", """
+A4/4 C5/4 E5/4 C5/4 A4/2 -/2
+""");
+    
     Melody PENTATONIC = new Melody("Pentatonic", """
 C4/4 D4/4 E4/4 G4/4
 A4/4 C5/4 A4/4 G4/4
@@ -80,6 +88,8 @@ G4 D4 G3 G3
 
 
     Melody[] MELODIES = new Melody[] {
+            C_CHORD,
+            AM_CHORD,
             PENTATONIC,
             C_MAJOR_SCALE,
             A_MINOR_HARMONIC,

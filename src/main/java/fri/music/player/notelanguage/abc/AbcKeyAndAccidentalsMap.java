@@ -31,7 +31,7 @@ import fri.music.ToneSystem;
      C10 = c'''''
  * </pre>
  */
-public class AbcKeyAndAccidentalsMap
+class AbcKeyAndAccidentalsMap
 {
     private static final String ABC_NATURAL = "="; // resolution of some preceding accidental
     private static final String ABC_SHARP = "^";
@@ -271,7 +271,7 @@ public class AbcKeyAndAccidentalsMap
      * @param keyAndClef the key of the melody, one of POSSIBLE_*_KEYS, 
      *      optionally containing a space-separated clef postfix.
      */
-    public AbcKeyAndAccidentalsMap(String keyAndClef) {
+    AbcKeyAndAccidentalsMap(String keyAndClef) {
         this.keyOfTune = getKey(keyAndClef);
         this.isFlatKey = isFlatKey(keyAndClef);
         

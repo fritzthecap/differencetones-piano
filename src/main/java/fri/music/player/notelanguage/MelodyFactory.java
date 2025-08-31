@@ -61,7 +61,10 @@ public class MelodyFactory
     }
     
     
-    private final Tones toneSystem;
+    /** The tuning this was built with. */
+    public final String tuning;
+    
+    private final Tones tones;
     private final Integer volume;
     
     private Integer beatsPerMinute; // BPM
@@ -124,7 +127,10 @@ public class MelodyFactory
             Integer beatType,
             Integer volume)
     {
-        this.toneSystem = (toneSystem != null) ? new Tones(toneSystem.tones()) : new Tones();
+        final boolean toneSystemGiven = (toneSystem != null);
+        this.tuning = toneSystemGiven ? toneSystem.name() : null; // null: do not render default in ABC export
+        this.tones = new Tones(toneSystemGiven ? toneSystem.tones() : null); // null will be EqualTemperament
+        
         this.volume = (volume != null) ? volume : Note.DEFAULT_VOLUME;
         
         this.beatsPerMinute = (beatsPerMinute != null) ? beatsPerMinute : Note.DEFAULT_TEMPO_BPM;
@@ -560,7 +566,7 @@ public class MelodyFactory
                     beatInfo);
         }
         else { // normal tone, not a rest
-            final Tone tone = toneSystem.forIpnName(melodyToken.ipnName);
+            final Tone tone = tones.forIpnName(melodyToken.ipnName);
             if (tone == null)
                 throw new IllegalArgumentException("Unknown note name: "+melodyToken.ipnName);
             

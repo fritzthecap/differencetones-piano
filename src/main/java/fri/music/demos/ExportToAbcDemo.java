@@ -47,6 +47,7 @@ public class ExportToAbcDemo
                 final Note[][] notes = melodyFactory.translate(notesText.getText());
                 final AbcExport exportToAbc = new AbcExport(
                         notes,
+                        melodyFactory.tuning,
                         melodyFactory.getBeatsPerMinute(),
                         melodyFactory.getBeatsPerBar(),
                         melodyFactory.getBeatType());

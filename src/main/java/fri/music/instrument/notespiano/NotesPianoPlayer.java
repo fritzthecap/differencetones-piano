@@ -179,10 +179,15 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     protected MelodyFactory newMelodyFactory() {
         final Integer[] timeSignature = timeSignatureParts();
         return new MelodyFactory(
-                null,
+                getToneSystem(),
                 (Integer) view().tempoSpinner.getValue(),
                 timeSignature[0],
                 timeSignature[1]);
+    }
+    
+    /** Returns null. To be overridden by classes that can choose tunings. */
+    protected ToneSystem getToneSystem() {
+        return null;
     }
     
     /** Factory method for AbcExportComponent, to be overridden. */
