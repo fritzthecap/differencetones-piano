@@ -33,8 +33,6 @@ public class NotesTextPanelBase extends JPanel
     
     protected final JPanel textAreaButtonsPanel;
     
-    private boolean permanentNotesCheck = true;
-    
     public NotesTextPanelBase(PlayControllerBase playController, boolean pianoIsVertical, boolean addControlPanelToWest) {
         super(new BorderLayout());
         
@@ -59,14 +57,12 @@ public class NotesTextPanelBase extends JPanel
         add(notesControlPanel, pianoIsVertical ? BorderLayout.NORTH : addControlPanelToWest ? BorderLayout.WEST : BorderLayout.EAST);
     }
     
-    /** @return whether permanentNotesCheck is ON. */
-    public boolean isPermanentNotesCheck() {
-        return permanentNotesCheck;
+    
+    /** Factory method for AbcExportComponent, to be overridden. */
+    protected AbcExportComponent newAbcExportComponent(String notesText) {
+        return new AbcExportComponent(notesText);
     }
-    /** When writing two notes that are tied it is useful to temporarily disable the syntax check (open tie). */
-    public void setPermanentNotesCheck(boolean active) {
-        this.permanentNotesCheck = active;
-    }
+    
     
     private JComponent buildNotesTextArea(boolean addControlPanelToWest) {
         notesText.setToolTipText("Write Notes to be Played on Piano, Context Actions via Right Mouse Click");
@@ -85,7 +81,7 @@ public class NotesTextPanelBase extends JPanel
                 DialogUtil.showModelessDialog(
                         "Export to ABC",
                         notesText, // parent
-                        new AbcExportComponent(notesText.getText()),
+                        newAbcExportComponent(notesText.getText()),
                         new Dimension(720, 530),
                         null);
             }

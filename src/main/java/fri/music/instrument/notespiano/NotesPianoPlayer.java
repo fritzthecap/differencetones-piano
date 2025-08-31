@@ -46,6 +46,8 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     private NotesTextPanel view;
     private NotesWritingMouseListener notesWritingPianoListener;
     
+    private boolean permanentNotesCheck = true;
+    
     /** @param piano required, the piano on which to play notes. */
     public NotesPianoPlayer(PianoWithSound piano) {
         this.piano = Objects.requireNonNull(piano);
@@ -181,6 +183,15 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
                 timeSignature[1]);
     }
     
+    /** @return whether permanentNotesCheck is ON. */
+    protected final boolean isPermanentNotesCheck() {
+        return permanentNotesCheck;
+    }
+    /** When writing notes programmatically (e.g. auto-compose) it is useful to temporarily disable the syntax check. */
+    protected final void setPermanentNotesCheck(boolean active) {
+        this.permanentNotesCheck = active;
+    }
+    
     // override-able UI builder methods
     
     /** @return the notes panel in CENTER, to be overridden for other components. */
@@ -277,7 +288,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
      * @return null when error, else the notes-array from text area.
      */
     protected final Note[][] readNotesFromTextAreaCatchExceptions(PlayControllerBase playController, NotesTextPanelBase view) {
-        if (view.isPermanentNotesCheck() == true) {
+        if (isPermanentNotesCheck() == true) {
             try {
                 final Note[][] notes = playController.readNotesFromTextArea(true);
                 enableUiOnReadNotes(null, view);

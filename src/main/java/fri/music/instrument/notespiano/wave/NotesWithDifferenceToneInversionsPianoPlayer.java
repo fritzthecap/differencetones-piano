@@ -180,7 +180,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         
         final boolean putInTie = (lengthNotations.length > 1);
         if (putInTie)
-            intervalNotes.setPermanentNotesCheck(false);
+            setPermanentNotesCheck(false);
         
         try {
             for (int i = 0; i < lengthNotations.length; i++) {
@@ -200,7 +200,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         }
         finally {
             if (putInTie)
-                intervalNotes.setPermanentNotesCheck(true);
+                setPermanentNotesCheck(true);
         }
     }
     
