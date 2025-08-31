@@ -91,12 +91,12 @@ public class NotesTextPanel extends NotesTextPanelBase
         tempoLayoutPanel.add(tempoSpinner, pianoIsVertical ? BorderLayout.WEST : BorderLayout.NORTH);
         tempoLayoutPanel.setBorder(BorderFactory.createTitledBorder("Tempo"));
         
-        timeSignatureChoice.setToolTipText("Time Signature, or Bar Type");
+        timeSignatureChoice.setToolTipText("Time Signature, or Meter, or Bar Type");
         timeSignatureChoice.setEditable(true);
         timeSignatureChoice.setPreferredSize(new Dimension(60, 24)); // else much too wide when editable
         final JPanel timeLayoutPanel = new SmartPanel(new BorderLayout());
         timeLayoutPanel.add(timeSignatureChoice, pianoIsVertical ? BorderLayout.WEST : BorderLayout.NORTH);
-        timeLayoutPanel.setBorder(BorderFactory.createTitledBorder("Bar"));
+        timeLayoutPanel.setBorder(BorderFactory.createTitledBorder("Time"));
         
         writeToNotesCheckbox.setToolTipText("Write Notes from Piano to Textarea at Cursor Position");
         
@@ -126,7 +126,7 @@ public class NotesTextPanel extends NotesTextPanelBase
         final JMenu downMenu = new JMenu("Down");
         popupMenu.add(downMenu);
         
-        for (int i = 1; i < ToneSystem.INTERVAL_NAMES.length; i++) { // 1: spare UNISON
+        for (int i = 1; i < ToneSystem.INTERVAL_NAMES.length; i++) { // 1: not UNISON
             upMenu.add(buildTransposeMenuItem(ToneSystem.INTERVAL_NAMES[i], true));
             downMenu.add(buildTransposeMenuItem(ToneSystem.INTERVAL_NAMES[i], false));
         }

@@ -18,13 +18,20 @@ public class PlayController extends PlayControllerBase
     
     @Override
     protected void onEmptyNotes() {
+        super.onEmptyNotes();
+        
         view.timeSignatureChoice.setEnabled(true); // let user choose tempo and bar-type
         view.tempoSpinner.setEnabled(true);
         view.transposeMenu.setEnabled(false);
+        
+        if (view.writeToNotesCheckbox.isSelected() == false)
+            view.writeToNotesCheckbox.doClick(); // triggers actionPerfomed()
     }
     
     @Override
     protected void onNonEmptyNotes(String timeSignatureOnTop, Integer tempoOnTop) {
+        super.onNonEmptyNotes(timeSignatureOnTop, tempoOnTop);
+        
         // get optional BPM and time-signature extracted from top
         if (timeSignatureOnTop != null) {
             view.timeSignatureChoice.setSelectedItem(timeSignatureOnTop);
@@ -47,6 +54,8 @@ public class PlayController extends PlayControllerBase
 
     @Override
     protected void onStartPlayer() {
+        super.onStartPlayer();
+        
         view.timeSignatureChoice.setEnabled(false);
         view.tempoSpinner.setEnabled(false);
         view.transposeMenu.setEnabled(false);
@@ -54,6 +63,8 @@ public class PlayController extends PlayControllerBase
     
     @Override
     protected void onEnableUiOnPlaying(boolean isStop) {
+        super.onEnableUiOnPlaying(isStop);
+        
         view.writeToNotesCheckbox.setEnabled(isStop);
         view.transposeMenu.setEnabled(isStop);
     }

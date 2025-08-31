@@ -300,6 +300,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
             view.error.setCaretPosition(0); // scroll back to start of possibly long message
             view.playButtons.setEnabled(false);
             view.formatBars.setEnabled(false);
+            view.abcExport.setEnabled(false);
             
             if (e instanceof IllegalArgumentException == false)
                 e.printStackTrace();

@@ -139,24 +139,25 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         
         view.playButtons.setEnabled(enable);
         view.formatBars.setEnabled(enable);
+        view.abcExport.setEnabled(enable);
         
         return notes;
     }
     
     
-    /** Does nothing, to be overridden for extended view. */
+    /** Called from readNotesFromTextArea(). Does nothing, to be overridden for extended view. */
     protected void onEmptyNotes() {
     }
     
-    /** Does nothing, to be overridden for extended view. */
+    /** Called from readNotesFromTextArea(). Does nothing, to be overridden for extended view. */
     protected void onNonEmptyNotes(String timeSignatureOnTop, Integer tempoOnTop) {
     }
 
-    /** Does nothing, to be overridden for extended view. */
+    /** Called from readNotesFromTextArea(). Does nothing, to be overridden for extended view. */
     protected void onStartPlayer() {
     }
 
-    /** Does nothing, to be overridden for extended view. */
+    /** Called from readNotesFromTextArea(). Does nothing, to be overridden for extended view. */
     protected void onEnableUiOnPlaying(boolean isStop) {
     }
     
@@ -247,6 +248,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         // disable controls that may have been enabled by readNotesFromTextArea()
         onStartPlayer();
         view.formatBars.setEnabled(false);
+        view.abcExport.setEnabled(false);
         
         // following assignment is synchronized because called from startOrStop()
         this.player = new Player(pianoKeyConnector()) {

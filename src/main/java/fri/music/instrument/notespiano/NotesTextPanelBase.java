@@ -15,18 +15,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
+import fri.music.instrument.wave.DifferenceToneInversionsPiano;
+import fri.music.swingutils.BorderUtil;
 import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.TextAreaActions;
 
 /** Basic view of NotesPianoPlayer with play- and format-buttons. */
 public class NotesTextPanelBase extends JPanel
 {
-    public final PlayControlButtons playButtons;
-    public final JButton formatBars;
     public final JTextArea notesText;
+    public final TextAreaActions textAreaActions;
     public final JTextComponent error;
     public final JPanel notesControlPanel;
-    public final TextAreaActions textAreaActions;
+    public final PlayControlButtons playButtons;
+    public final JButton formatBars;
+    public final JButton abcExport;
     
     protected final JPanel textAreaButtonsPanel;
     
@@ -44,6 +47,7 @@ public class NotesTextPanelBase extends JPanel
         this.playButtons = new PlayControlButtons(playController);
         this.formatBars = new JButton("Format");
         
+        this.abcExport = new JButton("ABC Export");
         this.textAreaButtonsPanel = new JPanel();
         
         this.notesControlPanel = buildNotesControlPanel(pianoIsVertical);
@@ -67,14 +71,13 @@ public class NotesTextPanelBase extends JPanel
     private JComponent buildNotesTextArea(boolean addControlPanelToWest) {
         notesText.setToolTipText("Write Notes to be Played on Piano, Context Actions via Right Mouse Click");
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
-        notesTextScrollPane.setBorder(BorderFactory.createTitledBorder("Notes"));
+        notesTextScrollPane.setBorder(BorderUtil.titledBorder("Notes", DifferenceToneInversionsPiano.TITLE_FONTSIZE_INCREMENT));
         
         error.setBorder(BorderFactory.createTitledBorder("Error"));
         error.setToolTipText("First Found Syntax Error in Notes Text");
         error.setEditable(false);
         error.setForeground(Color.RED);
         
-        final JButton abcExport = new JButton("ABC Export");
         abcExport.setToolTipText("Convert Notes Text to ABC Notation");
         abcExport.addActionListener(new ActionListener() {
             @Override
@@ -87,6 +90,7 @@ public class NotesTextPanelBase extends JPanel
                         null);
             }
         });
+        abcExport.setEnabled(false);
         
         textAreaButtonsPanel.add(abcExport);
         
@@ -118,6 +122,9 @@ public class NotesTextPanelBase extends JPanel
         notesControlPanel.add(formatBars);
         notesControlPanel.add(Box.createRigidArea(new Dimension(1, 2))); // space to other control fields
         
+        playButtons.setEnabled(false);
+        formatBars.setEnabled(false);
+
         return notesControlPanel;
     }
 }
