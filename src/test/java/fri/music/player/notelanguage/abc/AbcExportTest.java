@@ -279,7 +279,11 @@ K: D
     private void runTest(String testData, String expected, MelodyFactory melodyFactory, AbcExport.Configuration configuration) {
         final Note[][] notes = melodyFactory.translate(testData);
         
-        final AbcExport exporter = new AbcExport(notes);
+        final AbcExport exporter = new AbcExport(
+                notes, 
+                melodyFactory.getBeatsPerMinute(),
+                melodyFactory.getBeatsPerBar(),
+                melodyFactory.getBeatType());
         final String abcText = exporter.export(configuration);
         
         //System.out.println(abcText);

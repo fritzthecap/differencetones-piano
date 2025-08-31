@@ -1,6 +1,7 @@
 package fri.music.instrument.notespiano;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
@@ -24,6 +25,7 @@ import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
+import fri.music.swingutils.DialogUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -183,6 +185,11 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
                 timeSignature[1]);
     }
     
+    /** Factory method for AbcExportComponent, to be overridden. */
+    protected AbcExportComponent newAbcExportComponent(NotesTextPanelBase view) {
+        return new AbcExportComponent(view.notesText.getText(), newMelodyFactory(), false);
+    }
+    
     /** @return whether permanentNotesCheck is ON. */
     protected final boolean isPermanentNotesCheck() {
         return permanentNotesCheck;
@@ -224,7 +231,23 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
             }
         });
         
+        addExportActionListener(view);
+        
         return this.view;
+    }
+    
+    protected void addExportActionListener(final NotesTextPanelBase view) {
+        view.abcExport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DialogUtil.showModelessDialog(
+                        "Export to ABC",
+                        view.notesText, // parent to show above
+                        newAbcExportComponent(view), // fetches the view-owned text, with left-side tempo and time
+                        new Dimension(720, 530),
+                        null);
+            }
+        });
     }
     
     

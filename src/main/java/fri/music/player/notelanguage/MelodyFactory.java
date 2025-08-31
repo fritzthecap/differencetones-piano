@@ -143,6 +143,16 @@ public class MelodyFactory
         this.disallowChords = disallowChords;
     }
     
+    public int getBeatsPerMinute() {
+        return beatsPerMinute;
+    }
+    public int getBeatsPerBar() {
+        return beatsPerBar;
+    }
+    public int getBeatType() {
+        return beatType;
+    }
+    
     /**
      * Translates given text to a playable melody. See <code>translate(String[])</code> for docs.
      * @param text contains the notes of the melody, including ties and time signature changes.
@@ -251,12 +261,18 @@ public class MelodyFactory
     }
     
     
-    /** @return beatsPerMinute on text-area top from latest <code>translate()</code> call, or null if there was none. */
+    /**
+     * @return beatsPerMinute on text-area top from latest <code>translate()</code> call, 
+     *      or null if there was none.
+     */
     public Integer getTempoOnTop() {
         return tempoOnTop;
     }
 
-    /** @return "beatsPerBar/beatType" on text-area top from latest <code>translate()</code> call, or null if there was none. */
+    /**
+     * @return "beatsPerBar/beatType" on text-area top from latest <code>translate()</code> call, 
+     * or null if there was none.
+     */
     public String getTimeSignatureOnTop() {
         return timeSignatureOnTop;
     }

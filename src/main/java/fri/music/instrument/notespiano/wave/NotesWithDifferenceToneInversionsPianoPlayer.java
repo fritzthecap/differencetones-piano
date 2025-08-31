@@ -15,6 +15,7 @@ import fri.music.SoundChannel;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
+import fri.music.instrument.notespiano.AbcExportComponent;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.notespiano.NotesTextPanelBase;
 import fri.music.instrument.notespiano.PlayController;
@@ -25,6 +26,9 @@ import fri.music.player.Note;
 import fri.music.player.NotesUtil;
 import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.player.notelanguage.NoteConnections;
+import fri.music.player.notelanguage.abc.AbcExport;
+import fri.music.player.notelanguage.abc.AbcExport.Configuration;
+import fri.music.player.notelanguage.abc.AbcTunesCombiner;
 import fri.music.swingutils.BorderUtil;
 
 /**
@@ -78,6 +82,32 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     }
     
     @Override
+    protected AbcExportComponent newAbcExportComponent(NotesTextPanelBase view) {
+        if (view == intervalNotes) {
+            return new AbcExportComponent(view.notesText.getText(), newMelodyFactory(), true) {
+                @Override
+                protected String export(Configuration configuration, Note[][] notes) {
+                    final String intervalsAbcText = super.export(configuration, notes);
+                    if (includeMelody.isSelected() == false)
+                        return intervalsAbcText;
+                    
+                    // fetch and translate the single-voiced melody
+                    final Note[][] melodyNotes = melodyFactory.translate(view().notesText.getText());
+                    final AbcExport abcExport = new AbcExport(
+                            melodyNotes, 
+                            melodyFactory.getBeatsPerMinute(),
+                            melodyFactory.getBeatsPerBar(),
+                            melodyFactory.getBeatType());
+                    final String melodyAbcText = abcExport.export(configuration);
+                    
+                    return new AbcTunesCombiner().combine("Intervals", intervalsAbcText, "Melody", melodyAbcText);
+                }
+            };
+        }
+        return super.newAbcExportComponent(view);
+    }
+    
+    @Override
     public void transpose(String intervalName, boolean upwards, JTextComponent textArea) {
         super.transpose(intervalName, upwards, textArea);
         
@@ -88,11 +118,11 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     private NotesTextPanelBase buildIntervalNotesView() {
         this.intervalPlayController = new IntervalPlayController(this);
         
-        final NotesTextPanelBase intervalNotes = new NotesTextPanelBase(
-                intervalPlayController, 
-                piano.config.isVertical, 
-                false); // add controls to EAST
+        final NotesTextPanelBase intervalNotes = 
+                new NotesTextPanelBase(intervalPlayController, piano.config.isVertical, false); // false: add controls to EAST
         intervalPlayController.setBaseView(intervalNotes); // connect controller to view
+        
+        addExportActionListener(intervalNotes);
         
         buildNotesPanel(intervalPlayController, intervalNotes);
         
@@ -156,7 +186,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 
                 final MelodyFactory melodyFactory = newMelodyFactory();
                 melodyFactory.setDisallowChords(false); // allow chords here!
-                final String formatted = melodyFactory.formatBarLines(composedIntervals, true, true);
+                final String formatted = melodyFactory.formatBarLines(composedIntervals, false, false);
                 intervalNotes.notesText.setText(formatted);
             }
             catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain difference-tones

@@ -3,8 +3,6 @@ package fri.music.instrument.notespiano;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -17,10 +15,12 @@ import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
 import fri.music.swingutils.BorderUtil;
-import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.TextAreaActions;
 
-/** Basic view of NotesPianoPlayer with play- and format-buttons. */
+/**
+ * Basic view of NotesPianoPlayer, with play- and format-buttons.
+ * Contains a control-panel and a text-area with buttons and error field on bottom.
+ */
 public class NotesTextPanelBase extends JPanel
 {
     public final JTextArea notesText;
@@ -57,13 +57,6 @@ public class NotesTextPanelBase extends JPanel
         add(notesControlPanel, pianoIsVertical ? BorderLayout.NORTH : addControlPanelToWest ? BorderLayout.WEST : BorderLayout.EAST);
     }
     
-    
-    /** Factory method for AbcExportComponent, to be overridden. */
-    protected AbcExportComponent newAbcExportComponent(String notesText) {
-        return new AbcExportComponent(notesText);
-    }
-    
-    
     private JComponent buildNotesTextArea(boolean addControlPanelToWest) {
         notesText.setToolTipText("Write Notes to be Played on Piano, Context Actions via Right Mouse Click");
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
@@ -75,17 +68,6 @@ public class NotesTextPanelBase extends JPanel
         error.setForeground(Color.RED);
         
         abcExport.setToolTipText("Convert Notes Text to ABC Notation");
-        abcExport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DialogUtil.showModelessDialog(
-                        "Export to ABC",
-                        notesText, // parent
-                        newAbcExportComponent(notesText.getText()),
-                        new Dimension(720, 530),
-                        null);
-            }
-        });
         abcExport.setEnabled(false);
         
         textAreaButtonsPanel.add(abcExport);

@@ -45,7 +45,11 @@ public class ExportToAbcDemo
             public void actionPerformed(ActionEvent e) {
                 final MelodyFactory melodyFactory = new MelodyFactory();
                 final Note[][] notes = melodyFactory.translate(notesText.getText());
-                final AbcExport exportToAbc = new AbcExport(notes);
+                final AbcExport exportToAbc = new AbcExport(
+                        notes,
+                        melodyFactory.getBeatsPerMinute(),
+                        melodyFactory.getBeatsPerBar(),
+                        melodyFactory.getBeatType());
                 final String abc = exportToAbc.export(configuration.getExportToAbcConfiguration());
                 abcText.setText(abc);
             }

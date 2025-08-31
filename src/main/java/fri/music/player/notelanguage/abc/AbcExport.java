@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Objects;
 import fri.music.TextUtil;
 import fri.music.player.Note;
-import fri.music.player.notelanguage.MelodyFactory;
 
 /**
  * Exports MelodyFactory notation to ABC notation.
@@ -58,25 +57,22 @@ public class AbcExport
     
     
     private final Note[][] notes;
+    private final int beatsPerMinute, beatsPerBar, beatType;
+    
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
     private AbcKeyAndAccidentalsMap keyToAccidentalsMap;
     
-    /** Constructor of an exporter for different export-configurations from text. */
-    public AbcExport(String notes, MelodyFactory melodyFactory) {
-        this(melodyFactory.translate(notes));
-    }
-    
     /** Constructor of an exporter for different export-configurations from parsed notes. */
-    public AbcExport(Note[][] notes) {
+    public AbcExport(Note[][] notes, int beatsPerMinute, int beatsPerBar, int beatType) {
         Objects.requireNonNull(notes);
         if (notes.length <= 0 || notes[0].length <= 0)
             throw new IllegalArgumentException("Can not export empty notes!");
         
-        if (notes[0][0].beatInfo == null || notes[0][0].beatInfo.timeSignature() == null)
-            throw new IllegalArgumentException("First note is expected to carry time-signature and tempo!");
-            
         this.notes = notes;
+        this.beatsPerMinute = beatsPerMinute;
+        this.beatsPerBar = beatsPerBar;
+        this.beatType = beatType;
     }
     
     /**
@@ -189,12 +185,10 @@ public class AbcExport
             appendLine(result, "C: "+date);
         
         final Note firstNote = notes[0][0];
-        final String timeSignature = Objects.requireNonNull(firstNote.beatInfo.timeSignature());
+        final String timeSignature = getTimeSignature(firstNote.beatInfo);
+        
         appendLine(result, "M: "+timeSignature);
-        
-        if (firstNote.beatInfo.beatsPerMinute() != null)
-            appendLine(result, "Q: 1/4="+firstNote.beatInfo.beatsPerMinute());
-        
+        appendLine(result, "Q: 1/4="+getTempo(firstNote.beatInfo));
         appendLine(result, "L: 1/1"); // always keep duration on note, not in "L" field!
         
         if (nonEmpty(configuration.keyAndClef()))
@@ -203,6 +197,18 @@ public class AbcExport
         return timeSignature;
     }
     
+    private int getTempo(Note.BeatInfo beatInfo) {
+        if (beatInfo != null && beatInfo.beatsPerMinute() != null)
+            return beatInfo.beatsPerMinute();
+        return beatsPerMinute;
+    }
+
+    private String getTimeSignature(Note.BeatInfo beatInfo) {
+        if (beatInfo != null && beatInfo.timeSignature() != null)
+            return beatInfo.timeSignature();
+        return beatsPerBar+"/"+beatType;
+    }
+
     private void writeChordNotes(StringBuilder result, Note[] chord, String length) {
         for (final Note note : chord) { // single notes, mostly just one
             final String adjustedAbcNoteName = keyToAccidentalsMap.getAdjustedNote(note.ipnName);

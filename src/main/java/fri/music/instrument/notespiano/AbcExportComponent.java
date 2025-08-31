@@ -6,8 +6,10 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -49,15 +51,21 @@ public class AbcExportComponent extends JSplitPane
             "https://spuds.thursdaycontra.com/SPUDSConverter.html"
         };
 
-    public AbcExportComponent(final String notesText) {
+    
+    protected final MelodyFactory melodyFactory;
+    protected final JCheckBox includeMelody;
+    
+    public AbcExportComponent(final String notesText, MelodyFactory melodyFactory, boolean includeMelodyOption) {
         super(JSplitPane.HORIZONTAL_SPLIT);
+        
+        this.melodyFactory = Objects.requireNonNull(melodyFactory);
         
         final int ROWS = 12;
         final int COLUMNS = 24;
 
         final JTextArea abcTextarea = new JTextArea(ROWS, COLUMNS);
-        new TextAreaActions(abcTextarea); // adds itself as mouse-listener to textarea
         abcTextarea.setToolTipText("The ABC Text Generated from Notes");
+        new TextAreaActions(abcTextarea); // adds itself as mouse-listener to textarea
         
         final JScrollPane abcTextScrollPane = new JScrollPane(abcTextarea);
         abcTextScrollPane.setBorder(BorderFactory.createTitledBorder("ABC Text"));
@@ -71,7 +79,16 @@ public class AbcExportComponent extends JSplitPane
         helpPanel.add(help);
         configuration.fieldsPanel.add(helpPanel, 0); // put help text on top of fields
         
+        if (includeMelodyOption) {
+            includeMelody = new JCheckBox("Include Melody", true);
+            includeMelody.setToolTipText("Include the Notes the Intervals Were Generated For");
+        }
+        else {
+            includeMelody = null;
+        }
+        
         final JButton exportButton = new JButton("Translate to ABC");
+        exportButton.setToolTipText("Generate ABC Notes into Right-Side Textarea");
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -80,6 +97,8 @@ public class AbcExportComponent extends JSplitPane
         });
         final JPanel exportButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         exportButtonPanel.add(exportButton);
+        if (includeMelody != null)
+            exportButtonPanel.add(includeMelody);
         
         final JPanel configPanel = new JPanel(new BorderLayout());
         configPanel.add(configuration.topPanel, BorderLayout.NORTH);
@@ -113,15 +132,24 @@ public class AbcExportComponent extends JSplitPane
         setResizeWeight(0.28);
     }
     
-    private void writeExportToTextarea(
-            String notesText, 
-            JTextArea abcText,
-            AbcExportConfigurationPanel configuration)
-    {
-        final MelodyFactory melodyFactory = new MelodyFactory();
+    private void writeExportToTextarea(String notesText, JTextArea abcText, AbcExportConfigurationPanel configuration) {
         final Note[][] notes = melodyFactory.translate(notesText);
-        final AbcExport exportToAbc = new AbcExport(notes);
-        final String abc = exportToAbc.export(configuration.getExportToAbcConfiguration());
+        final String abc = export(configuration.getExportToAbcConfiguration(), notes);
         abcText.setText(abc);
+    }
+
+    /**
+     * Performs the export. To be overridden for combination with melody.
+     * @param configuration the ABC header data.
+     * @param notes the notes to convert to ABC.
+     * @return the ABC text to put into local text-area.
+     */
+    protected String export(AbcExport.Configuration configuration, final Note[][] notes) {
+        final AbcExport abcExport = new AbcExport(
+                notes, 
+                melodyFactory.getBeatsPerMinute(),
+                melodyFactory.getBeatsPerBar(),
+                melodyFactory.getBeatType());
+        return abcExport.export(configuration);
     }
 }
