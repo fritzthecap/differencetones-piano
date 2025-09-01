@@ -128,7 +128,7 @@ public class MelodyFactory
             Integer volume)
     {
         final boolean toneSystemGiven = (toneSystem != null);
-        this.tuning = toneSystemGiven ? toneSystem.name() : null; // null: do not render default in ABC export
+        this.tuning = toneSystemGiven ? toneSystem.name() : null;
         this.tones = new Tones(toneSystemGiven ? toneSystem.tones() : null); // null will be EqualTemperament
         
         this.volume = (volume != null) ? volume : Note.DEFAULT_VOLUME;
