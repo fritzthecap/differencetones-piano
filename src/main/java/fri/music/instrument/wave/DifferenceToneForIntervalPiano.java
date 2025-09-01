@@ -37,7 +37,7 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
             /** Must change playing keys according to deviation. */
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (deviationSlider.getValueIsAdjusting() == false)
+                //if (deviationSlider.getValueIsAdjusting() == false)
                     ((DifferenceToneMouseHandler) getMouseHandler()).reviseDifferenceTone();
             }
         });

@@ -219,10 +219,10 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     protected DeviationComponent newDeviationComponent(double deviation, boolean isVertical) {
         final DeviationComponent deviationComponent = super.newDeviationComponent(deviation, isVertical);
         final JSlider deviationSlider = deviationComponent.getSlider();
-        deviationComponent.getSlider().addChangeListener(new ChangeListener() {
+        deviationSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (deviationSlider.getValueIsAdjusting() == false)
+                //if (deviationSlider.getValueIsAdjusting() == false)
                     tuningParametersHaveChanged();
             }
         });
@@ -401,8 +401,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     private void addOrRemoveIntervalListFrame(final IntervalListFrame frame, boolean isAdd) {
-        final boolean listFramesExistBefore = (getIntervalListFrames().size() > 0);
-        
         if (isAdd) {
             final List<IntervalListFrame> frames = getIntervalListFrames(); 
             int targetIndex = 0;
@@ -420,10 +418,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         else {
             intervalListsPanel.remove(frame);
         }
-        
-        final boolean listFramesExistAfter = refreshListsContainer();
-        if (intervalSelectionListener != null && listFramesExistBefore != listFramesExistAfter)
-            intervalSelectionListener.intervalsAvailable(listFramesExistAfter);
+        refreshListsContainer();
     }
     
     private boolean refreshListsContainer() {
@@ -433,6 +428,9 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         listsScrollPane.getParent().revalidate(); // do NOT use listsContainer here, as lists my be in dialog!
         listsScrollPane.getParent().repaint();
+        
+        if (intervalSelectionListener != null)
+            intervalSelectionListener.intervalsAvailable(listFramesExist);
         
         return listFramesExist;
     }
