@@ -135,7 +135,7 @@ public abstract class AbstractToneSystem implements ToneSystem
         
         final int endIndex = startIndex + (ToneSystem.SEMITONES_PER_OCTAVE * octaves) + 1;
         if (endIndex > tones.length)
-            throw new IllegalArgumentException("Number of octaves is too big: "+octaves);
+            throw new IllegalArgumentException("Requested number of octaves ("+octaves+") is out of range!");
         
         return Arrays.copyOfRange(tones, startIndex, endIndex);
     }
