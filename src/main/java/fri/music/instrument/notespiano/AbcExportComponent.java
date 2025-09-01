@@ -132,7 +132,7 @@ public class AbcExportComponent extends JSplitPane
     }
     
     private void writeExportToTextarea(String notesText, JTextArea abcText, AbcExportConfigurationPanel configuration) {
-        final String abc = export(configuration.getExportToAbcConfiguration(), notesText);
+        final String abc = export(configuration.getExportToAbcConfiguration(), notesText, false);
         abcText.setText(abc);
     }
 
@@ -142,10 +142,10 @@ public class AbcExportComponent extends JSplitPane
      * @param notesText the notes to convert to ABC.
      * @return the ABC text to put into local text-area.
      */
-    protected String export(AbcExport.Configuration configuration, String notesText) {
+    protected String export(AbcExport.Configuration configuration, String notesText, boolean includeTuning) {
         final AbcExport abcExport = new AbcExport(
                 melodyFactory.translate(notesText), 
-                (includeMelody != null) ? melodyFactory.tuning : null,
+                includeTuning ? melodyFactory.tuning : null,
                 melodyFactory.getBeatsPerMinute(),
                 melodyFactory.getBeatsPerBar(),
                 melodyFactory.getBeatType());

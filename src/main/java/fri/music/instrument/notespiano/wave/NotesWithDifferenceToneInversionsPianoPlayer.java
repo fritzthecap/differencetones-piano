@@ -91,14 +91,17 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     @Override
     protected AbcExportComponent newAbcExportComponent(NotesTextPanelBase view) {
         if (view == intervalNotes) {
-            return new AbcExportComponent(view.notesText.getText(), newMelodyFactory(), true) {
+            final String melodyText = view().notesText.getText().trim();
+            final boolean includeMelodyOption = (melodyText.length() > 0);
+            
+            return new AbcExportComponent(view.notesText.getText(), newMelodyFactory(), includeMelodyOption) {
                 @Override
-                protected String export(AbcExport.Configuration configuration, String notesText) {
-                    final String intervalsAbcText = super.export(configuration, notesText); // intervals
-                    if (includeMelody.isSelected() == false)
+                protected String export(AbcExport.Configuration configuration, String notesText, boolean includeTuning) {
+                    final String intervalsAbcText = super.export(configuration, notesText, true); // intervals always need tuning
+                    if (includeMelody == null || includeMelody.isSelected() == false || melodyText.length() <= 0)
                         return intervalsAbcText;
                     
-                    final String melodyAbcText = super.export(configuration, view().notesText.getText()); // melody
+                    final String melodyAbcText = super.export(configuration, melodyText, true);
                     return new AbcTunesCombiner().combine("Intervals", intervalsAbcText, "Melody", melodyAbcText);
                 }
             };

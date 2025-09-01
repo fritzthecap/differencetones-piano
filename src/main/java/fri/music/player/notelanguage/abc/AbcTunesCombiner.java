@@ -9,7 +9,7 @@ public class AbcTunesCombiner
         final String[] upperHeaderAndNotes = splitIntoHeaderAndNotes(upperVoice);
         final String[] lowerHeaderAndNotes = splitIntoHeaderAndNotes(lowerVoice);
         
-        final String header = lowerHeaderAndNotes[0];
+        final String header = upperHeaderAndNotes[0];
         
         final String upperVoiceDefinition = "V: "+upperVoiceName+TextUtil.NEWLINE;
         final String lowerVoiceDefinition = "V: "+lowerVoiceName+TextUtil.NEWLINE;

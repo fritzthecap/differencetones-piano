@@ -175,10 +175,14 @@ public class MelodyFactory
      *      also possibly containing time signature changes like "3/4" or "6/8",
      *      also possibly containing parentheses that lengthen notes, like "(C5/8", "(C5/4)", "C5/8)".
      *      Spaces generally should not matter, but parentheses may not arrive without a note.
-     * @return a sequence of <code>Note</code> objects representing <code>melodyTokens</code>.
+     * @return a sequence of <code>Note</code> objects representing <code>melodyTokens</code>,
+     *      or null when nothing was given.
      * @throws IllegalArgumentException when notes are invalid.
      */
     public Note[][] translate(String[] melodyTokens) {
+        if (melodyTokens == null || melodyTokens.length <= 0)
+            return null;
+        
         final List<MelodyToken> melodyNotes = new ArrayList<>(melodyTokens.length);
         
         final List<Note> rawNotes = buildRawNotes(melodyTokens, melodyNotes);
