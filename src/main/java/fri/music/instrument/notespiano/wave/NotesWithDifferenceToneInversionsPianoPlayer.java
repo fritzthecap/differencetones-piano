@@ -220,6 +220,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         // change the title of text-area
         final JScrollPane scrollPane = (JScrollPane) intervalNotes.notesText.getParent().getParent();
         scrollPane.setBorder(BorderUtil.titledBorder("Difference-Tone Intervals", DifferenceToneInversionsPiano.TITLE_FONTSIZE_INCREMENT));
+        intervalNotes.notesText.setToolTipText("Write Intervals, in Order of Notes, by Clicking onto the According List Item");
         
         return intervalNotes;
     }
