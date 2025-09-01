@@ -115,7 +115,7 @@ public class DifferenceTones extends Tones
      * else an IllegalArgumenException will be thrown.
      * @param firstToneIpnName required, the first tone of the interval, can be upper or lower.
      * @param secondToneIpnName required, the second tone of the interval, can be upper or lower.
-     * @return array of resulting difference tones, can be up to three.
+     * @return non-null array of resulting difference tones, can be up to three.
      * @throws IllegalArgumenException when given interval is greater than an octave.
      */
     public Tone[] findDifferenceTones(String firstToneIpnName, String secondToneIpnName) {
@@ -128,7 +128,7 @@ public class DifferenceTones extends Tones
      * else an IllegalArgumenException will be thrown.
      * @param firstMidiNoteNumber required, the first tone of the interval, can be upper or lower.
      * @param secondMidiNoteNumber required, the second tone of the interval, can be upper or lower.
-     * @return array of resulting difference tones, can be up to three.
+     * @return non-null array of resulting difference tones, can be up to three.
      * @throws IllegalArgumenException when given interval is greater than an octave.
      */
     public Tone[] findDifferenceTones(int firstMidiNoteNumber, int secondMidiNoteNumber) {
@@ -141,7 +141,7 @@ public class DifferenceTones extends Tones
      * else an IllegalArgumenException will be thrown.
      * @param firstTone required, the first tone of the interval, can be upper or lower.
      * @param secondTone required, the second tone of the interval, can be upper or lower.
-     * @return array of resulting difference tones, can be up to three, each can be null when not found.
+     * @return non-null array of resulting difference tones, can be up to three, each can be null when not found.
      * @throws IllegalArgumentException when given interval is greater than an octave.
      */
     public Tone[] findDifferenceTones(Tone firstTone, Tone secondTone) {
