@@ -102,22 +102,29 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     }
     
     /**
-     * Transposes given textArea.
+     * Transposes given textArea by implementing TransposeListener.
+     * Writes any exception into error field of left-side view.
      * @param intervalName one of ToneSystem.INTERVAL_NAMES.
      * @param upwards true for transposing higher, false for lower.
      * @param textArea the holder of the text to transpose.
      */
     @Override
-    public void transpose(String intervalName, boolean upwards, JTextComponent textArea) {
+    public boolean transpose(String intervalName, boolean upwards, JTextComponent textArea) {
         try {
-            transpose(intervalName, upwards, textArea, false);
+            transposeThrowing(intervalName, upwards, textArea);
+            return true;
         }
         catch (Exception e) {
             view().error.setText(e.getMessage());
+            return false;
         }
     }
     
-    protected final void transpose(String intervalName, boolean upwards, JTextComponent textArea, boolean forceWriteTempoAndBar) {
+    /**
+     * Called from transpose(), same parameters, but does not do any error management.
+     * @throws IllegalArgumentException when transpose gets out of range of available notes.
+     */
+    protected final void transposeThrowing(String intervalName, boolean upwards, JTextComponent textArea) {
         final String notesText = textArea.getText();
         final MelodyFactory melodyFactory = newMelodyFactory();
         final Note[][] notes = melodyFactory.translate(notesText);
@@ -143,7 +150,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
                     final int newMidiNumber = note.midiNumber + (upwards ? +semitoneSteps : -semitoneSteps);
                     final Tone newTone = tones.forMidiNoteNumber(newMidiNumber);
                     if (newTone == null)
-                        throw new IllegalArgumentException("Note is out of range: "+note);
+                        throw new IllegalArgumentException("Transposed note would be out of range: "+note);
                     
                     transposedNote = new Note(note, newTone.ipnName, newTone.frequency, newTone.midiNumber, newTone.cent);
                 }
@@ -155,7 +162,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
             transposedNotes[i] = transposedChord;
         }
         
-        final String newText = formatNotes(transposedNotes, melodyFactory, forceWriteTempoAndBar);
+        final String newText = formatNotes(transposedNotes, melodyFactory);
         textArea.setText(newText);
     }
     
@@ -396,20 +403,18 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     private void formatNotes(PlayControllerBase playController, NotesTextPanelBase view) {
         final Note[][] notes = readNotesFromTextAreaCatchExceptions(playController, view);
         if (notes != null) {
-            // forceWriteTempoAndBar when the view is not the "Notes" view (then it is intervals view)
-            final boolean forceWriteTempoAndBar = (view() != view);
-            final String formatted = formatNotes(notes, newMelodyFactory(), forceWriteTempoAndBar);
+            final String formatted = formatNotes(notes, newMelodyFactory());
             view.notesText.setText(formatted);
             view.notesText.requestFocus();
         }
     }
     
-    private String formatNotes(Note[][] notes, MelodyFactory melodyFactory, boolean forceWriteTempoAndBar) {
+    private String formatNotes(Note[][] notes, MelodyFactory melodyFactory) {
         return melodyFactory.formatBarLines(
                 notes, 
                 // write tempo and bar only when it was written in text, or when forceWriteTempoAndBar
-                forceWriteTempoAndBar || view().tempoSpinner.isEnabled() == false,
-                forceWriteTempoAndBar || view().timeSignatureChoice.isEnabled() == false);
+                view().tempoSpinner.isEnabled() == false,
+                view().timeSignatureChoice.isEnabled() == false);
     }
     
     private Integer[] timeSignatureParts() {

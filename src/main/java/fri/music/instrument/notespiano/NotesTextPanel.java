@@ -30,8 +30,14 @@ public class NotesTextPanel extends NotesTextPanelBase
     /** Transposers listen via this interface for user commands. */
     public interface TransposeListener
     {
-        /** User triggered the transpose-command described by parameters. */
-        void transpose(String intervalName, boolean upwards, JTextComponent textArea);
+        /** 
+         * User triggered the transpose-command described by parameters.
+         * @param intervalName the distance to transpose.
+         * @param upwards the direction to transpose.
+         * @param textArea the target area for transposed notes.
+         * @return true when transpose succeeded.
+         */
+        boolean transpose(String intervalName, boolean upwards, JTextComponent textArea);
     }
     
     public final JSpinner tempoSpinner;

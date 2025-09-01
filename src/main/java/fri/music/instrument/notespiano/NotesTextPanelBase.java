@@ -41,7 +41,14 @@ public class NotesTextPanelBase extends JPanel
         this.notesText = new JTextArea(ROWS, COLUMNS);
         this.textAreaActions = new TextAreaActions(notesText);
         
-        this.error = new JTextField();
+        this.error = new JTextField() {
+            /** Always scroll to start when text is set. */
+            @Override
+            public void setText(String text) {
+                super.setText(text);
+                setCaretPosition(0);
+            }
+        };
         this.playButtons = new PlayControlButtons(playController);
         this.formatBars = new JButton("Format");
         
