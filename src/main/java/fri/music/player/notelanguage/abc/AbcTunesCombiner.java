@@ -2,9 +2,19 @@ package fri.music.player.notelanguage.abc;
 
 import fri.music.TextUtil;
 
-/** Merges to ABC tunes to one with two voices. */
+/**
+ * Merges to ABC tunes to one with two voices.
+ */
 public class AbcTunesCombiner
 {
+    /**
+     * Merges given tunes into one header and two "voices".
+     * @param upperVoiceName identifier of the higher voice.
+     * @param upperVoice the higher voice.
+     * @param lowerVoiceName identifier of the lower voice
+     * @param lowerVoice the lower voice
+     * @return a new tune with two voices, made from given voices.
+     */
     public String combine(String upperVoiceName, String upperVoice, String lowerVoiceName, String lowerVoice) {
         final String[] upperHeaderAndNotes = splitIntoHeaderAndNotes(upperVoice);
         final String[] lowerHeaderAndNotes = splitIntoHeaderAndNotes(lowerVoice);
@@ -35,7 +45,7 @@ public class AbcTunesCombiner
         for (String line : lines) {
             final char c1 = line.charAt(0);
             final char c2 = line.charAt(1);
-            final boolean headerLine = (Character.isLetter(c1) && Character.isUpperCase(c1) && c2 == ':');
+            final boolean headerLine = (Character.isLetter(c1) && c2 == ':');
             line = line + TextUtil.NEWLINE;
             if (headerLine)
                 header.append(line);

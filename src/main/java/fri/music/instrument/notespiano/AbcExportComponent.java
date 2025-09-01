@@ -134,6 +134,7 @@ public class AbcExportComponent extends JSplitPane
     private void writeExportToTextarea(String notesText, JTextArea abcText, AbcExportConfigurationPanel configuration) {
         final String abc = export(configuration.getExportToAbcConfiguration(), notesText, false);
         abcText.setText(abc);
+        abcText.setCaretPosition(0);
     }
 
     /**
