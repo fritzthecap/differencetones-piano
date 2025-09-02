@@ -79,6 +79,8 @@ public class DialogUtil
         
         dialog.setVisible(true);
         
+        componentToShow.requestFocus();
+        
         return dialog;
     }
 
@@ -91,7 +93,10 @@ public class DialogUtil
     private static JComponent buildHtmlTextPane(String htmlText) {
         final JTextPane textPane = new JTextPane();
         textPane.setContentType("text/html");
+        
         configureTextComponent(htmlText, textPane);
+        new TextPaneActions(textPane);
+        
         return textPane;
     }
 

@@ -15,7 +15,6 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.UndoableEditEvent;
@@ -35,10 +34,8 @@ import javax.swing.undo.UndoManager;
  *     textArea.addMouseListener(new TextAreaActions(textArea));
  * </pre>
  */
-public class TextAreaActions extends MouseAdapter
+public class TextAreaActions extends TextFontActions
 {
-    public final JPopupMenu contextMenu;
-    
     private final Action cut;
     private final Action copy;
     private final Action paste;
@@ -46,10 +43,9 @@ public class TextAreaActions extends MouseAdapter
     private final Action redo;
     private final Action selectAll;
     private final Action clear;
-    private final Action fontBigger;
-    private final Action fontSmaller;
     private final UndoManager undoManager;
-    private float fontSize = -1f;
+    
+    private float fontSize;
     
     /**
      * Attaches standard actions to given text-component.
@@ -59,8 +55,6 @@ public class TextAreaActions extends MouseAdapter
      * @param textComponent the text-component to add actions to.
      */
     public TextAreaActions(JTextComponent textComponent) {
-        textComponent.addMouseListener(this);
-        
         final ActionMap actionMap = textComponent.getActionMap();
         
         this.cut = actionMap.get(DefaultEditorKit.cutAction);
@@ -88,14 +82,8 @@ public class TextAreaActions extends MouseAdapter
         };
         clear.putValue(Action.NAME, "Clear");
         
-        final Action[] fontActions = addFontMagnifier(textComponent, keymap);
-        this.fontBigger = fontActions[0];
-        this.fontSmaller = fontActions[1];
-        final JMenu fontMenu = new JMenu("Font");
-        fontMenu.add(fontBigger);
-        fontMenu.add(fontSmaller);
+        final JMenu fontMenu = buildFontMenu(textComponent, keymap);
         
-        this.contextMenu = new JPopupMenu();
         contextMenu.add(cut);
         contextMenu.add(copy);
         contextMenu.add(paste);
@@ -117,18 +105,19 @@ public class TextAreaActions extends MouseAdapter
         });
         
         setActionsEnabled(textComponent);
-    }
-    
-    @Override
-    public void mousePressed(MouseEvent e) {
-        showContextMenu(e);
-    }
-    
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        if (showContextMenu(e) == false)
-            setActionsEnabled((JTextComponent) e.getSource());
-            // listen here to text-selection via mouse-drag because mouseDragged() doesn't work
+        
+        textComponent.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showContextMenu(e);
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (showContextMenu(e) == false)
+                    setActionsEnabled((JTextComponent) e.getSource());
+                    // listen here to text-selection via mouse-drag because mouseDragged() doesn't work
+            }
+        });
     }
     
     /**
@@ -166,28 +155,6 @@ public class TextAreaActions extends MouseAdapter
         return new Action[] { undo, redo };
     }
     
-    private Action[] addFontMagnifier(final JTextComponent textComponent, Keymap keymap)   {
-        final Action fontBigger = new AbstractAction("+ (Ctrl-Plus)") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                magnifyFont(true, textComponent);
-            }
-        };
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK);
-        keymap.addActionForKeyStroke(key, fontBigger);
-        
-        final Action fontSmaller = new AbstractAction("- (Ctrl-Minus)") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                magnifyFont(false, textComponent);
-            }
-        };
-        key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK);
-        keymap.addActionForKeyStroke(key, fontSmaller);
-        
-        return new Action[] { fontBigger, fontSmaller };
-    }
-    
     private boolean showContextMenu(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e))
             ((JComponent) e.getSource()).requestFocus(); // else right click would not focus text-area!
@@ -222,14 +189,15 @@ public class TextAreaActions extends MouseAdapter
         selectAll.setEnabled(textExists == true && textIsSelected == false);
     }
 
-    private void magnifyFont(boolean bigger, JTextComponent textComponent) {
+    @Override
+    protected void magnifyFont(boolean bigger, JTextComponent textComponent) {
         final Font font = textComponent.getFont();
         if (fontSize <= 0)
             fontSize = font.getSize2D();
-        else if (fontSize <= 8 & bigger == false || fontSize >= 28 & bigger == true)
+        else if (fontSize <= 8 && bigger == false || fontSize >= 28 && bigger == true)
             return; // is no more readable
         
-        fontSize += bigger ? +2 : -2;
+        fontSize += bigger ? +1 : -1;
         final Font newFont = font.deriveFont(fontSize);
         textComponent.setFont(newFont);
     }
