@@ -166,6 +166,7 @@ public class NotesTextPanel extends NotesTextPanelBase
 <html>
 <head></head>
 <body>
+
 <h2>Write by Piano</h2>
 <p>
 When you turn on the "Write Notes" checkbox, 
@@ -176,6 +177,7 @@ from the time the mouse button was down.
 Right mouse click opens a context-menu that lets choose
 the duration of the clicked note.
 </p>
+
 <h2>Notes Syntax</h2>
 <p>
 Every note is given as an IPN-name (international pitch notation)
@@ -215,6 +217,7 @@ Do not care about bars, the player will automatically calculate bar bounds
 using the given time signature(s).
 You can use the "Format" button to put every bar into a separate line.
 </p>
+
 <h3>Ties</h3>
 <p>
 Notes connected by a "tie" are notes of same pitch that are played as single note, 
@@ -222,6 +225,7 @@ even across several bars.
 Ties are started by an opened parenthesis "(" and ended by a closed ")",
 notes in between MUST NOT be enclosed in parentheses (no nested parentheses).
 </p>
+
 <h3>Slurs</h3>
 <p>
 Notes connected by a "slur" are notes of different pitch that are phrased together, 
@@ -230,6 +234,7 @@ Slurs are started by an opened brace "{" and ended by a closed "}",
 notes in between MUST NOT be enclosed in "{...}" (no nested braces),
 because it is not clear how to phrase several notes that are all slurred together.
 </p>
+
 <h3>Chords</h3>
 <p>
 Chord notes are two or more notes of different pitch that are played simultaneously.
@@ -239,7 +244,6 @@ Ties and slurs from inside to outside of a chord are not allowed, but you can ti
 even across bars.
 </p>
 
-</p>
 <h2>Editor Actions</h2>
 <p>
 With right mouse click you can open a context-menu that provides
@@ -253,6 +257,7 @@ some useful text-area actions:
 <li><b>Ctrl-y</b> for "Redo" last "Undo"</li>
 <li><b>Ctrl-a</b> for "Select All" text</li>
 </ul>
+
 </body>
 </html>
 """;
