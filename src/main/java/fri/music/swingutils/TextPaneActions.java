@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
@@ -37,22 +36,8 @@ public class TextPaneActions extends TextFontActions
         magnifyFont(true, textPane); // initial font-size is not correct, so jump to 13
     }
 
-    private void showContextMenu(MouseEvent e) {
-        if (e.isPopupTrigger())
-            contextMenu.show((JComponent) e.getSource(), e.getX(), e.getY());
-    }
-    
-    private Action buildCopyAction(final JTextPane textPane, Keymap keymap)   {
-        final KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK);
-        final Action copy = new DefaultEditorKit.CopyAction();
-        copy.putValue(Action.NAME, "Copy (Ctrl-C)");
-        keymap.addActionForKeyStroke(key, copy);
-        
-        return copy;
-    }
-    
     @Override
-    protected void magnifyFont(boolean bigger, JTextComponent textComponent) {
+    public void magnifyFont(boolean bigger, JTextComponent textComponent) {
         final JTextPane textPane = (JTextPane) textComponent;
         final MutableAttributeSet attributeSet = textPane.getInputAttributes();
         
@@ -96,5 +81,14 @@ public class TextPaneActions extends TextFontActions
                 return 10;
             return 8;
         }
+    }
+    
+    private Action buildCopyAction(final JTextPane textPane, Keymap keymap)   {
+        final KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK);
+        final Action copy = new DefaultEditorKit.CopyAction();
+        copy.putValue(Action.NAME, "Copy (Ctrl-C)");
+        keymap.addActionForKeyStroke(key, copy);
+        
+        return copy;
     }
 }

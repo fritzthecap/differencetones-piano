@@ -120,6 +120,19 @@ public class TextAreaActions extends TextFontActions
         });
     }
     
+    @Override
+    public void magnifyFont(boolean bigger, JTextComponent textComponent) {
+        final Font font = textComponent.getFont();
+        if (fontSize <= 0)
+            fontSize = font.getSize2D();
+        else if (fontSize <= 8 && bigger == false || fontSize >= 28 && bigger == true)
+            return; // is no more readable
+        
+        fontSize += bigger ? +1 : -1;
+        final Font newFont = font.deriveFont(fontSize);
+        textComponent.setFont(newFont);
+    }
+    
     /**
      * Adds an UndoManager and key bindings Ctrl-Z (undo) and Ctrl-Y (redo) to given textarea.
      * @return the two created actions (undo and redo) that can be used for buttons.
@@ -155,16 +168,17 @@ public class TextAreaActions extends TextFontActions
         return new Action[] { undo, redo };
     }
     
-    private boolean showContextMenu(MouseEvent e) {
+    @Override
+    protected void enableActions(JTextComponent textComponent) {
+        setActionsEnabled(textComponent);
+    }
+    
+    @Override
+    protected boolean showContextMenu(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e))
             ((JComponent) e.getSource()).requestFocus(); // else right click would not focus text-area!
         
-        final boolean isPopupEvent = e.isPopupTrigger();
-        if (isPopupEvent) {
-            setActionsEnabled((JTextComponent) e.getSource());
-            contextMenu.show((JComponent) e.getSource(), e.getX(), e.getY());
-        }
-        return isPopupEvent;
+        return super.showContextMenu(e);
     }
     
     private void setActionsEnabled(JTextComponent textComponent) {
@@ -187,18 +201,5 @@ public class TextAreaActions extends TextFontActions
         final boolean textExists = (textComponent.getDocument().getLength() > 0);
         clear.setEnabled(textExists);
         selectAll.setEnabled(textExists == true && textIsSelected == false);
-    }
-
-    @Override
-    protected void magnifyFont(boolean bigger, JTextComponent textComponent) {
-        final Font font = textComponent.getFont();
-        if (fontSize <= 0)
-            fontSize = font.getSize2D();
-        else if (fontSize <= 8 && bigger == false || fontSize >= 28 && bigger == true)
-            return; // is no more readable
-        
-        fontSize += bigger ? +1 : -1;
-        final Font newFont = font.deriveFont(fontSize);
-        textComponent.setFont(newFont);
     }
 }

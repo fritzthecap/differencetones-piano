@@ -40,6 +40,9 @@ public class NotesTextPanelBase extends JPanel
         final int ROWS = 9, COLUMNS = 20;
         this.notesText = new JTextArea(ROWS, COLUMNS);
         this.textAreaActions = new TextAreaActions(notesText);
+        // make font bigger
+        for (int i = 0; i < 2; i++)
+            textAreaActions.magnifyFont(true, notesText);
         
         this.error = new JTextField() {
             /** Always scroll to start when text is set. */
