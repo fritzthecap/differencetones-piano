@@ -32,8 +32,8 @@ public class AbcExportComponent extends JSplitPane
             <li>Select an ABC converter address</li>
             <li>Open address in web-browser</li>
             <li>Fill in fields below</li>
-            <li>Click "Translate to ABC"</li>
-            <li>(Automatically copies ABC text)</li>
+            <li>Click "Translate to ABC"<br/>
+                (this automatically copies ABC text)</li>
             <li>Paste into web-browser field (Ctrl-V)</li>
             </ol>
             </body></html>""";
