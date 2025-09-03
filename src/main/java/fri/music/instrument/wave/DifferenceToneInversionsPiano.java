@@ -180,14 +180,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     
     /** Player wants to select a list line while playing. */
     public void setFrameAndIntervalSelected(Note note1, Note note2) {
-        for (IntervalListFrame frame : getIntervalListFrames()) {
-            final DifferenceToneInversions.TonePair tonePair = frame.containsInterval(note1, note2);
-            if (tonePair != null) {
-                setFrameSelected(frame);
-                frame.selectItem(tonePair);
-                return;
-            }
-        }
+        setIntervalSelected(note1, note2, true);
+    }
+
+    /** Auto-Compose wants to select a list item. */
+    public void setIntervalSelected(Note note1, Note note2) {
+        setIntervalSelected(note1, note2, false);
     }
 
     /** Player wants to clear all list selections before playing. */
@@ -238,7 +236,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     // list frame callbacks
     
     /** Called when user clicks a piano key, opens an interval list for the key when not already existing. */
-    void addIntervalListFrame(String ipnNoteName, int midiNoteNumber) {
+    public void addIntervalListFrame(String ipnNoteName, int midiNoteNumber) {
         // avoid duplicate frames
         if (reuseOpenFrames.isSelected()) {
             for (IntervalListFrame frame : getIntervalListFrames()) {
@@ -454,6 +452,18 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             framePanel.getParent().remove(framePanel);
         
         refreshListsContainer();
+    }
+
+    private void setIntervalSelected(Note note1, Note note2, boolean selectAlsoFrame) {
+        for (IntervalListFrame frame : getIntervalListFrames()) {
+            final DifferenceToneInversions.TonePair tonePair = frame.containsInterval(note1, note2);
+            if (tonePair != null) {
+                if (selectAlsoFrame)
+                    setFrameSelected(frame);
+                frame.selectItem(tonePair);
+                return;
+            }
+        }
     }
 
     private List<IntervalListFrame> getIntervalListFrames() {

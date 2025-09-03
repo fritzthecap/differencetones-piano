@@ -230,7 +230,14 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     private void autoCompose() {
         final Note[][] notesArray = readNotesFromTextAreaCatchExceptions(getPlayController(), view());
         if (notesArray != null) {
-            final DifferenceToneForNotesPiano differenceTonePiano = getDifferenceToneInversionsPiano();
+            final DifferenceToneInversionsPiano differenceTonePiano = getDifferenceToneInversionsPiano();
+            
+            // open interval chooser lists for all notes of melody
+            // there are only single notes in view(), no intervals
+            for (Note[] chord : notesArray)
+                if (chord[0].isRest() == false)
+                    differenceTonePiano.addIntervalListFrame(chord[0].ipnName, chord[0].midiNumber);
+            
             final AbstractComposer composer = new DefaultComposer(
                     differenceTonePiano.getWaveSoundChannel().getTones(),
                     differenceTonePiano.narrowestAllowedInterval(),
@@ -240,9 +247,12 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 intervalNotes.error.setText("");
                 
                 final Note[][] composedIntervals = composer.compose(NotesUtil.toSingleNotesArray(notesArray));
+                for (Note[] chord : composedIntervals)
+                    if (chord[0].isRest() == false)
+                        differenceTonePiano.setIntervalSelected(chord[0], chord[1]);
                 
                 final MelodyFactory melodyFactory = newMelodyFactory();
-                melodyFactory.setDisallowChords(false); // allow chords here!
+                //melodyFactory.setDisallowChords(false); // allow chords here!
                 final String formatted = melodyFactory.formatBarLines(composedIntervals, false, false);
                 intervalNotes.notesText.setText(formatted);
             }
