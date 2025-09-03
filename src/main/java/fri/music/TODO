@@ -1,4 +1,19 @@
 
+- It must be possible to overwrite certain intervals via
+    click into an interval list frame. If there is text
+    in intervals area, and user clicks onto an interval
+    in a list frame below, all according notes must be found 
+    and be replaced by that click.
+    If there is an interval selected in text area, replace just
+    this one.
+ 
+ - A click onto "Sort Lists by Pitch" must sort the frames immediately,
+    not only after re-play. Same when it gets switched off,
+    then the frames should be ordered like the tune is ordered.
+    
+- Selection of notes while playing, for NotesPianoPlayer.
+    This should work only in single-step mode.
+
 - "Help" button in NotesWithDifferenceToneInversionsPianoPlayer
     bottom left before "Sort Lists" checkbox. Helps using the UI.
     Revise help text for notes area.
