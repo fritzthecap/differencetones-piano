@@ -1,4 +1,4 @@
-package fri.music.instrument.notespiano;
+package fri.music.instrument.notespiano.abc;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -29,12 +29,12 @@ public class AbcExportComponent extends JSplitPane
     private static final String HELP_TEXT = """
             <html><body>
             <ol>
-            <li>Fill in fields below</li>
-            <li>Click "Translate to ABC"</li>
             <li>Select an ABC converter address</li>
             <li>Open address in web-browser</li>
-            <li>Copy ABC text (Ctrl-A, Ctrl-C)</li>
-            <li>Paste text into web-browser field</li>
+            <li>Fill in fields below</li>
+            <li>Click "Translate to ABC"</li>
+            <li>(Automatically copies ABC text)</li>
+            <li>Paste into web-browser field (Ctrl-V)</li>
             </ol>
             </body></html>""";
 
@@ -50,7 +50,6 @@ public class AbcExportComponent extends JSplitPane
             "https://spuds.thursdaycontra.com/SPUDSConverter.html"
         };
 
-    
     protected final MelodyFactory melodyFactory;
     protected final JCheckBox includeMelody;
     
@@ -135,6 +134,9 @@ public class AbcExportComponent extends JSplitPane
         final String abc = export(configuration.getExportToAbcConfiguration(), notesText, false);
         abcText.setText(abc);
         abcText.setCaretPosition(0);
+        // select all and copy text to clipboard
+        abcText.selectAll();
+        abcText.copy();
     }
 
     /**

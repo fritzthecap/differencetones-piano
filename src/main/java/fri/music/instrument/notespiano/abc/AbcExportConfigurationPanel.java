@@ -1,4 +1,4 @@
-package fri.music.instrument.notespiano;
+package fri.music.instrument.notespiano.abc;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -17,8 +17,18 @@ import fri.music.player.notelanguage.abc.AbcExport;
  */
 public class AbcExportConfigurationPanel
 {
-    /** The UI with configuration fields. */
+    // in-memory store of last values
+    private static Integer songNumber;
+    private static String title;
+    private static String subTitle;
+    private static String author;
+    private static String date = "{date}";
+    private static String keyAndClef;
+    private static Integer numberOfBarsPerLine;
+    
+    /** The UI, holding configuration fields. */
     public final JPanel topPanel;
+    /** The panel where fields are in. */
     public final JPanel fieldsPanel;
     
     private JSpinner songNumberField;
@@ -47,26 +57,25 @@ public class AbcExportConfigurationPanel
      */
     public AbcExport.Configuration getExportToAbcConfiguration() {
         return new AbcExport.Configuration(
-                (Integer) songNumberField.getValue(),
-                titleField.getText(),
-                subTitleField.getText(),
-                authorField.getText(),
-                dateField.getText(),
-                keyAndClefField.getText(),
-                (Integer) numberOfBarsPerLineField.getValue()
+                songNumber = (Integer) songNumberField.getValue(),
+                title = titleField.getText(),
+                subTitle = subTitleField.getText(),
+                author= authorField.getText(),
+                date = dateField.getText(),
+                keyAndClef = keyAndClefField.getText(),
+                numberOfBarsPerLine = (Integer) numberOfBarsPerLineField.getValue()
             );
     }
     
     
     private void buildFields(JPanel panel) {
-        this.songNumberField = buildNumberField("The ABC 'X' Header Field", 1, 0, 100, 1);
-        this.titleField = buildTextField("Title", "The ABC 'T' Header Field");
-        this.subTitleField = buildTextField("Subtitle", "The 2nd ABC 'T' Header Field");
-        this.authorField = buildTextField("Composer", "The ABC 'C' Header Field");
-        this.dateField = buildTextField("Date", "Will be added to Composer");
-        dateField.setText("{date}");
-        this.keyAndClefField = buildTextField("Key", "The ABC 'K' Header Field, e.g. 'G bass' (Clef is Optional)");
-        this.numberOfBarsPerLineField = buildNumberField("Number of Bars per ABC Note Line", 4, 1, 16, 1);
+        this.songNumberField = buildNumberField("The ABC 'X' Header Field", 1, 0, 100, 1, songNumber);
+        this.titleField = buildTextField("Title", "The ABC 'T' Header Field", title);
+        this.subTitleField = buildTextField("Subtitle", "The 2nd ABC 'T' Header Field", subTitle);
+        this.authorField = buildTextField("Composer", "The ABC 'C' Header Field", author);
+        this.dateField = buildTextField("Date", "Will be added to Composer", date);
+        this.keyAndClefField = buildTextField("Key", "The ABC 'K' Header Field, e.g. 'G bass' (Clef is Optional)", keyAndClef);
+        this.numberOfBarsPerLineField = buildNumberField("Number of Bars per ABC Note Line", 4, 1, 16, 1, numberOfBarsPerLine);
         
         panel.add(buildNumberFieldLayout("Song Number", songNumberField));
         panel.add(titleField);
@@ -77,17 +86,21 @@ public class AbcExportConfigurationPanel
         panel.add(buildNumberFieldLayout("Number of Bars per Line", numberOfBarsPerLineField));
     }
 
-    private JTextField buildTextField(String title, String tooltip) {
+    private JTextField buildTextField(String title, String tooltip, String defaultValue) {
         final JTextField field = new JTextField();
         field.setToolTipText(tooltip);
         field.setBorder(BorderFactory.createTitledBorder(title));
+        if (defaultValue != null)
+            field.setText(defaultValue);
         return field;
     }
     
-    private JSpinner buildNumberField(String tooltip, int initial, int min, int max, int step) {
+    private JSpinner buildNumberField(String tooltip, int initial, int min, int max, int step, Integer defaultValue) {
         final SpinnerModel numberModel = new SpinnerNumberModel(initial, min, max, step);
         final JSpinner numberField = new JSpinner(numberModel);
         numberField.setToolTipText(tooltip);
+        if (defaultValue != null)
+            numberField.setValue(defaultValue);
         return numberField;
     }
     
