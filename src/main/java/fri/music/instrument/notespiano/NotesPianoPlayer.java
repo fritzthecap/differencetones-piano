@@ -21,6 +21,7 @@ import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
 import fri.music.instrument.PianoWithSound;
+import fri.music.instrument.notespiano.abc.AbcExportComponent;
 import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;

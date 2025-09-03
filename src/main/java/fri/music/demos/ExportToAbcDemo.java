@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import fri.music.instrument.notespiano.AbcExportConfigurationPanel;
+import fri.music.instrument.notespiano.abc.AbcExportConfigurationPanel;
 import fri.music.player.Note;
 import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.player.notelanguage.abc.AbcExport;

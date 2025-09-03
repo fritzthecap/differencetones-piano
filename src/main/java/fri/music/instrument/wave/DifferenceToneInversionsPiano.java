@@ -61,8 +61,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     public interface IntervalSelectionListener
     {
         /**
-         * Is called either when interval list frames get available, or when none exists.
-         * @param yes true for available, false when not.
+         * Called any time when interval list frames get opened or closed.
+         * @param yes true for at least one available, false when all were closed.
          */
         void intervalsAvailable(boolean yes);
         
@@ -318,7 +318,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         this.initialHeightHolder = Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4);
         intervalListsPanel.add(initialHeightHolder);
         
-        this.sortIntervalFrames = new JCheckBox("Sort Lists by Pitch", true);
+        this.sortIntervalFrames = new JCheckBox("Sort Lists by Pitch", false);
         sortIntervalFrames.setToolTipText("Insert New Interval-Lists Sorted by Difference-Tone Pitch");
         
         this.reuseOpenFrames = new JCheckBox("Reuse Open Lists", true);

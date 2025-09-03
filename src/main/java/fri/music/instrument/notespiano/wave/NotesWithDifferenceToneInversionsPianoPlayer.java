@@ -19,11 +19,11 @@ import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
-import fri.music.instrument.notespiano.AbcExportComponent;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.notespiano.NotesTextPanelBase;
 import fri.music.instrument.notespiano.PlayController;
 import fri.music.instrument.notespiano.PlayControllerBase;
+import fri.music.instrument.notespiano.abc.AbcExportComponent;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
 import fri.music.player.Note;
@@ -177,9 +177,9 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         autoCompose.setEnabled(false);
         intervalNotes.notesControlPanel.add(autoCompose);
 
-        this.generateMelody = new JButton("Generate Notes");
+        this.generateMelody = new JButton("Generate Melody");
         generateMelody.setEnabled(false);
-        generateMelody.setToolTipText("Generate Notes from Intervals When No Melody Present on Left Side");
+        generateMelody.setToolTipText("Generate Melody Notes from Intervals When No Melody Is Present");
         generateMelody.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -196,7 +196,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         intervalNotes.notesControlPanel.add(generateMelody);
 
         this.writeToIntervalsCheckbox = new JCheckBox("Write Intervals", true);
-        writeToIntervalsCheckbox.setToolTipText("Write Intervals from Listselection to Textarea");
+        writeToIntervalsCheckbox.setToolTipText("Write Intervals from List-Selection to Textarea");
         intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
         writeToIntervalsCheckbox.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         intervalNotes.notesControlPanel.add(writeToIntervalsCheckbox);
