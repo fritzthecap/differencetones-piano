@@ -205,13 +205,13 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     /** Interval-player wants to select a list line while playing. */
-    public void setFrameAndIntervalSelected(Note note1, Note note2) {
-        setIntervalSelected(note1, note2, true);
+    public void setFrameAndIntervalSelected(Note note1, Note note2, int intervalIndex) {
+        setIntervalSelected(note1, note2, intervalIndex, true);
     }
 
     /** Auto-Compose wants to select a list item. */
-    public void setIntervalSelected(Note note1, Note note2) {
-        setIntervalSelected(note1, note2, false);
+    public void setIntervalSelected(Note note1, Note note2, int intervalIndex) {
+        setIntervalSelected(note1, note2, intervalIndex, false);
     }
 
     /** Player wants to clear all list selections before playing. */
@@ -494,15 +494,17 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         refreshListsContainer();
     }
 
-    private void setIntervalSelected(Note note1, Note note2, boolean selectAlsoFrame) {
+    private void setIntervalSelected(Note note1, Note note2, int intervalIndex, boolean selectAlsoFrame) {
+        int index = 0;
         for (IntervalListFrame frame : getIntervalListFrames()) {
             final DifferenceToneInversions.TonePair tonePair = frame.containsInterval(note1, note2);
-            if (tonePair != null) {
+            if (tonePair != null && index == intervalIndex) {
                 if (selectAlsoFrame)
                     setFrameSelected(frame);
                 frame.selectItem(tonePair);
                 return;
             }
+            index++;
         }
     }
 

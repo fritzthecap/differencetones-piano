@@ -173,7 +173,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         buildNotesPanel(intervalPlayController, intervalNotes);
         
         this.autoCompose = new JButton("Auto-Compose");
-        autoCompose.setToolTipText("Automatically Find Difference-Tone Intervals for Notes and Write Them into Textarea");
+        autoCompose.setToolTipText("Automatically Find Difference-Tone Intervals for Melody and Write Them into Textarea");
         autoCompose.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -264,9 +264,13 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 intervalNotes.error.setText("");
                 
                 final Note[][] composedIntervals = composer.compose(NotesUtil.toSingleNotesArray(melody));
-                for (Note[] chord : composedIntervals)
-                    if (chord[0].isRest() == false)
-                        differenceTonePiano.setIntervalSelected(chord[0], chord[1]);
+                int index = 0;
+                for (Note[] chord : composedIntervals) {
+                    if (chord[0].isRest() == false) {
+                        differenceTonePiano.setIntervalSelected(chord[0], chord[1], index);
+                        index++;
+                    }
+                }
                 
                 final MelodyFactory melodyFactory = newMelodyFactory();
                 //melodyFactory.setDisallowChords(false); // allow chords here!
@@ -462,7 +466,10 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         
         
         private void selectInterval(Note secondIntervalNote) {
-            getDifferenceToneInversionsPiano().setFrameAndIntervalSelected(firstIntervalNote, secondIntervalNote);
+            getDifferenceToneInversionsPiano().setFrameAndIntervalSelected(
+                    firstIntervalNote, 
+                    secondIntervalNote, 
+                    getCurrentIndexIgnoringRests());
             firstIntervalNote = null; // reset for next tuple
         }
         

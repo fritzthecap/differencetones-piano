@@ -162,6 +162,16 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     }
     
     
+    protected int getCurrentIndexIgnoringRests() {
+        int index = 0;
+        for (int i = 0; i < currentSoundIndex && i < sounds.length; i++) {
+            final Note[] chord = sounds[i];
+            if (chord[0].isRest() == false)
+                index++;
+        }
+        return index;
+    }
+    
     // helpers
     
     /** "Play" or "Reverse" callback. */
@@ -367,7 +377,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
             if (firstNote.isRest() == false) {
                 enableUiOnPlaying(false);
                 
-                for (Note note : sounds[currentSoundIndex]) // starts playing all notes
+                for (Note note : sounds[currentSoundIndex]) // starts playing all notes of chord
                     playOrStopNote(pianoKeyConnector(), note, true);
             }
         }
@@ -375,7 +385,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
             if (sounds != null && sounds.length > 0 && 
                     currentSoundIndex >= 0 && sounds[currentSoundIndex][0].isRest() == false)
             {
-                for (Note note : sounds[currentSoundIndex]) // stops playing all notes
+                for (Note note : sounds[currentSoundIndex]) // stops playing all notes of chord
                     playOrStopNote(pianoKeyConnector(), note, false);
                 
                 enableUiOnPlaying(true);
