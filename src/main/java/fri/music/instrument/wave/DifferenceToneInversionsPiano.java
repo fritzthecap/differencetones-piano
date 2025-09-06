@@ -220,8 +220,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         deviationSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                //if (deviationSlider.getValueIsAdjusting() == false)
-                    tuningParametersHaveChanged();
+                tuningParametersHaveChanged();
             }
         });
         return deviationComponent;
