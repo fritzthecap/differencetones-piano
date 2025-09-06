@@ -217,7 +217,7 @@ public class PianoWithSound extends Piano
         protected void released(InputEvent e) {
             final PianoWithSound.Keyboard.Key key = getKey(e);
             noteOff(key);
-            stopGlissando(key);
+            stopGlissando(key); // CAUTION: when two notes playing at the same time, second gets stopped here!
         }
         /** Listens to mouse drag to play entered key as glissando. */
         protected void entered(InputEvent e) {

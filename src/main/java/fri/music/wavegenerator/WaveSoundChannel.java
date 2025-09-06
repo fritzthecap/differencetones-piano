@@ -18,6 +18,9 @@ public abstract class WaveSoundChannel implements SoundChannel
     /** Maximum tones playing simultaneously (without LineUnavailableException). */
     private static final int MAXIMUM_SOUND_GENERATORS = 12; // saw LineUnavailableException when 33 WaveGenerators
     
+    /** Turn this on to see whether difference-tone intervals play the difference-tone or not. They do not. */
+    private static final boolean LOGGING = false;
+    
     /** Key = MIDI note number, value = sound generator. */
     private final Map<Integer,WaveGenerator> generators = new Hashtable<>(MAXIMUM_SOUND_GENERATORS);
     /** Tone-system containing frequencies. */
@@ -54,6 +57,9 @@ public abstract class WaveSoundChannel implements SoundChannel
         final double frequency = midiNoteNumberToFrequency(midiNoteNumber);
         generator.start(frequency, amplitude);
         
+        if (LOGGING)
+            System.out.println("+ noteOn  "+midiNoteNumber);
+        
         if (generators.size() > MAXIMUM_SOUND_GENERATORS) {
             cleanUp();
             
@@ -65,8 +71,12 @@ public abstract class WaveSoundChannel implements SoundChannel
     @Override
     public void noteOff(int midiNoteNumber) {
         final WaveGenerator generator = findPlayingGenerator(midiNoteNumber);
-        if (generator != null) // there may be redundant events that already removed it
+        if (generator != null) { // stopGlissando may already have removed it
             generator.stop();
+            
+            if (LOGGING)
+                System.out.println("- noteOff "+midiNoteNumber);
+        }
     }
     
     @Override
