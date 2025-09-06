@@ -79,7 +79,7 @@ public class DifferenceToneInversions extends DifferenceTones
         final int maximumIndex = sortedMelody.length - 1;
         final int startIndex = lowest ? minimumIndex : maximumIndex;
         final int endIndex = lowest ? maximumIndex : minimumIndex;
-        for (int i = startIndex; i != endIndex; i += (lowest ? 1 : -1)) {
+        for (int i = startIndex; lowest ? (i <= endIndex) : (i >= startIndex); i += (lowest ? +1 : -1)) {
             final Tone tone = sortedMelody[i];
             if (tone.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
                 return tone;
