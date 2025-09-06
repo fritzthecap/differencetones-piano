@@ -1,11 +1,16 @@
 
+- When "Reuse Open Lists" is not selected, the interval-player
+    selects the wrong list line for duplicate list frames,
+    i.e. it does not find the duplicate frame and selects the line
+    in the first found frame.
+     
 - It must be possible to overwrite certain intervals via
     click into an interval list frame. If there is text
     in intervals area, and user clicks onto an interval
     in a list frame below, all according notes must be found 
     and be replaced by that click.
     If there is an interval selected in text area, replace just
-    this one.
+    this one, in case its difference tone matches the one of the clicked interval.
  
  - A click onto "Sort Lists by Pitch" must sort the frames immediately,
     not only after re-play. Same when it gets switched off,

@@ -327,18 +327,18 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         if (isPermanentNotesCheck() == true) {
             try {
                 final Note[][] notes = playController.readNotesFromTextArea(true);
-                enableUiOnReadNotes(null, view);
+                enableUiOnReadNotes(null, notes, view);
                 return notes;
             }
             catch (Exception e) {
-                enableUiOnReadNotes(e, view);
+                enableUiOnReadNotes(e, null, view);
             }
         }
         return null;
     }
     
-    /** Called when notes text or sound parameters change. */
-    protected void enableUiOnReadNotes(Exception e, NotesTextPanelBase view) {
+    /** Called when notes text, tempo or time signature changes. */
+    protected void enableUiOnReadNotes(Exception e, Note[][] notes, NotesTextPanelBase view) {
         if (e == null) {
             view.error.setText(""); // no exception was thrown, so clear errors
         }

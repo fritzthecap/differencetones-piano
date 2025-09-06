@@ -89,6 +89,9 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     protected JComponent buildCenterPanel() {
         final JComponent superCenterPanel = super.buildCenterPanel();
         
+        getDifferenceToneInversionsPiano().setReuseIntervalLists(false);
+        getDifferenceToneInversionsPiano().setOpenIntervalListWhenPianoKeyPressed(false);
+        
         this.intervalNotes = buildIntervalNotesView();
         
         final JSplitPane centerPanel = new JSplitPane();
@@ -100,8 +103,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     }
     
     @Override
-    protected void enableUiOnReadNotes(Exception e, NotesTextPanelBase view) {
-        super.enableUiOnReadNotes(e, view);
+    protected void enableUiOnReadNotes(Exception e, Note[][] notes, NotesTextPanelBase view) {
+        super.enableUiOnReadNotes(e, notes, view);
         
         final boolean notesTextPresent = (view().notesText.getText().trim().length() > 0);
         final boolean intervalTextPresent = (intervalNotes.notesText.getText().trim().length() > 0);
@@ -116,6 +119,9 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 e == null &&
                 intervalTextPresent == true &&
                 notesTextPresent == false);
+        
+        if (notes != null && view == view()) // no error occurred, view is melody text
+            manageIntervalListsOnMelodyChange(notes);
     }
     
     /** Overridden to disallow chords. */
@@ -126,6 +132,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         return playController;
     }
     
+    /** Overridden to export both melody and intervals to ABC. */
     @Override
     protected AbcExportComponent newAbcExportComponent(NotesTextPanelBase view) {
         if (view == intervalNotes) {
@@ -147,6 +154,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         return super.newAbcExportComponent(view);
     }
     
+    /** Overridden return the ToneSystem from DifferenceToneInversionsPiano, needed by ABC export. */
     @Override
     protected ToneSystem getToneSystem() {
         return getDifferenceToneInversionsPiano().getToneSystem();
@@ -226,16 +234,26 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     
     // callbacks
     
-    private void autoCompose() {
-        final Note[][] notesArray = readNotesFromTextAreaCatchExceptions(getPlayController(), view());
-        if (notesArray != null) {
+    private Note[][] manageIntervalListsOnMelodyChange(Note[][] melody) {
+        if (melody == null)
+            melody = readNotesFromTextAreaCatchExceptions(getPlayController(), view());
+        
+        if (melody != null) {
             final DifferenceToneInversionsPiano differenceTonePiano = getDifferenceToneInversionsPiano();
             
             // open interval chooser lists for all notes of melody
             // there are only single notes in view(), no intervals
-            for (Note[] chord : notesArray)
-                if (chord[0].isRest() == false)
-                    differenceTonePiano.addIntervalListFrame(chord[0].ipnName, chord[0].midiNumber);
+            Note[] singleNotes = NotesUtil.toSingleNotesArray(melody);
+            differenceTonePiano.manageIntervalListFrames(singleNotes);
+        }
+        return melody;
+    }
+    
+    private void autoCompose() {
+        final Note[][] melody = manageIntervalListsOnMelodyChange(null);
+        
+        if (melody != null) {
+            final DifferenceToneInversionsPiano differenceTonePiano = getDifferenceToneInversionsPiano();
             
             final AbstractComposer composer = new DefaultComposer(
                     differenceTonePiano.getWaveSoundChannel().getTones(),
@@ -245,7 +263,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             try {
                 intervalNotes.error.setText("");
                 
-                final Note[][] composedIntervals = composer.compose(NotesUtil.toSingleNotesArray(notesArray));
+                final Note[][] composedIntervals = composer.compose(NotesUtil.toSingleNotesArray(melody));
                 for (Note[] chord : composedIntervals)
                     if (chord[0].isRest() == false)
                         differenceTonePiano.setIntervalSelected(chord[0], chord[1]);
