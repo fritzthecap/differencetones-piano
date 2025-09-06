@@ -71,7 +71,6 @@ public final class EqualTemperament extends AbstractToneSystem
     protected Tone[] createTones() {
         final int semitonesPerOctave = ToneSystem.SEMITONES_PER_OCTAVE;
         final int semitonesOffsetC0FromA4 = -(4 * semitonesPerOctave + 9); // -57, 9 is major-sixth
-        final int c0MidiNoteNumber = ToneSystem.DEFAULT_BASETONE_MIDI_NUMBER;
         final Tone[] tones = new Tone[ToneSystem.MAXIMUM_OCTAVES * semitonesPerOctave + 1];
         final double frequencyOfA4 = referenceFrequency();
         
@@ -79,7 +78,7 @@ public final class EqualTemperament extends AbstractToneSystem
             final int octave = semitone / semitonesPerOctave;
             final String ipnNoteName = ToneSystem.IPN_BASE_NAMES[semitone % semitonesPerOctave]+octave;
             final int semitoneOffsetFromA4 = semitonesOffsetC0FromA4 + semitone;
-            final int midiNoteNumber = c0MidiNoteNumber + semitone;
+            final int midiNoteNumber = ToneSystem.DEFAULT_BASETONE_MIDI_NUMBER + semitone;
             
             // frequency is 12th root of 2 power semitoneOffsetFromA4
             final double ratio = Math.pow(2, semitoneOffsetFromA4 / 12.0);

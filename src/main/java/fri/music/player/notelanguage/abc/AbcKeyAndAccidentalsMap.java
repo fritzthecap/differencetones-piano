@@ -389,7 +389,7 @@ class AbcKeyAndAccidentalsMap
     
     /** Searches an IPN name like "F#4" in a list with names like "F", "F#", .... (comparison without octave). */
     private boolean isIn(List<String> ipnNames, String ipnName) {
-        final String nameWithoutOctave = TextUtil.getWithoutFirstNumber(ipnName);
+        final String nameWithoutOctave = TextUtil.getUntilFirstNumber(ipnName);
         return ipnNames.contains(nameWithoutOctave);
     }
 
@@ -401,7 +401,7 @@ class AbcKeyAndAccidentalsMap
         
         // match would be preceding G#, current G, in sharp key like D,
         // or preceding Gb (as F#), current G, in flat key like Eb
-        final String precedingIpnBaseName = TextUtil.getWithoutFirstNumber(precedingIpnNameNotInScale);
+        final String precedingIpnBaseName = TextUtil.getUntilFirstNumber(precedingIpnNameNotInScale);
         final String[] ipnBaseNames = ToneSystem.IPN_BASE_NAMES;
         int index = 0;
         while (index < ipnBaseNames.length && ipnBaseNames[index].equals(precedingIpnBaseName) == false)
@@ -414,7 +414,7 @@ class AbcKeyAndAccidentalsMap
         if (index < 0) // was counted to negative, go to end
             index = ipnBaseNames.length - 1;
         
-        final String ipnNameBaseName = TextUtil.getWithoutFirstNumber(ipnNameInScale);
+        final String ipnNameBaseName = TextUtil.getUntilFirstNumber(ipnNameInScale);
         
         return ipnBaseNames[index % ipnBaseNames.length].equals(ipnNameBaseName);
     }

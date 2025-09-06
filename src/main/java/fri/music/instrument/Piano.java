@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import fri.music.ScaleTypes;
+import fri.music.TextUtil;
 import fri.music.ToneSystem;
 
 /**
@@ -62,8 +63,7 @@ public class Piano
             
             this.lowestToneIpnName = (lowestToneIpnName == null) ? "C0" : lowestToneIpnName;
             // peel the "5" out of "C5" in lowestToneIpnName
-            final String onlyDigits = this.lowestToneIpnName.replaceAll("[^0-9\\-]", ""); // delete non-digits
-            this.lowestToneOctaveBasedOnC = (onlyDigits.length() > 0) ? Integer.valueOf(onlyDigits) : 0;
+            this.lowestToneOctaveBasedOnC = TextUtil.getFirstNumber(this.lowestToneIpnName);
             
             this.blackKeyWidth = (blackKeyWidthPixels <= 0) ? 16 : blackKeyWidthPixels;
             // for the black keys of a horizontal piano, 28 pixels are minimum to see the the IPN-name

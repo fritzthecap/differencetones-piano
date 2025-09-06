@@ -24,7 +24,6 @@ import fri.music.instrument.notespiano.NotesTextPanelBase;
 import fri.music.instrument.notespiano.PlayController;
 import fri.music.instrument.notespiano.PlayControllerBase;
 import fri.music.instrument.notespiano.abc.AbcExportComponent;
-import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
 import fri.music.player.Note;
 import fri.music.player.NotesUtil;
@@ -212,7 +211,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 @Override
                 public void intervalSelected(String ipnNoteName, DifferenceToneInversions.TonePair interval) {
                     if (writeToIntervalsCheckbox.isSelected())
-                        writeIntervalForMelody(ipnNoteName, interval);
+                        writeIntervalForNote(ipnNoteName, interval);
                 }
             }
         );
@@ -267,14 +266,14 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         }
     }
     
-    private void writeIntervalForMelody(String ipnNoteName, DifferenceToneInversions.TonePair interval) {
+    private void writeIntervalForNote(String ipnNoteName, DifferenceToneInversions.TonePair interval) {
         final String upper = interval.upperTone().ipnName;
         final String lower = interval.lowerTone().ipnName;
         final String[] lengthNotations = getLengthNotationsWriteRests(ipnNoteName);
         if (lengthNotations == null)
             return; // ipnNoteName not found in melody
         
-        final boolean putInTie = (lengthNotations.length > 1);
+        final boolean putInTie = (lengthNotations.length > 1); // a tied note has been found
         if (putInTie)
             setPermanentNotesCheck(false);
         

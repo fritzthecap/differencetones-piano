@@ -4,6 +4,10 @@ public final class TextUtil
 {
     public static final String NEWLINE = System.getProperty("line.separator");
     
+    /**
+     * @param stringBuilder the string to examine for ending with newline.
+     * @return true when end of string is a platform-newline ("line.separator"), else false.
+     */
     public static boolean endsWithNewline(StringBuilder stringBuilder) {
         final int newlineLength = NEWLINE.length();
         if (stringBuilder.length() < newlineLength)
@@ -17,6 +21,12 @@ public final class TextUtil
         return true;
     }
     
+    /**
+     * This is 10 times faster than <code>Integer.valueOf(ipnName.replaceAll("[^0-9]", ""))</code>.
+     * @param name some IPN note name like "C4".
+     * @return the first occurring number in given name, e.g. 4 from "C4",
+     *      or -1 when no number found.
+     */
     public static int getFirstNumber(String name) {
         boolean inDigits = false;
         int number = 0;
@@ -32,20 +42,18 @@ public final class TextUtil
         return inDigits ? number : -1;
     }
 
-    public static String getWithoutFirstNumber(String name) {
+    /**
+     * This is 10 times faster than <code>ipnName.replaceAll("[0-9]", "")</code>.
+     * @param name some IPN note name like "C4".
+     * @return the name without first occurring number, e.g. "C" from "C4".
+     */
+    public static String getUntilFirstNumber(String name) {
         final StringBuilder sb = new StringBuilder();
-        boolean checkDigits = true;
-        boolean inDigits = false;
         for (int i = 0; i < name.length(); i++) {
             char c = name.charAt(i);
-            if (checkDigits && Character.isDigit(c)) {
-                inDigits = true;
-            }
-            else {
-                sb.append(c);
-                if (inDigits)
-                    checkDigits = false;
-            }
+            if (Character.isDigit(c))
+                return sb.toString();
+            sb.append(c);
         }
         return sb.toString();
     }

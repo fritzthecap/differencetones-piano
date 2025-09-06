@@ -39,7 +39,7 @@ public class Tone implements Comparable<Tone>
     
     public String ipnNameWithoutOctave() {
         if (ipnNameWithoutOctave == null)
-            ipnNameWithoutOctave = TextUtil.getWithoutFirstNumber(ipnName);
+            ipnNameWithoutOctave = TextUtil.getUntilFirstNumber(ipnName);
         return ipnNameWithoutOctave;
     }
     

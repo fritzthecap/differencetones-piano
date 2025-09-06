@@ -1,6 +1,7 @@
 package fri.music;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class TextUtilTest
@@ -16,10 +17,32 @@ class TextUtilTest
 
     @Test
     void getWithoutFirstNumber() {
-        assertEquals("D#", TextUtil.getWithoutFirstNumber("D#5"));
-        assertEquals("C", TextUtil.getWithoutFirstNumber("C10"));
-        assertEquals("C10", TextUtil.getWithoutFirstNumber("2C10"));
-        assertEquals("DE4", TextUtil.getWithoutFirstNumber("D6E4"));
+        assertEquals("D#", TextUtil.getUntilFirstNumber("D#5"));
+        assertEquals("C", TextUtil.getUntilFirstNumber("C10"));
+        assertEquals("", TextUtil.getUntilFirstNumber("2C"));
+        assertEquals("D", TextUtil.getUntilFirstNumber("D6E4"));
     }
 
+    @Test
+    @Disabled // proof of concept, not a test
+    void performance() {
+        final String ipnName = "G#6";
+        
+        final long startTimeRegEx = System.currentTimeMillis();
+        for (int i = 0; i < 4000; i++) {
+            ipnName.replaceAll("[0-9]", "");
+            Integer.valueOf(ipnName.replaceAll("[^0-9]", ""));
+        }
+        final long endTimeRegEx = System.currentTimeMillis();
+        
+        final long startTime = System.currentTimeMillis();
+        for (int i = 0; i < 4000; i++) {
+            TextUtil.getUntilFirstNumber(ipnName);
+            TextUtil.getFirstNumber(ipnName);
+        }
+        final long endTime = System.currentTimeMillis();
+        
+        System.out.println("RegEx millis    = "+(endTimeRegEx - startTimeRegEx));
+        System.out.println("TextUtil millis = "+(endTime - startTime));
+    }
 }
