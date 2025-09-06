@@ -59,6 +59,7 @@ D4/4 G3/4 G3/4 C4/2.
     
     Melody WHEN_THE_SAINTS = new Melody("When the Saints", true, """
 120
+4/4
 -/2 -/8 G4/8 B4/8 C5/8 
 (D5/2 D5/8) G4/8 B4/8 C5/8
 (D5/2 D5/8) G4/8 B4/8 C5/8
