@@ -26,6 +26,32 @@ class ToneSystemTest
     }
 
     @Test
+    void ipnNameToMidiNumber() {
+        assertEquals(
+                ToneSystem.DEFAULT_BASETONE_MIDI_NUMBER, 
+                ToneSystem.ipnNameToMidiNumber(ToneSystem.DEFAULT_BASETONE_IPN_NAME));
+        assertEquals(132, ToneSystem.ipnNameToMidiNumber("C10"));
+        assertEquals(60, ToneSystem.ipnNameToMidiNumber("C4"));
+        assertEquals(61, ToneSystem.ipnNameToMidiNumber("C#4"));
+        assertEquals(62, ToneSystem.ipnNameToMidiNumber("D4"));
+        assertEquals(63, ToneSystem.ipnNameToMidiNumber("D#4"));
+        assertEquals(69, ToneSystem.ipnNameToMidiNumber("A4"));
+    }
+
+    @Test
+    void midiNumberToIpnName() {
+        assertEquals(
+                ToneSystem.DEFAULT_BASETONE_IPN_NAME,
+                ToneSystem.midiNumberToIpnName(ToneSystem.DEFAULT_BASETONE_MIDI_NUMBER));
+        assertEquals("C10", ToneSystem.midiNumberToIpnName(132));
+        assertEquals("C4", ToneSystem.midiNumberToIpnName(60));
+        assertEquals("C#4", ToneSystem.midiNumberToIpnName(61));
+        assertEquals("D4", ToneSystem.midiNumberToIpnName(62));
+        assertEquals("D#4", ToneSystem.midiNumberToIpnName(63));
+        assertEquals("A4", ToneSystem.midiNumberToIpnName(69));
+    }
+
+    @Test
     void equalTemperament() {
         final ToneSystem toneSystem = new EqualTemperament();
         assertDefaultToneSystem(toneSystem);

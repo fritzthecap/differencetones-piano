@@ -1,5 +1,7 @@
 package fri.music;
 
+import java.util.stream.IntStream;
+
 /**
  * Common usage of equal-temperament or just-intonation 12 tone systems.
  * A concrete instance should have at least a lowest base-tone and a 
@@ -24,13 +26,13 @@ public interface ToneSystem
     /** The symbol to be used for a rest. */
     String REST_SYMBOL = "-";
     
-    /** Twelve-tone scales length. */
+    /** Twelve-tone scales length is 12. */
     int SEMITONES_PER_OCTAVE = IPN_BASE_NAMES.length;
     
     /** The lowest octave number for C-based IPN note names. */
     int LOWEST_OCTAVE = 0;
     
-    /** The lowest tone's IPN-name, highest is "C10". */
+    /** The lowest tone's IPN-name is "C0" (highest is "C10"). */
     String DEFAULT_BASETONE_IPN_NAME = IPN_BASE_NAMES[0]+LOWEST_OCTAVE;
     /** The lowest tone's MIDI-number, highest is 132. */
     int DEFAULT_BASETONE_MIDI_NUMBER = 12;
@@ -123,5 +125,30 @@ public interface ToneSystem
             case OCTAVE: return 12;
             default: throw new IllegalArgumentException("Semitone steps for interval '"+intervalName+"' not implemented!");
         }
+    }
+    
+    /** Converts a MIDI tone number to an IPN-name with octave number. */
+    static String midiNumberToIpnName(int midiNumber) {
+        final int midiOffsetFromC0 = midiNumber - DEFAULT_BASETONE_MIDI_NUMBER;
+        if (midiOffsetFromC0 < 0)
+            throw new IllegalArgumentException("MIDI number too small: "+midiNumber);
+        
+        final int octaveNumber = midiOffsetFromC0 / SEMITONES_PER_OCTAVE;
+        final int octaveRemainder = midiOffsetFromC0 % SEMITONES_PER_OCTAVE;
+        
+        return IPN_BASE_NAMES[octaveRemainder] + octaveNumber;
+    }
+    
+    /** Converts an IPN-name with octave number to a MIDI tone number. */
+    static int ipnNameToMidiNumber(String ipnName) {
+        final int octave = TextUtil.getFirstNumber(ipnName);
+        final String ipnBaseName = TextUtil.getUntilFirstNumber(ipnName);
+        
+        final int ipnBaseNameIndex = IntStream.range(0, IPN_BASE_NAMES.length)
+                .filter(i -> IPN_BASE_NAMES[i].equals(ipnBaseName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown IPN-name: "+ipnName));
+        
+        return DEFAULT_BASETONE_MIDI_NUMBER + (octave * ToneSystem.SEMITONES_PER_OCTAVE) + ipnBaseNameIndex;
     }
 }
