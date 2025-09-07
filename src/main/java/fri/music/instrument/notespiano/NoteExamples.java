@@ -72,6 +72,31 @@ D5/4 B4/4 G4/4 A4/4
 G4/1 
 """);
     
+    Melody ODE_TO_JOY = new Melody("Ode to Joy", true, """
+120
+4/4
+A4/4 A4/4 A#4/4 C5/4
+C5/4 A#4/4 A4/4 G4/4
+F4/4 F4/4 G4/4 A4/4
+A4/4. G4/8 G4/2
+A4/4 A4/4 A#4/4 C5/4
+C5/4 A#4/4 A4/4 G4/4
+F4/4 F4/4 G4/4 A4/4
+G4/4. F4/8 F4/2
+""");
+    
+    Melody TUBULAR_BELLS = new Melody("Tubular Bells", true, """
+155
+4/4
+-/2. -/8 e5/8 
+a5/8 e5/8 b5/8 e5/8 {g5/8 a5/8} e5/8 c6/8 
+3/4
+e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8
+4/4
+a5/8 e5/8 b5/8 e5/8 {g5/8 a5/8} e5/8 c6/8 
+e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
+""");
+
     Melody BLUES = new Melody("Blues", true, """
 C4 E4 G4 E4
 F4 A4 C5 A4
@@ -98,6 +123,8 @@ G4 D4 G3 G3
             CHROMATIC_SCALE,
             AUGUSTIN,
             WHEN_THE_SAINTS,
+            ODE_TO_JOY,
+            TUBULAR_BELLS,
             BLUES
         };
 }
