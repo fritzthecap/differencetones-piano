@@ -34,7 +34,9 @@ public class PlayController extends PlayControllerBase
         
         // get optional BPM and time-signature extracted from top
         if (timeSignatureOnTop != null) {
-            view.timeSignatureChoice.setSelectedItem(timeSignatureOnTop);
+            // avoid triggering event when same value
+            if (timeSignatureOnTop.equals(view.timeSignatureChoice.getSelectedItem()) == false)
+                view.timeSignatureChoice.setSelectedItem(timeSignatureOnTop);
             view.timeSignatureChoice.setEnabled(false); // will be managed in text-area now
         }
         else {
@@ -42,7 +44,9 @@ public class PlayController extends PlayControllerBase
         }
         
         if (tempoOnTop != null) {
-            view.tempoSpinner.setValue(tempoOnTop);
+            // avoid triggering event when same value
+            if (tempoOnTop.equals(view.tempoSpinner.getValue()) == false)
+                view.tempoSpinner.setValue(tempoOnTop);
             view.tempoSpinner.setEnabled(false); // will be managed in text-area now
         }
         else {
