@@ -6,11 +6,8 @@
     and be replaced by that click.
     If there is an interval selected in text area, replace just
     this one, in case its difference tone matches the one of the clicked interval.
+    Same for state when reuseOpenIntervalLists is NOT active.
  
- - A click onto "Sort Lists by Pitch" must sort the frames immediately,
-    not only after re-play. Same when it gets switched off,
-    then the frames should be ordered like the tune is ordered.
-    
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 
