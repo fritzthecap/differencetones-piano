@@ -15,6 +15,11 @@ import fri.music.differencetones.DifferenceToneInversions.TonePair;
  * <li>Prefer counter-moves, when melody goes up, interval should go down, or interval should get wider</li>
  * <li>(TODO) Emphasized melody-notes should use intervals that contain the melody-note,
  *     others should prefer intervals that do not</li>
+ * <li>(TODO) Consider some relation to a base note, 
+ *     e.g. a tune in C major should express its chord notes as pure intervals like fifth or fourth</li>
+ * <li>(TODO) Consider patterns like a chord move, 
+ *     which mostly can be expressed by fifth - tritone - fourth, so splitting the melody into
+ *     patterns at start may provide interesting phrasing</li>
  * </ul>
  */
 public interface Strategy
