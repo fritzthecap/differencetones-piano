@@ -125,6 +125,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     
     private boolean openIntervalListWhenPianoKeyPressed = true;
     
+    private List<IntervalListFrame> previousIntervalLists;
+    
     /**
      * @param configuration the piano design configuration.
      * @param soundChannel the sound player of the piano.
@@ -209,6 +211,18 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 addIntervalListFrame(note.ipnName, note.midiNumber);
     }
     
+    /** Interval-player wants to select a list and item while playing. */
+    public void setFrameSelected(Note note, int frameIndex) {
+        int index = 0;
+        for (IntervalListFrame frame : getIntervalListFrames()) {
+            if (frame.ipnNoteName.equals(note.ipnName) && (reuseOpenFrames.isSelected() || frameIndex == index)) {
+                setFrameSelected(frame);
+                return;
+            }
+            index++;
+        }
+    }
+
     /** Interval-player wants to select a list and item while playing. */
     public void setFrameAndIntervalSelected(Note note1, Note note2, int intervalIndex) {
         setIntervalSelected(note1, note2, intervalIndex, true);
@@ -322,6 +336,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         this.sortIntervalFrames = new JCheckBox("Sort Lists by Pitch", true);
         sortIntervalFrames.setToolTipText("Insert New Interval-Lists Sorted by Difference-Tone Pitch");
+        sortIntervalFrames.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sortIntervalFrames(sortIntervalFrames.isSelected());
+            }
+        });
         
         this.reuseOpenFrames = new JCheckBox("Reuse Open Lists", true);
         reuseOpenFrames.setToolTipText("When OFF, Every Note Will Have Its Own Interval List");
@@ -417,6 +437,43 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 ipnNames.add(frame.ipnNoteName);
     }
     
+    private void sortIntervalFrames(boolean doSort) {
+        // get current frames
+        List<IntervalListFrame> currentIntervalLists = getIntervalListFrames();
+        // close all
+        closeAllIntervalFrames();
+        // rebuild
+        if (doSort) { // memorize sort template for reversing
+            if (currentIntervalLists.size() > 0)
+                previousIntervalLists = new ArrayList<>(currentIntervalLists);
+            else
+                previousIntervalLists = null;
+        }
+        else if (previousIntervalLists != null) { // use memorized template when not null
+            currentIntervalLists = merge(currentIntervalLists, previousIntervalLists);
+        }
+        
+        for (IntervalListFrame frame : currentIntervalLists)
+            addOrRemoveIntervalListFrame(frame, true);
+    }
+
+    private List<IntervalListFrame> merge(
+            List<IntervalListFrame> currentIntervalLists, 
+            List<IntervalListFrame> previousIntervalLists)
+    {
+        final List<IntervalListFrame> result = new ArrayList<>(currentIntervalLists.size());
+        for (IntervalListFrame previousFrame : previousIntervalLists) {
+            final IntervalListFrame inCurrent = currentIntervalLists.stream()
+                .filter(f -> f.ipnNoteName.equals(previousFrame.ipnNoteName) && result.contains(f) == false)
+                .findFirst()
+                .orElse(null);
+            if (inCurrent != null)
+                result.add(inCurrent);
+        }
+        this.previousIntervalLists = null; // garbage-collect
+        return result;
+    }
+
     /** Called when user clicks a piano key. Opens an interval list for the key when not already existing. */
     private void addIntervalListFrame(String ipnNoteName, int midiNoteNumber) {
         // avoid duplicate frames
@@ -500,7 +557,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     private void setIntervalSelected(Note note1, Note note2, int intervalIndex, boolean selectAlsoFrame) {
-        int index = 0; // intervalIndex can be -1
+        int index = 0;
         for (IntervalListFrame frame : getIntervalListFrames()) {
             final DifferenceToneInversions.TonePair tonePair = frame.containsInterval(note1, note2);
             // ignore intervalIndex when reuseOpenFrames is on, 

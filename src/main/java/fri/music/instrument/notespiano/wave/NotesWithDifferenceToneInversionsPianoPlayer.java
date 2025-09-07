@@ -151,7 +151,26 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     /** Overridden to disallow chords. */
     @Override
     protected PlayController newPlayController() {
-        final PlayController playController = super.newPlayController();
+        final PlayController playController  = new PlayController(this) {
+            /** Overridden to let piano open interval list frames when a key was pressed. */
+            @Override
+            protected void onEmptyNotes() {
+                super.onEmptyNotes();
+                getDifferenceToneInversionsPiano().setOpenIntervalListWhenPianoKeyPressed(true);
+            }
+            @Override
+            protected void onNonEmptyNotes(String timeSignatureOnTop, Integer tempoOnTop) {
+                super.onNonEmptyNotes(timeSignatureOnTop, tempoOnTop);
+                getDifferenceToneInversionsPiano().setOpenIntervalListWhenPianoKeyPressed(false);
+            }
+            /** Overridden to select the interval list frame of given note. */
+            @Override
+            protected void playOrStopNote(SoundChannel soundChannel, Note note, boolean noteOn) {
+                super.playOrStopNote(soundChannel, note, noteOn);
+                if (noteOn)
+                    getDifferenceToneInversionsPiano().setFrameSelected(note, getCurrentIndexIgnoringRests());
+            }
+        };
         playController.setDisallowChords(true);
         return playController;
     }
