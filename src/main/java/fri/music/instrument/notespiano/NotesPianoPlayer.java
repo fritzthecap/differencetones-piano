@@ -79,12 +79,11 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
 
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
             melodyView().notesText.setText(melody); // triggers check via DocumentListener
-            melodyView().notesText.setCaretPosition(melody.length());
+            melodyView().notesText.setCaretPosition(melody.length()); // ready to append notes
         }
         else {
-            if (melodyView().writeToNotesCheckbox.isSelected() == false)
-                melodyView().writeToNotesCheckbox.doClick(0); // enable immediate notes writing
-            notesWritingPianoListener.setActive(true);
+            if (melodyView().writeToNotesCheckbox.isSelected() == false) // enable immediate notes writing
+                melodyView().writeToNotesCheckbox.doClick(0); // triggers actionPerformed() to activate mouse listener
         }
         
         readNotesFromTextAreaCatchExceptions(playController, melodyView()); // enable or disable player buttons
