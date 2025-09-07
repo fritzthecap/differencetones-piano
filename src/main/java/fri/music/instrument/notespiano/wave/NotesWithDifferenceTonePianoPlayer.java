@@ -7,6 +7,7 @@ import javax.swing.JComponent;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
+import fri.music.instrument.notespiano.NotesTextPanelBase;
 import fri.music.instrument.notespiano.PlayController;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.player.Note;
@@ -40,7 +41,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
             /** Reload player when changing. */
             @Override
             public void actionPerformed(ActionEvent e) {
-                readNotesFromTextAreaCatchExceptions(getPlayController(), view());
+                readNotesFromTextAreaCatchExceptions(getPlayController(), melodyView());
             }
         };
         convertToDifferenceTones.addActionListener(resetPlayerListener);
@@ -48,7 +49,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         getDifferenceTonePiano().addIntervalRangeActionListener(resetPlayerListener);
         
         convertToDifferenceTones.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        view().notesControlPanel.add(convertToDifferenceTones, 1); // add below "Play" button
+        melodyView().notesControlPanel.add(convertToDifferenceTones, 1); // add below "Play" button
         
         convertToDifferenceTones.addActionListener(new ActionListener() {
             @Override
@@ -62,8 +63,8 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
     
     /** Overridden to disable several <code>DifferenceToneForNotesPiano</code> controls on playing. */
     @Override
-    protected void enableUiOnPlaying(boolean isStop) {
-        super.enableUiOnPlaying(isStop);
+    protected void enableUiOnPlaying(boolean isStop, Note[][] sounds, int currentSoundIndex, NotesTextPanelBase view) {
+        super.enableUiOnPlaying(isStop, sounds, currentSoundIndex, view);
         
         getDifferenceTonePiano().setTuningControlsEnabled(isStop);
         convertToDifferenceTones.setEnabled(isStop);
@@ -89,11 +90,11 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
                     differenceTonePiano.widestAllowedInterval(),
                     differenceTonePiano.getDeviation());
             try {
-                view().error.setText("");
+                melodyView().error.setText("");
                 return composer.compose(NotesUtil.toSingleNotesArray(notesArray));
             }
             catch (Exception e) { // some tunings like HARMONIC_SERIES can not generate certain difference-tones
-                view().error.setText(
+                melodyView().error.setText(
                         e.getMessage()+
                         " Tuning "+differenceTonePiano.getSelectedTuning()+
                         ", deviation "+Math.round(differenceTonePiano.getDeviation() * 2.0 * 100.0)+

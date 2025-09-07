@@ -19,7 +19,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayerDemo
             final int octaves = 7;
             final String lowestToneIpnName = "C2";
             
-            final JFrame frame = new JFrame("Compose Difference-Tone Intervals for Melodies");
+            final JFrame frame = new JFrame("Compose Difference-Tone Intervals for a Melody");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             
             final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName);

@@ -113,7 +113,7 @@ public class NotesWritingMouseListener extends MouseKeyAdapter
             return null;
         
         final String noteWithLength = key.ipnName + Note.DURATION_SEPARATOR + noteLength;
-        notesPianoPlayer.writeSingleNote(notesPianoPlayer.view(), noteWithLength);
+        notesPianoPlayer.writeSingleNote(notesPianoPlayer.melodyView(), noteWithLength);
         return noteWithLength;
     }
 

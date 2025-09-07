@@ -74,19 +74,20 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
                 buildCenterPanel(), // allocates view
                 BorderLayout.CENTER); // to CENTER, so that user can resize text-area
         
-        view().textAreaActions.contextMenu.addSeparator();
-        view().textAreaActions.contextMenu.add(buildLoadMenuItems());
+        melodyView().textAreaActions.contextMenu.addSeparator();
+        melodyView().textAreaActions.contextMenu.add(buildLoadMenuItems());
 
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
-            view().notesText.setText(melody); // triggers check via DocumentListener
-            view().notesText.setCaretPosition(melody.length());
+            melodyView().notesText.setText(melody); // triggers check via DocumentListener
+            melodyView().notesText.setCaretPosition(melody.length());
         }
         else {
-            view().writeToNotesCheckbox.setSelected(true); // enable immediate notes writing
+            if (melodyView().writeToNotesCheckbox.isSelected() == false)
+                melodyView().writeToNotesCheckbox.doClick(0); // enable immediate notes writing
             notesWritingPianoListener.setActive(true);
         }
         
-        readNotesFromTextAreaCatchExceptions(playController, view()); // enable or disable player buttons
+        readNotesFromTextAreaCatchExceptions(playController, melodyView()); // enable or disable player buttons
         
         // listen to piano mouse clicks and write notes into text-area
         for (PianoWithSound.Keyboard.Key key : piano.getKeys()) {
@@ -100,6 +101,12 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     /** @return the close-listener of created piano, required when using WaveGenerator! */
     public WindowListener getWindowClosingListener() {
         return piano.getWindowClosingListener();
+    }
+    
+    /** Method called by NotesWritingMouseListener. */
+    public void writeSingleNote(NotesTextPanelBase view, String noteWithLength) {
+        removeSelectedText(view); // overwrite selected text if any
+        insertTextAtNearestSpace(view, noteWithLength); // intelligent insertion
     }
     
     /**
@@ -116,7 +123,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
             return true;
         }
         catch (Exception e) {
-            view().error.setText(e.getMessage());
+            melodyView().error.setText(e.getMessage());
             return false;
         }
     }
@@ -173,7 +180,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         return new PlayController(this);
     }
     
-    /** @return the PlayController created by getPlayer(). */
+    /** @return the PlayController created by <code>getPlayer()</code>. */
     protected final PlayController getPlayController() {
         return playController;
     }
@@ -188,7 +195,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         final Integer[] timeSignature = timeSignatureParts();
         return new MelodyFactory(
                 getToneSystem(),
-                (Integer) view().tempoSpinner.getValue(),
+                (Integer) melodyView().tempoSpinner.getValue(),
                 timeSignature[0],
                 timeSignature[1]);
     }
@@ -263,11 +270,10 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         });
     }
     
-    
     // methods needed in sub-classes
     
-    /** @return the view from getPlayer() call. */
-    protected final NotesTextPanel view() {
+    /** @return the view from <code>getPlayer()</code> call. */
+    protected final NotesTextPanel melodyView() {
         return view;
     }
     
@@ -311,7 +317,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     }
     
     /** Called when starting or stopping the player thread. */
-    protected void enableUiOnPlaying(boolean isStop) {
+    protected void enableUiOnPlaying(boolean isStop, Note[][] sounds, int currentSoundIndex, NotesTextPanelBase view) {
         // block mouse events for any listener
         for (PianoWithSound.Keyboard.Key key : piano.getKeys())
             key.setIgnoreMouse(isStop == false);
@@ -356,19 +362,13 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     
     /** Method called by NotesWritingMouseListener. */
     String noteLengthForMillis(int durationMillis) {
-        Integer beatsPerMinute = (Integer) view().tempoSpinner.getValue();
+        Integer beatsPerMinute = (Integer) melodyView().tempoSpinner.getValue();
         final int beatDurationMillis = Note.beatDurationMillis(beatsPerMinute);
         
         final Integer[] timeSignature = timeSignatureParts();
         final Integer beatType = timeSignature[1];
         
         return MelodyFactory.noteLengthDivisor(durationMillis, beatType, beatDurationMillis);
-    }
-    
-    /** Method called by NotesWritingMouseListener. */
-    public void writeSingleNote(NotesTextPanelBase view, String noteWithLength) {
-        removeSelectedText(view); // overwrite selected text if any
-        insertTextAtNearestSpace(view, noteWithLength); // intelligent insertion
     }
     
     /** Method called by NotesWritingMouseListener. */
@@ -391,7 +391,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    view().notesText.setText(melody.notes());
+                    melodyView().notesText.setText(melody.notes());
                 }
             });
             menu.add(item);
@@ -414,12 +414,12 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         return melodyFactory.formatBarLines(
                 notes, 
                 // write tempo and bar only when it was written in text, or when forceWriteTempoAndBar
-                view().tempoSpinner.isEnabled() == false,
-                view().timeSignatureChoice.isEnabled() == false);
+                melodyView().tempoSpinner.isEnabled() == false,
+                melodyView().timeSignatureChoice.isEnabled() == false);
     }
     
     private Integer[] timeSignatureParts() {
-        final String timeSignature = (String) view().timeSignatureChoice.getSelectedItem();
+        final String timeSignature = (String) melodyView().timeSignatureChoice.getSelectedItem();
         final int separatorIndex = timeSignature.indexOf(Note.DURATION_SEPARATOR);
         final String beatsPerBar = timeSignature.substring(0, separatorIndex);
         final String beatType = timeSignature.substring(separatorIndex + 1);

@@ -161,7 +161,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     protected void onEnableUiOnPlaying(boolean isStop) {
     }
     
-    
+    /** @return the current player position, counted without rests. */
     protected int getCurrentIndexIgnoringRests() {
         int index = 0;
         for (int i = 0; i < currentSoundIndex && i < sounds.length; i++) {
@@ -206,11 +206,10 @@ public class PlayControllerBase implements PlayControlButtons.Listener
             if (player != null)
                 startOrStopPlayer(false, playingReverse);
             
-            if (sounds != null)
-                if (toStart) // fastBackard
-                    currentSoundIndex = -1; // forward will increment
-                else // fastForward
-                    currentSoundIndex = sounds.length; // backward will decrement
+            if (toStart) // fastBackard
+                currentSoundIndex = -1; // forward will increment
+            else // fastForward
+                currentSoundIndex = sounds.length; // backward will decrement
         }
     }
     
@@ -231,19 +230,21 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     
     /** Make sure to always call this synchronized(playerLock)! */
     private void startOrStopPlayer(boolean isStart, boolean reverse) {
-        view.playButtons.setPlaying(isStart == true, reverse);
-        
-        enableUiOnPlaying(isStart == false);
-    
         if (isStart) {
             final Note[][] notesArray = readNotesFromTextArea(false);
             final Note[][] sounds = notesPianoPlayer.convertNotes(notesArray); // is optionally overridden!
-            if (sounds != null && sounds.length > 0) // could have caused a reported exception
+            if (sounds != null && sounds.length > 0) { // could have caused a reported exception
+                view.playButtons.setPlaying(true, reverse);
+                enableUiOnPlaying(false, sounds);
+                
                 startPlayer(sounds, reverse); // thread is running now
-            else
-                startOrStopPlayer(false, reverse); // stop, there were errors reported
+            }
+            // else: there were errors reported
         }
         else { // is stop
+            view.playButtons.setPlaying(false, reverse);
+            enableUiOnPlaying(true, sounds);
+            
             if (player != null) {
                 player.close();
                 player = null;
@@ -375,7 +376,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
             
             final Note firstNote = sounds[currentSoundIndex][0];
             if (firstNote.isRest() == false) {
-                enableUiOnPlaying(false);
+                enableUiOnPlaying(false, sounds);
                 
                 for (Note note : sounds[currentSoundIndex]) // starts playing all notes of chord
                     playOrStopNote(pianoKeyConnector(), note, true);
@@ -388,17 +389,17 @@ public class PlayControllerBase implements PlayControlButtons.Listener
                 for (Note note : sounds[currentSoundIndex]) // stops playing all notes of chord
                     playOrStopNote(pianoKeyConnector(), note, false);
                 
-                enableUiOnPlaying(true);
+                enableUiOnPlaying(true, sounds);
             }
         }
     }
 
 
-    private void enableUiOnPlaying(boolean isStop) {
+    private void enableUiOnPlaying(boolean isStop, Note[][] sounds) {
         onEnableUiOnPlaying(isStop);
         
         view.notesText.setEditable(isStop);
-        notesPianoPlayer.enableUiOnPlaying(isStop);
+        notesPianoPlayer.enableUiOnPlaying(isStop, sounds, currentSoundIndex, view);
     }
     
     private void skipCurrentSoundIndex(boolean increment) {
