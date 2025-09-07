@@ -1,9 +1,4 @@
 
-- When "Reuse Open Lists" is not selected, the interval-player
-    selects the wrong list line for duplicate list frames,
-    i.e. it does not find the duplicate frame and selects the line
-    in the first found frame.
-     
 - It must be possible to overwrite certain intervals via
     click into an interval list frame. If there is text
     in intervals area, and user clicks onto an interval

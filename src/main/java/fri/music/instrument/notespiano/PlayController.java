@@ -23,9 +23,6 @@ public class PlayController extends PlayControllerBase
         view.timeSignatureChoice.setEnabled(true); // let user choose tempo and bar-type
         view.tempoSpinner.setEnabled(true);
         view.transposeMenu.setEnabled(false);
-        
-        /*if (view.writeToNotesCheckbox.isSelected() == false) // no notes, activate write
-            view.writeToNotesCheckbox.doClick(); // triggers actionPerfomed() */
     }
     
     @Override
