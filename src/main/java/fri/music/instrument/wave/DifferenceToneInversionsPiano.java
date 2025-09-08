@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -98,6 +99,9 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     private JScrollPane listsScrollPane;
     /** The container of the scroll pane for intervalListsPanel, also containing the toolbar. */
     private JPanel listsContainer;
+    
+    /** The detached dialog is visible when this is not null. */
+    private JDialog intervalListsDialog;
     /** Retain last dialog size. */
     private Dimension dialogSize;
     /** Retain last dialog location. */
@@ -108,8 +112,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     
     private JButton closeAllIntervalFrames;
     private JButton detachIntervalFrames;
-    private JCheckBox sortIntervalFrames;
-    private JCheckBox reuseOpenFrames;
+    private JCheckBox sortListsByPitch;
+    private JCheckBox reuseOpenLists;
     
     /** Plays difference-tone intervals. */
     private PianoKeyConnector pianoKeyConnector;
@@ -170,17 +174,20 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return centerPanel;
     }
     
-    /** Applications may prefer to not reuse interval list frames. */
+    /** Applications initially may prefer to not reuse interval list frames. */
     public void setReuseIntervalLists(boolean reuseIntervalLists) {
-        if (reuseIntervalLists != reuseOpenFrames.isSelected()) {
-            reuseOpenFrames.setEnabled(true);
-            reuseOpenFrames.doClick(); // triggers actionPerformed() to enable "Sort by Pitch" checkbox
+        if (reuseIntervalLists != reuseOpenLists.isSelected()) {
+            reuseOpenLists.setEnabled(true); // to allow user to control it
+            reuseOpenLists.doClick(0); // trigger actionPerformed() to affect "Sort by Pitch" checkbox
+            
+            // when not reusing interval-lists, sorting makes no sense
+            sortListsByPitch.setSelected(reuseIntervalLists);
         }
     }
     
     /** @return true when checkbox <code>reuseOpenFrames</code> is selected. */
     public boolean isReuseIntervalLists() {
-        return reuseOpenFrames.isSelected();
+        return reuseOpenLists.isSelected();
     }
     
     /** Player or piano keys will not open interval lists when false. */
@@ -204,23 +211,39 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     
     /** Melody notes text has changed. Rebuild all interval lists for given notes. */
     public void manageIntervalListFrames(Note[] singleNotes) {
-        closeAllIntervalFrames(); // order of lists not maintainable
+        final List<IntervalListFrame> frames = removeAllIntervalFrames();
         
-        for (Note note : singleNotes)
-            if (note.isRest() == false)
-                addIntervalListFrame(note.ipnName, note.midiNumber);
+        for (int i = 0; i < singleNotes.length; i++) {
+            final Note note = singleNotes[i];
+            
+            if (note.isRest() == false) {
+                boolean done = false;
+                
+                if (i < frames.size()) {
+                    final IntervalListFrame frame = frames.get(i);
+                    if (frame.ipnNoteName.equals(note.ipnName)) { // reuse frame
+                        addOrRemoveIntervalListFrame(frame, true);
+                        done = true;
+                    }
+                }
+                    
+                if (done == false)
+                    addIntervalListFrame(note.ipnName, note.midiNumber);
+            }
+        }
     }
     
     /** Interval-player wants to select a list and item while playing. */
     public void setFrameSelected(Note note, int frameIndex) {
         int index = 0;
         for (IntervalListFrame frame : getIntervalListFrames()) {
-            if (frame.ipnNoteName.equals(note.ipnName) && (reuseOpenFrames.isSelected() || frameIndex == index)) {
+            if (frame.ipnNoteName.equals(note.ipnName) && (reuseOpenLists.isSelected() || frameIndex == index)) {
                 setFrameSelected(frame);
                 return;
             }
             index++;
         }
+        System.err.println("Missed to select frame for note "+note);
     }
 
     /** Interval-player wants to select a list and item while playing. */
@@ -325,6 +348,20 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return buildIntervalListsContainer();
     }
 
+    /** Calculated difference-tone inversions are not valid anymore, replace or remove them. */
+    private void tuningParametersHaveChanged() {
+        this.differenceToneInversions = null; // force new calculation by getDifferenceToneInversions()
+        
+        for (IntervalListFrame frame : getIntervalListFrames())
+            frame.fillList(
+                getDifferenceToneInversions().getIntervalsGenerating(frame.ipnNoteName));
+
+        refreshListsContainer();
+        
+        if (tuningParametersChangeListener != null)
+            tuningParametersChangeListener.tuningParametersChanged();
+    }
+    
     private JPanel buildIntervalListsContainer() {
         this.intervalListsPanel = new JPanel();
         intervalListsPanel.setToolTipText(
@@ -334,30 +371,30 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         this.initialHeightHolder = Box.createVerticalStrut(INTERVAL_FRAME_HEIGHT + 4);
         intervalListsPanel.add(initialHeightHolder);
         
-        this.sortIntervalFrames = new JCheckBox("Sort Lists by Pitch", true);
-        sortIntervalFrames.setToolTipText("Insert New Interval-Lists Sorted by Difference-Tone Pitch");
-        sortIntervalFrames.addActionListener(new ActionListener() {
+        this.sortListsByPitch = new JCheckBox("Sort Lists by Pitch", true);
+        sortListsByPitch.setToolTipText("Insert New Interval-Lists Sorted by Difference-Tone Pitch");
+        sortListsByPitch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sortIntervalFrames(sortIntervalFrames.isSelected());
+                sortIntervalFrames(sortListsByPitch.isSelected());
             }
         });
         
-        this.reuseOpenFrames = new JCheckBox("Reuse Open Lists", true);
-        reuseOpenFrames.setToolTipText("When OFF, Every Note Will Have Its Own Interval List");
+        this.reuseOpenLists = new JCheckBox("Reuse Open Lists", true);
+        reuseOpenLists.setToolTipText("When OFF, Every Note Will Have Its Own Interval List");
         final ActionListener reuseActionListener = new ActionListener() {
             /** Switching off reuse of open lists  makes sortIntervalFrames useless. */
             @Override
             public void actionPerformed(ActionEvent e) {
-                final boolean reuse = reuseOpenFrames.isSelected();
-                sortIntervalFrames.setEnabled(reuse);
+                final boolean reuse = reuseOpenLists.isSelected();
+                sortListsByPitch.setEnabled(reuse);
                 if (reuse)
                     closeDuplicateIntervalListFrames();
             }
         };
-        reuseOpenFrames.addActionListener(reuseActionListener);
+        reuseOpenLists.addActionListener(reuseActionListener);
         reuseActionListener.actionPerformed(null);
-        reuseOpenFrames.setEnabled(false); // makes no sense here to use this
+        reuseOpenLists.setEnabled(false); // makes no sense here to use this
         
         this.closeAllIntervalFrames = new JButton("Close All Lists");
         closeAllIntervalFrames.setToolTipText("Close All Open Interval-List Frames");
@@ -365,7 +402,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         closeAllIntervalFrames.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                closeAllIntervalFrames();
+                removeAllIntervalFrames();
             }
         });
         
@@ -380,8 +417,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         });
         
         final JToolBar intervalListsToolbar = new JToolBar();
-        intervalListsToolbar.add(sortIntervalFrames);
-        intervalListsToolbar.add(reuseOpenFrames);
+        intervalListsToolbar.add(sortListsByPitch);
+        intervalListsToolbar.add(reuseOpenLists);
         intervalListsToolbar.add(detachIntervalFrames);
         intervalListsToolbar.add(closeAllIntervalFrames);
         
@@ -430,18 +467,22 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
 
     private void closeDuplicateIntervalListFrames() {
         final Set<String> ipnNames = new HashSet<>();
-        for (IntervalListFrame frame : getIntervalListFrames())
-            if (ipnNames.contains(frame.ipnNoteName))
-                addOrRemoveIntervalListFrame(frame, false);
-            else
-                ipnNames.add(frame.ipnNoteName);
+        boolean changesDone = false;
+        for (IntervalListFrame frame : getIntervalListFrames()) {
+            if (ipnNames.contains(frame.ipnNoteName)) {
+                intervalListsPanel.remove(frame);
+                changesDone = true;
+            }
+            ipnNames.add(frame.ipnNoteName);
+        }
+        
+        if (changesDone)
+            refreshListsContainer();
     }
     
     private void sortIntervalFrames(boolean doSort) {
-        // get current frames
-        List<IntervalListFrame> currentIntervalLists = getIntervalListFrames();
-        // close all
-        closeAllIntervalFrames();
+        // remove and get current frames
+        List<IntervalListFrame> currentIntervalLists = removeAllIntervalFrames();
         // rebuild
         if (doSort) { // memorize sort template for reversing
             if (currentIntervalLists.size() > 0)
@@ -477,7 +518,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     /** Called when user clicks a piano key. Opens an interval list for the key when not already existing. */
     private void addIntervalListFrame(String ipnNoteName, int midiNoteNumber) {
         // avoid duplicate frames
-        if (reuseOpenFrames.isSelected()) {
+        if (reuseOpenLists.isSelected()) {
             for (IntervalListFrame frame : getIntervalListFrames()) {
                 if (frame.ipnNoteName.equals(ipnNoteName)) {
                     setFrameSelected(frame);
@@ -500,20 +541,16 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         addOrRemoveIntervalListFrame(newFrame, true);
     }
     
-    private void addOrRemoveIntervalListFrame(final IntervalListFrame frame, boolean isAdd) {
+    private void addOrRemoveIntervalListFrame(IntervalListFrame frame, boolean isAdd) {
         if (isAdd) {
-            final List<IntervalListFrame> frames = getIntervalListFrames(); 
-            int targetIndex = 0;
-            if (sortIntervalFrames.isEnabled() && sortIntervalFrames.isSelected()) { // sort in new frame
+            int targetIndex = -1; // by default append to end
+            if (sortListsByPitch.isEnabled() && sortListsByPitch.isSelected()) { // sort-in new frame
+                final List<IntervalListFrame> frames = getIntervalListFrames();
                 while (targetIndex < frames.size() && frames.get(targetIndex).midiNoteNumber < frame.midiNoteNumber)
                     targetIndex++;
             }
-            else { // append to end
-                targetIndex = frames.size();
-            }
-            
             intervalListsPanel.add(frame, targetIndex);
-            setFrameSelected(frame);
+            //setFrameSelected(frame);
         }
         else {
             intervalListsPanel.remove(frame);
@@ -524,7 +561,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     private boolean refreshListsContainer() {
         final boolean listFramesExist = (getIntervalListFrames().size() > 0);
         closeAllIntervalFrames.setEnabled(listFramesExist);
-        detachIntervalFrames.setEnabled(listFramesExist);
+        detachIntervalFrames.setEnabled(intervalListsDialog == null && listFramesExist);
         
         listsScrollPane.getParent().revalidate(); // do NOT use listsContainer here, as lists my be in dialog!
         listsScrollPane.getParent().repaint();
@@ -535,25 +572,14 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return listFramesExist;
     }
     
-    /** Calculated difference-tone inversions are not valid anymore, replace or remove them. */
-    private void tuningParametersHaveChanged() {
-        this.differenceToneInversions = null; // force new calculation by getDifferenceToneInversions()
-        
-        for (IntervalListFrame framePanel : getIntervalListFrames())
-            framePanel.fillList(
-                getDifferenceToneInversions().getIntervalsGenerating(framePanel.ipnNoteName));
-
-        refreshListsContainer();
-        
-        if (tuningParametersChangeListener != null)
-            tuningParametersChangeListener.tuningParametersChanged();
-    }
-    
-    private void closeAllIntervalFrames() {
-        for (IntervalListFrame framePanel : getIntervalListFrames())
-            framePanel.getParent().remove(framePanel);
+    private List<IntervalListFrame> removeAllIntervalFrames() {
+        final List<IntervalListFrame> frames = getIntervalListFrames();
+        for (IntervalListFrame frame : frames)
+            intervalListsPanel.remove(frame);
         
         refreshListsContainer();
+        
+        return frames;
     }
 
     private void setIntervalSelected(Note note1, Note note2, int intervalIndex, boolean selectAlsoFrame) {
@@ -562,7 +588,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             final DifferenceToneInversions.TonePair tonePair = frame.containsInterval(note1, note2);
             // ignore intervalIndex when reuseOpenFrames is on, 
             // because then the number of notes is different from the number of interval list frames
-            if (tonePair != null && (reuseOpenFrames.isSelected() || index == intervalIndex)) {
+            if (tonePair != null && (reuseOpenLists.isSelected() || index == intervalIndex)) {
                 if (selectAlsoFrame)
                     setFrameSelected(frame);
                 frame.selectItem(tonePair);
@@ -581,14 +607,16 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     private void detachIntervalFrames() {
-        if (detachIntervalFrames.isEnabled() == false)
+        if (intervalListsDialog != null)
             return; // dialog is showing
+        
+        detachIntervalFrames.setEnabled(false); // mark dialog showing
         
         if (dialogSize == null) {
             final Dimension listsContainerSize = listsContainer.getSize();
             dialogSize = new Dimension(
                     listsContainerSize.width + 20, // let it protrude a little so that it is visible
-                    listsContainerSize.height + 16);
+                    listsContainerSize.height + 20);
         }
         
         listsContainer.remove(listsScrollPane);
@@ -596,32 +624,30 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         listsContainer.repaint();
         
         listsScrollPane.setBorder(null); // no titled border within titled dialog
-        intervalListsPanel.remove(initialHeightHolder); // not needed any more
+        if (initialHeightHolder != null) {
+            intervalListsPanel.remove(initialHeightHolder); // not needed any more
+            initialHeightHolder = null;
+        }
         
         setLayoutToIntervalListsPanel(true);
-        final JDialog dialog = DialogUtil.showModelessDialog(
+        intervalListsDialog = DialogUtil.showModelessDialog(
                 INTERVAL_LISTS_TITLE,
                 listsContainer,
                 listsScrollPane,
                 dialogSize,
                 dialogLocation);
         
-        dialog.addWindowListener(new WindowAdapter() {
+        intervalListsDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                dialogSize = dialog.getSize(); // remember for next launch
-                dialogLocation = dialog.getLocation();
+                dialogSize = intervalListsDialog.getSize(); // remember for next launch
+                dialogLocation = intervalListsDialog.getLocation();
+                intervalListsDialog = null;
                 
                 addIntervalListsToInternalScrollPane();
                 refreshListsContainer();
             }
-            @Override
-            public void windowClosed(WindowEvent e) {
-                System.err.println("window is closed!");
-            }
         });
-        
-        detachIntervalFrames.setEnabled(false);
     }
     
 
@@ -650,7 +676,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     
-    /** Creates an interval-frame showing possible intervals for every clicked piano-key. */
+    
+    /** For every clicked piano-key this creates an interval-list frame showing possible intervals. */
     public static class DifferenceToneInversionsMouseHandler extends DifferenceToneMouseHandler
     {
         private boolean active = true;
@@ -681,6 +708,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     
+    /** The interval-list frame, showing possible intervals for a difference-tone. */
     private class IntervalListFrame extends JPanel
     {
         public final String ipnNoteName;
@@ -778,7 +806,22 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         // methods called by outer class
         
         void scrollToVisible() {
-            ((JComponent) getParent()).scrollRectToVisible(getBounds());
+            Rectangle bounds = getBounds();
+            if (bounds.width <= 0 && intervalListsDialog == null) {
+                // this workaround would not work in detached dialog!
+                int myIndex = 0;
+                for (Component c : getParent().getComponents())
+                    if (c instanceof IntervalListFrame)
+                        if (c == this)
+                            break;
+                        else
+                            myIndex++;
+                bounds.width = INTERVAL_FRAME_WIDTH;
+                bounds.height = INTERVAL_FRAME_HEIGHT;
+                bounds.x = INTERVAL_FRAME_WIDTH * myIndex;
+                bounds.y = 2;
+            }
+            intervalListsPanel.scrollRectToVisible(bounds);
         }
 
         void fillList(List<DifferenceToneInversions.TonePair> intervals) {
@@ -819,6 +862,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
 
         void selectItem(DifferenceToneInversions.TonePair tonePair) {
             intervalList.setSelectedValue(tonePair, true);
+        }
+        
+        @Override
+        public String toString() {
+            //return getClass().getSimpleName()+"@"+hashCode()+": "+ipnNoteName;
+            return ipnNoteName;
         }
 
 
