@@ -22,7 +22,7 @@ package fri.music;
  */
 public final class EqualTemperament extends AbstractToneSystem
 {
-    public static final String NAME_POSTFIX = "(EDO-12, 12-TET)";
+    public static final String NAME_POSTFIX = "(12-ET)";
     
     public EqualTemperament() {
         this(-1.0);
