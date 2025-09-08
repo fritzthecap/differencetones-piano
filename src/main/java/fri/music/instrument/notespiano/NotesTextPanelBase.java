@@ -68,7 +68,7 @@ public class NotesTextPanelBase extends JPanel
     }
     
     private JComponent buildNotesTextArea(boolean addControlPanelToWest) {
-        notesText.setToolTipText("Write Notes to be Played on Piano; Use Context Actions via Right Mouse Click");
+        notesText.setToolTipText("Write Notes, or click Piano Keys; Use Context Actions via Right Mouse Click");
         final JScrollPane notesTextScrollPane = new JScrollPane(notesText);
         notesTextScrollPane.setBorder(BorderUtil.titledBorder("Melody Notes", DifferenceToneInversionsPiano.TITLE_FONTSIZE_INCREMENT));
         
