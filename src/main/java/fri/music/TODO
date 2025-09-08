@@ -1,12 +1,6 @@
 
-- It must be possible to overwrite certain intervals via
-    click into an interval list frame. If there is text
-    in intervals area, and user clicks onto an interval
-    in a list frame below, all according notes must be found 
-    and be replaced by that click.
-    If there is an interval selected in text area, replace just
-    this one, in case its difference tone matches the one of the clicked interval.
-    Same for state when reuseOpenIntervalLists is NOT active.
+- If there is an interval selected in text area, what should happen
+    in case user clicks onto an interval in a list frame?
  
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.

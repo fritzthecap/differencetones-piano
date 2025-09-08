@@ -65,7 +65,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     {
         /**
          * Called any time when interval list frames get opened or closed.
-         * @param yes true for at least one available, false when all were closed.
+         * @param yes true for at least one available, false otherwise.
          */
         void intervalsAvailable(boolean yes);
         
@@ -73,8 +73,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
          * The given interval was clicked and played on piano.
          * @param ipnNoteName the tone the interval represents as difference-tone.
          * @param interval the selected difference-tone interval.
+         * @param indexIgnoringRests the notes-index of the interval, counted ignoring rests.
          */
-        void intervalSelected(String ipnNoteName, DifferenceToneInversions.TonePair interval);
+        void intervalSelected(
+                String ipnNoteName, 
+                DifferenceToneInversions.TonePair interval,
+                int indexIgnoringRests);
     }
     
     /** Listeners get notified when tuning, deviation or interval range changed. */
@@ -324,8 +328,15 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 new int[] { interval.lowerTone().midiNumber, interval.upperTone().midiNumber },
                 mouseDown);
         
-        if (intervalSelectionListener != null && mouseDown)
-            intervalSelectionListener.intervalSelected(activeFrame.ipnNoteName, interval);
+        if (mouseDown && intervalSelectionListener != null) {
+            int index;
+            if (reuseOpenLists.isSelected())
+                index = -1;
+            else
+                index = activeFrame.getIndex();
+            
+            intervalSelectionListener.intervalSelected(activeFrame.ipnNoteName, interval, index);
+        }
     }
 
     /** Called by interval-list frame when the title-bar of an interval is clicked. */
@@ -803,24 +814,23 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             SizeUtil.forceSize(this, new Dimension(INTERVAL_FRAME_WIDTH, INTERVAL_FRAME_HEIGHT));
         }
         
+        int getIndex() {
+            int myIndex = 0;
+            for (Component c : getParent().getComponents())
+                if (c instanceof IntervalListFrame)
+                    if (c == this)
+                        return myIndex;
+                    else
+                        myIndex++;
+            throw new IllegalStateException("The IntervaListFrame is not in parent list!");
+        }
+
         // methods called by outer class
         
         void scrollToVisible() {
             Rectangle bounds = getBounds();
-            if (bounds.width <= 0 && intervalListsDialog == null) {
-                // this workaround would not work in detached dialog!
-                int myIndex = 0;
-                for (Component c : getParent().getComponents())
-                    if (c instanceof IntervalListFrame)
-                        if (c == this)
-                            break;
-                        else
-                            myIndex++;
-                bounds.width = INTERVAL_FRAME_WIDTH;
-                bounds.height = INTERVAL_FRAME_HEIGHT;
-                bounds.x = INTERVAL_FRAME_WIDTH * myIndex;
-                bounds.y = 2;
-            }
+            if (bounds.width <= 0 && intervalListsDialog == null) // this workaround would not work in detached dialog!
+                bounds = new Rectangle(INTERVAL_FRAME_WIDTH * getIndex(), 2, INTERVAL_FRAME_WIDTH, INTERVAL_FRAME_HEIGHT);
             intervalListsPanel.scrollRectToVisible(bounds);
         }
 
@@ -866,7 +876,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         @Override
         public String toString() {
-            //return getClass().getSimpleName()+"@"+hashCode()+": "+ipnNoteName;
             return ipnNoteName;
         }
 

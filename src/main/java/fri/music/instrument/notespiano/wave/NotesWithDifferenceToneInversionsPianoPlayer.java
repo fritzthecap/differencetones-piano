@@ -16,6 +16,7 @@ import fri.music.SoundChannel;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
+import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
@@ -260,9 +261,9 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                     writeToIntervalsCheckbox.setEnabled(yes);
                 }
                 @Override
-                public void intervalSelected(String ipnNoteName, DifferenceToneInversions.TonePair interval) {
+                public void intervalSelected(String ipnNoteName, DifferenceToneInversions.TonePair interval, int indexIgnoringRests) {
                     if (writeToIntervalsCheckbox.isSelected())
-                        writeIntervalForNote(ipnNoteName, interval);
+                        writeIntervalForNote(ipnNoteName, interval, indexIgnoringRests);
                 }
             }
         );
@@ -329,13 +330,70 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         }
     }
     
-    private void writeIntervalForNote(String ipnNoteName, DifferenceToneInversions.TonePair interval) {
-        final String upper = interval.upperTone().ipnName;
-        final String lower = interval.lowerTone().ipnName;
-        final String[] lengthNotations = getLengthNotationsWriteRests(ipnNoteName);
+    private void writeIntervalForNote(String ipnNoteName, DifferenceToneInversions.TonePair interval, int indexIgnoringRests) {
+        final MelodyFactory melodyFactory = newMelodyFactory();
+        final Note[][] notes = melodyFactory.translate(melodyView().notesText.getText());
+        final Note[][] intervals = melodyFactory.translate(intervalNotes.notesText.getText());
+        final int searchForNoteStartIndex = (intervals != null ? intervals.length : 0);
+        
+        final int notesWithoutRests = countNotesWithoutRests(notes);
+        final int intervalsWithoutRests = countNotesWithoutRests(intervals);
+        
+        final boolean indexIsValid = (indexIgnoringRests >= 0); // if valid, user has activated reuseOpenLists checkbox
+        
+        if (indexIsValid == true) {
+            // when indexIsValid and index is smaller number of intervals, change interval on index
+            if (indexIgnoringRests < intervalsWithoutRests) {
+                changeOneInterval(intervals, indexIgnoringRests, interval, melodyFactory);
+            }
+            // when indexIsValid and index is smaller number of notes, append new interval
+            else if (indexIgnoringRests < notesWithoutRests) {
+                appendOneInterval(notes, ipnNoteName, searchForNoteStartIndex, interval);
+            }
+        }
+        else { // either append, or change all referring to ipnNoteName
+            if (intervals.length < notes.length) { // append
+                appendOneInterval(notes, ipnNoteName, searchForNoteStartIndex, interval);
+            }
+            else { // change all referring to ipnNoteName
+                changeManyIntervals(ipnNoteName, notes, intervals, interval, melodyFactory);
+            }
+        }
+    }
+    
+    private void changeOneInterval(Note[][] intervals, int indexIgnoringRests, TonePair tonePair, MelodyFactory melodyFactory) {
+        final Note[] intervalToChange = getIntervalWithoutCountingRests(intervals, indexIgnoringRests);
+        changeInterval(tonePair, intervalToChange);
+        writeIntervalChangesToTextarea(intervals, melodyFactory);
+    }
+
+    private void changeManyIntervals(String ipnNoteName, Note[][] notes, Note[][] intervals, TonePair tonePair, MelodyFactory melodyFactory) {
+        int index = 0;
+        for (Note[] chord : notes) {
+            if (chord[0].ipnName.equals(ipnNoteName))
+                changeInterval(tonePair, intervals[index]);
+            index++;
+        }
+        writeIntervalChangesToTextarea(intervals, melodyFactory);
+    }
+
+    private void changeInterval(TonePair tonePair, Note[] intervalToChange) {
+        intervalToChange[0] = new Note(tonePair.lowerTone(), intervalToChange[0]);
+        intervalToChange[1] = new Note(tonePair.upperTone(), intervalToChange[1]);
+    }
+
+    private void writeIntervalChangesToTextarea(Note[][] intervals, MelodyFactory melodyFactory) {
+        final String intervalsText = melodyFactory.formatBarLines(intervals);
+        intervalNotes.notesText.setText(intervalsText);
+    }
+
+    private void appendOneInterval(Note[][] notes, String ipnNoteName, int searchForNoteStartIndex, DifferenceToneInversions.TonePair interval) {
+        final String[] lengthNotations = getLengthNotationsWriteRests(ipnNoteName, notes, searchForNoteStartIndex);
         if (lengthNotations == null)
             return; // ipnNoteName not found in melody
         
+        final String upper = interval.upperTone().ipnName;
+        final String lower = interval.lowerTone().ipnName;
         final boolean putInTie = (lengthNotations.length > 1); // a tied note has been found
         if (putInTie)
             setPermanentNotesCheck(false);
@@ -352,8 +410,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 
                 final String upperNote = tieStart + NoteConnections.CHORD_START_SYMBOL + Note.toString(upper, lengthNotation);
                 final String lowerNote = lower + NoteConnections.CHORD_END_SYMBOL + tieEnd; // 2nd chord note needs no length
-                writeSingleNote(intervalNotes, upperNote);
                 writeSingleNote(intervalNotes, lowerNote);
+                writeSingleNote(intervalNotes, upperNote);
             }
         }
         finally {
@@ -362,32 +420,38 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         }
     }
     
-    private String[] getLengthNotationsWriteRests(String ipnNoteName) {
-        final String melodyText = melodyView().notesText.getText().trim();
-        if (melodyText.isEmpty())
+    private int countNotesWithoutRests(Note[][] notes) {
+        int count = 0;
+        if (notes != null)
+            for (Note[] chord : notes)
+                if (chord[0].isRest() == false)
+                    count++;
+        return count;
+    }
+
+    private Note[] getIntervalWithoutCountingRests(Note[][] intervals, int index) {
+        int count = 0;
+        if (intervals != null)
+            for (Note[] chord : intervals)
+                if (chord[0].isRest() == false)
+                    if (index == count)
+                        return chord;
+                    else
+                        count++;
+        return null;
+    }
+
+    private String[] getLengthNotationsWriteRests(String ipnNoteName, Note[][] melodyNotes, int searchForNoteStartIndex) {
+        if (melodyNotes == null || melodyNotes.length <= 0)
             return new String[] { MelodyFactory.DEFAULT_NOTE_LENGTH }; // no melody present, return default length
         
-        final MelodyFactory melodyFactory = newMelodyFactory();
-        final Note[][] melodyNotes = melodyFactory.translate(melodyText); // the single-voiced melody in left text area
-        
         // find the start index to search for ipnNoteName in melody by checking how many intervals were written
-        final int occurrencePosition;
-        final String intervalsText = intervalNotes.notesText.getText().trim();
-        if (intervalsText.isEmpty()) {
-            occurrencePosition = 0; // no intervals were written yet
-        }
-        else { // get the last index of intervals
-            final Note[][] intervalNotes = melodyFactory.translate(intervalsText);
-            occurrencePosition = intervalNotes.length; // so far written position
-        }
-        
-        boolean inTie = false;
         final List<String> lengthList = new ArrayList<>(); // possibly several tied notes
+        boolean inTie = false;
         
         // search for ipnNoteName in melodyNotes starting from occurrencePosition
-        for (int i = occurrencePosition; i < melodyNotes.length; i++) {
-            final Note[] chord = melodyNotes[i];
-            final Note note = chord[0]; // there is just one note
+        for (int i = searchForNoteStartIndex; i < melodyNotes.length; i++) {
+            final Note note = melodyNotes[i][0]; // there is just one note
             if (note.isRest()) { // jump over any rest, but copy it to intervals
                 writeSingleNote(intervalNotes, note.toString());
             }
@@ -405,7 +469,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                     return lengthList.toArray(new String[lengthList.size()]);
             }
         }
-        return null; // ipnNoteName not found in melody - happens when it was edited
+        
+        return null; // ipnNoteName not found in melody, happens when it was edited
     }
     
 
@@ -438,10 +503,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             }
         }
         
-        final boolean tempoOnTop = (melodyFactory.getTempoOnTop() != null);
-        final boolean timeSignatureOnTop = (melodyFactory.getTimeSignatureOnTop() != null);
-        
-        final String melodyText = melodyFactory.formatBarLines(melodyNotes, tempoOnTop, timeSignatureOnTop);
+        final String melodyText = melodyFactory.formatBarLines(melodyNotes);
         melodyView().notesText.setText(melodyText);
     }
 

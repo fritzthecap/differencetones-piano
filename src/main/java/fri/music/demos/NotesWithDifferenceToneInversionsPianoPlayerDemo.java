@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.notespiano.wave.NotesWithDifferenceToneInversionsPianoPlayer;
+import fri.music.instrument.notespiano.NoteExamples;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
 import fri.music.wavegenerator.SineWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
@@ -27,7 +28,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayerDemo
             final NotesWithDifferenceToneInversionsPianoPlayer player = 
                     new NotesWithDifferenceToneInversionsPianoPlayer(
                             new DifferenceToneInversionsPiano(config, soundChannel));
-            //final JComponent playerPanel = player.getPlayer(NoteExamples.WHEN_THE_SAINTS_GO_MARCHING);
+            //final JComponent playerPanel = player.getPlayer(NoteExamples.MARSEILLAISE.notes());
             final JComponent playerPanel = player.getPlayer(null);
             
             frame.addWindowListener(player.getWindowClosingListener());
