@@ -161,7 +161,9 @@ public class MelodyFactory
     
     /**
      * Translates given text to a playable melody. See <code>translate(String[])</code> for docs.
-     * @param text contains the notes of the melody, including ties and time signature changes.
+     * @param text not null, contains the notes of the melody, including ties and time-signature changes.
+     * @return a sequence of <code>Note</code> objects representing <code>melodyTokens</code>,
+     *      or null when given text was empty.
      * @throws IllegalArgumentException when notes are invalid.
      */
     public Note[][] translate(String text) {
@@ -195,6 +197,17 @@ public class MelodyFactory
         return connectedNotes.toArray(new Note[connectedNotes.size()][]);
     }
     
+    /**
+     * This does the opposite of <code>translate()</code>, but with each bar in a new line.
+     * @param notes the notes to output bar-formatted as string.
+     * @return a text where each bar of given notes will be displayed in a new line.
+     */
+    public String formatBarLines(Note[][] notes) {
+        final boolean tempoOnTop = (getTempoOnTop() != null);
+        final boolean timeSignatureOnTop = (getTimeSignatureOnTop() != null);
+        return formatBarLines(notes, tempoOnTop, timeSignatureOnTop);
+    }
+
     /**
      * This does the opposite of <code>translate()</code>, but with each bar in a new line.
      * @param notes the notes to output bar-formatted as string.
