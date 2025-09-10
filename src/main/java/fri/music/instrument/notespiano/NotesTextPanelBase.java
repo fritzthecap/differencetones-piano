@@ -32,8 +32,7 @@ public class NotesTextPanelBase extends JPanel
     public final JButton formatBars;
     public final JButton abcExport;
     
-    //protected final JPanel textAreaButtonsPanel;
-    protected final JToolBar textAreaButtonsPanel;
+    protected final JToolBar textareaToolbar;
     
     public NotesTextPanelBase(PlayControllerBase playController, boolean pianoIsVertical, boolean addControlPanelToWest) {
         super(new BorderLayout());
@@ -58,7 +57,7 @@ public class NotesTextPanelBase extends JPanel
         this.formatBars = new JButton("Format");
         
         this.abcExport = new JButton("ABC Export");
-        this.textAreaButtonsPanel = new JToolBar();
+        this.textareaToolbar = new JToolBar();
         
         this.notesControlPanel = buildNotesControlPanel(pianoIsVertical);
         // END build public fields
@@ -82,12 +81,12 @@ public class NotesTextPanelBase extends JPanel
         abcExport.setToolTipText("Convert Notes Text to ABC Notation");
         abcExport.setEnabled(false);
         
-        textAreaButtonsPanel.add(addControlPanelToWest ? abcExport : error);
-        textAreaButtonsPanel.add(addControlPanelToWest ? error : abcExport);
+        textareaToolbar.add(addControlPanelToWest ? abcExport : error);
+        textareaToolbar.add(addControlPanelToWest ? error : abcExport);
         
         final JPanel textAreaAndError = new JPanel(new BorderLayout());
         textAreaAndError.add(notesTextScrollPane, BorderLayout.CENTER);
-        textAreaAndError.add(textAreaButtonsPanel, BorderLayout.SOUTH);
+        textAreaAndError.add(textareaToolbar, BorderLayout.SOUTH);
         
         return textAreaAndError;
     }

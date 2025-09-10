@@ -313,7 +313,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 DialogUtil.showModelessHtmlDialog(
                         "Composition User Guide", 
                         help.getParent().getParent(), 
-                        COMPOSE_HELP,
+                        HelpForCompose.HTML,
                         null);
             }
         });
@@ -631,20 +631,4 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             firstIntervalNote = null;
         }
     }
-    
-    
-    /** Help taken from JavaDoc of MelodyFactory class. */
-    private static final String COMPOSE_HELP = """
-<html>
-<head></head>
-<body>
-
-<h2>TODO: Document how to use this user-interface!</h2>
-<p>
-</p>
-
-</body>
-</html>
-""";
-
 }

@@ -1,6 +1,7 @@
 
 - Looks like rests confuse the composer so that its strategies do not work.
-    Reproduction: 
+    Reproduction: enter three different notes (C4, D4, E4), click "Auto-Compose".
+    All three notes have the same interval, but should have different ones by strategy.
     
 - If there is an interval selected in text area, what should happen
     in case user clicks onto an interval in a list frame?
