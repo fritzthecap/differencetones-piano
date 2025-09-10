@@ -88,7 +88,7 @@ public class NotesTextPanel extends NotesTextPanelBase
                         null);
             }
         });
-        textAreaButtonsPanel.add(help, 0); // "Help" button on the very left
+        textAreaButtonsPanel.add(help);
     }
     
     private void buildNotesControlPanel(boolean pianoIsVertical) {

@@ -103,6 +103,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     private JScrollPane listsScrollPane;
     /** The container of the scroll pane for intervalListsPanel, also containing the toolbar. */
     private JPanel listsContainer;
+    /** The button bar below interval list frames and above piano. */
+    private JToolBar intervalListsToolbar;
     
     /** The detached dialog is visible when this is not null. */
     private JDialog intervalListsDialog;
@@ -189,16 +191,17 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         }
     }
     
-    /** @return true when checkbox <code>reuseOpenFrames</code> is selected. */
-    public boolean isReuseIntervalLists() {
-        return reuseOpenLists.isSelected();
-    }
-    
     /** Player or piano keys will not open interval lists when false. */
     public void setOpenIntervalListWhenPianoKeyPressed(boolean openIntervalListWhenPianoKeyPressed) {
         this.openIntervalListWhenPianoKeyPressed = openIntervalListWhenPianoKeyPressed;
     }
     
+    /** Applications may want to add buttons to interval-lists toolbar. */
+    public void addToIntervalListsToolbar(Component button, int index) {
+        intervalListsToolbar.add(button, index);
+    }
+    
+    /** @return the currently selected tone-system. */
     public ToneSystem getToneSystem() {
         return selectedToneSystem;
     }
@@ -427,7 +430,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             }
         });
         
-        final JToolBar intervalListsToolbar = new JToolBar();
+        this.intervalListsToolbar = new JToolBar();
         intervalListsToolbar.add(sortListsByPitch);
         intervalListsToolbar.add(reuseOpenLists);
         intervalListsToolbar.add(detachIntervalFrames);

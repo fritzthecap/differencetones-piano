@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.text.JTextComponent;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
 import fri.music.swingutils.BorderUtil;
@@ -31,7 +32,8 @@ public class NotesTextPanelBase extends JPanel
     public final JButton formatBars;
     public final JButton abcExport;
     
-    protected final JPanel textAreaButtonsPanel;
+    //protected final JPanel textAreaButtonsPanel;
+    protected final JToolBar textAreaButtonsPanel;
     
     public NotesTextPanelBase(PlayControllerBase playController, boolean pianoIsVertical, boolean addControlPanelToWest) {
         super(new BorderLayout());
@@ -56,7 +58,7 @@ public class NotesTextPanelBase extends JPanel
         this.formatBars = new JButton("Format");
         
         this.abcExport = new JButton("ABC Export");
-        this.textAreaButtonsPanel = new JPanel();
+        this.textAreaButtonsPanel = new JToolBar();
         
         this.notesControlPanel = buildNotesControlPanel(pianoIsVertical);
         // END build public fields
@@ -80,15 +82,12 @@ public class NotesTextPanelBase extends JPanel
         abcExport.setToolTipText("Convert Notes Text to ABC Notation");
         abcExport.setEnabled(false);
         
-        textAreaButtonsPanel.add(abcExport);
-        
-        final JPanel errorsAndHelpPanel = new JPanel(new BorderLayout());
-        errorsAndHelpPanel.add(textAreaButtonsPanel, addControlPanelToWest ? BorderLayout.WEST : BorderLayout.EAST);
-        errorsAndHelpPanel.add(error, BorderLayout.CENTER);
+        textAreaButtonsPanel.add(addControlPanelToWest ? abcExport : error);
+        textAreaButtonsPanel.add(addControlPanelToWest ? error : abcExport);
         
         final JPanel textAreaAndError = new JPanel(new BorderLayout());
         textAreaAndError.add(notesTextScrollPane, BorderLayout.CENTER);
-        textAreaAndError.add(errorsAndHelpPanel, BorderLayout.SOUTH);
+        textAreaAndError.add(textAreaButtonsPanel, BorderLayout.SOUTH);
         
         return textAreaAndError;
     }

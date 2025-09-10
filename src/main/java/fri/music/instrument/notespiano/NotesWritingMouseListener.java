@@ -1,9 +1,6 @@
 package fri.music.instrument.notespiano;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import fri.music.instrument.PianoWithSound;
 import fri.music.player.Note;
@@ -25,20 +22,12 @@ public class NotesWritingMouseListener extends MouseKeyAdapter
     public NotesWritingMouseListener(NotesPianoPlayer notesPianoPlayer) {
         this.notesPianoPlayer = notesPianoPlayer;
         
-        this.popup = new JPopupMenu();
-        final ActionListener menuListener = new ActionListener() {
+        this.popup = new NoteLengthsPopupMenu() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                noteLengthSelected(((JMenuItem) e.getSource()).getActionCommand());
+            protected void noteLengthWasSelected(String noteLength) {
+                noteLengthSelected(noteLength);
             }
         };
-        for (int i = 1; i <= Note.SHORTEST_NOTELENGTH_DIVISOR; i *= 2) { // 1, 2, 4, 8, 16, 32, 64
-            final String actionCommand = Integer.toString(i);
-            final JMenuItem menuItem = new JMenuItem(actionCommand);
-            menuItem.setToolTipText("1/"+actionCommand+" Note");
-            menuItem.addActionListener(menuListener);
-            popup.add(menuItem);
-        }
     }
     
     /** Turns this mouse listener on and off. Initially it is NOT active. */
@@ -112,7 +101,7 @@ public class NotesWritingMouseListener extends MouseKeyAdapter
         if (active == false)
             return null;
         
-        final String noteWithLength = key.ipnName + Note.DURATION_SEPARATOR + noteLength;
+        final String noteWithLength = Note.toString(key.ipnName, noteLength);
         notesPianoPlayer.writeSingleNote(notesPianoPlayer.melodyView(), noteWithLength);
         return noteWithLength;
     }

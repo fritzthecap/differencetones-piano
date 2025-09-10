@@ -1,4 +1,7 @@
 
+- Looks like rests confuse the composer so that its strategies do not work.
+    Reproduction: 
+    
 - If there is an interval selected in text area, what should happen
     in case user clicks onto an interval in a list frame?
  

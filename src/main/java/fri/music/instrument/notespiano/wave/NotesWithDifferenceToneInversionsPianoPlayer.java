@@ -9,6 +9,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.text.JTextComponent;
@@ -20,6 +21,7 @@ import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
+import fri.music.instrument.notespiano.NoteLengthsPopupMenu;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.notespiano.NotesTextPanelBase;
 import fri.music.instrument.notespiano.PlayController;
@@ -33,6 +35,8 @@ import fri.music.player.notelanguage.NoteConnections;
 import fri.music.player.notelanguage.abc.AbcExport;
 import fri.music.player.notelanguage.abc.AbcTunesCombiner;
 import fri.music.swingutils.BorderUtil;
+import fri.music.swingutils.DialogUtil;
+import fri.music.swingutils.SizeUtil;
 
 /**
  * The most complex view of this project.
@@ -105,6 +109,10 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                         notesTextEmpty);
             }
         });
+        
+        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(buildRestButton(), 0);
+        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createHorizontalGlue(), -1);
+        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(buildHelpButton(), -1);
         
         this.intervalNotes = buildIntervalNotesView(); // right side text area and play controller
         
@@ -275,6 +283,43 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         
         return intervalNotes;
     }
+    
+    
+    private JComponent buildRestButton() {
+        final JButton rest = new JButton("\u2B24"); // large black circle
+        rest.setToolTipText("Write Rest to Textarea at Cursor Position");
+        final JPopupMenu popupMenu = new NoteLengthsPopupMenu() {
+            @Override
+            protected void noteLengthWasSelected(String noteLength) {
+                writeSingleNote(melodyView(), Note.toString(ToneSystem.REST_SYMBOL, noteLength));
+            }
+        };
+        rest.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                popupMenu.show(rest, rest.getWidth() / 2, rest.getHeight() / 2);
+            }
+        });
+        SizeUtil.forceSize(rest, new Dimension(50, 30));
+        return rest;
+    }
+
+    private JComponent buildHelpButton() {
+        final JButton help = new JButton("Help");
+        help.setToolTipText("Difference-Tone Composition User Guide");
+        help.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DialogUtil.showModelessHtmlDialog(
+                        "Composition User Guide", 
+                        help.getParent().getParent(), 
+                        COMPOSE_HELP,
+                        null);
+            }
+        });
+        return help;
+    }
+
     
     // callbacks
     
@@ -586,4 +631,20 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             firstIntervalNote = null;
         }
     }
+    
+    
+    /** Help taken from JavaDoc of MelodyFactory class. */
+    private static final String COMPOSE_HELP = """
+<html>
+<head></head>
+<body>
+
+<h2>TODO: Document how to use this user-interface!</h2>
+<p>
+</p>
+
+</body>
+</html>
+""";
+
 }
