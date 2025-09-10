@@ -408,8 +408,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                     else if (i == lengthNotations.length - 1)
                         tieEnd = NoteConnections.TIE_END_SYMBOL;
                 
-                final String upperNote = tieStart + NoteConnections.CHORD_START_SYMBOL + Note.toString(upper, lengthNotation);
-                final String lowerNote = lower + NoteConnections.CHORD_END_SYMBOL + tieEnd; // 2nd chord note needs no length
+                final String lowerNote = tieStart + NoteConnections.CHORD_START_SYMBOL + Note.toString(lower, lengthNotation);
+                final String upperNote = upper + NoteConnections.CHORD_END_SYMBOL + tieEnd; // 2nd chord note needs no length
                 writeSingleNote(intervalNotes, lowerNote);
                 writeSingleNote(intervalNotes, upperNote);
             }

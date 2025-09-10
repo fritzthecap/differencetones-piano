@@ -12,13 +12,18 @@ class InputTextScanner
     private static final String SPACE_PATTERN = "[\r\n\t ]+";
 
     public String[] toStringArray(String text) {
-        text = text.trim()
+        text = text.trim();
+        if (text.length() <= 0)
+            return null;
+        
+        text = text
             .replaceAll("\\"+TIE_START_SYMBOL+SPACE_PATTERN,  TIE_START_SYMBOL)
             .replaceAll(SPACE_PATTERN+"\\"+TIE_END_SYMBOL,    TIE_END_SYMBOL)
             .replaceAll("\\"+SLUR_START_SYMBOL+SPACE_PATTERN, SLUR_START_SYMBOL)
             .replaceAll(SPACE_PATTERN+"\\"+SLUR_END_SYMBOL,   SLUR_END_SYMBOL)
             .replaceAll("\\"+CHORD_START_SYMBOL+SPACE_PATTERN, CHORD_START_SYMBOL)
             .replaceAll(SPACE_PATTERN+"\\"+CHORD_END_SYMBOL,   CHORD_END_SYMBOL);
+        
         return text.split("[\r\n\t ]+");
     }
 }
