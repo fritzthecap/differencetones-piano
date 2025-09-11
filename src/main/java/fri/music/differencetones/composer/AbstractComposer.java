@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SequencedMap;
+import fri.music.AbstractToneSystem;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
@@ -35,29 +36,6 @@ public abstract class AbstractComposer
     }
 
     /**
-     * Provides all possibilities of difference-tone intervals ("inversions")
-     * for given melody. That means, it will measure the pitch range and
-     * then build fitting difference-tone intervals for all semi-tones in that range.
-     * @param melody the melody that should be translated into a sequence of intervals
-     *      generating difference-tones.
-     * @return the DifferenceToneInversions that can represent given melody.
-     */
-    private DifferenceToneInversions createInversions(Note[] melody) {
-        final DifferenceToneInversions inversions = DifferenceToneInversions.toneRangeFor(
-                melody, 
-                tones, 
-                (narrowestInterval != null) ? ToneSystem.semitoneSteps(narrowestInterval) : -1,
-                (widestInterval != null)    ? ToneSystem.semitoneSteps(widestInterval)    : -1,
-                deviationTolerance);
-        
-        if (ToneSystem.MINOR_SECOND.equals(narrowestInterval) == false &&
-                ToneSystem.MAJOR_SEVENTH.equals(widestInterval) == false)
-            inversions.removeDissonant(false);
-        
-        return inversions;
-    }
-    
-    /**
      * Tries to find a good difference-tone representation of given melody.
      * There are many ways to do that. It even depends on which <code>ToneSystem</code> (tuning)
      * is used, so you will get different results for equal-temperament and just-intonations.
@@ -85,23 +63,26 @@ public abstract class AbstractComposer
             Note note,
             SequencedMap<NoteWithIndex,TonePair> result);
 
+
     /**
-     * @param melody the melody to translate.
+     * @param melody the melody to translate into difference-tone intervals.
      */
     private Map<NoteWithIndex,TonePair> buildMap(Note[] melody) {
-        final DifferenceToneInversions inversions = createInversions(melody);
-        
-        final List<Note> melodyList = Arrays.asList(melody);
-        final Note lowest  = melodyList.stream().min((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
-        final Note highest = melodyList.stream().max((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
+        final List<Note> notesWithoutRests = Arrays.stream(melody).filter(n -> (false == n.isRest())).toList();
+        final Note lowest  = notesWithoutRests.stream().min((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
+        final Note highest = notesWithoutRests.stream().max((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
         final int maximumSemitoneDistance = highest.midiNumber - lowest.midiNumber;
         
+        final DifferenceToneInversions inversions = createInversions(lowest, highest);
         final SequencedMap<NoteWithIndex,TonePair> result = new LinkedHashMap<>();
+        
         TonePair previousInterval = null;
         for (int i = 0; i < melody.length; i++) {
             final Note note = melody[i];
+            final boolean isRest = note.isRest();
+            
             final TonePair bestInterval;
-            if (note.isRest()) {
+            if (isRest) {
                 bestInterval = new TonePair();
             }
             else {
@@ -117,8 +98,13 @@ public abstract class AbstractComposer
                             note,
                             result);
             }
-            result.put(new NoteWithIndex(note, i), previousInterval = bestInterval);
+            
+            result.put(new NoteWithIndex(note, i), bestInterval);
+            
+            if (isRest == false)
+                previousInterval = bestInterval;
         }
+        
         return result;
     }
 
@@ -140,5 +126,78 @@ public abstract class AbstractComposer
             result[resultIndex][0] = new Note(tonePair.lowerTone(), note);
             result[resultIndex][1] = new Note(tonePair.upperTone(), note);
         }
+    }
+    
+    /**
+     * Provides all possibilities of difference-tone intervals ("inversions")
+     * for given melody. That means, it will measure the pitch range and
+     * then build fitting difference-tone intervals for all semi-tones in that range.
+     * @param melody the melody that should be translated into a sequence of intervals
+     *      generating difference-tones.
+     * @return the DifferenceToneInversions that can represent given melody.
+     */
+    private DifferenceToneInversions createInversions(Note lowest, Note highest) {
+        final DifferenceToneInversions inversions = toneRangeFor(
+                lowest,
+                highest,
+                tones, 
+                (narrowestInterval != null) ? ToneSystem.semitoneSteps(narrowestInterval) : -1,
+                (widestInterval != null)    ? ToneSystem.semitoneSteps(widestInterval)    : -1,
+                deviationTolerance);
+        
+        if (ToneSystem.MINOR_SECOND.equals(narrowestInterval) == false &&
+                ToneSystem.MAJOR_SEVENTH.equals(widestInterval) == false)
+            inversions.removeDissonant(false);
+        
+        return inversions;
+    }
+    
+    /**
+     * Builds a sufficient range of tones to model given melody with difference tones.
+     * A melody with 1.3 octaves tone-range requires about 4 octaves above its lowest note.
+     * @param melody required, the melody to model with difference tones.
+     * @param toneStock required, the 12-tone system to be used for the melody and its difference tones.
+     * @param smallestSemitoneDistance optional, the number of semi-tones representing the 
+     *      smallest difference-tone interval to provide in returned tone-inversions.
+     *      Default is MINOR_THIRD.
+     * @param biggestSemitoneDistance optional, the number of semi-tones representing the 
+     *      biggest difference-tone interval to provide in returned tone-inversions.
+     *      Default is MAJOR_SIXTH.
+     * @param deviationTolerance required, the tolerance for finding difference-tones.
+     * @return the intervals (inversions) that can represent given melody.
+     * @throws IllegalArgumentException when melody and its inversions do not fit into toneStock.
+     */
+    private DifferenceToneInversions toneRangeFor(
+            Tone lowest,
+            Tone highest, 
+            Tone[] toneStock, 
+            int smallestSemitoneDistance,
+            int biggestSemitoneDistance,
+            double deviationTolerance)
+    {
+        // Find octave range of melody and calculate a subset of tones fitting to that range.
+        final int numberOfSemitones = highest.midiNumber - lowest.midiNumber;
+        final double melodyOctaves = (double) numberOfSemitones / (double) ToneSystem.SEMITONES_PER_OCTAVE;
+        
+        // we need the tone below lowest melody note to make deviation work also for bottom
+        int lowestIndexInToneStock = Arrays.binarySearch(toneStock, lowest, (t1, t2) -> t1.midiNumber - t2.midiNumber);
+        lowestIndexInToneStock--; // go one deeper
+        if (lowestIndexInToneStock < 0)
+            throw new IllegalArgumentException("Tone stock is too small for lowest melody note "+lowest.ipnName+", its lowest is "+toneStock[0].ipnName);
+        
+        final String lowestIpnName = toneStock[lowestIndexInToneStock].ipnName;
+        
+        // melodyOctaves up to 1.3 -> 4 octaves, up to 2.3 -> 5, up to 3.3 -> 6, ...
+        final int additionalOctavesTo4 = Math.min(0, (int) Math.ceil(melodyOctaves - 1.3));
+        toneStock = AbstractToneSystem.tones(toneStock, lowestIpnName, 4 + additionalOctavesTo4);
+        
+        return new DifferenceToneInversions(
+            new DifferenceToneInversions.Configuration(
+                toneStock, 
+                (smallestSemitoneDistance > 0) ? smallestSemitoneDistance : DifferenceToneInversions.Configuration.DEFAULT_SMALLEST_SEMITONE_STEPS,
+                (biggestSemitoneDistance > 0) ? biggestSemitoneDistance : DifferenceToneInversions.Configuration.DEFAULT_BIGGEST_SEMITONE_STEPS,
+                deviationTolerance
+            )
+        );
     }
 }

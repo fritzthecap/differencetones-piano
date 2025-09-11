@@ -1,14 +1,12 @@
 package fri.music.differencetones;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import fri.music.AbstractToneSystem;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 
@@ -22,72 +20,6 @@ import fri.music.ToneSystem;
  */
 public class DifferenceToneInversions extends DifferenceTones
 {
-    /**
-     * Builds a sufficient range of tones to model given melody with difference tones.
-     * A melody with 1.3 octaves tone-range requires about 4 octaves above its lowest note.
-     * @param melody required, the melody to model with difference tones.
-     * @param toneStock required, the 12-tone system to be used for the melody and its difference tones.
-     * @param smallestSemitoneDistance optional, the number of semi-tones representing the 
-     *      smallest difference-tone interval to provide in returned tone-inversions.
-     *      Default is MINOR_THIRD.
-     * @param biggestSemitoneDistance optional, the number of semi-tones representing the 
-     *      biggest difference-tone interval to provide in returned tone-inversions.
-     *      Default is MAJOR_SIXTH.
-     * @param deviationTolerance required, the tolerance for finding difference-tones.
-     * @return the intervals (inversions) that can represent given melody.
-     * @throws IllegalArgumentException when melody and its inversions do not fit into toneStock.
-     */
-    public static DifferenceToneInversions toneRangeFor(
-            Tone[] melody, 
-            Tone[] toneStock, 
-            int smallestSemitoneDistance,
-            int biggestSemitoneDistance,
-            double deviationTolerance)
-    {
-        // Find octave range of melody and calculate a subset of tones fitting to that range.
-        final Tone[] sortedMelody = Arrays.copyOf(melody, melody.length);
-        Arrays.sort(sortedMelody, (n1, n2) -> n1.midiNumber - n2.midiNumber);
-        final Tone lowest  = findNonRest(sortedMelody, true);
-        final Tone highest = findNonRest(sortedMelody, false);
-        final int numberOfSemitones = highest.midiNumber - lowest.midiNumber;
-        final double melodyOctaves = (double) numberOfSemitones / (double) ToneSystem.SEMITONES_PER_OCTAVE;
-        
-        // we need the tone below lowest melody note to make deviation work also for bottom
-        int lowestIndexInToneStock = Arrays.binarySearch(toneStock, lowest, (t1, t2) -> t1.midiNumber - t2.midiNumber);
-        lowestIndexInToneStock--; // go one deeper
-        if (lowestIndexInToneStock < 0)
-            throw new IllegalArgumentException("Tone stock is too small for lowest melody note "+lowest.ipnName+", its lowest is "+toneStock[0].ipnName);
-        
-        final String lowestIpnName = toneStock[lowestIndexInToneStock].ipnName;
-        
-        // melodyOctaves up to 1.3 -> 4 octaves, up to 2.3 -> 5, up to 3.3 -> 6, ...
-        final int additionalOctavesTo4 = Math.min(0, (int) Math.ceil(melodyOctaves - 1.3));
-        toneStock = AbstractToneSystem.tones(toneStock, lowestIpnName, 4 + additionalOctavesTo4);
-        
-        return new DifferenceToneInversions(
-            new DifferenceToneInversions.Configuration(
-                toneStock, 
-                (smallestSemitoneDistance > 0) ? smallestSemitoneDistance : Configuration.DEFAULT_SMALLEST_SEMITONE_STEPS,
-                (biggestSemitoneDistance > 0) ? biggestSemitoneDistance : Configuration.DEFAULT_BIGGEST_SEMITONE_STEPS,
-                deviationTolerance
-            )
-        );
-    }
-
-    private static Tone findNonRest(Tone[] sortedMelody, boolean lowest) {
-        final int minimumIndex = 0;
-        final int maximumIndex = sortedMelody.length - 1;
-        final int startIndex = lowest ? minimumIndex : maximumIndex;
-        final int endIndex = lowest ? maximumIndex : minimumIndex;
-        for (int i = startIndex; lowest ? (i <= endIndex) : (i >= startIndex); i += (lowest ? +1 : -1)) {
-            final Tone tone = sortedMelody[i];
-            if (tone.ipnName.equals(ToneSystem.REST_SYMBOL) == false)
-                return tone;
-        }
-        throw new IllegalArgumentException("Only rests in melody?");
-    }
-
-
     /**
      * Configuration of this class, to be passed to constructor.
      * @param tones the tone-system the difference-tones should be generated from.
