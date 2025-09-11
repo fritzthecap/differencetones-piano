@@ -23,7 +23,7 @@ public class NonParallel extends AbstractNonParallel
             // prefer a narrower/higher interval when going down
             int betterIndex = downward ? indexByPitch - 1 : indexByPitch + 1;
             // but do the contrary when violating limits
-            betterIndex = (betterIndex > lastIndex) ? indexByPitch - 1 : (betterIndex < 0) ? indexByPitch + 1 : betterIndex;
+            betterIndex = (betterIndex > lastIntervalIndex) ? indexByPitch - 1 : (betterIndex < 0) ? indexByPitch + 1 : betterIndex;
             return generatingIntervals.get(betterIndex);
         }
         return null;
