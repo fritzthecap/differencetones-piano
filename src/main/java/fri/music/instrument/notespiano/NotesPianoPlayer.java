@@ -266,7 +266,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     }
     
     /** Adds the "Rest" button to textAreaToolbar. To be overridden. */
-    protected void addRestButton(final NotesTextPanelBase view) {
+    protected void addRestButton(NotesTextPanelBase view) {
         view.textareaToolbar.add(buildRestButton(), 0);
         view.textareaToolbar.add(Box.createRigidArea(new Dimension(16, 1)), 1);
     }
