@@ -11,11 +11,12 @@ interface HelpForNotes
 <p>
 When you turn on the "Write Notes" checkbox, 
 you can use the piano to write notes.
-Left click on any key writes to the text-area at cursor position 
-with a note duration that is calculated
+Left click on any key writes to the text-area
+at cursor position with a duration that is calculated
 from the time the mouse button was down.
 Right mouse click opens a context-menu that lets choose
-the duration of the clicked note.
+the duration of the clicked piano key and then
+writes to the text-area.
 </p>
 
 <h2>Notes Syntax</h2>
@@ -32,7 +33,7 @@ and its duration behind a slash, for example:
     a quarter note triplet MUST start with a quarter note 
     (that may be tied to a subsequent one),
     but it MUST NOT start with an eighth note or a half note, 
-    else it will be regarded as eighth or half triplet</li>
+    else it will be regarded as eighth or half triplet!</li>
 <li>"[C4/4 E4 G4]" for a C-major chord, only the first note needs to have a length</li>
 <li>"(G5/1 G5/1 G5/1)" for a G5 whole note that spans three 4/4 bars</li>
 <li>"{A5/4 B5/4 C5/4}" for slurred notes</li>
