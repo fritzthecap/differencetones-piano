@@ -48,6 +48,7 @@ public class Note extends Tone
         return (int) Math.round(1000.0 * 60.0 / (double) beatsPerMinute);
     }
     
+    /** @return ipnName "/" lengthNotation. */
     public static String toString(String ipnName, String lengthNotation) {
         return ipnName + DURATION_SEPARATOR + lengthNotation;
     }
@@ -201,6 +202,7 @@ public class Note extends Tone
         return ToneSystem.REST_SYMBOL.equals(ipnName);
     }
     
+    /** @return ipnName "/" lengthNotation. */
     @Override
     public String toString() {
         return toString(ipnName, lengthNotation);
