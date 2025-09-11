@@ -127,7 +127,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     
     /** Overridden to do nothing, because "Rest" button will be above piano. */
     @Override
-    protected void addRestButton() {
+    protected void addRestButton(NotesTextPanelBase view) {
     }
     
     @Override
