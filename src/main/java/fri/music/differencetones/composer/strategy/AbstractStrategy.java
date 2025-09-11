@@ -13,7 +13,7 @@ public abstract class AbstractStrategy implements Strategy
     /** Contains intervals that can generate the current note. */
     protected List<TonePair> generatingIntervals;
     /** The last index of generatingIntervals, size - 1. */
-    protected int lastIndex;
+    protected int lastIntervalIndex;
     /** True when generatingIntervals contains more than one and a previous note exists. */
     protected boolean considerAlternatives;
     /** True when the preceding note is the same as the current one. */
@@ -27,8 +27,8 @@ public abstract class AbstractStrategy implements Strategy
         if (generatingIntervals == null || generatingIntervals.size() <= 0)
             throw new IllegalArgumentException("Note '"+context.note()+"' could not be mapped to an interval!");
         
-        lastIndex = generatingIntervals.size() - 1;
-        considerAlternatives = (lastIndex > 0 && context.previousInterval() != null);
+        lastIntervalIndex = generatingIntervals.size() - 1;
+        considerAlternatives = (lastIntervalIndex > 0 && context.previousInterval() != null);
         isRepeatedNote = context.note().equals(context.previousNote());
     }
 
