@@ -1,17 +1,22 @@
 package fri.music.instrument.wave;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.SequencedSet;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
 import fri.music.swingutils.ButtonUtil;
+import fri.music.swingutils.DialogUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -50,6 +55,25 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         this.intervalRange = new IntervalRangeComponent(null, null);
         getControlPanel().add(intervalRange.getNarrowestChoice(), index++);
         getControlPanel().add(intervalRange.getWidestChoice(), index++);
+        
+        final JButton help = new JButton("Help");
+        help.setToolTipText("Piano Settings Description");
+        help.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DialogUtil.showModelessHtmlDialog(
+                        "Piano Settings", 
+                        help.getParent(), 
+                        HelpForPianoSettings.HTML,
+                        null);
+            }
+        });
+        getControlPanel().add(Box.createHorizontalGlue(), -1);
+        final JToolBar toolbar = new JToolBar(); // configure same look&feel as other Help buttons in toolbars
+        toolbar.setFloatable(false);
+        toolbar.setBorder(null);
+        toolbar.add(help);
+        getControlPanel().add(toolbar);
         
         return this.pianoPanel = pianoPanel;
     }
