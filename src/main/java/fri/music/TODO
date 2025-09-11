@@ -1,7 +1,4 @@
 
-- If there is an interval selected in text area, what should happen
-    in case user clicks onto an interval in a list frame?
- 
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 

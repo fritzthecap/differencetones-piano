@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
 import java.util.Objects;
+import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -250,11 +251,21 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
             }
         });
         
+        addRestButton();
+        
         addExportActionListener(view);
         
         return this.view;
     }
     
+    /** Adds the "Rest" button to textAreaToolbar. To be overridden. */
+    protected void addRestButton() {
+        melodyView().textareaToolbar.add(buildRestButton(), 0);
+        melodyView().textareaToolbar.add(Box.createRigidArea(new Dimension(16, 1)), 1);
+    }
+    
+    
+    /** Installs an ActionListener to "ABC Export" button. To be overridden. */
     protected void addExportActionListener(final NotesTextPanelBase view) {
         view.abcExport.addActionListener(new ActionListener() {
             @Override
@@ -276,6 +287,16 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         return view;
     }
     
+    /** @return a new "Rest" button that writes to notes text-area. */
+    protected JComponent buildRestButton() {
+        return new RestButton(new RestButton.Callback() {
+            @Override
+            public void writeRest(String note) {
+                writeSingleNote(melodyView(), note);
+            }
+        });
+    }
+
     /** Adds notesText and formatBars listeners to given view. */
     protected final NotesTextPanelBase buildNotesPanel(final PlayControllerBase playController, final NotesTextPanelBase view) {
         view.notesText.getDocument().addDocumentListener(new DocumentListener() {

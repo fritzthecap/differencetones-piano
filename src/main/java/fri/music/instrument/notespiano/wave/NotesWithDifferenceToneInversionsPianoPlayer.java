@@ -1,23 +1,16 @@
 package fri.music.instrument.notespiano.wave;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 import fri.music.SoundChannel;
 import fri.music.Tone;
@@ -27,7 +20,6 @@ import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.differencetones.composer.AbstractComposer;
 import fri.music.differencetones.composer.DefaultComposer;
-import fri.music.instrument.notespiano.NoteLengthsPopupMenu;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.notespiano.NotesTextPanelBase;
 import fri.music.instrument.notespiano.PlayController;
@@ -42,7 +34,6 @@ import fri.music.player.notelanguage.abc.AbcExport;
 import fri.music.player.notelanguage.abc.AbcTunesCombiner;
 import fri.music.swingutils.BorderUtil;
 import fri.music.swingutils.DialogUtil;
-import fri.music.swingutils.SizeUtil;
 
 /**
  * The most complex view of this project.
@@ -116,10 +107,12 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             }
         });
         
+        // add "Rest" button at left side
         getDifferenceToneInversionsPiano().addToIntervalListsToolbar(buildRestButton(), 0);
-        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createRigidArea(new Dimension(8, 1)), 1);
+        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createRigidArea(new Dimension(16, 1)), 1);
         
-        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createHorizontalGlue(), -1);
+        // add "Help" button at right side
+        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createHorizontalGlue(), -1); // -1: append to end
         getDifferenceToneInversionsPiano().addToIntervalListsToolbar(buildHelpButton(), -1);
         
         this.intervalNotes = buildIntervalNotesView(); // right side text area and play controller
@@ -130,6 +123,11 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         centerPanel.setResizeWeight(0.5); // divider location in middle
         
         return centerPanel;
+    }
+    
+    /** Overridden to do nothing, because "Rest" button will be above piano. */
+    @Override
+    protected void addRestButton() {
     }
     
     @Override
@@ -293,41 +291,6 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     }
     
     
-    private JComponent buildRestButton() {
-        final String REST_PREFIX = "\u2012 / "; // dash
-        final JButton rest = new JButton(REST_PREFIX + MelodyFactory.DEFAULT_NOTE_LENGTH);
-        rest.setBackground(Color.WHITE);
-        rest.setFont(rest.getFont().deriveFont(Font.BOLD, 16f));
-        rest.setBorder(BorderFactory.createLineBorder(Color.GRAY, 4, true));
-        rest.setToolTipText("Write Rest to Textarea at Cursor Position, Right Click for Length Choice");
-        
-        final NoteLengthsPopupMenu popupMenu = new NoteLengthsPopupMenu() {
-            @Override
-            public void noteLengthWasSelected(String noteLength) {
-                rest.setText(REST_PREFIX + noteLength);
-                writeSingleNote(melodyView(), Note.toString(ToneSystem.REST_SYMBOL, noteLength));
-            }
-        };
-        
-        rest.addMouseListener(new MouseAdapter() { // support both left and right mouse button
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) // let choose length
-                    popupMenu.show(rest, e.getX(), e.getY());
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) // deliver the most recently chosen length
-                    popupMenu.noteLengthWasSelected(popupMenu.getCurrentlySelectedLength());
-                else if (e.isPopupTrigger()) // let choose length
-                    popupMenu.show(rest, e.getX(), e.getY());
-            }
-        });
-        
-        SizeUtil.forceSize(rest, new Dimension(64, 32));
-        return rest;
-    }
-
     private JComponent buildHelpButton() {
         final JButton help = new JButton("Help");
         help.setToolTipText("Difference-Tone Composition User Guide");
