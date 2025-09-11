@@ -9,7 +9,7 @@ import fri.music.differencetones.DifferenceToneInversions.TonePair;
  * Wide intervals are good for high difference-tones, narrow intervals good for low ones.
  * The generatingIntervals list is sorted by narrow intervals first and wide intervals last.
  * The bestByPitch field will be the tone-pair in generatingIntervals
- * that is on index <code>lastIndex * (semitoneDistanceFromLowest / maximumSemitoneDistance)</code>.
+ * that is on index <code>lastIntervalIndex * (semitoneDistanceFromLowest / maximumSemitoneDistance)</code>.
  * The <code>(semitoneDistanceFromLowest / maximumSemitoneDistance)</code> fraction describes
  * the ratio within the global melody context where the current note resides.
  */
@@ -29,7 +29,7 @@ public abstract class AbstractByPitch extends AbstractStrategy
                 (double) context.semitoneDistanceFromLowest() / (double) context.maximumSemitoneDistance();
         // will be 0 for lowest note, 1 for highest
         
-        indexByPitch = (int) Math.round(pitchFraction * (double) lastIndex);
+        indexByPitch = (int) Math.round(pitchFraction * (double) lastIntervalIndex);
         bestByPitch = generatingIntervals.get(indexByPitch);
     }
 }
