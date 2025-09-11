@@ -294,8 +294,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     
     
     private JComponent buildRestButton() {
-        final String REST_BASE_TEXT = "\u2012 / ";
-        final JButton rest = new JButton(REST_BASE_TEXT + MelodyFactory.DEFAULT_NOTE_LENGTH);
+        final String REST_PREFIX = "\u2012 / "; // dash
+        final JButton rest = new JButton(REST_PREFIX + MelodyFactory.DEFAULT_NOTE_LENGTH);
         rest.setBackground(Color.WHITE);
         rest.setFont(rest.getFont().deriveFont(Font.BOLD, 16f));
         rest.setBorder(BorderFactory.createLineBorder(Color.GRAY, 4, true));
@@ -304,7 +304,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         final NoteLengthsPopupMenu popupMenu = new NoteLengthsPopupMenu() {
             @Override
             public void noteLengthWasSelected(String noteLength) {
-                rest.setText(REST_BASE_TEXT + noteLength);
+                rest.setText(REST_PREFIX + noteLength);
                 writeSingleNote(melodyView(), Note.toString(ToneSystem.REST_SYMBOL, noteLength));
             }
         };
@@ -312,14 +312,14 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         rest.addMouseListener(new MouseAdapter() { // support both left and right mouse button
             @Override
             public void mousePressed(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) // deliver the most recently chosen length
-                    popupMenu.noteLengthWasSelected(popupMenu.getCurrentlySelectedLength());
-                else if (e.isPopupTrigger()) // let choose length
+                if (e.isPopupTrigger()) // let choose length
                     popupMenu.show(rest, e.getX(), e.getY());
             }
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) // let choose length
+                if (SwingUtilities.isLeftMouseButton(e)) // deliver the most recently chosen length
+                    popupMenu.noteLengthWasSelected(popupMenu.getCurrentlySelectedLength());
+                else if (e.isPopupTrigger()) // let choose length
                     popupMenu.show(rest, e.getX(), e.getY());
             }
         });
