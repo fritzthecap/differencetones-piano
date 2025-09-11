@@ -24,7 +24,7 @@ public class NotesWritingMouseListener extends MouseKeyAdapter
         
         this.popup = new NoteLengthsPopupMenu() {
             @Override
-            protected void noteLengthWasSelected(String noteLength) {
+            public void noteLengthWasSelected(String noteLength) {
                 noteLengthSelected(noteLength);
             }
         };

@@ -1,17 +1,23 @@
 package fri.music.instrument.notespiano.wave;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 import fri.music.SoundChannel;
 import fri.music.Tone;
@@ -111,6 +117,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         });
         
         getDifferenceToneInversionsPiano().addToIntervalListsToolbar(buildRestButton(), 0);
+        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createRigidArea(new Dimension(8, 1)), 1);
+        
         getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createHorizontalGlue(), -1);
         getDifferenceToneInversionsPiano().addToIntervalListsToolbar(buildHelpButton(), -1);
         
@@ -286,21 +294,37 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     
     
     private JComponent buildRestButton() {
-        final JButton rest = new JButton("\u2B24"); // large black circle
-        rest.setToolTipText("Write Rest to Textarea at Cursor Position");
-        final JPopupMenu popupMenu = new NoteLengthsPopupMenu() {
+        final String REST_BASE_TEXT = "\u2012 / ";
+        final JButton rest = new JButton(REST_BASE_TEXT + MelodyFactory.DEFAULT_NOTE_LENGTH);
+        rest.setBackground(Color.WHITE);
+        rest.setFont(rest.getFont().deriveFont(Font.BOLD, 16f));
+        rest.setBorder(BorderFactory.createLineBorder(Color.GRAY, 4, true));
+        rest.setToolTipText("Write Rest to Textarea at Cursor Position, Right Click for Length Choice");
+        
+        final NoteLengthsPopupMenu popupMenu = new NoteLengthsPopupMenu() {
             @Override
-            protected void noteLengthWasSelected(String noteLength) {
+            public void noteLengthWasSelected(String noteLength) {
+                rest.setText(REST_BASE_TEXT + noteLength);
                 writeSingleNote(melodyView(), Note.toString(ToneSystem.REST_SYMBOL, noteLength));
             }
         };
-        rest.addActionListener(new ActionListener() {
+        
+        rest.addMouseListener(new MouseAdapter() { // support both left and right mouse button
             @Override
-            public void actionPerformed(ActionEvent e) {
-                popupMenu.show(rest, rest.getWidth() / 2, rest.getHeight() / 2);
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) // deliver the most recently chosen length
+                    popupMenu.noteLengthWasSelected(popupMenu.getCurrentlySelectedLength());
+                else if (e.isPopupTrigger()) // let choose length
+                    popupMenu.show(rest, e.getX(), e.getY());
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) // let choose length
+                    popupMenu.show(rest, e.getX(), e.getY());
             }
         });
-        SizeUtil.forceSize(rest, new Dimension(50, 30));
+        
+        SizeUtil.forceSize(rest, new Dimension(64, 32));
         return rest;
     }
 
