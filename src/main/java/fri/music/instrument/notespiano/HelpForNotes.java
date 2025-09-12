@@ -33,23 +33,23 @@ Every note is given as an IPN-name (international pitch notation)
 and its duration behind a slash, for example: 
 </p>
 <ul>
-<li>"A4/8" for a eighth note on "A4" (4th octave, pitch 440 Hz)</li>
-<li>"E5" for a quarter note on "E5", as the default note-length is "4" and the note ends as "E5/4"</li>
-<li>"C#4/2." for a dotted "C#4" half note (spans three quarter notes)</li>
+<li>"<b>A4/8</b>" for a eighth note on "A4" (4th octave, pitch 440 Hz)</li>
+<li>"<b>E5</b>" for a quarter note on "E5", as the default note-length is "4" and the note ends as "E5/4"</li>
+<li>"<b>C#4/2.</b>" for a dotted "C#4" half note (spans three quarter notes)</li>
 <li>"-/4" for a quarter rest note</li>
-<li>"E5/16~3" for a "E5" triplet sixteenth note 
+<li>"<b>E5/16~3</b>" for a "E5" triplet sixteenth note 
     (each of the triplets must have the "~3" tilde-postfix!);
     a quarter note triplet MUST start with a quarter note 
     (that may be tied to a subsequent one),
     but it MUST NOT start with an eighth note or a half note, 
     else it will be regarded as eighth or half triplet!</li>
-<li>"[C4/4 E4 G4]" for a C-major chord, only the first note needs to have a length</li>
-<li>"(G5/1 G5/1 G5/1)" for a "G5" whole note that spans three 4/4 bars</li>
-<li>"{A5/4 B5/4 C6/4}" for slurred notes</li>
+<li>"<b>[C4/4 E4 G4]</b>" brackets for a C-major <b>chord</b>, only the first note needs to have a length</li>
+<li>"<b>(G5/1 G5/1 G5/1)</b>" parentheses for a <b>tied</b> "G5" whole note that spans three 4/4 bars</li>
+<li>"<b>{A5/4 B5/4 C6/4}</b>" braces for <b>slurred</b> notes</li>
 </ul>
 <p>
-No space must appear between a note and its duration specification,
-but at least one whitespace MUST be between different notes.
+Space must not appear between a note and its duration specification,
+but at least one whitespace MUST be between notes.
 Spaces are allowed between notes and tie-, slur- and chord-symbols.
 </p><p>
 Mind that there is no "Eb" or "Bb", you must use "D#" or "A#" instead,
@@ -101,18 +101,21 @@ With right mouse click you can open a context-menu that provides
 some useful text-area actions:
 </p>
 <ul>
-<li><b>Ctrl-x</b> for "Cut" selection</li>
-<li><b>Ctrl-c</b> for "Copy" selection</li>
-<li><b>Ctrl-v</b> for "Paste" at caret position</li>
-<li><b>Ctrl-z</b> for "Undo" last action</li>
-<li><b>Ctrl-y</b> for "Redo" last "Undo"</li>
-<li><b>Ctrl-a</b> for "Select All" text</li>
+<li><b>Ctrl x</b> for "Cut" selection</li>
+<li><b>Ctrl c</b> for "Copy" selection</li>
+<li><b>Ctrl v</b> for "Paste" at caret position</li>
+<li><b>Ctrl z</b> for "Undo" last action</li>
+<li><b>Ctrl y</b> for "Redo" last "Undo"</li>
+<li><b>Ctrl a</b> for "Select All" text</li>
+<li><b>Ctrl +</b> for bigger font</li>
+<li><b>Ctrl -</b> for smaller font</li>
 </ul>
 
 
 <h1>References</h1>
 <ul>
 <li>https://www.flutopedia.com/octave_notation.htm</li>
+<li>https://abcnotation.com/wiki/abc:standard:v2.1</li>
 </ul>
 
 </body>

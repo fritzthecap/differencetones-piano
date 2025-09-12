@@ -10,11 +10,14 @@ import java.awt.event.KeyListener;
 import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 /**
  * Shows text in non-modal dialogs.
@@ -91,13 +94,16 @@ public class DialogUtil
      * @return a JTextPane containing given HTML text.
      */
     private static JComponent buildHtmlTextPane(String htmlText) {
-        final JTextPane textPane = new JTextPane();
-        textPane.setContentType("text/html");
+        final JTextPane htmlViewer = new JTextPane();
+        htmlViewer.setContentType("text/html");
         
-        configureTextComponent(htmlText, textPane);
-        new TextPaneActions(textPane);
+        configureHtmlView(htmlViewer);
         
-        return textPane;
+        configureTextComponent(htmlText, htmlViewer);
+        
+        new HtmlViewerActions(htmlViewer); // font magnifier, works just with JTextPane, not with JEditorPane!
+        
+        return htmlViewer;
     }
 
     /**
@@ -116,5 +122,13 @@ public class DialogUtil
         textComponent.setEditable(false);
         textComponent.setText(text);
         textComponent.setCaretPosition(0); // scroll back to top
+    }
+    
+    private static void configureHtmlView(JEditorPane textPane) {
+        final HTMLEditorKit kit = (HTMLEditorKit) textPane.getEditorKitForContentType("text/html");
+        final StyleSheet css = kit.getStyleSheet();
+        css.addRule("h1 { text-decoration: underline; color: blue; }");
+        //css.addRule("h2, h3, h4 { color: green; }");
+        css.addRule("p { margin-top: 0; padding-top: 0; padding-bottom: 10; }");
     }
 }

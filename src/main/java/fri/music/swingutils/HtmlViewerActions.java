@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.Action;
+import javax.swing.JEditorPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
@@ -14,15 +15,15 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-public class TextPaneActions extends TextFontActions
+public class HtmlViewerActions extends TextFontActions
 {
     private int fontSize;
     
-    public TextPaneActions(JTextPane textPane) {
-        contextMenu.add(buildCopyAction(textPane, textPane.getKeymap()));
-        contextMenu.add(buildFontMenu(textPane, textPane.getKeymap()));
+    public HtmlViewerActions(JEditorPane htmlViewer) {
+        contextMenu.add(buildCopyAction(htmlViewer, htmlViewer.getKeymap()));
+        contextMenu.add(buildFontMenu(htmlViewer, htmlViewer.getKeymap()));
         
-        textPane.addMouseListener(new MouseAdapter() {
+        htmlViewer.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 showContextMenu(e);
@@ -33,11 +34,11 @@ public class TextPaneActions extends TextFontActions
             }
         });
         
-        magnifyFont(true, textPane); // initial font-size is not correct, so jump to 13
+        magnifyFont(true, htmlViewer); // initial font-size is too small, so jump to 13
     }
-
+    
     @Override
-    public void magnifyFont(boolean bigger, JTextComponent textComponent) {
+    public void magnifyFont(boolean bigger, final JTextComponent textComponent) {
         final JTextPane textPane = (JTextPane) textComponent;
         final MutableAttributeSet attributeSet = textPane.getInputAttributes();
         
@@ -83,7 +84,7 @@ public class TextPaneActions extends TextFontActions
         }
     }
     
-    private Action buildCopyAction(final JTextPane textPane, Keymap keymap)   {
+    private Action buildCopyAction(final JTextComponent textPane, Keymap keymap)   {
         final KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK);
         final Action copy = new DefaultEditorKit.CopyAction();
         copy.putValue(Action.NAME, "Copy (Ctrl-C)");
