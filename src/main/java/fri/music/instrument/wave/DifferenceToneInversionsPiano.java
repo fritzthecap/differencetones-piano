@@ -436,6 +436,10 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         intervalListsToolbar.add(detachIntervalFrames);
         intervalListsToolbar.add(closeAllIntervalFrames);
         
+        // add "Help" button at right side
+        intervalListsToolbar.add(Box.createHorizontalGlue(), -1); // -1: append to end
+        intervalListsToolbar.add(buildHelpButton(), -1);
+        
         this.listsContainer = new JPanel(new BorderLayout());
         addIntervalListsToInternalScrollPane();
         listsContainer.add(intervalListsToolbar, BorderLayout.SOUTH);
@@ -443,6 +447,22 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return listsContainer;
     }
 
+    private JComponent buildHelpButton() {
+        final JButton help = new JButton("Help");
+        help.setToolTipText("Interval Lists Explanations");
+        help.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DialogUtil.showModelessHtmlDialog(
+                        "Interval Lists Explanations", 
+                        help.getParent().getParent(), 
+                        HelpForIntervalLists.HTML,
+                        null);
+            }
+        });
+        return help;
+    }
+    
     private void addIntervalListsToInternalScrollPane() {
         setLayoutToIntervalListsPanel(false);
         

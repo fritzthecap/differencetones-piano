@@ -7,9 +7,13 @@ interface HelpForCompose
 <head></head>
 <body>
 
-<h2>TODO: Document how to use this user-interface!</h2>
+<h2>Composing Difference-Tone Intervals for a Melody</h2>
 <p>
-This help is under construction!
+  TODO: Describe how to use this UI.
+</p>
+<p>
+</p>
+<p>
 </p>
 
 </body>

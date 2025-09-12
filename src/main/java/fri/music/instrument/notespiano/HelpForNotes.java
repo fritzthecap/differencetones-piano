@@ -19,6 +19,14 @@ the duration of the clicked piano key and then
 writes to the text-area.
 </p>
 
+<h1>Render Notes as ABC</h1>
+<p>
+The notes language used here is not designed for writing printable music scores. 
+Nevertheless you can export the content of the text-area to ABC language
+and then render the result on some free ABC converter page on the Internet. 
+If you click "ABC Export", a dialog will lead you through that.
+</p>
+
 <h1>Notes Syntax</h1>
 <p>
 Every note is given as an IPN-name (international pitch notation)
@@ -44,8 +52,9 @@ No space must appear between a note and its duration specification,
 but at least one whitespace MUST be between different notes.
 Spaces are allowed between notes and tie-, slur- and chord-symbols.
 </p><p>
-In IPN there is no "Eb" or "Bb", you must give "D#" or "A#",
-and there is no German "H", such is written as "B".
+Mind that there is no "Eb" or "Bb", you must use "D#" or "A#" instead,
+there is no European "H", such is written as "B",
+there is no "E#" which is "F", there is no "B#" which is "C".
 But you can use both lower or upper case letters in IPN-names.
 </p><p>
 The <b>tempo</b> can appear as simple BPM-number (beats per minute)
@@ -98,6 +107,12 @@ some useful text-area actions:
 <li><b>Ctrl-z</b> for "Undo" last action</li>
 <li><b>Ctrl-y</b> for "Redo" last "Undo"</li>
 <li><b>Ctrl-a</b> for "Select All" text</li>
+</ul>
+
+
+<h1>References</h1>
+<ul>
+<li>https://www.flutopedia.com/octave_notation.htm</li>
 </ul>
 
 </body>

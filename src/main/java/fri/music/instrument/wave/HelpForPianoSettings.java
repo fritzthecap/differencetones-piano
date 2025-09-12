@@ -22,8 +22,9 @@ computer's sound resources, but hopefully you won't need it ever.
 
 <h3>Tunings</h3>
 <p>
-There are 8 different (hardcoded) tunings for 12-tone scales (which I took from Wikipedia).
-Mind that the application is not equipped for others than 12-tone scales.
+There are 8 different (hardcoded but extensible) tunings for 12-tone scales
+(which I took from Wikipedia).
+Mind that the application is not equipped for others than 12-tone scales!
 </p>
 <p>
 The <i>EqualTemperament</i> is a modern neutral tuning that tries
@@ -37,10 +38,10 @@ have the same structure.
 <p>
 Most of the other tunings are <i>JustIntonation</i> scales. 
 These have variable distances between their semitones.
-They focus on the good sound of 7-tone "modal" scales, 
+They focus on the good sound of 7-tone diatonic scales, 
 that means there should be less beatings (vibrations, discords) in a polyphonic
-performance with <i>JustIntonation</i>.
-The word "limit" refers to prime numbers used in the tuning's frequency calculations.
+performance with <i>JustIntonation</i> than in one with <i>EqualTemperament</i>.
+The word "limit" refers to prime number limits used in the tuning's frequency calculations.
 Most of the <i>JustIntonation</i> difference-tone interval-lists have different structures.
 </p>
 <p>
@@ -101,7 +102,7 @@ In the interval-list below, you will see that both the intervals
 <p>
 The wider the tones of an interval are apart, the higher their difference-tone will become.
 If you have an octave, the difference-tone will be identical with the lower tone and thus disappear.
-Thus it makes few sense to allow intervals greater than major-sixth. 
+For that reason it makes few sense to allow intervals greater than major-sixth.
 </p>
 
 <h3>Wave Form</h3>
@@ -109,7 +110,7 @@ Thus it makes few sense to allow intervals greater than major-sixth.
 The piano can be played with different sounds.
 For hearing difference-tones, the best will be the "Sine" wave form,
 but "Triangle" is also quite good.
-The less overtones the sound has (sine-wave is the purest), 
+The less overtones the sound has (sine-wave is the purest),
 the better you will hear difference-tones.
 </p>
 
@@ -119,8 +120,16 @@ The volume control (loudness) is called "Amplitude" because the sound of the pia
 is created by a wave-generator, not a MIDI-synthesizer.
 Reason for the wave-generator is, you cannot tune a Java MIDI-synthesizer,
 its tuning is fixed to equal-temperament, but here different tunings are needed
-to explore the nature of difference-tones.
+to bring light into the nature of difference-tones.
 </p>
+
+<h1>References</h1>
+<ul>
+<li>https://en.wikipedia.org/wiki/Equal_temperament</li>
+<li>https://en.wikipedia.org/wiki/Just_intonation</li>
+<li>https://en.wikipedia.org/wiki/Five-limit_tuning#Twelve-tone_scale</li>
+<li>https://en.wikipedia.org/wiki/Harmonic_series_(music)</li>
+</ul>
 
 </body>
 </html>

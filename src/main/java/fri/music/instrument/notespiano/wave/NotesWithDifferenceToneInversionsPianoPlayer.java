@@ -111,10 +111,6 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         getDifferenceToneInversionsPiano().addToIntervalListsToolbar(buildRestButton(), 0);
         getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createRigidArea(new Dimension(16, 1)), 1);
         
-        // add "Help" button at right side
-        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(Box.createHorizontalGlue(), -1); // -1: append to end
-        getDifferenceToneInversionsPiano().addToIntervalListsToolbar(buildHelpButton(), -1);
-        
         this.intervalNotes = buildIntervalNotesView(); // right side text area and play controller
         
         final JSplitPane centerPanel = new JSplitPane();
@@ -205,7 +201,9 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                         return intervalsAbcText;
                     
                     final String melodyAbcText = super.export(configuration, melodyText, true);
-                    return new AbcTunesCombiner().combine("Intervals", intervalsAbcText, "Melody", melodyAbcText);
+                    return new AbcTunesCombiner().combine(
+                            "Intervals name=\"Intervals\"", intervalsAbcText, 
+                            "Melody name=\"Difference Tones\"", melodyAbcText);
                 }
             };
         }
@@ -262,10 +260,18 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
 
         this.writeToIntervalsCheckbox = new JCheckBox("Write Intervals", true);
         writeToIntervalsCheckbox.setToolTipText("Write Intervals from List-Selection to Textarea");
+        writeToIntervalsCheckbox.setEnabled(false);
+        
         intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
+        
+        final JComponent helpButton = buildHelpButton();
+        helpButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        intervalNotes.notesControlPanel.add(helpButton);
+        
+        intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
+        
         writeToIntervalsCheckbox.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         intervalNotes.notesControlPanel.add(writeToIntervalsCheckbox);
-        writeToIntervalsCheckbox.setEnabled(false);
         
         // listen to interval-selection in list-frames for writing notes into intervals text-area
         getDifferenceToneInversionsPiano().setIntervalSelectionListener(
@@ -298,7 +304,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             @Override
             public void actionPerformed(ActionEvent e) {
                 DialogUtil.showModelessHtmlDialog(
-                        "Composition User Guide", 
+                        "Difference-Tone Composition User Guide", 
                         help.getParent().getParent(), 
                         HelpForCompose.HTML,
                         null);
