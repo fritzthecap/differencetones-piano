@@ -184,7 +184,7 @@ public class AbcExport
             appendLine(result, "C: "+date);
         
         if (tuning != null)
-            appendLine(result, "P: "+tuning);
+            appendLine(result, "P: Tuning = "+tuning);
 
         final Note firstNote = notes[0][0];
         final String timeSignature = getTimeSignature(firstNote.beatInfo);
