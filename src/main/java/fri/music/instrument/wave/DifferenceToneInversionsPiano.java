@@ -559,6 +559,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         if (isAdd) {
             int targetIndex = -1; // by default append to end
             if (sortListsByPitch.isEnabled() && sortListsByPitch.isSelected()) { // sort-in new frame
+                targetIndex = 0;
                 final List<IntervalListFrame> frames = getIntervalListFrames();
                 while (targetIndex < frames.size() && frames.get(targetIndex).midiNoteNumber < frame.midiNoteNumber)
                     targetIndex++;
