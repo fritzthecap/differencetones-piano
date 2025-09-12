@@ -7,7 +7,7 @@ import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.notespiano.wave.NotesWithDifferenceToneInversionsPianoPlayer;
 import fri.music.instrument.notespiano.NoteExamples;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
-import fri.music.wavegenerator.SineWaveSoundChannel;
+import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -24,7 +24,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayerDemo
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             
             final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName);
-            final WaveSoundChannel soundChannel = new SineWaveSoundChannel(null);
+            final WaveSoundChannel soundChannel = new GenericWaveSoundChannel(null, null);
             final NotesWithDifferenceToneInversionsPianoPlayer player = 
                     new NotesWithDifferenceToneInversionsPianoPlayer(
                             new DifferenceToneInversionsPiano(config, soundChannel));

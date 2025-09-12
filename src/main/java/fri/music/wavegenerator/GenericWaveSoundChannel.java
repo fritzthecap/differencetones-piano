@@ -12,6 +12,13 @@ public class GenericWaveSoundChannel extends WaveSoundChannel
 {
     private Class<? extends WaveGenerator> generatorClass;
     
+    /** 
+     * A wave generator that can switch wave forms on the fly.
+     * @param toneSystem optional, null for EqualTemperament, 
+     *      else the wanted tone stock for notes to play. 
+     * @param generatorClass optional, null for SineWaveGenerator, 
+     *      else the fully qualified class-name of the sound wave generator.
+     */
     public GenericWaveSoundChannel(Tone[] toneSystem, Class<? extends WaveGenerator> generatorClass) {
         super(toneSystem);
         this.generatorClass = (generatorClass == null) ? SineWaveGenerator.class: generatorClass;

@@ -7,7 +7,7 @@ import fri.music.EqualTemperament;
 import fri.music.ToneSystem;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
-import fri.music.wavegenerator.SineWaveSoundChannel;
+import fri.music.wavegenerator.GenericWaveSoundChannel;
 
 public class DifferenceToneInversionsPianoDemo
 { 
@@ -21,7 +21,7 @@ public class DifferenceToneInversionsPianoDemo
             
             final ToneSystem toneSystem = new EqualTemperament(lowestToneIpnName, octaves);
             final PianoWithSound.Configuration config = new PianoWithSound.Configuration(octaves, lowestToneIpnName, 18);
-            final PianoWithSound piano = new DifferenceToneInversionsPiano(config, new SineWaveSoundChannel(toneSystem.tones()));
+            final PianoWithSound piano = new DifferenceToneInversionsPiano(config, new GenericWaveSoundChannel(toneSystem.tones(), null));
             final JComponent pianoPanel = piano.getKeyboard();
             
             frame.addWindowListener(piano.getWindowClosingListener());

@@ -17,6 +17,7 @@ import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
 import fri.music.swingutils.ButtonUtil;
 import fri.music.swingutils.DialogUtil;
+import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -55,6 +56,11 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         this.intervalRange = new IntervalRangeComponent(null, null);
         getControlPanel().add(intervalRange.getNarrowestChoice(), index++);
         getControlPanel().add(intervalRange.getWidestChoice(), index++);
+        
+        if (getWaveSoundChannel() instanceof GenericWaveSoundChannel) {
+            final WaveChoiceComponent waveChoice = new WaveChoiceComponent((GenericWaveSoundChannel) getWaveSoundChannel());
+            getControlPanel().add(waveChoice.choice, index++);
+        }
         
         final JButton help = new JButton("Help");
         help.setToolTipText("Piano Settings Description");
