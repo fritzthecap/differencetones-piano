@@ -2,94 +2,125 @@ package fri.music.swingutils;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.Action;
 import javax.swing.JEditorPane;
-import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 public class HtmlViewerActions extends TextFontActions
 {
-    private int fontSize;
+    /** Name = HTML element tag, value = font-size of this element. */
+    private static final Map<String,Integer> fontSizes = new HashMap<>();
+    /** The amount of font magnification or reduction, in percent. */
+    private static final int magnifyPercent = 10;
+    /** Add all used HTML elements to style with their font size. */
+    static {
+        fontSizes.put("h1", 24); // header elements
+        fontSizes.put("h2", 22);
+        fontSizes.put("h3", 20);
+        fontSizes.put("h4", 18);
+        fontSizes.put("h5", 16);
+        fontSizes.put("p",  14); // paragraph elements
+        fontSizes.put("li", 14); // list elements
+    }
     
+    /**
+     * Call this to set current font-sizes in given HTML viewer.
+     * @param htmlViewer the HTML-area where to set font-sizes.
+     */
+    private static void updateFonts(JEditorPane htmlViewer) {
+        final HTMLEditorKit editorKit = (HTMLEditorKit) htmlViewer.getEditorKit();
+        final StyleSheet styleSheet = editorKit.getStyleSheet();
+        
+        for (final Map.Entry<String,Integer> fontSize : fontSizes.entrySet()) {
+            final String htmlElementName = fontSize.getKey();
+            final int size = fontSize.getValue();
+            
+            final String rule = htmlElementName+" { font-size : "+size+" }";
+            styleSheet.addRule(rule);
+        }
+        
+        final String html = htmlViewer.getText();
+        final int caretPostion = htmlViewer.getCaretPosition();
+        
+        final Document document = editorKit.createDefaultDocument();
+        htmlViewer.setDocument(document);
+        htmlViewer.setText(html);
+        htmlViewer.setCaretPosition(caretPostion);
+    }
+    
+    
+    private final Action copy;
+    
+    /**
+     * Attaches standard actions to given HTML-viewer.
+     * @param htmlViewer the JEditorPane or JTextPane to add actions to.
+     */
     public HtmlViewerActions(JEditorPane htmlViewer) {
-        contextMenu.add(buildCopyAction(htmlViewer, htmlViewer.getKeymap()));
-        contextMenu.add(buildFontMenu(htmlViewer, htmlViewer.getKeymap()));
+        super(htmlViewer);
         
-        htmlViewer.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                showContextMenu(e);
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                showContextMenu(e);
-            }
-        });
+        contextMenu.add(this.copy = buildCopyAction(htmlViewer.getKeymap()));
+        contextMenu.add(buildFontMenu(htmlViewer.getKeymap()));
         
-        magnifyFont(true, htmlViewer); // initial font-size is too small, so jump to 13
+        // adjust fonts
+        HtmlViewerActions.updateFonts(htmlViewer);
     }
     
     @Override
-    public void magnifyFont(boolean bigger, final JTextComponent textComponent) {
-        final JTextPane textPane = (JTextPane) textComponent;
-        final MutableAttributeSet attributeSet = textPane.getInputAttributes();
-        
-        if (fontSize <= 0)
-            fontSize = StyleConstants.getFontSize(attributeSet);
-        else if (fontSize <= 8 && bigger == false || fontSize >= 28 && bigger == true)
-            return; // is no more readable
-        
-        fontSize = nextFontSize(bigger, fontSize);
-        
-        StyleConstants.setFontSize(attributeSet, fontSize);
-        final StyledDocument styledDocument = textPane.getStyledDocument();
-        styledDocument.setCharacterAttributes(0, styledDocument.getLength() + 1, attributeSet, false);
+    protected void enableActions(JTextComponent textComponent) {
+        final boolean textIsSelected = (textComponent.getSelectionStart() != textComponent.getSelectionEnd());
+        copy.setEnabled(textIsSelected);
     }
     
-    private int nextFontSize(boolean bigger, int fontSize) {
-        // -> 9/8 10/11 12/13 14/15 18/19 24/25
-        if (bigger) {
-            if (fontSize <= 8)
-                return 9;
-            if (fontSize <= 10)
-                return 11;
-            if (fontSize <= 12)
-                return 13;
-            if (fontSize <= 14)
-                return 15;
-            if (fontSize <= 18)
-                return 19;
-            return 25;
+    @Override
+    public void magnifyFont(boolean bigger, JTextComponent textComponent) {
+        int minimalSize = Integer.MAX_VALUE;
+        int maximalSize = 0;
+        for (final Integer size : fontSizes.values()) {
+            if (size < minimalSize)
+                minimalSize = size;
+            if (size > maximalSize)
+                maximalSize = size;
         }
-        else {
-            if (fontSize >= 25)
-                return 24;
-            if (fontSize >= 19)
-                return 18;
-            if (fontSize >= 15)
-                return 14;
-            if (fontSize >= 13)
-                return 12;
-            if (fontSize >= 11)
-                return 10;
-            return 8;
+        
+        if (minimalSize <= 8 && bigger == false || maximalSize >= 40 && bigger == true)
+            return; // deny smaller or bigger fonts
+        
+        for (final Map.Entry<String,Integer> fontSize : fontSizes.entrySet()) {
+            final int oldSize = fontSize.getValue();
+            final int delta = calculatePercent(oldSize);
+            final int newSize;
+            if (bigger) {
+                newSize = oldSize + delta;
+            }
+            else { // going down, calculate balanced delta from an approximated lower value
+                final int lowerSize = oldSize - delta;
+                final int lowerDelta = calculatePercent(lowerSize);
+                newSize = oldSize - lowerDelta;
+            }
+            fontSize.setValue(newSize);
         }
+        updateFonts((JEditorPane) textComponent);
+    }
+
+
+    private int calculatePercent(int size) {
+        return (int) Math.round((double) size * (double) magnifyPercent / (double) 100);
     }
     
-    private Action buildCopyAction(final JTextComponent textPane, Keymap keymap)   {
+    private Action buildCopyAction(Keymap keymap)   {
         final KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK);
-        final Action copy = new DefaultEditorKit.CopyAction();
-        copy.putValue(Action.NAME, "Copy (Ctrl-C)");
-        keymap.addActionForKeyStroke(key, copy);
-        
-        return copy;
+        // EditorPane as no default copy-action in its actionMap, so create a new one
+        final Action copyAction = new DefaultEditorKit.CopyAction();
+        copyAction.putValue(Action.NAME, "Copy (Ctrl-C)");
+        keymap.addActionForKeyStroke(key, copyAction);
+        return copyAction;
     }
 }

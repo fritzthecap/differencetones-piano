@@ -6,17 +6,12 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
-import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.DefaultEditorKit;
@@ -27,11 +22,13 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 /**
- * Text-area with cut/copy/paste/clear/undo/redo actions
- * and according key-bindings. Usage:
+ * Text-area or text-field with cut/copy/paste/clear/undo/redo actions
+ * and according key-bindings. Constructor installs
+ * itself as mouse-listener to given text-component.
+ * Usage:
  * <pre>
- *     JTextArea textArea = new JTextArea();
- *     textArea.addMouseListener(new TextAreaActions(textArea));
+ *   JTextArea textArea = new JTextArea();
+ *   TextAreaActions textAreaActions = new TextAreaActions(textArea);
  * </pre>
  */
 public class TextAreaActions extends TextFontActions
@@ -49,12 +46,11 @@ public class TextAreaActions extends TextFontActions
     
     /**
      * Attaches standard actions to given text-component.
-     * This is a mouse- and key-listener to the component.
-     * The component will not be stored here, it will be accessed
-     * via <code>anyEvent.getSource()</code>.
-     * @param textComponent the text-component to add actions to.
+     * @param textComponent the JTextArea or JTextField to add actions to.
      */
     public TextAreaActions(JTextComponent textComponent) {
+        super(textComponent);
+        
         final ActionMap actionMap = textComponent.getActionMap();
         
         this.cut = actionMap.get(DefaultEditorKit.cutAction);
@@ -82,7 +78,7 @@ public class TextAreaActions extends TextFontActions
         };
         clear.putValue(Action.NAME, "Clear");
         
-        final JMenu fontMenu = buildFontMenu(textComponent, keymap);
+        final JMenu fontMenu = buildFontMenu(keymap);
         
         contextMenu.add(cut);
         contextMenu.add(copy);
@@ -96,28 +92,7 @@ public class TextAreaActions extends TextFontActions
         contextMenu.addSeparator();
         contextMenu.add(fontMenu);
         
-        // we need to listen to any key for enabling actions
-        textComponent.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                setActionsEnabled(textComponent);
-            }
-        });
-        
-        setActionsEnabled(textComponent);
-        
-        textComponent.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                showContextMenu(e);
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (showContextMenu(e) == false)
-                    setActionsEnabled((JTextComponent) e.getSource());
-                    // listen here to text-selection via mouse-drag because mouseDragged() doesn't work
-            }
-        });
+        enableActions(textComponent);
     }
     
     @Override
@@ -126,12 +101,36 @@ public class TextAreaActions extends TextFontActions
         if (fontSize <= 0)
             fontSize = font.getSize2D();
         else if (fontSize <= 8 && bigger == false || fontSize >= 28 && bigger == true)
-            return; // is no more readable
+            return; // deny smaller or bigger fonts
         
         fontSize += bigger ? +1 : -1;
         final Font newFont = font.deriveFont(fontSize);
         textComponent.setFont(newFont);
     }
+    
+    @Override
+    protected void enableActions(JTextComponent textComponent) {
+        final boolean textIsSelected = (textComponent.getSelectionStart() != textComponent.getSelectionEnd());
+        cut.setEnabled(textIsSelected);
+        copy.setEnabled(textIsSelected);
+        
+        final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        try {
+            final Object data = clipboard.getData(DataFlavor.stringFlavor);
+            paste.setEnabled(data != null);
+        }
+        catch (Exception e) {
+            paste.setEnabled(false);
+        }
+        
+        undo.setEnabled(undoManager.canUndo());
+        redo.setEnabled(undoManager.canRedo());
+        
+        final boolean textExists = (textComponent.getDocument().getLength() > 0);
+        clear.setEnabled(textExists);
+        selectAll.setEnabled(textExists == true && textIsSelected == false);
+    }
+    
     
     /**
      * Adds an UndoManager and key bindings Ctrl-Z (undo) and Ctrl-Y (redo) to given textarea.
@@ -166,40 +165,5 @@ public class TextAreaActions extends TextFontActions
         textComponent.setKeymap(keymap);
         
         return new Action[] { undo, redo };
-    }
-    
-    @Override
-    protected void enableActions(JTextComponent textComponent) {
-        setActionsEnabled(textComponent);
-    }
-    
-    @Override
-    protected boolean showContextMenu(MouseEvent e) {
-        if (SwingUtilities.isRightMouseButton(e))
-            ((JComponent) e.getSource()).requestFocus(); // else right click would not focus text-area!
-        
-        return super.showContextMenu(e);
-    }
-    
-    private void setActionsEnabled(JTextComponent textComponent) {
-        final boolean textIsSelected = textComponent.getSelectionStart() != textComponent.getSelectionEnd();
-        cut.setEnabled(textIsSelected);
-        copy.setEnabled(textIsSelected);
-        
-        final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        try {
-            final Object data = clipboard.getData(DataFlavor.stringFlavor);
-            paste.setEnabled(data != null);
-        }
-        catch (Exception e) {
-            paste.setEnabled(false);
-        }
-        
-        undo.setEnabled(undoManager.canUndo());
-        redo.setEnabled(undoManager.canRedo());
-        
-        final boolean textExists = (textComponent.getDocument().getLength() > 0);
-        clear.setEnabled(textExists);
-        selectAll.setEnabled(textExists == true && textIsSelected == false);
     }
 }

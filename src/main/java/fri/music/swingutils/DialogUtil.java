@@ -96,13 +96,8 @@ public class DialogUtil
     private static JComponent buildHtmlTextPane(String htmlText) {
         final JTextPane htmlViewer = new JTextPane();
         htmlViewer.setContentType("text/html");
-        
         configureHtmlView(htmlViewer);
-        
         configureTextComponent(htmlText, htmlViewer);
-        
-        new HtmlViewerActions(htmlViewer); // font magnifier, works just with JTextPane, not with JEditorPane!
-        
         return htmlViewer;
     }
 
@@ -124,11 +119,13 @@ public class DialogUtil
         textComponent.setCaretPosition(0); // scroll back to top
     }
     
-    private static void configureHtmlView(JEditorPane textPane) {
-        final HTMLEditorKit kit = (HTMLEditorKit) textPane.getEditorKitForContentType("text/html");
+    private static void configureHtmlView(JEditorPane htmlViewer) {
+        final HTMLEditorKit kit = (HTMLEditorKit) htmlViewer.getEditorKit();
         final StyleSheet css = kit.getStyleSheet();
-        css.addRule("h1 { text-decoration: underline; color: blue; }");
-        //css.addRule("h2, h3, h4 { color: green; }");
-        css.addRule("p { margin-top: 0; padding-top: 0; padding-bottom: 10; }");
+        // some convenience corrections
+        css.addRule("h1 { text-decoration: underline; }");
+        css.addRule("p { margin-top: 0; }"); // Why 15? This creates big gap between <h1> and <p>!
+        // install font and copy actions, initially adjust fonts
+        new HtmlViewerActions(htmlViewer);
     }
 }
