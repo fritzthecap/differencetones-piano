@@ -26,7 +26,7 @@ public class RestButton extends JButton
         super(REST_PREFIX + MelodyFactory.DEFAULT_NOTE_LENGTH);
         setBackground(Color.WHITE);
         setFont(getFont().deriveFont(Font.BOLD, 16f));
-        setBorder(BorderFactory.createLineBorder(Color.GRAY, 4, true));
+        setBorder(BorderFactory.createLineBorder(Color.BLACK, 2, true));
         setToolTipText("Write Rest to Textarea at Cursor Position, Right Click for Length Choice");
         
         final NoteLengthsPopupMenu popupMenu = new NoteLengthsPopupMenu() {
