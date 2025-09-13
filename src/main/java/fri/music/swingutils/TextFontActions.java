@@ -17,7 +17,9 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
 
 /**
- * Base class for both JTextArea and JEditorPane to make bigger or smaller fonts.
+ * Base class for any <code>JTextComponent</code> to make bigger or smaller fonts.
+ * Mind that the font menu will not be automatically in provided context-menu,
+ * call <code>buildFontMenu()</code> to get it.
  */
 public abstract class TextFontActions
 {
@@ -52,13 +54,18 @@ public abstract class TextFontActions
     }
     
     /**
-     * Makes font bigger or smaller. To be implemented by sub-classes.
+     * Makes font bigger or smaller. 
+     * As this is specific to <code>JTextArea</code> and <code>EditorPane</code>,
+     * this has to be implemented by sub-classes.
      * @param bigger true for bigger, false for smaller.
      * @param textComponent the text-component where to magnify or reduce font.
      */
     public abstract void magnifyFont(boolean bigger, JTextComponent textComponent);
     
-    /** To be called by sub-classes that want a font menu. */
+    /**
+     * To be called by sub-classes that want a font menu.
+     * @param keymap the keyboard mapping of target JTextComponent.
+     */
     protected final JMenu buildFontMenu(Keymap keymap)  {
         final Action fontBigger = new AbstractAction("+ (Ctrl-Plus)") {
             @Override
@@ -105,7 +112,10 @@ public abstract class TextFontActions
         return isPopupTrigger;
     }
     
-    /** Called before showing popup menu. Does nothing, to be overridden. */
+    /**
+     * Called on mouse-pressed and -released, and on key-released. Does nothing, to be overridden.
+     * @param textComponent the component where the event happened.
+     */
     protected void enableActions(JTextComponent textComponent) {
     }
 }

@@ -17,7 +17,7 @@ import java.awt.event.MouseEvent;
  * or "released", this is platform-specific (WINDOWS, UNIX, ...),
  * implementations must be flexible to catch both cases.
  * <p/>
- * The keyboards sends repeated "pressed" events as long as the key is down,
+ * The keyboard sends repeated "pressed" events as long as the key is down,
  * followed by a single "released" when it goes up.
  * This effect <b>was removed here</b>, thus there is only the first "pressed"
  * with a single "released" event afterwards. All press- or release-events

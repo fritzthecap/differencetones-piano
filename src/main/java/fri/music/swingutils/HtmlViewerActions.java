@@ -16,7 +16,7 @@ import javax.swing.text.html.StyleSheet;
 
 public class HtmlViewerActions extends TextFontActions
 {
-    /** Name = HTML element tag, value = font-size of this element. */
+    /** Font size mapping, name = HTML element tag, value = font-size of this element. */
     private static final Map<String,Integer> fontSizes = new HashMap<>();
     /** The amount of font magnification or reduction, in percent. */
     private static final int magnifyPercent = 10;
@@ -33,9 +33,9 @@ public class HtmlViewerActions extends TextFontActions
     
     /**
      * Call this to set current font-sizes in given HTML viewer.
-     * @param htmlViewer the HTML-area where to set font-sizes.
+     * @param htmlViewer the HTML-area where to set mapped font-sizes.
      */
-    private static void updateFonts(JEditorPane htmlViewer) {
+    private static void updateFontSizes(JEditorPane htmlViewer) {
         final HTMLEditorKit editorKit = (HTMLEditorKit) htmlViewer.getEditorKit();
         final StyleSheet styleSheet = editorKit.getStyleSheet();
         
@@ -70,7 +70,7 @@ public class HtmlViewerActions extends TextFontActions
         contextMenu.add(buildFontMenu(htmlViewer.getKeymap()));
         
         // adjust fonts
-        HtmlViewerActions.updateFonts(htmlViewer);
+        HtmlViewerActions.updateFontSizes(htmlViewer);
     }
     
     @Override
@@ -107,7 +107,7 @@ public class HtmlViewerActions extends TextFontActions
             }
             fontSize.setValue(newSize);
         }
-        updateFonts((JEditorPane) textComponent);
+        updateFontSizes((JEditorPane) textComponent);
     }
 
 
