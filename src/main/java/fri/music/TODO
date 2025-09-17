@@ -1,19 +1,12 @@
 
 - Add hyperlinks for each other to "Help" texts.
     Create table of contents for each text.
-
-- Introduce the option to use IPN note names like "Eb", "Gb", ...
-    Will be really complicated, because Note.ipnName is public and
-    was used in many many places ...
-    DONE: will not do this, really hard to implement, for what?.
+    Create a global table of content.
+    Create a term dictionary (glossary).
 
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 
-- "Help" button in NotesWithDifferenceToneInversionsPianoPlayer
-    bottom left before "Sort Lists" checkbox. Helps using the UI.
-    Revise help text for notes area.
-    
 - The titles of demo apps should be also visible when running
     pianos from ConfigurationPanel.
     A "Help" button in configuration panel should document the 
@@ -44,6 +37,11 @@
     "Look at Pianos" (PianoConfiguration), 
     "Try out Wave Generators" (WavePianoDemo, PianoConfiguration), 
     TODO: there is more!
+
+- Introduce the option to use IPN note names like "Eb", "Gb", ...
+    Will be really complicated, because Note.ipnName is public and
+    was used in many many places ...
+    DONE: will not do this, really hard to implement, for what?.
 
 ==============================
 
