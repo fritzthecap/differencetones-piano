@@ -19,25 +19,32 @@ composing a difference-tone melody requires choosing one of these intervals.
 A melody with 1.3 octaves tone-range will need about 4 octaves above its lowest note, 
 one with 2.3 octaves about 5 octaves, and so on.
 </p><p>
-This user-interface supports the process of difference tone composition
+This user-interface supports the process of difference-tone composition
 by working from bottom left to top right.
+Be aware that there is <b>no way to read files from hard-disk</b> except opening
+it via a text editor, copying the text and ppasting it into the application.
+Also there is <b>no way to save any data</b>
+except copying it to some text editor and save it from there.
 </p>
 
 <h2>Recording a Melody</h2>
 <p>
-Bottom left will be the melody notes on piano. 
-Above the piano, interval lists will be displayed for every clicked piano key.
+Bottom left you can click the melody notes on piano. 
+Record the melody in the lower octave range, so that there is enough space for the intervals above.
+On top of the piano, interval lists will be displayed for every clicked piano key.
 If the checkbox "Write Notes" is on, every piano key will also be written 
 into the "Melody" text-area above. Thus you can record a melody 
 and then play it using the player on the left side of the text-area.
 </p><p>
 A note is a tone with a specific duration. 
 The duration of the written notes can be controlled by either how long the mouse button is held down,
-or by right mouse click and a duration popup menu, available on every piano key.
-Triplets and other special cases need to be edited manually in the text-area.
+or by right mouse click and a duration context-menu, available on every piano key.
+You can also edit the text, the duration is stored nowhere else.
+Triplets and other special cases need to be edited manually in the text-area,
+for syntax see the "Help" button below text-area.
 For rests there is a button on top left of the piano.
-Click it for writing the shown rest duration, or apply right-click to get
-a duration popup menu.
+Click it for writing the shown rest duration, or apply right-click to choose from
+a duration context-menu.
 </p><p>
 The "Tempo" is for playing the melody by the recorder.
 The "Time" signature is for formatting every bar into a separate text line, 
@@ -59,7 +66,7 @@ Make sure the right-side checkbox "Write Intervals" is on.
 else they won't be written to the right-side text-area!
 </p><p>
 For that purpose it is useful to have the checkbox "Reuse Open Lists" deactivated (turned off).
-That wa you can work through the lists from left to right.
+That way you can work through the lists from left to right.
 Else you need to have the melody notes order in your head and click the interval
 list items in the according order. (But when you decide to reuse open lists,
 then it will be useful to also turn on the checkbox "Sort Lists by Pitch", 
@@ -72,6 +79,11 @@ Any further click onto an interval list item will change the according interval 
 If you accidentally close all interval lists, you can open them again
 by playing the melody on left side using its recorder, 
 or by adding a space somewhere in the text-area.
+</p><p>
+Be warned about the loss of your work when you change 
+parameters like tuning, deviation or narrowest/widest interval. 
+Any such change will <b>erase the intervals text-area without warning</b>, 
+because the intervals written there may not represent the melody any more. 
 </p>
 
 <h2>Auto-Compose</h2>
@@ -83,12 +95,15 @@ But do not expect the result to be beautiful.
 The algorithm that does the interval selections is quite naive and
 will almost always need human corrections. 
 Nevertheless you can use the "Auto-Compose" button as base for your sound selection.
+</p>
 
 <h2>Generate Melody</h2>
 <p>
 As soon as you have intervals in the right-side text-area and you
-accidentally lost the left-side melody, you can re-generate the melody from the intervals.
+accidentally loose the left-side melody, you can re-generate the melody from the intervals.
 This works reliably, because each interval can generate only one difference-tone.
+But do not change tuning or any other parameter on top before, 
+because any such change will erase the intervals text-area.
 </p>
 
 <h2>Write Intervals</h2>

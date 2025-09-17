@@ -6,29 +6,38 @@
     </head>
     
     <body>
-        <h2>Restrictions of this Software</h2>
+        <h2>Limitations of this Software</h2>
         
-        <p>
+        <ul>
+        <li>
             This project is educational. 
             Its intention was not production of anything other than knowledge,
             although you can use it to compose difference-tone melodies. 
-        </p>
-        <p>
+        </li>
+        <li>
+            The application has not load- or save-actions that access the hard-disk.
+            Any data you want to keep must be saved and loaded via copy and paste in an external text editor.
+        </li>
+        <li>
+            There is a facility to export data to ABC notation language,
+            but no means to import from ABC.
+        </li>
+        <li>
             Computer keyboard support is provided very limited,
             no TAB-key order was implemented.
             mostly you will need the mouse to use the user-interface.
             The piano, once having input focus, 
             could be played using TAB- or Shift-TAB and ENTER- or SPACE-keys,
             but actually this is not realistic.
-        </p>
-        <p>
+        </li>
+        <li>
             You can scale the fonts in all "Help" text views using "Ctrl +" and "Ctrl -" keys or context-menus,
             but you can not scale the fonts of the graphical user interface.
-        </p>
-        <p>
+        </li>
+        <li>
             This project is restricted to 12-tone scales.
-        </p>
-        <p>
+        </li>
+        <li>
             You can not try out your own 12-tone scale
             unless you implement it and recompile the project.
             In other words, currently there is no tool for building scales dynamically at runtime. 
@@ -37,7 +46,8 @@
             extend <code>AbstractToneSystem</code> or <code>AbstractJustIntonation</code>. 
             For the latter, you simply can add new <code>Intervals</code> and <code>ChromaticScales</code> 
             to class <code>JustIntonation</code>.
-        </p>
+        </li>
+        </ul>
         
     </body>
 </html>
