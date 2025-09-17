@@ -22,9 +22,9 @@ public class HtmlViewerActions extends TextFontActions
     private static final int magnifyPercent = 10;
     /** Add all used HTML elements to style with their font size. */
     static {
-        fontSizes.put("h1", 24); // header elements
-        fontSizes.put("h2", 22);
-        fontSizes.put("h3", 20);
+        fontSizes.put("h1", 28); // header elements
+        fontSizes.put("h2", 25);
+        fontSizes.put("h3", 21);
         fontSizes.put("h4", 18);
         fontSizes.put("h5", 16);
         fontSizes.put("p",  14); // paragraph elements

@@ -122,9 +122,11 @@ public class DialogUtil
     private static void configureHtmlView(JEditorPane htmlViewer) {
         final HTMLEditorKit kit = (HTMLEditorKit) htmlViewer.getEditorKit();
         final StyleSheet css = kit.getStyleSheet();
+        
         // some convenience corrections
         css.addRule("h1 { text-decoration: underline; }");
-        css.addRule("p { margin-top: 0; }"); // Why 15? This creates big gap between <h1> and <p>!
+        css.addRule("p { margin-top: 0; margin-bottom: 10; }"); // Why 15 as margin-top? This creates a big gap between <h1> and <p>!
+        
         // install font and copy actions, initially adjust fonts
         new HtmlViewerActions(htmlViewer);
     }
