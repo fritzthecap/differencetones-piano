@@ -90,6 +90,8 @@ useful to close them all together.
 Mind that in combination with a notes text-area, lists may be reopened 
 when their difference-tone is contained in the text-area's melody
 and you either click a piano key or edit the text or play the melody.
+In this case it may also happen that lists get closed when their difference-tone
+is not contained in the text-area's melody.
 </i>
 </p>
 

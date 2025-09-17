@@ -112,6 +112,24 @@ some useful text-area actions:
 <li><b>Ctrl -</b> for smaller font</li>
 </ul>
 
+<h1>Player Buttons</h1>
+<p>
+The arrow buttons beside the text-area will play whatever is in the text-area.
+If there is no text or it is invalid, they will be disabled. 
+Any of these buttons will stop the player in case it is currently playing sound.
+</p><p>
+From left to right:
+</p>
+<ul>
+<li>"Rewind" will reset the melody to its start note</li>
+<li>"Previous Note" will play the note that was played before the player was stopped,
+  it will sound as long as the mouse button is down</li>
+<li>"Reverse" will play the melody from end to start (in reverse order)</li>
+<li>"Play" will play the melody from start to end, with the recorded note durations</li>
+<li>"Next Note" will play the note that comes after the previously played one,
+  it will sound as long as the mouse button is down</li>
+<li>"Go to End" will jump past the last note of the melody</li>
+</ul>
 
 <h1>References</h1>
 <ul>
