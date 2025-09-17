@@ -10,19 +10,32 @@
         
         <p>
             This project is educational. 
-            Its intention was not production of anything other than knowledge. 
+            Its intention was not production of anything other than knowledge,
+            although you can use it to compose difference-tone melodies. 
+        </p>
+        <p>
+            Computer keyboard support is provided very limited,
+            no TAB-key order was implemented.
+            mostly you will need the mouse to use the user-interface.
+            The piano, once having input focus, 
+            could be played using TAB- or Shift-TAB and ENTER- or SPACE-keys,
+            but actually this is not realistic.
+        </p>
+        <p>
+            You can scale the fonts in all "Help" text views using "Ctrl +" and "Ctrl -" keys or context-menus,
+            but you can not scale the fonts of the graphical user interface.
         </p>
         <p>
             This project is restricted to 12-tone scales.
         </p>
         <p>
             You can not try out your own 12-tone scale
-            except when you implement it and recompile the project,
-            currently there is no tool for building scales dynamically at runtime. 
-            If you want to implement such, then 
+            unless you implement it and recompile the project.
+            In other words, currently there is no tool for building scales dynamically at runtime. 
+            If you want to implement a new 12-tone scale, then 
             implement interface <code>ToneSystem</code> or
-            extend <code>AbstractToneSystem</code>. 
-            For just-intonations, you can add new <code>Intervals</code> and <code>ChromaticScales</code> 
+            extend <code>AbstractToneSystem</code> or <code>AbstractJustIntonation</code>. 
+            For the latter, you simply can add new <code>Intervals</code> and <code>ChromaticScales</code> 
             to class <code>JustIntonation</code>.
         </p>
         
