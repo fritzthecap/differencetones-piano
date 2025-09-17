@@ -57,12 +57,13 @@ there is no European "H", such is written as "B",
 there is no "E#" which is "F", there is no "B#" which is "C".
 But you can use both lower or upper case letters in IPN-names.
 </p><p>
-The <b>tempo</b> can appear as simple BPM-number (beats per minute)
+The <b>tempo</b> may appear as simple BPM-number (beats per minute)
 on top of the notes only, it can not change in-between.
 It always refers to a quarter note.
 </p><p>
-The <b>time signature</b> can appear on top of the notes, or everywhere in-between,
-written as "4/4" or "3/4" or similar.
+The <b>time signature</b> may appear on top of the notes, after the optional tempo, 
+or everywhere in-between the melody. It is written as "4/4" or "3/4" or similar,
+best in a separate line.
 </p><p>
 Do not care about bars, the player will automatically calculate bar bounds
 using the given time signature(s).
