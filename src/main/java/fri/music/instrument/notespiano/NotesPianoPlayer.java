@@ -277,8 +277,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         final JButton restButton = new RestButton(new RestButton.Callback() {
             @Override
             public void writeRest(String note) {
-                if (view.writeToNotesCheckbox.isSelected())
-                    writeSingleNote(melodyView(), note);
+                writeSingleNote(melodyView(), note);
             }
         });
         view.writeToNotesCheckbox.addActionListener(new ActionListener() {
