@@ -66,11 +66,11 @@ public abstract class TextFontActions
      * To be called by sub-classes that want a font menu.
      * @param keymap the keyboard mapping of target JTextComponent.
      */
-    protected final JMenu buildFontMenu(Keymap keymap)  {
+    protected final JMenu buildFontMenu(Keymap keymap, final JTextComponent textComponent)  {
         final Action fontBigger = new AbstractAction("+ (Ctrl-Plus)") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                magnifyFont(true, (JTextComponent) e.getSource());
+                magnifyFont(true, textComponent);
             }
         };
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK);
@@ -79,13 +79,13 @@ public abstract class TextFontActions
         final Action fontSmaller = new AbstractAction("- (Ctrl-Minus)") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                magnifyFont(false, (JTextComponent) e.getSource());
+                magnifyFont(false, textComponent);
             }
         };
         key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK);
         keymap.addActionForKeyStroke(key, fontSmaller);
         
-        final JMenu fontMenu = new JMenu("Font");
+        final JMenu fontMenu = new JMenu("Font Size");
         fontMenu.add(fontBigger);
         fontMenu.add(fontSmaller);
         

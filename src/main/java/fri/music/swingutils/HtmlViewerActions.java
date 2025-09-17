@@ -67,7 +67,7 @@ public class HtmlViewerActions extends TextFontActions
         super(htmlViewer);
         
         contextMenu.add(this.copy = buildCopyAction(htmlViewer.getKeymap()));
-        contextMenu.add(buildFontMenu(htmlViewer.getKeymap()));
+        contextMenu.add(buildFontMenu(htmlViewer.getKeymap(), htmlViewer));
         
         // adjust fonts
         HtmlViewerActions.updateFontSizes(htmlViewer);

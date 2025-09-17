@@ -48,7 +48,7 @@ public class TextAreaActions extends TextFontActions
      * Attaches standard actions to given text-component.
      * @param textComponent the JTextArea or JTextField to add actions to.
      */
-    public TextAreaActions(JTextComponent textComponent) {
+    public TextAreaActions(final JTextComponent textComponent) {
         super(textComponent);
         
         final ActionMap actionMap = textComponent.getActionMap();
@@ -78,7 +78,7 @@ public class TextAreaActions extends TextFontActions
         };
         clear.putValue(Action.NAME, "Clear");
         
-        final JMenu fontMenu = buildFontMenu(keymap);
+        final JMenu fontMenu = buildFontMenu(keymap, textComponent);
         
         contextMenu.add(cut);
         contextMenu.add(copy);
