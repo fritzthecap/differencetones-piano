@@ -69,7 +69,7 @@ using the given time signature(s).
 You can use the "Format" button to put every bar into a separate line.
 </p>
 
-<h3>Ties</h3>
+<h2>Ties</h2>
 <p>
 Notes connected by a "tie" are notes of same pitch that are played as single note, 
 even across several bars.
@@ -77,7 +77,7 @@ Ties are started by an opened parenthesis "(" and ended by a closed ")",
 notes in between MUST NOT be enclosed in parentheses (no nested parentheses).
 </p>
 
-<h3>Slurs</h3>
+<h2>Slurs</h2>
 <p>
 Notes connected by a "slur" are notes of different pitch that are phrased together, 
 even across several bars.
@@ -86,7 +86,7 @@ notes in between MUST NOT be enclosed in "{...}" (no nested braces),
 because it is not clear how to phrase several notes that are all slurred together.
 </p>
 
-<h3>Chords</h3>
+<h2>Chords</h2>
 <p>
 Chord notes are two or more notes of different pitch that are played simultaneously.
 Chords are started by an opened bracket "[" and ended by closed "]", 

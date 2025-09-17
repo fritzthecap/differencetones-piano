@@ -12,7 +12,7 @@ interface HelpForPianoSettings
   The controls on top of the user-interface affect the piano on bottom.
 </p>
 
-<h3>On/Off Switch</h3>
+<h2>On/Off Switch</h2>
 <p>
 With this switch you can turn off sound while the piano is playing, 
 be it because you click a piano key or the notes-player is running.
@@ -20,7 +20,7 @@ It's also an emergency switch when something goes wrong with the
 computer's sound resources, but hopefully you won't need it ever.
 </p>
 
-<h3>Tunings</h3>
+<h2>Tunings</h2>
 <p>
 There are 8 different (hardcoded but extensible) tunings for 12-tone scales
 (which I took from Wikipedia).
@@ -56,7 +56,7 @@ if you load a C-major scale into the text-area,
 you will see that its "F" and "A" interval-lists are empty (deviation 76 %).
 </p>
 
-<h3>Deviation Tolerance</h3>
+<h2>Deviation Tolerance</h2>
 <p>
 If you calculate difference-tones from the frequencies of two higher notes, 
 you will see that the difference-tone's frequency mostly does not match
@@ -81,7 +81,7 @@ in the difference-tone intervals list of "C4". That means the tuning is very cle
 in other words, it generates nearly no beatings when used polyhonically.
 </p>
 
-<h3>Narrowest Interval</h3>
+<h2>Narrowest Interval</h2>
 <p>
 The closer the tones of an interval are together, the deeper their difference-tone will become.
 If you have a major second interval, e.g. "[C6 D6]", the differece-tone will be 3 octaves lower on "C3".
@@ -98,14 +98,14 @@ In the interval-list below, you will see that both the intervals
 "[C6 D6]" and "[D6 E6]" generate "C3", which makes major-second very ambiguous.
 </p>
 
-<h3>Widest Interval</h3>
+<h2>Widest Interval</h2>
 <p>
 The wider the tones of an interval are apart, the higher their difference-tone will become.
 If you have an octave, the difference-tone will be identical with the lower tone and thus disappear.
 For that reason it makes few sense to allow intervals greater than major-sixth.
 </p>
 
-<h3>Wave Form</h3>
+<h2>Wave Form</h2>
 <p>
 The piano can be played with different sounds.
 For hearing difference-tones, the best will be the "Sine" wave form,
@@ -114,7 +114,7 @@ The less overtones the sound has (sine-wave is the purest),
 the better you will hear difference-tones.
 </p>
 
-<h3>Amplitude</h3>
+<h2>Amplitude</h2>
 <p>
 The volume control (loudness) is called "Amplitude" because the sound of the piano
 is created by a wave-generator, not a MIDI-synthesizer.
