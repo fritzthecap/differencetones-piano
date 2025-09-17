@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowListener;
 import java.util.Objects;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -273,12 +274,20 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     
     /** @return a new "Rest" button that writes to notes text-area. */
     protected JComponent buildRestButton() {
-        return new RestButton(new RestButton.Callback() {
+        final JButton restButton = new RestButton(new RestButton.Callback() {
             @Override
             public void writeRest(String note) {
-                writeSingleNote(melodyView(), note);
+                if (view.writeToNotesCheckbox.isSelected())
+                    writeSingleNote(melodyView(), note);
             }
         });
+        view.writeToNotesCheckbox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                restButton.setEnabled(view.writeToNotesCheckbox.isSelected());
+            }
+        });
+        return restButton;
     }
 
     /** Installs an ActionListener to "ABC Export" button. To be overridden. */

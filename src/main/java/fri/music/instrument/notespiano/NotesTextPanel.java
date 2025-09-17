@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -137,16 +139,17 @@ public class NotesTextPanel extends NotesTextPanelBase
             downMenu.add(buildTransposeMenuItem(ToneSystem.INTERVAL_NAMES[i], false));
         }
         
-        final JButton popupButton = new JButton("Transpose  \u25B8");
-        popupButton.setToolTipText("Shift All Notes to Another Pitch");
-        popupButton.addActionListener(new ActionListener() {
+        final JButton transposeButton = new JButton("Transpose  \u25B8"); // arrow left to indicate menu
+        transposeButton.setToolTipText("Shift All Notes to Another Pitch");
+        transposeButton.addMouseListener(new MouseAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                popupMenu.show(popupButton, popupButton.getWidth() / 2, popupButton.getHeight() / 2);
+            public void mousePressed(MouseEvent e) {
+                if (transposeButton.isEnabled())
+                    popupMenu.show(transposeButton, e.getX(), e.getY());
             }
         });
         
-        return popupButton;
+        return transposeButton;
     }
 
     private JMenuItem buildTransposeMenuItem(final String intervalName, final boolean upwards) {

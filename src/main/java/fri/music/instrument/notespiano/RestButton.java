@@ -40,15 +40,16 @@ public class RestButton extends JButton
         addMouseListener(new MouseAdapter() { // support both left and right mouse button
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) // let choose length
+                if (isEnabled() && e.isPopupTrigger()) // let choose length
                     popupMenu.show(RestButton.this, e.getX(), e.getY());
             }
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) // deliver the most recently chosen length
-                    popupMenu.noteLengthWasSelected(popupMenu.getCurrentlySelectedLength());
-                else if (e.isPopupTrigger()) // let choose length
-                    popupMenu.show(RestButton.this, e.getX(), e.getY());
+                if (isEnabled())
+                    if (SwingUtilities.isLeftMouseButton(e)) // deliver the most recently chosen length
+                        popupMenu.noteLengthWasSelected(popupMenu.getCurrentlySelectedLength());
+                    else if (e.isPopupTrigger()) // let choose length
+                        popupMenu.show(RestButton.this, e.getX(), e.getY());
             }
         });
         
