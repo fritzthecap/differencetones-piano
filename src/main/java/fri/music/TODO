@@ -1,4 +1,12 @@
 
+- Add hyperlinks for each other to "Help" texts.
+    Create table of contents for each text.
+
+- Introduce the option to use IPN note names like "Eb", "Gb", ...
+    Will be really complicated, because Note.ipnName is public and
+    was used in many many places ...
+    DONE: will not do this, really hard to implement, for what?.
+
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 
