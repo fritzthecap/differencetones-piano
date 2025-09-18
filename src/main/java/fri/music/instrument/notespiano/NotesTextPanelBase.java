@@ -16,7 +16,7 @@ import javax.swing.JToolBar;
 import javax.swing.text.JTextComponent;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
 import fri.music.swingutils.BorderUtil;
-import fri.music.swingutils.TextAreaActions;
+import fri.music.swingutils.text.TextAreaActions;
 
 /**
  * Basic view of NotesPianoPlayer, with play- and format-buttons.

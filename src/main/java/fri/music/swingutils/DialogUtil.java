@@ -18,6 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import fri.music.swingutils.text.HtmlViewerActions;
 
 /**
  * Shows text in non-modal dialogs.

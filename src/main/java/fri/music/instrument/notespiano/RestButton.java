@@ -11,7 +11,7 @@ import javax.swing.SwingUtilities;
 import fri.music.ToneSystem;
 import fri.music.player.Note;
 import fri.music.player.notelanguage.MelodyFactory;
-import fri.music.swingutils.SizeUtil;
+import fri.music.swingutils.layout.SizeUtil;
 
 public class RestButton extends JButton
 {

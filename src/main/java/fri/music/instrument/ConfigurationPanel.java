@@ -27,7 +27,7 @@ import fri.music.instrument.midi.SynthesizerFactory;
 import fri.music.instrument.wave.DifferenceToneForIntervalPiano;
 import fri.music.instrument.wave.IntervalPlayingPiano;
 import fri.music.instrument.wave.TriadPlayingPiano;
-import fri.music.swingutils.SmartComboBox;
+import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveGenerator;
 import fri.music.wavegenerator.WaveNames;

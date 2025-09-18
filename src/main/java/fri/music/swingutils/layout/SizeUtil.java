@@ -1,4 +1,4 @@
-package fri.music.swingutils;
+package fri.music.swingutils.layout;
 
 import java.awt.Component;
 import java.awt.Dimension;

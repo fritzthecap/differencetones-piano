@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
-import fri.music.swingutils.SmartComboBox;
+import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveGenerator;
 import fri.music.wavegenerator.WaveNames;

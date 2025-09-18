@@ -18,8 +18,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
 import fri.music.swingutils.ButtonUtil;
-import fri.music.swingutils.SmartComboBox;
-import fri.music.swingutils.SmartSlider;
+import fri.music.swingutils.layout.SmartComboBox;
+import fri.music.swingutils.layout.SmartSlider;
 
 /**
  * Lets try out 4 frequencies combined.

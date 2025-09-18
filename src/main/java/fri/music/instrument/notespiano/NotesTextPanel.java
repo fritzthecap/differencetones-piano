@@ -23,8 +23,8 @@ import javax.swing.text.JTextComponent;
 import fri.music.ToneSystem;
 import fri.music.player.Note;
 import fri.music.swingutils.DialogUtil;
-import fri.music.swingutils.SmartComboBox;
-import fri.music.swingutils.SmartPanel;
+import fri.music.swingutils.layout.SmartComboBox;
+import fri.music.swingutils.layout.SmartPanel;
 
 /** Full view of NotesPianoPlayer with time-signature and tempo controls. */
 public class NotesTextPanel extends NotesTextPanelBase

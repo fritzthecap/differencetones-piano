@@ -1,4 +1,4 @@
-package fri.music.swingutils;
+package fri.music.swingutils.text;
 
 import java.awt.Font;
 import java.awt.Toolkit;

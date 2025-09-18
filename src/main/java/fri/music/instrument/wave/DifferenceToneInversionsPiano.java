@@ -46,7 +46,7 @@ import fri.music.player.Note;
 import fri.music.swingutils.BorderUtil;
 import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.FlowLayoutForScrollPane;
-import fri.music.swingutils.SizeUtil;
+import fri.music.swingutils.layout.SizeUtil;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**

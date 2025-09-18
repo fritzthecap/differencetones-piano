@@ -1,4 +1,4 @@
-package fri.music.swingutils;
+package fri.music.swingutils.text;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;

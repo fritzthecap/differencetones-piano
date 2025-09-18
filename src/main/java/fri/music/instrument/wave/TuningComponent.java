@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
-import fri.music.swingutils.SmartComboBox;
+import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**

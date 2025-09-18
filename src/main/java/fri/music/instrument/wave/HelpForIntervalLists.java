@@ -51,13 +51,13 @@ a click onto an interval may write that interval into the text-area.
 
 <h2>Sort Lists by Pitch</h2>
 <p>
-If you deactivate this checkbox, the lists will be sorted in the 
+If you deactivate this checkbox, the interval lists will be sorted in the 
 order you click the keys on piano. 
 </p><p>
 If you activate it, the lists will be ordered by the pitch
 of their difference-tone, so they will be arranged parallel to the piano keys.
-This is useful if you have the piano key progression of a melody in mind and 
-want to play it using the interval lists instead of the piano keys.
+This is useful if you know the structure of a melody by heart and 
+want to use the interval lists like piano keys for playing it.
 </p>
 
 <h2>Reuse Open Lists</h2>

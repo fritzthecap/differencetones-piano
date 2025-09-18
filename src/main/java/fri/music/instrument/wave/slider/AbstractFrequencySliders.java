@@ -23,7 +23,7 @@ import fri.music.ToneSystem;
 import fri.music.Tones;
 import fri.music.instrument.wave.TuningComponent;
 import fri.music.swingutils.ButtonUtil;
-import fri.music.swingutils.SmartComboBox;
+import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.wavegenerator.SineWaveGenerator;
 import fri.music.wavegenerator.WaveGenerator;
 import fri.music.wavegenerator.WaveNames;
