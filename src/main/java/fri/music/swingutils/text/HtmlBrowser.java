@@ -31,7 +31,6 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
     private final Class<?> htmlResourcesClass;
     private final HtmlBrowserToolbar toolbar;
     private final JEditorPane htmlView;
-    private final HtmlViewActions htmlViewActions;
     
     private final List<URL> history = new ArrayList<>();
     private int currentHistoryIndex = 0;
@@ -51,7 +50,7 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
         
         htmlView.addHyperlinkListener(this);
         
-        this.htmlViewActions = new HtmlViewActions(htmlView); // popup menu
+        final HtmlViewActions htmlViewActions = new HtmlViewActions(htmlView); // popup menu
         int index = 0;
         htmlViewActions.contextMenu.add(newJMenuItem(toolbar.back), index++);
         htmlViewActions.contextMenu.add(newJMenuItem(toolbar.up), index++);

@@ -89,7 +89,7 @@ public class DialogUtil
 
     /**
      * Builds a panel containing given HTML.
-     * @param htmlUrl the HTML resource to render in returned JTextPane.
+     * @param htmlUrl the HTML resource to render in returned component.
      * @return a scroll-able navigation-able panel containing given HTML resource.
      */
     private static JComponent buildHtmlView(URL htmlUrl) {
@@ -97,9 +97,9 @@ public class DialogUtil
     }
 
     /**
-     * Builds a TextArea containing given plain text.
-     * @param text the text to render in returned JTextArea.
-     * @return a JTextArea containing given HTML text.
+     * Builds a text-area containing given plain text.
+     * @param text the plain text to render in returned component.
+     * @return a scroll-able text-area containing given HTML text.
      */
     private static JComponent buildPlainTextArea(String text) {
         final JTextArea textArea = new JTextArea();
