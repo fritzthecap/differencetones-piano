@@ -7,18 +7,15 @@ import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.net.URL;
 import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
-import fri.music.swingutils.text.HtmlViewerActions;
+import fri.music.HtmlResources;
+import fri.music.swingutils.text.HtmlBrowser;
 
 /**
  * Shows text in non-modal dialogs.
@@ -32,8 +29,8 @@ public class DialogUtil
      * @param parent required, a parent Component in same Window where to locate dialog relatively.
      * @param size optional, the dimension when different from 600 x 460.
      */
-    public static void showModelessHtmlDialog(String title, Component parent, String htmlText, Dimension size) {
-        showModelessDialog(title, parent, buildHtmlTextPane(htmlText), size, null);
+    public static void showModelessHtmlDialog(String title, Component parent, URL htmlUrl, Dimension size) {
+        showModelessDialog(title, parent, buildHtmlView(htmlUrl), size, null, false);
     }
 
     /**
@@ -44,21 +41,22 @@ public class DialogUtil
      * @param size optional, the dimension when different from 600 x 460.
      */
     public static void showModelessTextDialog(String title, Component parent, String plainText, Dimension size) {
-        showModelessDialog(title, parent, buildPlainTextArea(plainText), size, null);
+        showModelessDialog(title, parent, buildPlainTextArea(plainText), size, null, true);
     }
 
     /**
      * Opens a non-modal dialog showing given component.
      * @param title text for title-bar.
-     * @param componentToShow the panel to render.
+     * @param componentToShow the panel to render, expected to already have a scoll-pane when needed.
      * @param parent the parent Component to show over.
      * @param size the wanted size of the dialog.
+     * @param relativeToParent true for showing dialog at location relative to parent (not window).
      * @return the created dialog window.
      */
-    public static JDialog showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size, Point location) {
+    public static JDialog showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size, Point location, boolean relativeToParent) {
         final Window window = SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
         final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
-        dialog.getContentPane().add(new JScrollPane(componentToShow));
+        dialog.getContentPane().add(componentToShow);
         
         final KeyListener escapeListener = new KeyAdapter()   {
             @Override
@@ -74,61 +72,41 @@ public class DialogUtil
         dialog.addKeyListener(escapeListener);
         dialog.setFocusable(true); // else no ESCAPE
         
-        dialog.setSize(size != null ? size : new Dimension(660, 460));
+        dialog.setSize(size != null ? size : new Dimension(760, 580));
         
         if (location == null)
-            dialog.setLocationRelativeTo(parent);
+            dialog.setLocationRelativeTo(relativeToParent ? parent : window);
         else
             dialog.setLocation(location);
         
         dialog.setVisible(true);
         
-        componentToShow.requestFocus();
+        componentToShow.requestFocus(); // for immediately sizing font by keyboard
         
         return dialog;
     }
 
 
     /**
-     * Builds a TextPane containing given HTML text. Has no JScrollPane yet!
-     * @param htmlText the text to render in returned JTextPane.
-     * @return a JTextPane containing given HTML text.
+     * Builds a panel containing given HTML.
+     * @param htmlUrl the HTML resource to render in returned JTextPane.
+     * @return a scroll-able navigation-able panel containing given HTML resource.
      */
-    private static JComponent buildHtmlTextPane(String htmlText) {
-        final JTextPane htmlViewer = new JTextPane();
-        htmlViewer.setContentType("text/html");
-        configureHtmlView(htmlViewer);
-        configureTextComponent(htmlText, htmlViewer);
-        return htmlViewer;
+    private static JComponent buildHtmlView(URL htmlUrl) {
+        return new HtmlBrowser(htmlUrl, HtmlResources.class);
     }
 
     /**
-     * Builds a TextArea containing given plain text. Has no JScrollPane yet!
+     * Builds a TextArea containing given plain text.
      * @param text the text to render in returned JTextArea.
      * @return a JTextArea containing given HTML text.
      */
     private static JComponent buildPlainTextArea(String text) {
         final JTextArea textArea = new JTextArea();
         textArea.setToolTipText("Use Ctrl-A and Ctrl-C to Copy the Whole Text");
-        configureTextComponent(text, textArea);
-        return textArea;
-    }
-
-    private static void configureTextComponent(String text, JTextComponent textComponent) {
-        textComponent.setEditable(false);
-        textComponent.setText(text);
-        textComponent.setCaretPosition(0); // scroll back to top
-    }
-    
-    private static void configureHtmlView(JEditorPane htmlViewer) {
-        final HTMLEditorKit kit = (HTMLEditorKit) htmlViewer.getEditorKit();
-        final StyleSheet css = kit.getStyleSheet();
-        
-        // some convenience corrections
-        css.addRule("h1 { text-decoration: underline; }");
-        css.addRule("p { margin-top: 0; margin-bottom: 10; }"); // Why 15 as margin-top? This creates a big gap between <h1> and <p>!
-        
-        // install font and copy actions, initially adjust fonts
-        new HtmlViewerActions(htmlViewer);
+        textArea.setEditable(false);
+        textArea.setText(text);
+        textArea.setCaretPosition(0); // scroll back to top
+        return new JScrollPane(textArea);
     }
 }

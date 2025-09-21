@@ -85,8 +85,8 @@ public class NotesTextPanel extends NotesTextPanelBase
             public void actionPerformed(ActionEvent e) {
                 DialogUtil.showModelessHtmlDialog(
                         "Notes Edit Help", 
-                        notesText, // parent
-                        HelpForNotes.HTML, 
+                        help, // parent
+                        HelpForNotes.URL, 
                         null);
             }
         });

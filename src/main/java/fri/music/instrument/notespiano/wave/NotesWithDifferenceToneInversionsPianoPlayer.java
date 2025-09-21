@@ -11,6 +11,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
 import javax.swing.text.JTextComponent;
 import fri.music.SoundChannel;
 import fri.music.Tone;
@@ -266,7 +267,11 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         
         final JComponent helpButton = buildHelpButton();
         helpButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        intervalNotes.notesControlPanel.add(helpButton);
+        final JToolBar helpBar = new JToolBar();
+        helpBar.setFloatable(false);
+        helpBar.setBorder(null);
+        helpBar.add(helpButton);
+        intervalNotes.notesControlPanel.add(helpBar);
         
         intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
         
@@ -305,8 +310,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             public void actionPerformed(ActionEvent e) {
                 DialogUtil.showModelessHtmlDialog(
                         "Difference-Tone Composition User Guide", 
-                        help.getParent().getParent(), 
-                        HelpForCompose.HTML,
+                        help, 
+                        HelpForCompose.URL,
                         null);
             }
         });

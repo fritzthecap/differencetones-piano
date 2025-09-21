@@ -1,0 +1,29 @@
+/*
+ * Some Swing standard-style corrections for JEditorPane.
+ * Font-sizes for all elements used in HTML help texts.
+ */
+
+h1 {
+    font-size: 28;
+    text-decoration: underline;
+}
+h2 {
+    font-size: 25;
+}
+h3 {
+    font-size: 21;
+}
+h4 {
+    font-size: 18;
+}
+h5 {
+    font-size: 16;
+}
+p {
+    font-size: 14;
+    margin-top: 0; /* margin-top 15 for <p> would create a big gap between <h1> and <p> */
+    margin-bottom: 10; /* instead, create a gap to next heading */
+}
+li {
+    font-size: 14;
+}

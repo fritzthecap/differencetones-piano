@@ -1,86 +1,183 @@
 package fri.music.swingutils.text;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.Action;
 import javax.swing.JEditorPane;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 /**
  * HTML documentation browser that can load hyperlinks, 
- * but not HTTP links, just relative ones.
- * All hyperlinks must be written as relative to a given resource-class.
- * Intended for loading HTML documents from the application's JAR file.
- * No dotted hyperlinks like "../xxx.html" are allowed!
+ * but not HTTP links, just relative ones. This is NOT a web browser!
+ * All hyperlinks must be written relative to <code>HtmlResources.class</code>
+ * which is in "fri/music/", so they mostly will start with "instrument/wave" or similar.
+ * This is intended for loading HTML documents from the application's JAR file.
+ * Mind that no dotted hyperlinks like "../xxx.html" are allowed!
  */
 public class HtmlBrowser extends JPanel implements HyperlinkListener
 {
-    private final JEditorPane htmlView;
     private final Class<?> htmlResourcesClass;
+    private final HtmlBrowserToolbar toolbar;
+    private final JEditorPane htmlView;
+    private final HtmlViewActions htmlViewActions;
+    
+    private final List<URL> history = new ArrayList<>();
+    private int currentHistoryIndex = 0;
     
     /**
-     * @param htmlUrl required, the initial URL to load.
+     * @param url required, the initial URL to load.
      * @param htmlResourcesClass optional, a class that is the resource-loader
      *      for all HTML resources, will be this class when null.
      */
-    public HtmlBrowser(URL htmlUrl, Class<?> htmlResourcesClass) {
+    public HtmlBrowser(URL url, Class<?> htmlResourcesClass) {
         super(new BorderLayout());
         
-        try {
-            this.htmlView = new EditorPane(htmlUrl);
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         this.htmlResourcesClass = (htmlResourcesClass != null) ? htmlResourcesClass : this.getClass();
+        this.toolbar = new HtmlBrowserToolbar(this); // navigation
+        this.htmlView = new HtmlView(url);
+        history.add(url);
         
         htmlView.addHyperlinkListener(this);
         
-        new HtmlViewerActions(htmlView);
-        
-        // TODO: back + forward buttons, URL text disabled
+        this.htmlViewActions = new HtmlViewActions(htmlView); // popup menu
+        int index = 0;
+        htmlViewActions.contextMenu.add(newJMenuItem(toolbar.back), index++);
+        htmlViewActions.contextMenu.add(newJMenuItem(toolbar.up), index++);
+        htmlViewActions.contextMenu.add(newJMenuItem(toolbar.forward), index++);
+        htmlViewActions.contextMenu.add(new JPopupMenu.Separator(), index++);
         
         add(new JScrollPane(htmlView), BorderLayout.CENTER);
+        add(toolbar, BorderLayout.NORTH);
     }
 
-    /** Called when user clicks a hyperlink in HTML-document. */
+    /** Toolbar navigation callback. */
+    public void up() {
+        currentHistoryIndex = 0;
+        gotoCurrentIndex();
+    }
+
+    /** Toolbar navigation callback. */
+    public void back() {
+        currentHistoryIndex--;
+        gotoCurrentIndex();
+    }
+
+    /** Toolbar navigation callback. */
+    public boolean canGoBack() {
+        return currentHistoryIndex > 0;
+    }
+    
+    /** Toolbar navigation callback. */
+    public void forward() {
+        currentHistoryIndex++;
+        gotoCurrentIndex();
+    }
+
+    /** Toolbar navigation callback. */
+    public boolean canGoForward() {
+        return currentHistoryIndex < (history.size() - 1);
+    }
+    
+    /** Called when user hovers or clicks a hyperlink in HTML-document. */
     @Override
     public void hyperlinkUpdate(HyperlinkEvent event) {
+        final String[] fileNameAndReference = splitHrefToFilenameAndReference(event.getDescription());
+        final String relativeFileName = fileNameAndReference[0];
+        final String anchorRef = fileNameAndReference[1];
+        final boolean hasAnchorRef = (anchorRef.length() > 0);
+        
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            final String[] fileNameAndReference = splitHrefTextToFilenameAndReference(event.getDescription());
-            final String relativeFileName = fileNameAndReference[0];
-            final String anchorRef = fileNameAndReference[1];
-            final boolean hasAnchorRef = (anchorRef.length() > 0);
-            
             if (relativeFileName.length() <= 0 && hasAnchorRef) { // is an anchor URL, stay on page
                 htmlView.scrollToReference(anchorRef);
+                manageHistory(toUrl(null, anchorRef));
             }
             else {
                 final URL gotoUrl = htmlResourcesClass.getResource(relativeFileName);
                 // mind that all links must be relative to htmlResourcesClass for this to work!
-                try {
-                    final URL gotoUrlWithRef = (hasAnchorRef && gotoUrl != null)
-                            ? new URI(gotoUrl.toExternalForm()+"#"+anchorRef).toURL()
-                            : gotoUrl;
-                    if (gotoUrlWithRef != null)
+                final URL gotoUrlWithRef = (hasAnchorRef && gotoUrl != null)
+                        ? toUrl(gotoUrl, anchorRef)
+                        : gotoUrl;
+                
+                if (gotoUrlWithRef != null) {
+                    try {
                         htmlView.setPage(gotoUrlWithRef);
-                    else
-                        System.err.println("URL is not resolvable from "+htmlResourcesClass.getName()+": "+relativeFileName);
+                        manageHistory(gotoUrlWithRef);
+                    }
+                    catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-                catch (Exception e1) {
-                    throw new RuntimeException(e1);
-                }
+                else
+                    System.err.println("URL is not resolvable from "+htmlResourcesClass.getName()+": "+relativeFileName);
             }
+        }
+        else if (event.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+            if (relativeFileName.length() > 0) {
+                final String tooltip = relativeFileName + (hasAnchorRef ? "#"+anchorRef : "");
+                htmlView.setToolTipText(tooltip);
+            }
+        }
+        else if (event.getEventType() == HyperlinkEvent.EventType.EXITED) {
+            htmlView.setToolTipText(null);
         }
     }
     
-    private String[] splitHrefTextToFilenameAndReference(String hrefAttributeText) {
+    
+    private Component newJMenuItem(Action action) {
+        final JMenuItem item = new JMenuItem(action);
+        item.setText((String) action.getValue(HtmlBrowserToolbar.MENU_ACTION_LABEL));
+        return item;
+    }
+
+    private void gotoCurrentIndex() {
+        try {
+            htmlView.setPage(history.get(currentHistoryIndex));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private URL toUrl(URL url, String anchorRef) {
+        if (anchorRef == null)
+            return url;
+        
+        try {
+            final String externalForm = (url == null)
+                ? splitHrefToFilenameAndReference(htmlView.getPage().toString())[0]
+                : url.toExternalForm();
+            
+            return new URI(externalForm+"#"+anchorRef).toURL();
+        }
+        catch (MalformedURLException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void manageHistory(URL url) {
+        if (canGoForward()) // navigating forward while other forward path exists, remove it
+            for (int i = history.size() - 1; i > currentHistoryIndex; i--)
+                history.remove(i);
+        
+        history.add(url);
+        currentHistoryIndex++;
+        
+        toolbar.updateOnLinkNavigation(this);
+    }
+
+    private String[] splitHrefToFilenameAndReference(String hrefAttributeText) {
         final int hashIndex = hrefAttributeText.indexOf('#');
         final String reference = (hashIndex >= 0) ? hrefAttributeText.substring(hashIndex + 1) : "";
         String filename = (hashIndex >= 0) ? hrefAttributeText.substring(0, hashIndex) : hrefAttributeText;
@@ -89,8 +186,8 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
         return new String[] { filename, reference };
     }
     
-    /*
-    public static void main(String[] args) {
+    
+    /*public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             final Class<?> htmlResourcesClass = HtmlBrowser.class;
             final URL url = htmlResourcesClass.getResource("mainBrowseTest.html");

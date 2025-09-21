@@ -1,0 +1,83 @@
+package fri.music.swingutils.text;
+
+import java.awt.FlowLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
+
+public class HtmlBrowserToolbar extends JToolBar
+{
+    public static final String MENU_ACTION_LABEL = "menuActionLabel";
+    
+    public final Action back;
+    public final Action up;
+    public final Action forward;
+    
+    public HtmlBrowserToolbar(final HtmlBrowser browser) {
+        setLayout(new FlowLayout(FlowLayout.CENTER));
+        
+        this.back = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                navigate(browser, Boolean.TRUE);
+            }
+        };
+        back.putValue(Action.NAME, "    \u25C0    ");
+        back.putValue(MENU_ACTION_LABEL, "Back");
+        back.putValue(Action.SHORT_DESCRIPTION, "Go Backward in History");
+        back.setEnabled(false);
+        
+        this.up = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                navigate(browser, null);
+            }
+        };
+        up.putValue(Action.NAME, "    \u25B2    ");
+        up.putValue(MENU_ACTION_LABEL, "Up");
+        up.putValue(Action.SHORT_DESCRIPTION, "Back to Top Page");
+        up.setEnabled(false);
+        
+        this.forward = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                navigate(browser, Boolean.FALSE);
+            }
+        };
+        forward.putValue(Action.NAME, "    \u25B6    ");
+        forward.putValue(MENU_ACTION_LABEL, "Forward");
+        forward.putValue(Action.SHORT_DESCRIPTION, "Go Forward in History");
+        forward.setEnabled(false);
+
+        add(newButton(back, 6));
+        add(newButton(up, 8));
+        add(newButton(forward, 6));
+    }
+    
+    public void updateOnLinkNavigation(HtmlBrowser browser)  {
+        back.setEnabled(browser.canGoBack());
+        forward.setEnabled(browser.canGoForward());
+        up.setEnabled(browser.canGoBack());
+    }
+    
+    private void navigate(HtmlBrowser browser, Boolean goBack) {
+        if (goBack == Boolean.TRUE)
+            browser.back();
+        else if (goBack == Boolean.FALSE)
+            browser.forward();
+        else
+            browser.up();
+        
+        updateOnLinkNavigation(browser);
+    }
+    
+    private JButton newButton(Action action, int bottomMargin) {
+        final JButton button = new JButton(action);
+        button.setFocusPainted(false);
+        button.setMargin(new Insets(1, 4, bottomMargin, 4));
+        return button;
+    }
+}

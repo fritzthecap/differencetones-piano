@@ -298,8 +298,9 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
                         "Export to ABC",
                         view.notesText, // parent to show above
                         newAbcExportComponent(view), // fetches the view-owned text, with left-side tempo and time
-                        new Dimension(720, 530),
-                        null);
+                        new Dimension(720, 540),
+                        null,
+                        true);
             }
         });
     }

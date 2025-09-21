@@ -11,54 +11,34 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
+import javax.swing.text.Style;
+import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
-public class HtmlViewerActions extends TextFontActions
+/**
+ * This class relies on the <code>HtmlEView.css</code> stylesheet that
+ * should have been loaded initially by the given <code>HtmlView</code>.
+ */
+public class HtmlViewActions extends TextFontActions
 {
     private static final int MINIMAL_FONT_SIZE = 8;
     private static final int MAXIMAL_FONT_SIZE = 50;
     
-    /** Font size mapping, name = HTML element tag, value = font-size of this element. */
+    /** The HTML element names whose font-sizes are managed here.*/
+    private static final String [] fontElements = new String[] {
+          "h1", // header elements
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "p", // paragraph elements
+          "li", // list elements
+    };
+    /** Font size mapping, name = HTML element tag, value = integer font-size of this element. */
     private static final Map<String,Integer> fontSizes = new HashMap<>();
     /** The amount of font magnification or reduction, in percent. */
     private static final int magnifyPercent = 10;
-    /** Add all used HTML elements to style with their font size. */
-    static {
-        fontSizes.put("h1", 28); // header elements
-        fontSizes.put("h2", 25);
-        fontSizes.put("h3", 21);
-        fontSizes.put("h4", 18);
-        fontSizes.put("h5", 16);
-        fontSizes.put("p",  14); // paragraph elements
-        fontSizes.put("li", 14); // list elements
-    }
-    
-    /**
-     * Call this to set current font-sizes in given HTML viewer.
-     * @param htmlViewer the HTML-area where to set mapped font-sizes.
-     */
-    private static void updateFontSizes(JEditorPane htmlViewer) {
-        final HTMLEditorKit editorKit = (HTMLEditorKit) htmlViewer.getEditorKit();
-        final StyleSheet styleSheet = editorKit.getStyleSheet();
-        
-        for (final Map.Entry<String,Integer> fontSize : fontSizes.entrySet()) {
-            final String htmlElementName = fontSize.getKey();
-            final int size = fontSize.getValue();
-            
-            final String rule = htmlElementName+" { font-size : "+size+" }";
-            styleSheet.addRule(rule);
-        }
-        
-        final String html = htmlViewer.getText();
-        final int caretPosition = htmlViewer.getCaretPosition();
-        
-        final Document newDocument = editorKit.createDefaultDocument();
-        htmlViewer.setDocument(newDocument);
-        
-        htmlViewer.setText(html);
-        htmlViewer.setCaretPosition(caretPosition);
-    }
     
     
     private final Action copy;
@@ -67,14 +47,14 @@ public class HtmlViewerActions extends TextFontActions
      * Attaches standard actions to given HTML-viewer.
      * @param htmlViewer the JEditorPane or JTextPane to add actions to.
      */
-    public HtmlViewerActions(JEditorPane htmlViewer) {
+    public HtmlViewActions(JEditorPane htmlViewer) {
         super(htmlViewer);
         
         contextMenu.add(this.copy = buildCopyAction(htmlViewer.getKeymap()));
         contextMenu.add(buildFontMenu(htmlViewer.getKeymap(), htmlViewer));
         
         // immediately adjust current fonts to fontSizes table
-        HtmlViewerActions.updateFontSizes(htmlViewer);
+        initializeFontSizes(htmlViewer);
     }
     
     @Override
@@ -128,5 +108,51 @@ public class HtmlViewerActions extends TextFontActions
         copyAction.putValue(Action.NAME, "Copy (Ctrl-C)");
         keymap.addActionForKeyStroke(key, copyAction);
         return copyAction;
+    }
+
+    private void initializeFontSizes(JEditorPane htmlViewer) {
+        if (fontSizes.isEmpty()) { // will happen just once in application lifetime
+            final HTMLEditorKit editorKit = (HTMLEditorKit) htmlViewer.getEditorKit();
+            final StyleSheet styleSheet = editorKit.getStyleSheet();
+            
+            for (final String elementName : fontElements) {
+                final Style rule = styleSheet.getRule(elementName);
+                final Object attribute = rule.getAttribute(CSS.Attribute.FONT_SIZE);
+                try {
+                    final Integer fontSize = Integer.valueOf(attribute.toString());
+                    fontSizes.put(elementName, fontSize);
+                    //System.out.println(elementName+" "+CSS.Attribute.FONT_SIZE+"="+fontSize);
+                }
+                catch (Exception e) { // NumberFormatException, NullPointerException
+                    System.err.println("Could not decode font-size of element "+elementName+": "+e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Call this to set current font-sizes in given HTML viewer.
+     * @param htmlViewer the HTML-area where to set mapped font-sizes.
+     */
+    private void updateFontSizes(JEditorPane htmlViewer) {
+        final HTMLEditorKit editorKit = (HTMLEditorKit) htmlViewer.getEditorKit();
+        final StyleSheet styleSheet = editorKit.getStyleSheet();
+        
+        for (final Map.Entry<String,Integer> fontSize : fontSizes.entrySet()) {
+            final String htmlElementName = fontSize.getKey();
+            final int size = fontSize.getValue();
+            
+            final String rule = htmlElementName+" { font-size : "+size+" }";
+            styleSheet.addRule(rule);
+        }
+        
+        final String html = htmlViewer.getText();
+        final int caretPosition = htmlViewer.getCaretPosition();
+        
+        final Document newDocument = editorKit.createDefaultDocument();
+        htmlViewer.setDocument(newDocument);
+        
+        htmlViewer.setText(html);
+        htmlViewer.setCaretPosition(caretPosition);
     }
 }

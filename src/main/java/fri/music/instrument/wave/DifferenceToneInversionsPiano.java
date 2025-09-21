@@ -455,8 +455,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             public void actionPerformed(ActionEvent e) {
                 DialogUtil.showModelessHtmlDialog(
                         "Interval Lists Explanations", 
-                        help.getParent().getParent(), 
-                        HelpForIntervalLists.HTML,
+                        help, 
+                        HelpForIntervalLists.URL,
                         null);
             }
         });
@@ -665,12 +665,14 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         }
         
         setLayoutToIntervalListsPanel(true);
-        intervalListsDialog = DialogUtil.showModelessDialog(
+        
+        intervalListsDialog = DialogUtil.showModelessDialog( // detach frames
                 INTERVAL_LISTS_TITLE,
                 listsContainer,
                 listsScrollPane,
                 dialogSize,
-                dialogLocation);
+                dialogLocation,
+                true);
         
         intervalListsDialog.addWindowListener(new WindowAdapter() {
             @Override

@@ -69,8 +69,8 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
             public void actionPerformed(ActionEvent e) {
                 DialogUtil.showModelessHtmlDialog(
                         "Piano Settings", 
-                        help.getParent(), 
-                        HelpForPianoSettings.HTML,
+                        help, 
+                        HelpForPianoSettings.URL,
                         null);
             }
         });
