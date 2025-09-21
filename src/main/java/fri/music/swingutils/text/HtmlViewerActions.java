@@ -16,6 +16,9 @@ import javax.swing.text.html.StyleSheet;
 
 public class HtmlViewerActions extends TextFontActions
 {
+    private static final int MINIMAL_FONT_SIZE = 8;
+    private static final int MAXIMAL_FONT_SIZE = 50;
+    
     /** Font size mapping, name = HTML element tag, value = font-size of this element. */
     private static final Map<String,Integer> fontSizes = new HashMap<>();
     /** The amount of font magnification or reduction, in percent. */
@@ -48,12 +51,13 @@ public class HtmlViewerActions extends TextFontActions
         }
         
         final String html = htmlViewer.getText();
-        final int caretPostion = htmlViewer.getCaretPosition();
+        final int caretPosition = htmlViewer.getCaretPosition();
         
-        final Document document = editorKit.createDefaultDocument();
-        htmlViewer.setDocument(document);
+        final Document newDocument = editorKit.createDefaultDocument();
+        htmlViewer.setDocument(newDocument);
+        
         htmlViewer.setText(html);
-        htmlViewer.setCaretPosition(caretPostion);
+        htmlViewer.setCaretPosition(caretPosition);
     }
     
     
@@ -69,7 +73,7 @@ public class HtmlViewerActions extends TextFontActions
         contextMenu.add(this.copy = buildCopyAction(htmlViewer.getKeymap()));
         contextMenu.add(buildFontMenu(htmlViewer.getKeymap(), htmlViewer));
         
-        // adjust fonts
+        // immediately adjust current fonts to fontSizes table
         HtmlViewerActions.updateFontSizes(htmlViewer);
     }
     
@@ -90,7 +94,7 @@ public class HtmlViewerActions extends TextFontActions
                 maximalSize = size;
         }
         
-        if (minimalSize <= 8 && bigger == false || maximalSize >= 40 && bigger == true)
+        if (minimalSize <= MINIMAL_FONT_SIZE && bigger == false || maximalSize >= MAXIMAL_FONT_SIZE && bigger == true)
             return; // deny smaller or bigger fonts
         
         for (final Map.Entry<String,Integer> fontSize : fontSizes.entrySet()) {
@@ -107,6 +111,8 @@ public class HtmlViewerActions extends TextFontActions
             }
             fontSize.setValue(newSize);
         }
+        
+        // bring fonts to screen
         updateFontSizes((JEditorPane) textComponent);
     }
 
@@ -117,7 +123,7 @@ public class HtmlViewerActions extends TextFontActions
     
     private Action buildCopyAction(Keymap keymap)   {
         final KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK);
-        // EditorPane as no default copy-action in its actionMap, so create a new one
+        // EditorPane has no default copy-action in its actionMap, so create a new one
         final Action copyAction = new DefaultEditorKit.CopyAction();
         copyAction.putValue(Action.NAME, "Copy (Ctrl-C)");
         keymap.addActionForKeyStroke(key, copyAction);
