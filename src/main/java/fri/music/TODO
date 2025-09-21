@@ -1,9 +1,12 @@
 
-- Add internal hyperlinks to "Help" texts, and "Back" and "Forward" buttons.
-    Create table of contents for each text.
+- Create table of contents for each HTML help text programmatically by scanning for h1-h5.
     Create a global table of content.
     Create a term dictionary (glossary).
 
+- Bug in NotesWithDifferenceToneInversionsPianoPlayer:
+    When appending an interval to end of text, it is written in next text line instead of same.
+    Only when bar is full it should be written into next line.
+    
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 
