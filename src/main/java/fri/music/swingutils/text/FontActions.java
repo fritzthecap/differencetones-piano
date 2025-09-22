@@ -21,7 +21,7 @@ import javax.swing.text.Keymap;
  * Mind that the font menu will not be automatically in provided context-menu,
  * call <code>buildFontMenu()</code> to get it.
  */
-public abstract class TextFontActions
+public abstract class FontActions
 {
     /** An empty context menu to be filled with text-actions. */
     public final JPopupMenu contextMenu = new JPopupMenu();
@@ -30,7 +30,7 @@ public abstract class TextFontActions
      * Provides an empty context menu and font actions.
      * @param textComponent the text-compoinent to listen to for mouse- and key -events.
      */
-    public TextFontActions(JTextComponent textComponent) {
+    public FontActions(JTextComponent textComponent) {
         // we need to listen to any key event for enabling actions
         textComponent.addKeyListener(new KeyAdapter() {
             @Override

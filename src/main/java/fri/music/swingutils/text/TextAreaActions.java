@@ -31,7 +31,7 @@ import javax.swing.undo.UndoManager;
  *   TextAreaActions textAreaActions = new TextAreaActions(textArea);
  * </pre>
  */
-public class TextAreaActions extends TextFontActions
+public class TextAreaActions extends FontActions
 {
     private final Action cut;
     private final Action copy;

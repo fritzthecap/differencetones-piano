@@ -20,7 +20,7 @@ import javax.swing.text.html.StyleSheet;
  * This class relies on the <code>HtmlEView.css</code> stylesheet that
  * should have been loaded initially by the given <code>HtmlView</code>.
  */
-public class HtmlViewActions extends TextFontActions
+public class HtmlViewActions extends FontActions
 {
     private static final int MINIMAL_FONT_SIZE = 8;
     private static final int MAXIMAL_FONT_SIZE = 50;
