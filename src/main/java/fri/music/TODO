@@ -1,8 +1,4 @@
 
-- Create table of contents for each HTML help text programmatically by scanning for h1-h5.
-    Create a global table of content.
-    Create a term dictionary (glossary).
-
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 

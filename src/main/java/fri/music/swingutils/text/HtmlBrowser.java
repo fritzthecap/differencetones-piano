@@ -2,6 +2,9 @@ package fri.music.swingutils.text;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -26,7 +29,7 @@ import javax.swing.event.HyperlinkListener;
  * This is intended for loading HTML documents from the application's JAR file.
  * Mind that no dotted hyperlinks like "../xxx.html" are allowed!
  */
-public class HtmlBrowser extends JPanel implements HyperlinkListener
+public class HtmlBrowser extends JPanel implements HyperlinkListener, HtmlViewScanningHeaders.HeaderListener
 {
     private final Class<?> htmlResourcesClass;
     private final HtmlBrowserToolbar toolbar;
@@ -45,7 +48,7 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
         
         this.htmlResourcesClass = (htmlResourcesClass != null) ? htmlResourcesClass : this.getClass();
         this.toolbar = new HtmlBrowserToolbar(this); // navigation
-        this.htmlView = new HtmlView(url);
+        this.htmlView = new HtmlViewScanningHeaders(url, this);
         history.add(url);
         
         htmlView.addHyperlinkListener(this);
@@ -60,6 +63,25 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
         add(new JScrollPane(htmlView), BorderLayout.CENTER);
         add(toolbar, BorderLayout.NORTH);
     }
+    
+    /** Implements HtmlView.HeaderListener to render click-able headers in tool-bar choice. */
+    @Override
+    public void headersAvailable(List<HtmlViewScanningHeaders.HeaderElement> headers) {
+        toolbar.setHeaders(
+            headers,
+            new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent event) {
+                    if (event.getStateChange() == ItemEvent.SELECTED) {
+                        final HtmlViewScanningHeaders.HeaderElement header = 
+                                (HtmlViewScanningHeaders.HeaderElement) event.getItem();
+                        htmlView.scrollToReference(header.id());
+                    }
+                }
+            }
+        );
+        htmlView.requestFocus(); // else "Ctrl +" font command would not work immediately
+    }
 
     /** Toolbar navigation callback. */
     public void up() {
@@ -73,7 +95,7 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
         gotoCurrentIndex();
     }
 
-    /** Toolbar navigation callback. */
+    /** Toolbar navigation callback, also covers canGoUp(). */
     public boolean canGoBack() {
         return currentHistoryIndex > 0;
     }
@@ -92,15 +114,23 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
     /** Called when user hovers or clicks a hyperlink in HTML-document. */
     @Override
     public void hyperlinkUpdate(HyperlinkEvent event) {
-        final String[] fileNameAndReference = splitHrefToFilenameAndReference(event.getDescription());
+        final String[] fileNameAndReference = splitFilenameAndReference(event.getDescription());
         final String relativeFileName = fileNameAndReference[0];
         final String anchorRef = fileNameAndReference[1];
         final boolean hasAnchorRef = (anchorRef.length() > 0);
         
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            if (relativeFileName.length() <= 0 && hasAnchorRef) { // is an anchor URL, stay on page
+            if (relativeFileName.length() <= 0 && hasAnchorRef) { // url is an anchor-reference, stay on page
                 htmlView.scrollToReference(anchorRef);
                 manageHistory(toUrl(null, anchorRef));
+            }
+            else if (relativeFileName.startsWith("http")) { // open hyperlink in external browser
+                try {
+                    Desktop.getDesktop().browse(URI.create(event.getDescription()));
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
             else {
                 final URL gotoUrl = htmlResourcesClass.getResource(relativeFileName);
@@ -123,10 +153,7 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
             }
         }
         else if (event.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-            if (relativeFileName.length() > 0) {
-                final String tooltip = relativeFileName + (hasAnchorRef ? "#"+anchorRef : "");
-                htmlView.setToolTipText(tooltip);
-            }
+            htmlView.setToolTipText(event.getDescription());
         }
         else if (event.getEventType() == HyperlinkEvent.EventType.EXITED) {
             htmlView.setToolTipText(null);
@@ -155,7 +182,7 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
         
         try {
             final String externalForm = (url == null)
-                ? splitHrefToFilenameAndReference(htmlView.getPage().toString())[0]
+                ? splitFilenameAndReference(history.get(currentHistoryIndex).toString())[0]
                 : url.toExternalForm();
             
             return new URI(externalForm+"#"+anchorRef).toURL();
@@ -165,8 +192,9 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
         }
     }
 
+    /** Called when hyperlink clicked, not on navigation. */
     private void manageHistory(URL url) {
-        if (canGoForward()) // navigating forward while other forward path exists, remove it
+        if (canGoForward()) // navigating forward while different forward path exists, remove it
             for (int i = history.size() - 1; i > currentHistoryIndex; i--)
                 history.remove(i);
         
@@ -176,18 +204,16 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
         toolbar.updateOnLinkNavigation(this);
     }
 
-    private String[] splitHrefToFilenameAndReference(String hrefAttributeText) {
-        final int hashIndex = hrefAttributeText.indexOf('#');
-        final String reference = (hashIndex >= 0) ? hrefAttributeText.substring(hashIndex + 1) : "";
-        String filename = (hashIndex >= 0) ? hrefAttributeText.substring(0, hashIndex) : hrefAttributeText;
-        while (filename.startsWith("/"))
-            filename = filename.substring(1);
+    private String[] splitFilenameAndReference(String url) {
+        final int hashIndex = url.indexOf('#');
+        final String reference = (hashIndex >= 0) ? url.substring(hashIndex + 1) : "";
+        final String filename = (hashIndex >= 0) ? url.substring(0, hashIndex) : url;
         return new String[] { filename, reference };
     }
     
     
-    /*public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
+    public static void main(String[] args) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
             final Class<?> htmlResourcesClass = HtmlBrowser.class;
             final URL url = htmlResourcesClass.getResource("mainBrowseTest.html");
             try {
@@ -205,5 +231,5 @@ public class HtmlBrowser extends JPanel implements HyperlinkListener
                 throw new RuntimeException(e);
             }
         });
-    }*/
+    }
 }

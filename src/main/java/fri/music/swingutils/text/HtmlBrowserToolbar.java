@@ -1,13 +1,21 @@
 package fri.music.swingutils.text;
 
-import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
+/**
+ * The toolbar for HTML browser.
+ */
 public class HtmlBrowserToolbar extends JToolBar
 {
     public static final String MENU_ACTION_LABEL = "menuActionLabel";
@@ -16,9 +24,9 @@ public class HtmlBrowserToolbar extends JToolBar
     public final Action up;
     public final Action forward;
     
+    private JComboBox<HtmlViewScanningHeaders.HeaderElement> headersChoice;
+    
     public HtmlBrowserToolbar(final HtmlBrowser browser) {
-        setLayout(new FlowLayout(FlowLayout.CENTER));
-        
         this.back = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -61,6 +69,23 @@ public class HtmlBrowserToolbar extends JToolBar
         back.setEnabled(browser.canGoBack());
         forward.setEnabled(browser.canGoForward());
         up.setEnabled(browser.canGoBack());
+    }
+
+    public void setHeaders(List<HtmlViewScanningHeaders.HeaderElement> headers, ItemListener itemListener) {
+        if (headersChoice == null) {
+            headersChoice = new JComboBox<HtmlViewScanningHeaders.HeaderElement>();
+            headersChoice.setMaximumRowCount(20);
+            headersChoice.addItemListener(itemListener);
+            add(Box.createHorizontalGlue());
+            add(new JLabel(" Overview: "));
+            add(headersChoice);
+        }
+        
+        final DefaultComboBoxModel<HtmlViewScanningHeaders.HeaderElement> model = new DefaultComboBoxModel<>();
+        for (HtmlViewScanningHeaders.HeaderElement header : headers)
+            model.addElement(header);
+        
+        headersChoice.setModel(model);
     }
     
     private void navigate(HtmlBrowser browser, Boolean goBack) {

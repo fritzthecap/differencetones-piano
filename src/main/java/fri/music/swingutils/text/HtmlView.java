@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import javax.swing.JEditorPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
@@ -25,12 +26,19 @@ public class HtmlView extends JEditorPane
         setContentType("text/html"); // do not let setPage() do this
         setEditable(false);
         
-        final InputStream css = getClass().getResourceAsStream(getClass().getSimpleName()+".css");
+        final InputStream css = getClass().getResourceAsStream(HtmlView.class.getSimpleName()+".css");
         final StyleSheet styleSheet = ((HTMLEditorKit) getEditorKit()).getStyleSheet();
         try {
             styleSheet.loadRules(new InputStreamReader(css), null);
             
-            setPage(url);
+            SwingUtilities.invokeLater(()-> { // let sub-classes finish constructor
+                try {
+                    setPage(url);
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
         catch (IOException e) {
             throw new RuntimeException(e);
