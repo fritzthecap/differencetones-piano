@@ -3,10 +3,6 @@
     Create a global table of content.
     Create a term dictionary (glossary).
 
-- Bug in NotesWithDifferenceToneInversionsPianoPlayer:
-    When appending an interval to end of text, it is written in next text line instead of same.
-    Only when bar is full it should be written into next line.
-    
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 
@@ -50,6 +46,11 @@
 
 Fixed Bugs:
 
+- Bug in NotesWithDifferenceToneInversionsPianoPlayer:
+    When appending an interval to end of text, it is written in next text line instead of same.
+    Only when bar is full it should be written into next line.
+    DONE: fixed by formatting notes after insertion of a new interval.
+    
 - Bug WrapLayout: 
     - add 1 list frame by clicking onto C 
     - detach dialog

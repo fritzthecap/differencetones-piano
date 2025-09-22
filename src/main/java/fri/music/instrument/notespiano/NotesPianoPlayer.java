@@ -460,9 +460,8 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         final int caretPosition = view.notesText.getCaretPosition();
         int insertPosition = caretPosition;
         
-        // don't write into existing notes
         final int textLenght = view.notesText.getDocument().getLength();
-        if (textLenght > 0) {
+        if (textLenght > 0) { // don't destroy existing notes
             int before = caretPosition, after = caretPosition;
             boolean leftSideBlank  = false;
             boolean rightSideBlank = false;
