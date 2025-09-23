@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import fri.music.justintonation.ConfigurationPanel;
 
-public class JustIntonationCheckerSwingDemo
+public class JustIntonationCheckerConfigurationDemo
 {
     private static int count = 1;
     
