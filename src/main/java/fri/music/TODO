@@ -42,6 +42,10 @@
 
 Fixed Bugs:
 
+- Bug: JEditorPane does not display image any more when increasing font size.
+    Reproduction: run Main and click "Ctrl +".
+    DONE: fixed by setBase() and putProperty() in updateFontSizes) In HtmlViewActions
+
 - Bug in NotesWithDifferenceToneInversionsPianoPlayer:
     When appending an interval to end of text, it is written in next text line instead of same.
     Only when bar is full it should be written into next line.
