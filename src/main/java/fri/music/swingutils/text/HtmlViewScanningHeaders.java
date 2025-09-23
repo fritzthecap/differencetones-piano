@@ -29,10 +29,14 @@ public class HtmlViewScanningHeaders extends HtmlView
         }
     }
     
-    /** Clients interested in headers implement this interface. */
+    /** Clients interested in headers after page-load implement this interface. */
     public interface HeaderListener
     {
-        void headersAvailable(List<HeaderElement> headers);
+        /** Called when view starts to load or reload a page. */
+        void startLoadingPage();
+        
+        /** Called when view has scanned headers on fully loaded page. */
+        void endLoadingPage(List<HeaderElement> headers);
     }
     
     private final HeaderListener headerListener;
@@ -46,6 +50,8 @@ public class HtmlViewScanningHeaders extends HtmlView
     @Override
     public void setPage(URL url) throws IOException {
         if (headerListener != null) {
+            headerListener.startLoadingPage();
+            
             final PropertyChangeListener loadFinishedListener = new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent event)   {
@@ -53,7 +59,7 @@ public class HtmlViewScanningHeaders extends HtmlView
                         removePropertyChangeListener(this); // stop listening
                         try {
                             final List<HeaderElement> headers = getTableOfContents((HTMLDocument) getDocument());
-                            headerListener.headersAvailable(headers);
+                            headerListener.endLoadingPage(headers);
                         }
                         catch (Exception e) {
                             throw new RuntimeException(e);

@@ -2,6 +2,7 @@ package fri.music.swingutils.text;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Action;
@@ -13,6 +14,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
 import javax.swing.text.Style;
 import javax.swing.text.html.CSS;
+import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
@@ -45,16 +47,16 @@ public class HtmlViewActions extends FontActions
     
     /**
      * Attaches standard actions to given HTML-viewer.
-     * @param htmlViewer the JEditorPane or JTextPane to add actions to.
+     * @param htmlView the JEditorPane or JTextPane to add actions to.
      */
-    public HtmlViewActions(JEditorPane htmlViewer) {
-        super(htmlViewer);
+    public HtmlViewActions(JEditorPane htmlView) {
+        super(htmlView);
         
-        contextMenu.add(this.copy = buildCopyAction(htmlViewer.getKeymap()));
-        contextMenu.add(buildFontMenu(htmlViewer.getKeymap(), htmlViewer));
+        contextMenu.add(this.copy = buildCopyAction(htmlView.getKeymap()));
+        contextMenu.add(buildFontMenu(htmlView.getKeymap(), htmlView));
         
         // immediately adjust current fonts to fontSizes table
-        initializeFontSizes(htmlViewer);
+        initializeFontSizes(htmlView);
     }
     
     @Override
@@ -110,9 +112,9 @@ public class HtmlViewActions extends FontActions
         return copyAction;
     }
 
-    private void initializeFontSizes(JEditorPane htmlViewer) {
+    private void initializeFontSizes(JEditorPane htmlView) {
         if (fontSizes.isEmpty()) { // will happen just once in application lifetime
-            final HTMLEditorKit editorKit = (HTMLEditorKit) htmlViewer.getEditorKit();
+            final HTMLEditorKit editorKit = (HTMLEditorKit) htmlView.getEditorKit();
             final StyleSheet styleSheet = editorKit.getStyleSheet();
             
             for (final String elementName : fontElements) {
@@ -132,10 +134,10 @@ public class HtmlViewActions extends FontActions
 
     /**
      * Call this to set current font-sizes in given HTML viewer.
-     * @param htmlViewer the HTML-area where to set mapped font-sizes.
+     * @param htmlView the HTML-area where to set mapped font-sizes.
      */
-    private void updateFontSizes(JEditorPane htmlViewer) {
-        final HTMLEditorKit editorKit = (HTMLEditorKit) htmlViewer.getEditorKit();
+    private void updateFontSizes(JEditorPane htmlView) {
+        final HTMLEditorKit editorKit = (HTMLEditorKit) htmlView.getEditorKit();
         final StyleSheet styleSheet = editorKit.getStyleSheet();
         
         for (final Map.Entry<String,Integer> fontSize : fontSizes.entrySet()) {
@@ -146,13 +148,20 @@ public class HtmlViewActions extends FontActions
             styleSheet.addRule(rule);
         }
         
-        final String html = htmlViewer.getText();
-        final int caretPosition = htmlViewer.getCaretPosition();
+        final String html = htmlView.getText();
+        final int caretPosition = htmlView.getCaretPosition();
+        final URL url = htmlView.getPage();
         
-        final Document newDocument = editorKit.createDefaultDocument();
-        htmlViewer.setDocument(newDocument);
+        final HTMLDocument newDocument = (HTMLDocument) editorKit.createDefaultDocument();
+        htmlView.setDocument(newDocument);
         
-        htmlViewer.setText(html);
-        htmlViewer.setCaretPosition(caretPosition);
+        // Fix for image loading bug after font resize
+        if (url != null) { // add base and stream-desc, else image loading will fail next time
+            newDocument.setBase(url);
+            newDocument.putProperty(Document.StreamDescriptionProperty, url);
+        }
+        
+        htmlView.setText(html);
+        htmlView.setCaretPosition(caretPosition);
     }
 }

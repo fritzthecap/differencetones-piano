@@ -18,11 +18,13 @@ import javax.swing.JToolBar;
  */
 public class HtmlBrowserToolbar extends JToolBar
 {
+    /** The key to another label (not unicode-icon) for actions to be used in menus. */
     public static final String MENU_ACTION_LABEL = "menuActionLabel";
     
     public final Action back;
     public final Action up;
     public final Action forward;
+    public final Action reload;
     
     private JComboBox<HtmlViewScanningHeaders.HeaderElement> headersChoice;
     
@@ -60,9 +62,21 @@ public class HtmlBrowserToolbar extends JToolBar
         forward.putValue(Action.SHORT_DESCRIPTION, "Go Forward in History");
         forward.setEnabled(false);
 
+        this.reload = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                browser.reload();
+            }
+        };
+        reload.putValue(Action.NAME, "    \u21BB    "); // 21BB 27F3 1F5D8
+        reload.putValue(MENU_ACTION_LABEL, "Reload");
+        reload.putValue(Action.SHORT_DESCRIPTION, "Reload Current Page");
+        reload.setEnabled(true); // reload does not depend on history
+        
         add(newButton(back, 6));
         add(newButton(up, 8));
         add(newButton(forward, 6));
+        add(newButton(reload, 6));
     }
     
     public void updateOnLinkNavigation(HtmlBrowser browser)  {

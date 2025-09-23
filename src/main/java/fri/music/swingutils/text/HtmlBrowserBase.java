@@ -1,0 +1,131 @@
+package fri.music.swingutils.text;
+
+import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import javax.swing.JEditorPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
+/**
+ * HTML documentation browser that can load hyperlinks. 
+ * This class has no navigation.
+ * HTTP links are opened in external desktop browser, 
+ * relative ones in this view. This is NOT a web browser.
+ * All hyperlinks must be written relative to <code>HtmlResources.class</code>
+ * which is in "fri/music/", so they mostly will start with "instrument/wave" or similar.
+ * This is intended for loading HTML documents from the application's JAR file.
+ * Mind that no dotted hyperlinks like "../xxx.html" are allowed!
+ */
+public class HtmlBrowserBase extends JPanel implements HyperlinkListener
+{
+    protected final JEditorPane htmlView;
+    protected final HtmlViewActions htmlViewActions;
+    
+    private final Class<?> htmlResourcesClass;
+    
+    /**
+     * @param url required, the initial URL to load.
+     * @param htmlResourcesClass optional, a class that is the resource-loader
+     *      for all HTML resources, will be this class when null.
+     */
+    public HtmlBrowserBase(URL url, Class<?> htmlResourcesClass) {
+        super(new BorderLayout());
+        
+        this.htmlResourcesClass = (htmlResourcesClass != null) ? htmlResourcesClass : this.getClass();
+        this.htmlView = newHtmlView(url);
+        
+        htmlView.addHyperlinkListener(this);
+        
+        this.htmlViewActions = new HtmlViewActions(htmlView); // font popup menu
+        
+        add(new JScrollPane(htmlView), BorderLayout.CENTER);
+    }
+    
+    /** Factory method for HTML view, called from constructor. */
+    protected JEditorPane newHtmlView(URL url) {
+        return new HtmlView(url);
+    }
+
+    /** Called when user hovers or clicks a hyperlink in HTML-document. */
+    @Override
+    public void hyperlinkUpdate(HyperlinkEvent event) {
+        final String[] fileNameAndReference = splitFilenameAndReference(event.getDescription());
+        final String relativeFileName = fileNameAndReference[0];
+        final String anchorRef = fileNameAndReference[1];
+        final boolean hasAnchorRef = (anchorRef.length() > 0);
+        
+        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            if (relativeFileName.length() <= 0 && hasAnchorRef) { // url is an anchor-reference, stay on page
+                htmlView.scrollToReference(anchorRef);
+                manageHistory(toUrl(null, anchorRef));
+            }
+            else if (relativeFileName.startsWith("http")) { // open hyperlink in external browser
+                try {
+                    Desktop.getDesktop().browse(URI.create(event.getDescription()));
+                }
+                catch (IOException e) {
+                    e.printStackTrace(); // may happen in environments that do not support Java/Swing Desktop
+                }
+            }
+            else {
+                final URL gotoUrl = htmlResourcesClass.getResource(relativeFileName);
+                // mind that all links must be relative to htmlResourcesClass for this to work!
+                final URL gotoUrlWithRef = (hasAnchorRef && gotoUrl != null)
+                        ? toUrl(gotoUrl, anchorRef)
+                        : gotoUrl;
+                
+                if (gotoUrlWithRef != null) {
+                    try {
+                        htmlView.setPage(gotoUrlWithRef);
+                        manageHistory(gotoUrlWithRef);
+                    }
+                    catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                else
+                    System.err.println("URL is not resolvable from "+htmlResourcesClass.getName()+": "+relativeFileName);
+            }
+        }
+        else if (event.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+            htmlView.setToolTipText(event.getDescription());
+        }
+        else if (event.getEventType() == HyperlinkEvent.EventType.EXITED) {
+            htmlView.setToolTipText(null);
+        }
+    }
+    
+    /** Called on hyperlink click, does nothing, to be overridden. */
+    protected void manageHistory(URL url) {
+    }
+    
+    private URL toUrl(URL url, String anchorRef) {
+        if (anchorRef == null)
+            return url;
+        
+        try {
+            final String externalForm = (url == null)
+                ? splitFilenameAndReference(htmlView.getPage().toString())[0]
+                : url.toExternalForm();
+            
+            return new URI(externalForm+"#"+anchorRef).toURL();
+        }
+        catch (MalformedURLException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String[] splitFilenameAndReference(String url) {
+        final int hashIndex = url.indexOf('#');
+        final String reference = (hashIndex >= 0) ? url.substring(hashIndex + 1) : "";
+        final String filename = (hashIndex >= 0) ? url.substring(0, hashIndex) : url;
+        return new String[] { filename, reference };
+    }
+}
