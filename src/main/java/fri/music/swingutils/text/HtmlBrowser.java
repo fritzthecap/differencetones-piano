@@ -2,12 +2,13 @@ package fri.music.swingutils.text;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.Action;
 import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
@@ -17,12 +18,14 @@ import javax.swing.text.Document;
 /**
  * HTML documentation browser with navigation toolbar.
  */
-public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHeaders.HeaderListener
+public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.HeaderListener
 {
     private final HtmlBrowserToolbar toolbar;
     
     private final List<URL> history = new ArrayList<>();
     private int currentHistoryIndex = 0;
+    
+    private ItemListener referenceItemListener;
     
     /**
      * @param url required, the initial URL to load.
@@ -47,7 +50,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
     
     @Override
     protected JEditorPane newHtmlView(URL url) {
-        return new HtmlViewScanningHeaders(url, this);
+        return new HtmlViewWithHeaders(url, this);
     }
     
     /** Implements HtmlView.HeaderListener to set reload action disabled. */
@@ -58,22 +61,22 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
     
     /** Implements HtmlView.HeaderListener to render click-able headers in tool-bar choice. */
     @Override
-    public void endLoadingPage(List<HtmlViewScanningHeaders.HeaderElement> headers) {
+    public void endLoadingPage(List<HtmlViewWithHeaders.HeaderElement> headers) {
         toolbar.reload.setEnabled(true);
         
-        toolbar.setHeaders(
-            headers,
-            new ItemListener() {
+        if (referenceItemListener == null)
+            referenceItemListener = new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent event) {
                     if (event.getStateChange() == ItemEvent.SELECTED) {
-                        final HtmlViewScanningHeaders.HeaderElement header = 
-                                (HtmlViewScanningHeaders.HeaderElement) event.getItem();
-                        htmlView.scrollToReference(header.id());
+                        final HtmlViewWithHeaders.HeaderElement header = 
+                                (HtmlViewWithHeaders.HeaderElement) event.getItem();
+                        gotoAnchorReference(header.id());
                     }
                 }
-            }
-        );
+            };
+        
+        toolbar.setHeaders(headers, referenceItemListener);
         
         htmlView.requestFocus(); // else "Ctrl +" font command would not work immediately
     }
@@ -88,6 +91,13 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
     public void back() {
         currentHistoryIndex--;
         gotoCurrentIndex();
+        
+        // Fix for JEditorPane not scrolling to top when going from ref back to non-ref
+        final URL oldUrl = history.get(currentHistoryIndex + 1);
+        final URL newUrl = history.get(currentHistoryIndex);
+        if (Objects.equals(oldUrl.getPath(), newUrl.getPath()) == true &&
+                Objects.equals(oldUrl.getRef(), newUrl.getRef()) == false)
+            htmlView.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
     }
 
     /** Toolbar navigation callback, also covers canGoUp(). */
@@ -108,14 +118,9 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
     
     /** Toolbar navigation callback. */
     public void reload() {
-        try {
-            // clear JEditorPane page cache, else nothing happens on setPage()
-            htmlView.getDocument().putProperty(Document.StreamDescriptionProperty, null);
-            htmlView.setPage(history.get(currentHistoryIndex));
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // clear JEditorPane page cache, else nothing happens on setPage()
+        htmlView.getDocument().putProperty(Document.StreamDescriptionProperty, null);
+        gotoCurrentIndex();
     }
 
     /** Called when hyperlink clicked, not on navigation. */
@@ -139,12 +144,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
     }
 
     private void gotoCurrentIndex() {
-        try {
-            htmlView.setPage(history.get(currentHistoryIndex));
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        gotoUrl(history.get(currentHistoryIndex));
     }
     
    

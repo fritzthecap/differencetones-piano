@@ -42,6 +42,10 @@
 
 Fixed Bugs:
 
+- Bug: "Back" does not work after internal jump to anchor and then going back.
+    Page should be at 0/0 but does not move on "Back".
+    DONE: is a JEditorPane bug, fixed by explicitly doing scrollRectToVisible() in "Back".
+    
 - Bug: JEditorPane does not display image any more when increasing font size.
     Reproduction: run Main and click "Ctrl +".
     DONE: fixed by setBase() and putProperty() in updateFontSizes) In HtmlViewActions

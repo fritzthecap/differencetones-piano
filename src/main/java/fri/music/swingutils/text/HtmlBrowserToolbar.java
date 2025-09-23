@@ -26,7 +26,7 @@ public class HtmlBrowserToolbar extends JToolBar
     public final Action forward;
     public final Action reload;
     
-    private JComboBox<HtmlViewScanningHeaders.HeaderElement> headersChoice;
+    private JComboBox<HtmlViewWithHeaders.HeaderElement> headersChoice;
     
     public HtmlBrowserToolbar(final HtmlBrowser browser) {
         this.back = new AbstractAction() {
@@ -85,9 +85,9 @@ public class HtmlBrowserToolbar extends JToolBar
         up.setEnabled(browser.canGoBack());
     }
 
-    public void setHeaders(List<HtmlViewScanningHeaders.HeaderElement> headers, ItemListener itemListener) {
+    public void setHeaders(List<HtmlViewWithHeaders.HeaderElement> headers, ItemListener itemListener) {
         if (headersChoice == null) {
-            headersChoice = new JComboBox<HtmlViewScanningHeaders.HeaderElement>();
+            headersChoice = new JComboBox<HtmlViewWithHeaders.HeaderElement>();
             headersChoice.setMaximumRowCount(20);
             headersChoice.addItemListener(itemListener);
             add(Box.createHorizontalGlue());
@@ -95,8 +95,8 @@ public class HtmlBrowserToolbar extends JToolBar
             add(headersChoice);
         }
         
-        final DefaultComboBoxModel<HtmlViewScanningHeaders.HeaderElement> model = new DefaultComboBoxModel<>();
-        for (HtmlViewScanningHeaders.HeaderElement header : headers)
+        final DefaultComboBoxModel<HtmlViewWithHeaders.HeaderElement> model = new DefaultComboBoxModel<>();
+        for (HtmlViewWithHeaders.HeaderElement header : headers)
             model.addElement(header);
         
         headersChoice.setModel(model);

@@ -14,7 +14,7 @@ import javax.swing.text.html.HTMLDocument;
 /**
  * Provides extracted header information about HTML elements H1-H5.
  */
-public class HtmlViewScanningHeaders extends HtmlView
+public class HtmlViewWithHeaders extends HtmlView
 {
     /** The extracted header information. */
     public record HeaderElement(int level, String id, String textContent, int startOffset)
@@ -41,7 +41,7 @@ public class HtmlViewScanningHeaders extends HtmlView
     
     private final HeaderListener headerListener;
     
-    public HtmlViewScanningHeaders(URL url, HeaderListener headerListener) {
+    public HtmlViewWithHeaders(URL url, HeaderListener headerListener) {
         super(url);
         this.headerListener = headerListener;
     }
