@@ -102,7 +102,7 @@ public class HtmlBrowserBase extends JPanel implements HyperlinkListener
         }
     }
     
-    /** Called on hyperlink click, does nothing, to be overridden. */
+    /** Called on hyperlink click, does nothing, to be overridden by history manager (navigator). */
     protected void manageHistory(URL url) {
     }
     

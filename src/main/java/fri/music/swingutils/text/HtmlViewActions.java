@@ -133,7 +133,7 @@ public class HtmlViewActions extends FontActions
     }
 
     /**
-     * Call this to set current font-sizes in given HTML viewer.
+     * Call this to set current font-sizes in given HTML view.
      * @param htmlView the HTML-area where to set mapped font-sizes.
      */
     private void updateFontSizes(JEditorPane htmlView) {

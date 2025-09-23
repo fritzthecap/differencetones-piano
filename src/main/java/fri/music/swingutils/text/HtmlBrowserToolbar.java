@@ -68,7 +68,7 @@ public class HtmlBrowserToolbar extends JToolBar
                 browser.reload();
             }
         };
-        reload.putValue(Action.NAME, "    \u21BB    "); // 21BB 27F3 1F5D8
+        reload.putValue(Action.NAME, "    \u21BB    "); // 21BB 27F3
         reload.putValue(MENU_ACTION_LABEL, "Reload");
         reload.putValue(Action.SHORT_DESCRIPTION, "Reload Current Page");
         reload.setEnabled(true); // reload does not depend on history

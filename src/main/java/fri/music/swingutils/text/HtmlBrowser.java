@@ -13,7 +13,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.Document;
-import javax.swing.text.html.HTMLDocument;
 
 /**
  * HTML documentation browser with navigation toolbar.
@@ -33,7 +32,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
     public HtmlBrowser(URL url, Class<?> htmlResourcesClass) {
         super(url, htmlResourcesClass);
         
-        this.toolbar = new HtmlBrowserToolbar(this); // navigation
+        this.toolbar = new HtmlBrowserToolbar(this); // navigation bar
         history.add(url);
         
         int index = 0;
@@ -110,10 +109,8 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
     /** Toolbar navigation callback. */
     public void reload() {
         try {
-            final URL url = history.get(currentHistoryIndex);
             // clear JEditorPane page cache, else nothing happens on setPage()
             htmlView.getDocument().putProperty(Document.StreamDescriptionProperty, null);
-            // set same page again
             htmlView.setPage(history.get(currentHistoryIndex));
         }
         catch (IOException e) {
@@ -156,7 +153,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
             final Class<?> htmlResourcesClass = HtmlBrowser.class;
             final URL url = htmlResourcesClass.getResource("mainBrowseTest.html");
             try {
-                final URL urlWithRef = new URI(url.toExternalForm()+"#Three").toURL();
+                final URL urlWithRef = new java.net.URI(url.toExternalForm()+"#Three").toURL();
                 final HtmlBrowser htmlBrowser = new HtmlBrowser(urlWithRef, htmlResourcesClass);
                 
                 final javax.swing.JFrame frame = new javax.swing.JFrame("HTML Browse Test");
@@ -166,7 +163,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewScanningHead
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
             }
-            catch (MalformedURLException | URISyntaxException e) {
+            catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
                 throw new RuntimeException(e);
             }
         });
