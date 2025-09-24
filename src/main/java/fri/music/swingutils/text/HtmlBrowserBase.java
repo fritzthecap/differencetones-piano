@@ -14,14 +14,12 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 /**
- * HTML documentation browser that can load hyperlinks. 
- * This class has no navigation.
- * HTTP links are opened in external desktop browser, 
- * relative ones in this view. This is NOT a web browser.
- * All hyperlinks must be written relative to <code>HtmlResources.class</code>
- * which is in "fri/music/", so they mostly will start with "instrument/wave" or similar.
- * This is intended for loading HTML documents from the application's JAR file.
- * Mind that no dotted hyperlinks like "../xxx.html" are allowed!
+ * HTML documentation browser that can load hyperlinks but can not navigate.
+ * HTTP links are opened in an external desktop browser, relative links in this view.
+ * Such internal hyperlinks must be written relative to <code>HtmlResources.class</code>
+ * which is in "fri/music/", so the link mostly will start with "instrument/wave/" or similar.
+ * Its intent is to load HTML documents from the application's JAR file.
+ * Dotted relative links, like "../xxx.html", are not allowed!
  */
 public class HtmlBrowserBase extends JPanel implements HyperlinkListener
 {

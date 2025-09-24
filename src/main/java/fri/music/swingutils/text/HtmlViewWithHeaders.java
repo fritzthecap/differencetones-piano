@@ -16,9 +16,10 @@ import javax.swing.text.html.HTMLDocument;
  */
 public class HtmlViewWithHeaders extends HtmlView
 {
-    /** The extracted header information. */
+    /** An extracted H1-H5 chapter heading. If there is no id, use startOffset for scrolling. */
     public record HeaderElement(int level, String id, String textContent, int startOffset)
     {
+        /** @return what can be seen in combo-box in navigation toolbar. */
         @Override
         public final String toString() {
             final StringBuilder sb = new StringBuilder();
