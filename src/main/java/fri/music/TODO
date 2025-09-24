@@ -1,4 +1,13 @@
 
+- Bug: ESCAPE on dialogs does not work anymore - DialogUtil.
+
+- It should be possible to choose the number of octaves for any piano,
+    the lowest tone, the initial tuning.
+    Refactor and reuse PianoConfiguration for this.
+
+- For all frames there must be a Help button that gives hints
+    how to use the UI. Some already exist, but others not.
+    
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 
