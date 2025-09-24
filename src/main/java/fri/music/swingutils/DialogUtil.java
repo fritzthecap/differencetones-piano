@@ -4,15 +4,19 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.net.URL;
 import java.util.Objects;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import fri.music.HtmlResources;
 import fri.music.swingutils.text.HtmlBrowser;
@@ -58,20 +62,16 @@ public class DialogUtil
         final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
         dialog.getContentPane().add(componentToShow);
         
-        final KeyListener escapeListener = new KeyAdapter()   {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    dialog.setVisible(false);
-                    try { dialog.dispose(); } catch (Exception ex) {}
-                }
-            }
-        };
-        // TODO: escape not working any more!
-        componentToShow.addKeyListener(escapeListener);
-        componentToShow.setFocusable(true); // else no ESCAPE
-        dialog.addKeyListener(escapeListener);
-        dialog.setFocusable(true); // else no ESCAPE
+        final String CLOSE_ACTION_ID = "closeDialogAction";
+        final KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        componentToShow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, CLOSE_ACTION_ID);
+        componentToShow.getActionMap().put(CLOSE_ACTION_ID, new AbstractAction() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                  dialog.setVisible(false);
+                  try { dialog.dispose(); } catch (Exception ex) {}
+              }
+        });
         
         dialog.setSize(size != null ? size : new Dimension(760, 580));
         
@@ -82,7 +82,7 @@ public class DialogUtil
         
         dialog.setVisible(true);
         
-        componentToShow.requestFocus(); // for immediately sizing font by keyboard
+        componentToShow.requestFocusInWindow(); // for immediately sizing font by keyboard
         
         return dialog;
     }

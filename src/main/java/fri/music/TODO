@@ -1,6 +1,4 @@
 
-- Bug: ESCAPE on dialogs does not work anymore - DialogUtil.
-
 - It should be possible to choose the number of octaves for any piano,
     the lowest tone, the initial tuning.
     Refactor and reuse PianoConfiguration for this.
@@ -50,6 +48,9 @@
 ==============================
 
 Fixed Bugs:
+
+- Bug: ESCAPE on dialogs does not work anymore - DialogUtil.
+    DONE: replaced KeyListener by getInputMap and getActionMap calls. 
 
 - Bug: "Back" does not work after internal jump to anchor and then going back.
     Page should be at 0/0 but does not move on "Back".
