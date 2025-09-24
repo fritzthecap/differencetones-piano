@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -17,6 +18,7 @@ import javax.swing.text.Document;
 
 /**
  * HTML documentation browser with navigation toolbar.
+ * This is NOT a web browser!
  */
 public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.HeaderListener
 {
@@ -25,7 +27,17 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
     private final List<URL> history = new ArrayList<>();
     private int currentHistoryIndex = 0;
     
-    private ItemListener referenceItemListener;
+    /** Listener that navigates to a selected chapter header. */
+    private ItemListener referenceItemListener = new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent event) {
+            if (event.getStateChange() == ItemEvent.SELECTED) {
+                final HtmlViewWithHeaders.HeaderElement header = 
+                        (HtmlViewWithHeaders.HeaderElement) event.getItem();
+                gotoAnchorReference(header.id());
+            }
+        }
+    };
     
     /**
      * @param url required, the initial URL to load.
@@ -48,36 +60,28 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
         add(toolbar, BorderLayout.NORTH);
     }
     
+    /** Overridden to use HtmlViewWithHeaders. */
     @Override
     protected JEditorPane newHtmlView(URL url) {
         return new HtmlViewWithHeaders(url, this);
     }
     
-    /** Implements HtmlView.HeaderListener to set reload action disabled. */
+    /** Adds an optional "Help" button for this browser. */
+    public void addHelpButton(JButton helpButton) {
+        toolbar.add(helpButton, 4);
+    }
+    
+    /** Implements HeaderListener to set reload action disabled. */
     @Override
     public void startLoadingPage() {
         toolbar.reload.setEnabled(false);
     }
     
-    /** Implements HtmlView.HeaderListener to render click-able headers in tool-bar choice. */
+    /** Implements HeaderListener to render click-able headers in tool-bar choice. */
     @Override
     public void endLoadingPage(List<HtmlViewWithHeaders.HeaderElement> headers) {
         toolbar.reload.setEnabled(true);
-        
-        if (referenceItemListener == null)
-            referenceItemListener = new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent event) {
-                    if (event.getStateChange() == ItemEvent.SELECTED) {
-                        final HtmlViewWithHeaders.HeaderElement header = 
-                                (HtmlViewWithHeaders.HeaderElement) event.getItem();
-                        gotoAnchorReference(header.id());
-                    }
-                }
-            };
-        
         toolbar.setHeaders(headers, referenceItemListener);
-        
         htmlView.requestFocus(); // else "Ctrl +" font command would not work immediately
     }
 

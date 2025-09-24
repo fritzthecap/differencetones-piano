@@ -91,7 +91,7 @@ public class HtmlBrowserToolbar extends JToolBar
             headersChoice.setMaximumRowCount(20);
             headersChoice.addItemListener(itemListener);
             add(Box.createHorizontalGlue());
-            add(new JLabel(" Overview: "));
+            add(new JLabel(" Chapters: "));
             add(headersChoice);
         }
         
