@@ -67,6 +67,7 @@ public class DialogUtil
                 }
             }
         };
+        // TODO: escape not working any more!
         componentToShow.addKeyListener(escapeListener);
         componentToShow.setFocusable(true); // else no ESCAPE
         dialog.addKeyListener(escapeListener);
