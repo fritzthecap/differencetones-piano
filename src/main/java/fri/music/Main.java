@@ -22,6 +22,7 @@ import fri.music.instrument.notespiano.wave.NotesWithDifferenceTonePianoPlayer;
 import fri.music.instrument.wave.DifferenceToneForIntervalPiano;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
+import fri.music.instrument.wave.IntervalPlayingPiano;
 import fri.music.instrument.wave.TriadPlayingPiano;
 import fri.music.instrument.wave.slider.AbstractFrequencySliders;
 import fri.music.instrument.wave.slider.FrequencyChordSliders;
@@ -78,30 +79,13 @@ public final class Main
     }
 
 
-    private static class VerticalToolbar extends JToolBar
-    {
-        public VerticalToolbar() {
-            super(JToolBar.VERTICAL);
-        }
-        
-        @Override
-        protected JButton createActionComponent(Action action) {
-            final JButton button = super.createActionComponent(action);
-            final Font buttonFont = button.getFont();
-            button.setFont(buttonFont.deriveFont(buttonFont.getStyle(), buttonFont.getSize() + 2f));
-            SizeUtil.forceSize(button, new Dimension(140, 120));
-            return button;
-        }
-    }
-
-
     private JComponent buildLeftButtons() {
         final JToolBar toolbar = new VerticalToolbar();
-        toolbar.add(buildDifferenceToneForIntervalPiano());
-        toolbar.add(buildDifferenceToneInversionsPiano());
-        toolbar.add(buildNotesPianoPlayer());
-        toolbar.add(buildNotesWithDifferenceTonePianoPlayer());
         toolbar.add(buildNotesWithDifferenceToneInversionsPianoPlayer());
+        toolbar.add(buildNotesWithDifferenceTonePianoPlayer());
+        toolbar.add(buildNotesPianoPlayer());
+        toolbar.add(buildDifferenceToneInversionsPiano());
+        toolbar.add(buildDifferenceToneForIntervalPiano());
         return toolbar;
     }
 
@@ -109,17 +93,12 @@ public final class Main
         final JToolBar toolbar = new VerticalToolbar();
         toolbar.add(buildFrequencyDifferenceSliders());
         toolbar.add(buildFrequencyChordSliders());
+        toolbar.add(buildIntervalPlayingPiano());
         toolbar.add(buildTriadPlayingPiano());
         toolbar.add(buildJustIntonationCheckerConfiguration());
-        toolbar.add(buildPianoConfiguration());
         return toolbar;
     }
     
-    /** Enables line breaks for long texts on buttons, instead of "...". */
-    private String asHtml(String text) {
-        return "<html>"+text+"</html>";
-    }
-
     // left buttons
     
     private int octaves = 7;
@@ -148,7 +127,6 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
@@ -164,7 +142,6 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
@@ -180,12 +157,11 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
     private Action buildDifferenceToneInversionsPiano() {
-        final String title = "See Which Intervals Can Generate a Difference-Tone";
+        final String title = "Find Out Which Intervals Can Generate a Difference-Tone";
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -196,7 +172,6 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
@@ -212,7 +187,6 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
@@ -227,20 +201,21 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
-    private Action buildPianoConfiguration() {
-        final String title = "Configure Various Pianos (API Demo)";
+    private Action buildIntervalPlayingPiano() {
+        final String title = "Hear Interval Beatings in Different Tunings";
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                throw new RuntimeException("Implement me!");
+                final PianoWithSound piano = 
+                        new IntervalPlayingPiano(wavePianoParams.config, wavePianoParams.soundChannel);
+                final JComponent panel = piano.getKeyboard();
+                FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
@@ -255,7 +230,6 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
@@ -269,7 +243,6 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
     }
 
@@ -283,7 +256,29 @@ public final class Main
             }
         };
         action.putValue(Action.NAME, asHtml(title));
-        action.putValue(Action.SHORT_DESCRIPTION, title);
         return action;
+    }
+
+
+    /** Enables line breaks for long texts on buttons, instead of "...". */
+    private String asHtml(String text) {
+        return "<html>"+text+"</html>";
+    }
+
+    private static class VerticalToolbar extends JToolBar
+    {
+        public VerticalToolbar() {
+            super(JToolBar.VERTICAL);
+        }
+        
+        @Override
+        protected JButton createActionComponent(Action action) {
+            final JButton button = super.createActionComponent(action);
+            
+            final Font buttonFont = button.getFont();
+            button.setFont(buttonFont.deriveFont(buttonFont.getStyle(), buttonFont.getSize() + 3f));
+            SizeUtil.forceSize(button, new Dimension(150, 130));
+            return button;
+        }
     }
 }
