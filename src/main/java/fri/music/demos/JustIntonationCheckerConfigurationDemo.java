@@ -16,7 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import fri.music.justintonation.ConfigurationPanel;
+import fri.music.justintonation.swing.ConfigurationPanel;
 
 public class JustIntonationCheckerConfigurationDemo
 {
