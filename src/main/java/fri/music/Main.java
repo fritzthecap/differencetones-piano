@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -13,13 +14,22 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import fri.music.instrument.PianoWithSound;
+import fri.music.instrument.PianoWithVolume;
+import fri.music.instrument.notespiano.NoteExamples;
+import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.notespiano.wave.NotesWithDifferenceToneInversionsPianoPlayer;
+import fri.music.instrument.notespiano.wave.NotesWithDifferenceTonePianoPlayer;
+import fri.music.instrument.wave.DifferenceToneForIntervalPiano;
+import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
+import fri.music.instrument.wave.TriadPlayingPiano;
 import fri.music.instrument.wave.slider.AbstractFrequencySliders;
 import fri.music.instrument.wave.slider.FrequencyChordSliders;
 import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
+import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.FrameStarter;
 import fri.music.swingutils.layout.SizeUtil;
+import fri.music.swingutils.text.HelpForBrowser;
 import fri.music.swingutils.text.HtmlBrowser;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
@@ -36,21 +46,38 @@ public final class Main
             FrameStarter.start(
                     "Welcome to the World of Difference-Tones!",
                     new Main().panel,
-                    new Dimension(1000, 700))
+                    new Dimension(1010, 700))
         );
     }
+    
     
     private final JPanel panel = new JPanel(new BorderLayout());
     
     private Main() {
-        final URL url = HtmlResources.class.getResource("introduction.html");
-        final HtmlBrowser htmlBrowser = new HtmlBrowser(url, HtmlResources.class);
-        panel.add(htmlBrowser, BorderLayout.CENTER);
+        panel.add(buildHtmlBrowser(), BorderLayout.CENTER);
         panel.add(buildLeftButtons(), BorderLayout.WEST);
         panel.add(buildRightButtons(), BorderLayout.EAST);
     }
-    
-    
+
+    private HtmlBrowser buildHtmlBrowser() {
+        final URL url = HtmlResources.class.getResource("introduction.html");
+        final HtmlBrowser htmlBrowser = new HtmlBrowser(url, HtmlResources.class);
+        final JButton help = new JButton("Help");
+        help.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DialogUtil.showModelessHtmlDialog(
+                        "HTML Browser Help", 
+                        help, 
+                        HelpForBrowser.URL,
+                        null);
+            }
+        });
+        htmlBrowser.addHelpButton(help);
+        return htmlBrowser;
+    }
+
+
     private static class VerticalToolbar extends JToolBar
     {
         public VerticalToolbar() {
@@ -66,6 +93,7 @@ public final class Main
             return button;
         }
     }
+
 
     private JComponent buildLeftButtons() {
         final JToolBar toolbar = new VerticalToolbar();
@@ -94,16 +122,27 @@ public final class Main
 
     // left buttons
     
+    private int octaves = 7;
+    private String lowestToneName = "C2";
+    private ToneSystem toneSystem = new EqualTemperament(lowestToneName, octaves);
+    
+    private record WavePianoParameters(PianoWithSound.Configuration config, WaveSoundChannel soundChannel)
+    {
+    }
+    
+    private WavePianoParameters wavePianoParams = new WavePianoParameters(
+            new PianoWithSound.Configuration(octaves, lowestToneName),
+            new GenericWaveSoundChannel(toneSystem.tones(), null));
+
+    
     private Action buildNotesWithDifferenceToneInversionsPianoPlayer() {
         final String title = "Compose Difference-Tone Intervals for a Melody";
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final PianoWithSound.Configuration config = new PianoWithSound.Configuration(7, "C2");
-                final WaveSoundChannel soundChannel = new GenericWaveSoundChannel(null, null);
                 final NotesWithDifferenceToneInversionsPianoPlayer player = 
                         new NotesWithDifferenceToneInversionsPianoPlayer(
-                                new DifferenceToneInversionsPiano(config, soundChannel));
+                            new DifferenceToneInversionsPiano(wavePianoParams.config, wavePianoParams.soundChannel));
                 final JComponent playerPanel = player.getPlayer(null);
                 FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
             }
@@ -118,7 +157,10 @@ public final class Main
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                throw new RuntimeException("Implement me!");
+                final NotesPianoPlayer player = new NotesWithDifferenceTonePianoPlayer(
+                        new DifferenceToneForNotesPiano(wavePianoParams.config, wavePianoParams.soundChannel));
+                final JComponent playerPanel = player.getPlayer(NoteExamples.AUGUSTIN.notes());
+                FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -131,7 +173,10 @@ public final class Main
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                throw new RuntimeException("Implement me!");
+                final NotesPianoPlayer player = new NotesPianoPlayer(
+                        new PianoWithVolume(wavePianoParams.config, wavePianoParams.soundChannel));
+                final JComponent playerPanel = player.getPlayer(NoteExamples.ODE_TO_JOY.notes());
+                FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -144,7 +189,10 @@ public final class Main
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                throw new RuntimeException("Implement me!");
+                final PianoWithSound piano = 
+                        new DifferenceToneInversionsPiano(wavePianoParams.config, wavePianoParams.soundChannel);
+                final JComponent panel = piano.getKeyboard();
+                FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -157,7 +205,10 @@ public final class Main
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                throw new RuntimeException("Implement me!");
+                final PianoWithSound piano = 
+                        new DifferenceToneForIntervalPiano(wavePianoParams.config, wavePianoParams.soundChannel);
+                final JComponent panel = piano.getKeyboard();
+                FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -198,7 +249,9 @@ public final class Main
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                throw new RuntimeException("Implement me!");
+                final PianoWithSound piano = new TriadPlayingPiano(wavePianoParams.config, wavePianoParams.soundChannel);
+                final JComponent panel = piano.getKeyboard();
+                FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
