@@ -33,6 +33,11 @@ If you click "ABC Export", a dialog will lead you through that.
 
 <h1 id="Syntax">Notes Syntax</h1>
 <p>
+This notes syntax should make it easy to write readable melodies and intervals.
+It is not able to carry all the complexities traditional music notations have.
+Following are the limited abilities of it.
+</p>
+<p>
 Every note is given as an IPN-name (international pitch notation)
 and its duration behind a slash, for example: 
 </p>
@@ -47,7 +52,8 @@ and its duration behind a slash, for example:
     (that may be tied to a subsequent one),
     but it MUST NOT start with an eighth note or a half note, 
     else it will be regarded as eighth or half triplet!</li><br/>
-<li>"<b>[C4/4 E4 G4]</b>" brackets for a C-major <b>chord</b>, only the first note needs to have a length</li><br/>
+<li>"<b>[C4/4 E4 G4]</b>" brackets for a C-major <b>chord</b>, only the first note needs to have a duration,
+for others it is optional but will be ignored</li><br/>
 <li>"<b>(G5/1 G5/1 G5/1)</b>" parentheses for a <b>tied</b> "G5" whole note that spans three 4/4 bars</li><br/>
 <li>"<b>{A5/4 B5/4 C6/4}</b>" braces for <b>slurred</b> notes</li>
 </ul>
