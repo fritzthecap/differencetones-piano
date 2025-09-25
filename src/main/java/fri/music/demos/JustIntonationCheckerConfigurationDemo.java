@@ -1,65 +1,19 @@
 package fri.music.demos;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import fri.music.justintonation.swing.ConfigurationPanel;
+import fri.music.justintonation.swing.CheckLauncher;
 
 public class JustIntonationCheckerConfigurationDemo
 {
-    private static int count = 1;
-    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            final ConfigurationPanel configurationPanel = new ConfigurationPanel();
-            
-            final JButton showDiagnosisButton = new JButton("Check Purity");
-            
-            final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            buttonPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true));
-            buttonPanel.add(showDiagnosisButton);
-            
-            final JPanel mainPanel = new JPanel(new BorderLayout());
-            mainPanel.add(configurationPanel.panel, BorderLayout.CENTER);
-            mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-            
-            startFrame("Check Just-Intonation Tunings for Purity", mainPanel, WindowConstants.EXIT_ON_CLOSE);
-    
-            showDiagnosisButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    final String[] result = configurationPanel.getTitleAndResult();
-                    if (result == null) {
-                        JOptionPane.showMessageDialog(mainPanel, "Please choose at least one just-intonation tuning!");
-                        return;
-                    }
-                    
-                    final JTextArea textArea = new JTextArea(result[1]);
-                    textArea.setTabSize(4);
-                    textArea.setFont(new Font("Monospaced", Font.BOLD, 16));
-                    textArea.setRows(32);
-                    textArea.setColumns(120);
-                    
-                    startFrame(
-                            result[0]+" (Window "+count+")", 
-                            new JScrollPane(textArea), 
-                            WindowConstants.DISPOSE_ON_CLOSE);
-                    count++;
-                }
-            });
+            startFrame(
+                    "Check Just-Intonation Tunings for Purity",
+                    new CheckLauncher("Check Just-Intonation Tunings for Purity").panel,
+                    WindowConstants.EXIT_ON_CLOSE);
         });
     }
     
