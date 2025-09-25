@@ -84,6 +84,10 @@ public class HtmlBrowserBase extends JPanel implements HyperlinkListener
         }
     }
 
+    /** Called on hyperlink click, does nothing, to be overridden by history manager (navigator). */
+    protected void manageHistory(URL url) {
+    }
+    
     /** Called on hyperlink click onto an anchor-reference, or navigation via header list. */
     protected void gotoAnchorReference(String anchorRef) {
         htmlView.scrollToReference(anchorRef);
@@ -118,11 +122,7 @@ public class HtmlBrowserBase extends JPanel implements HyperlinkListener
         }
     }
 
-    /** Called on hyperlink click, does nothing, to be overridden by history manager (navigator). */
-    protected void manageHistory(URL url) {
-    }
-    
-    protected URL toUrl(URL url, String anchorRef) {
+    private final URL toUrl(URL url, String anchorRef) {
         if (anchorRef == null)
             return url;
         

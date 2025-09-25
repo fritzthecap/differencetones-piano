@@ -3,6 +3,8 @@ package fri.music.swingutils.text;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.net.URL;
@@ -15,6 +17,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.Document;
+import fri.music.swingutils.DialogUtil;
 
 /**
  * HTML documentation browser with navigation toolbar.
@@ -34,7 +37,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
             if (event.getStateChange() == ItemEvent.SELECTED) {
                 final HtmlViewWithHeaders.HeaderElement header = 
                         (HtmlViewWithHeaders.HeaderElement) event.getItem();
-                gotoAnchorReference(header.id());
+                gotoAnchorReference(header.id(), header.startOffset());
             }
         }
     };
@@ -47,7 +50,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
     public HtmlBrowser(URL url, Class<?> htmlResourcesClass) {
         super(url, htmlResourcesClass);
         
-        this.toolbar = new HtmlBrowserToolbar(this); // navigation bar
+        this.toolbar = new HtmlBrowserToolbar(this, referenceItemListener); // navigation bar
         history.add(url);
         
         int index = 0;
@@ -64,11 +67,6 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
     @Override
     protected JEditorPane newHtmlView(URL url) {
         return new HtmlViewWithHeaders(url, this);
-    }
-    
-    /** Adds an optional "Help" button for this browser. */
-    public void addHelpButton(JButton helpButton) {
-        toolbar.add(helpButton, 4);
     }
     
     /** Implements HeaderListener to set reload action disabled. */
@@ -140,6 +138,13 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
         toolbar.updateOnLinkNavigation(this);
     }
 
+
+    private void gotoAnchorReference(String id, int startOffset) {
+        if (id != null)
+            gotoAnchorReference(id);
+        else
+            ((HtmlView) htmlView).scrollToStartOffset(startOffset);
+    }
     
     private Component newJMenuItem(Action action) {
         final JMenuItem item = new JMenuItem(action);

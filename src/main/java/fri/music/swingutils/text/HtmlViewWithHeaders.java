@@ -81,37 +81,57 @@ public class HtmlViewWithHeaders extends HtmlView
         return headers;
     }
     
+    private int currentChapterLevel = 1;
+    
     private void scanHeaders(HTMLDocument document, Element element, List<HeaderElement> headers) throws BadLocationException {
-        if (isHeader(element.getName())) {
-            final int level = Integer.valueOf(element.getName().substring(1));
-            final String id = getId(element);
+        if (element.isLeaf())
+            return;
+        
+        final boolean isChapterHeading = isChapterHeading(element);
+        final String id = getId(element);
+        
+        if (isChapterHeading || id != null) {
+            final int level;
+            if (isChapterHeading) {
+                currentChapterLevel = Integer.valueOf(element.getName().substring(1));
+                level = currentChapterLevel;
+            }
+            else {
+                level = currentChapterLevel + 1;
+            }
+            
             final String textContent = getText(document, element);
-            final HeaderElement header = new HeaderElement(level, id, textContent, element.getStartOffset());
-            headers.add(header);
-        }
-        else {
-            for (int i = 0; i < element.getElementCount(); i++) {
-                scanHeaders(document, element.getElement(i), headers);
+            if (textContent.length() > 0) {
+                final HeaderElement header = new HeaderElement(level, id, textContent, element.getStartOffset());
+                headers.add(header);
             }
         }
+        
+        for (int i = 0; i < element.getElementCount(); i++) {
+            scanHeaders(document, element.getElement(i), headers);
+        }
     }
     
-    private boolean isHeader(String name) {
-        return
-            name.equals(HTML.Tag.H1.toString()) ||
-            name.equals(HTML.Tag.H2.toString()) ||
-            name.equals(HTML.Tag.H3.toString()) ||
-            name.equals(HTML.Tag.H4.toString()) ||
-            name.equals(HTML.Tag.H5.toString());
+    private String getId(Element element) throws BadLocationException {
+        if (element.getAttributes().isDefined(HTML.Attribute.ID) == false)
+            return  null; // fix: getAttribute() would ask parent for inherited value
+        final Object id = element.getAttributes().getAttribute(HTML.Attribute.ID);
+        return (id == null) ? null : id.toString();
     }
 
-    private String getId(Element element) throws BadLocationException {
-        return ""+element.getAttributes().getAttribute(HTML.Attribute.ID);
+    private boolean isChapterHeading(Element element) {
+      final String name = element.getName();
+      return
+          name.equals(HTML.Tag.H1.toString()) ||
+          name.equals(HTML.Tag.H2.toString()) ||
+          name.equals(HTML.Tag.H3.toString()) ||
+          name.equals(HTML.Tag.H4.toString()) ||
+          name.equals(HTML.Tag.H5.toString());
     }
-    
+
     private String getText(HTMLDocument document, Element element) throws BadLocationException {
         StringBuilder all = new StringBuilder();
-        for (int i = 0; i < element.getElementCount(); i++) {
+        for (int i = 0; all.length() <= 0 && i < element.getElementCount(); i++) {
             Element child = element.getElement(i);
             int start = child.getStartOffset();
             int end = child.getEndOffset();

@@ -3,7 +3,8 @@ package fri.music.instrument.notespiano;
 import java.net.URL;
 import fri.music.HtmlResources;
 
-interface HelpForNotes
+public interface HelpForNotes
 {
+    String TITLE = "Write Notes on the Piano and Then Play Back the Melody";
     URL URL = HtmlResources.getUrl(HelpForNotes.class);
 }

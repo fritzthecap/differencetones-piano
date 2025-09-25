@@ -50,20 +50,23 @@ public class HtmlView extends JEditorPane
     public void scrollToReference(String reference) {
         final HTMLDocument document = (HTMLDocument) getDocument();
         final Element element = document.getElement(reference);
-        if (element != null) {
-            try {
-                final int pos = element.getStartOffset();
-                final Rectangle viewRectangle = (Rectangle) modelToView2D(pos);
-                if (viewRectangle != null) {
-                    final Rectangle visibleRectangle = getVisibleRect();
-                    viewRectangle.height = visibleRectangle.height;
-                    scrollRectToVisible(viewRectangle);
-                    setCaretPosition(pos);
-                }
+        if (element != null)
+            scrollToStartOffset(element.getStartOffset());
+    }
+    
+    /** Scrolls to an element's startOffset. */
+    public void scrollToStartOffset(int startOffset) {
+        try {
+            final Rectangle viewRectangle = (Rectangle) modelToView2D(startOffset);
+            if (viewRectangle != null) {
+                final Rectangle visibleRectangle = getVisibleRect();
+                viewRectangle.height = visibleRectangle.height;
+                scrollRectToVisible(viewRectangle);
+                setCaretPosition(startOffset);
             }
-            catch (BadLocationException e) {
-                UIManager.getLookAndFeel().provideErrorFeedback(this);
-            }
+        }
+        catch (BadLocationException e) {
+            UIManager.getLookAndFeel().provideErrorFeedback(this);
         }
     }
 }
