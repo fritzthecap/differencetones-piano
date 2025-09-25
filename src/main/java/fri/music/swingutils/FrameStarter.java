@@ -27,12 +27,17 @@ public class FrameStarter
     
     /** Runs an EXIT_ON_CLOSE frame. */
     public static JFrame start(String title, JComponent content) {
-        return start(title, content, null);
+        return start(title, true, content);
     }
     
     /** Runs an EXIT_ON_CLOSE frame. */
     public static JFrame start(String title, JComponent content, Dimension dimension) {
         return start(title, true, content, null, dimension);
+    }
+    
+    /** Runs a frame configured by given parameters. */
+    public static JFrame start(String title, boolean exitOnClose, JComponent content) {
+        return start(title, exitOnClose, content, null, null);
     }
     
     /** Runs a frame configured by given parameters. */

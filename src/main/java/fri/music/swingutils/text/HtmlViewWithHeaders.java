@@ -131,7 +131,7 @@ public class HtmlViewWithHeaders extends HtmlView
 
     private String getText(HTMLDocument document, Element element) throws BadLocationException {
         StringBuilder all = new StringBuilder();
-        for (int i = 0; all.length() <= 0 && i < element.getElementCount(); i++) {
+        for (int i = 0; all.length() <= 0 && i < element.getElementCount(); i++) { // take just first non-empty element
             Element child = element.getElement(i);
             int start = child.getStartOffset();
             int end = child.getEndOffset();
