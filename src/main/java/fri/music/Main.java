@@ -29,6 +29,7 @@ import fri.music.instrument.wave.TriadPlayingPiano;
 import fri.music.instrument.wave.slider.AbstractFrequencySliders;
 import fri.music.instrument.wave.slider.FrequencyChordSliders;
 import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
+import fri.music.justintonation.swing.CheckLauncher;
 import fri.music.swingutils.FrameStarter;
 import fri.music.swingutils.layout.SizeUtil;
 import fri.music.swingutils.text.HtmlBrowser;
@@ -49,7 +50,7 @@ public final class Main
             FrameStarter.start(
                     "Welcome to the World of Difference-Tones!",
                     new Main().panel,
-                    new Dimension(1010, 700))
+                    new Dimension(1020, 700))
         );
     }
     
@@ -123,7 +124,7 @@ public final class Main
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final NotesPianoPlayer player = new NotesWithDifferenceTonePianoPlayer(
+                final NotesWithDifferenceTonePianoPlayer player = new NotesWithDifferenceTonePianoPlayer(
                         new DifferenceToneForNotesPiano(wavePianoParams.config, wavePianoParams.soundChannel));
                 final JComponent playerPanel = player.getPlayer(NoteExamples.AUGUSTIN.notes());
                 FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
@@ -185,7 +186,7 @@ public final class Main
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                throw new RuntimeException("Implement me!");
+                FrameStarter.start(title, false, new CheckLauncher(title).panel);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
