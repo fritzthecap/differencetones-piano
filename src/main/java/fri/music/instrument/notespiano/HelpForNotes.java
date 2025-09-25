@@ -5,6 +5,6 @@ import fri.music.HtmlResources;
 
 public interface HelpForNotes
 {
-    String TITLE = "Write Notes on the Piano and Then Play Back the Melody";
+    String TITLE = "Write Notes on the Piano and Play Back the Melody";
     URL URL = HtmlResources.getUrl(HelpForNotes.class);
 }

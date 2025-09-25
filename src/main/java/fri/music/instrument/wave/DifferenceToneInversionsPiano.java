@@ -449,12 +449,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
 
     private JComponent buildHelpButton() {
         final JButton help = new JButton("Help");
-        help.setToolTipText("Interval Lists Explanations");
+        help.setToolTipText("Interval Lists Description");
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DialogUtil.showModelessHtmlDialog(
-                        "Interval Lists Explanations", 
+                        "Interval Lists Description", 
                         help, 
                         HelpForIntervalLists.URL,
                         null);

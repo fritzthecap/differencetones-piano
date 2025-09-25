@@ -90,6 +90,12 @@ public class FrameStarter
         return frame;
     }
 
+    /** In special cases you may want to remove some frame from the global list. */
+    public static void remove(Object frame) {
+        frames.remove(frame);
+    }
+
+    
     private static void ensureVisibleSize(JFrame frame) {
         final Dimension size = frame.getSize();
         if (size.width < 30)
