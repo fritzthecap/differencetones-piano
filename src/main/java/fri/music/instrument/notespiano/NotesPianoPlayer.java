@@ -79,14 +79,18 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         melodyView().textAreaActions.contextMenu.addSeparator();
         melodyView().textAreaActions.contextMenu.add(buildLoadMenuItems());
 
+        final boolean activateWriteToNotesCheckbox;
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
             melodyView().notesText.setText(melody); // triggers check via DocumentListener
             melodyView().notesText.setCaretPosition(melody.length()); // ready to append notes
+            activateWriteToNotesCheckbox = false;
         }
         else {
-            if (melodyView().writeToNotesCheckbox.isSelected() == false) // enable immediate notes writing
-                melodyView().writeToNotesCheckbox.doClick(0); // triggers actionPerformed() to activate mouse listener
+            activateWriteToNotesCheckbox = true; // enable immediate notes writing
         }
+        
+        if (activateWriteToNotesCheckbox != melodyView().writeToNotesCheckbox.isSelected())
+            melodyView().writeToNotesCheckbox.doClick(0); // triggers actionPerformed() to activate mouse listener
         
         readNotesFromTextAreaCatchExceptions(playController, melodyView()); // enable or disable player buttons
         
@@ -286,6 +290,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
                 restButton.setEnabled(view.writeToNotesCheckbox.isSelected());
             }
         });
+        restButton.setEnabled(view.writeToNotesCheckbox.isSelected());
         return restButton;
     }
 
