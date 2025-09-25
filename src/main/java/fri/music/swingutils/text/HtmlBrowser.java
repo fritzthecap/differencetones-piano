@@ -3,8 +3,6 @@ package fri.music.swingutils.text;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.net.URL;
@@ -12,12 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.Document;
-import fri.music.swingutils.DialogUtil;
 
 /**
  * HTML documentation browser with navigation toolbar.

@@ -1,6 +1,5 @@
 package fri.music.swingutils.text;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -13,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import fri.music.swingutils.DialogUtil;
 
 /**
