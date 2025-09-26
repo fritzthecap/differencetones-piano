@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>Quick Tour</title>
+    </head>
+    
+    <body>
+        <h1>Quick Tour</h1>
+        
+        <ol>
+        <li><a href="#NotesPiano">Notes Piano</a></li>
+        <li><a href="#FrequencySliders">Frequency Sliders</li>
+        </ol>
+        
+        <h2 id="NotesPiano">Notes Piano</h2>
+        
+        <p>This is about composing difference-tone intervals for a melody.
+        
+        <ol>
+        <li>
+            <p>Click the top-left button <i>"Compose Difference-Tone Intervals for a Melody"</i>.
+            A new window opens.</p>
+        </li><br/>
+        <li>
+            <p>In the new window, right-click into the top <b>left</b> text-area 
+            and click "Load Examples" in the context-menu. Select "Ode to Joy", 
+            this is in the key of F, use "Transpose" to move it to another key.</p>
+            <p>Notes are in text-area now.
+                Interval lists fill the lower part of the UI that was initially empty.
+                Their number is the same as the number of notes in the melody.</p>
+        </li>
+        <ul><li>
+            <p>Optionally you can play the melody now by clicking the "Play Notes" player button
+            on top left, this is the 4th button from left. Click it again to stop the playback.</p>
+        </li></ul>
+        <li>
+            <p>Click "Auto-Compose" on the very right.
+            The top <b>right</b> text-area is filled with intervals now.
+            In the interval lists below the auto-composed intervals are selected.</p>
+        </li>
+        <ul><li>
+            <p>Optionally you can play the intervals by clicking the "Play Notes" player button
+            on top right. This will play the intervals, not the difference-tones.
+            The piano keyboard displays any 'pressed' key and marks the resulting difference-tone
+            with a red border. (Although it looks like, it does NOT play it!)
+            Listen carefully. You should hear the melody sound below the intervals.</p>
+        </li></ul>
+        <li>
+            <p>Click "ABC Export" below the top right text-area. A dialog opens.
+            Select an "ABC Converter" on botton right, the selected web-address
+            will be copied to the system clipboard automatically.
+            Go to your web-browser and paste (Ctrl-V) the address in its address-line on top.</p>
+            <p>Go back to the dialog. 
+            Enter "Title", "Key", "Author", "Date" fields and click "Translate" on bottom.
+            The new content of the right-side text-area 
+            gets copied to the system clipboard automatically.</p>
+            <p>Go to your web-browser and paste (Ctrl-V) the ABC notes into the according area.
+            Printable notes should be rendered by the ABC converter now, like the ones below:</p>
+            
+            <img src="ode-to-joy_difftones.png"></img>
+        </li><br/>
+        <li>
+            <p>You can see that the intervals for 9th and 10th tone (F4) are quite high
+                in relation to all other notes. The algorithm's calculations went 'wrong'.
+                You want to correct that manually.</p>
+        </li><br/>
+        <li>
+            <p>Close the "Export" dialog. 
+                To change all occurrences of F4 with one click, find the "Reuse Open Lists"
+                on bottom left and deactivate it. The number of interval-lists will reduce dramatically
+                to just 5 different notes of the melody.
+                You can also activate the "Sort Lists by Pitch" checkbox 
+                to get the F4 interval list to the left side.
+            </p>
+        </li><br/>
+        <li>
+            <p>In the F4 list, click onto the second interval from top, which is "C6 F6".
+                All occurrences of F4 in the top right intervals text-area will change.
+            </p>
+        </li><br/>
+        <li>
+            <p>Once again click the right-side "ABC Export". The recently entered properties
+                like "Title" are already there, you can immediately go to your web-browser
+                and paste the automatically copied ABC notes.
+                Result should be this:
+            </p>
+
+            <img src="ode-to-joy_adjusted-difftones.png"></img>
+        </li><br/>
+        <li>
+            <p>Why is the "Tuning" on the notes?
+                Difference-tones depend on tuning. 
+                If you'd play these intervals in another tuning than <i>EqualTemperament</i>,
+                the melody would sound wrong.
+                You'd get different intervals if you chose a <i>JustIntonation</i>
+                tuning in the top bar on the left side. 
+                All three of "Tuning", "Deviation", "Narrowest/Widest Interval" 
+                affect the set of possible intervals for a difference-tone.
+            </p>
+        </li><br/>
+        </ol>
+        
+        <h2 id="FrequencySliders">Frequency Sliders</h2>
+    
+        <ul>
+        <li>
+            <p></p>
+        </li><br/>
+        <li>
+            <p></p>
+        </li><br/>
+        </ul>
+
+    </body>
+</html>
+    
