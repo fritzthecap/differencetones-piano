@@ -16,22 +16,30 @@ import javax.swing.text.html.StyleSheet;
 
 /**
  * JEditorPane bug fix concerning URLs with "ref".
- * For CSS see <code>HtmlEditorPane.css</code> in <code>src/main/resources</code>.
+ * This view is HTML only, no RTF or other.
+ * For CSS see <code>HtmlView.css</code> in <code>src/main/resources</code>.
  */
 public class HtmlView extends JEditorPane
 {
     public HtmlView(URL url) {
         super(); // do not pass URL before constructor is done
         
-        setContentType("text/html"); // do not let setPage() do this
         setEditable(false);
+        
+        // do not share CSS with all other HTML views like JLabel
+        final HtmlEditorKitWithLocalStyles editorKit = new HtmlEditorKitWithLocalStyles();
+        final StyleSheet localStyleSheet = new StyleSheet();
+        localStyleSheet.addStyleSheet(editorKit.getGlobalStyleSheet()); // merge JDK default styles into empty sheet
+        editorKit.setStyleSheet(localStyleSheet);
+        
+        setEditorKit(editorKit); // this replaces setContentType("text/html"); do not let setPage() do this!
         
         final InputStream css = getClass().getResourceAsStream(HtmlView.class.getSimpleName()+".css");
         final StyleSheet styleSheet = ((HTMLEditorKit) getEditorKit()).getStyleSheet();
         try {
             styleSheet.loadRules(new InputStreamReader(css), null);
             
-            SwingUtilities.invokeLater(()-> { // let sub-classes finish constructor
+            SwingUtilities.invokeLater(()-> { // let sub-classes finish their constructors before setPage()
                 try {
                     setPage(url);
                 }
@@ -45,11 +53,14 @@ public class HtmlView extends JEditorPane
         }
     }
     
+    protected final HTMLDocument getHtmlDocument() {
+        return (HTMLDocument) getDocument();
+    }
+    
     /** Fix: the JDK implementation is wrongly searching for hyperlink elements. */
     @Override
     public void scrollToReference(String reference) {
-        final HTMLDocument document = (HTMLDocument) getDocument();
-        final Element element = document.getElement(reference);
+        final Element element = getHtmlDocument().getElement(reference);
         if (element != null)
             scrollToStartOffset(element.getStartOffset());
     }
@@ -67,6 +78,33 @@ public class HtmlView extends JEditorPane
         }
         catch (BadLocationException e) {
             UIManager.getLookAndFeel().provideErrorFeedback(this);
+        }
+    }
+    
+
+    /**
+     * Bugfix for global styles that affect even JLabel HTML texts, see
+     * https://stackoverflow.com/questions/43408539/how-does-one-properly-initialize-a-jtextpane-stylesheet-so-no-other-html-enable
+     */
+    private static class HtmlEditorKitWithLocalStyles extends HTMLEditorKit
+    {
+        private StyleSheet styleSheet;
+        
+        /** Overridden to return the private local style-sheet. */
+        @Override
+        public StyleSheet getStyleSheet() {
+            return styleSheet;
+        }
+        
+        /** Overridden to set the private local style-sheet. */
+        @Override
+        public void setStyleSheet(StyleSheet styleSheet) {
+            this.styleSheet = styleSheet;
+        }
+        
+        /** Delivers static global JDK styles. */
+        StyleSheet getGlobalStyleSheet() {
+            return super.getStyleSheet();
         }
     }
 }

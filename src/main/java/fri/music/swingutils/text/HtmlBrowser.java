@@ -119,6 +119,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
         // clear JEditorPane page cache, else nothing happens on setPage()
         htmlView.getDocument().putProperty(Document.StreamDescriptionProperty, null);
         gotoCurrentIndex();
+        htmlViewActions.updateFontSizes(htmlView); // may have been altered by another view
     }
 
     /** Called when hyperlink clicked, not on navigation. */

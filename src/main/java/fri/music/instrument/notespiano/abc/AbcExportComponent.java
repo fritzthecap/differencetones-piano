@@ -27,7 +27,7 @@ import fri.music.swingutils.text.TextAreaActions;
 public class AbcExportComponent extends JSplitPane
 {
     private static final String HELP_TEXT = """
-            <html><body>
+            <html>
             <ol>
             <li>Select an ABC converter address</li>
             <li>Open address in web-browser</li>
@@ -36,12 +36,12 @@ public class AbcExportComponent extends JSplitPane
                 (this automatically copies ABC text)</li>
             <li>Paste into web-browser field (Ctrl-V)</li>
             </ol>
-            </body></html>""";
+            </html>"""; // somehow Swing HTML font-size for <li> seems to be global - ?
 
     private static final String[] ABC_CONVERTER_URLS = new String[] {
+            "https://notabc.app/abc-converter/",
             "https://www.abcjs.net/abcjs-editor",
             "https://michaeleskin.com/abctools/abctools.html",
-            "https://notabc.app/abc-converter/",
             "https://editor.drawthedots.com/",
             "https://abc.hieuthi.com/",
             "https://abc.rectanglered.com/",

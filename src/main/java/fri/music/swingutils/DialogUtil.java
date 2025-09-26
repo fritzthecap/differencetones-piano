@@ -13,7 +13,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import fri.music.HtmlResources;
 import fri.music.swingutils.text.HtmlBrowser;
@@ -59,16 +58,18 @@ public class DialogUtil
         final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
         dialog.getContentPane().add(componentToShow);
         
-        final String CLOSE_ACTION_ID = "closeDialogAction";
-        final KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-        componentToShow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, CLOSE_ACTION_ID);
-        componentToShow.getActionMap().put(CLOSE_ACTION_ID, new AbstractAction() {
-              @Override
-              public void actionPerformed(ActionEvent e) {
-                  dialog.setVisible(false);
-                  try { dialog.dispose(); } catch (Exception ex) {}
-              }
-        });
+        KeyStrokeUtil.install(
+                componentToShow, 
+                JComponent.WHEN_IN_FOCUSED_WINDOW,
+                "closeDialogAction", 
+                KeyEvent.VK_ESCAPE,
+                new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.setVisible(false);
+                        try { dialog.dispose(); } catch (Exception ex) {}
+                    }
+                });
         
         dialog.setSize(size != null ? size : new Dimension(760, 580));
         

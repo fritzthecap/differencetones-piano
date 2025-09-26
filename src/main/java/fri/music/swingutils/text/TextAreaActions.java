@@ -10,16 +10,16 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
-import javax.swing.KeyStroke;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.Keymap;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+import fri.music.swingutils.KeyStrokeUtil;
 
 /**
  * Text-area or text-field with cut/copy/paste/clear/undo/redo actions
@@ -62,11 +62,9 @@ public class TextAreaActions extends FontActions
         this.selectAll = actionMap.get(DefaultEditorKit.selectAllAction);
         selectAll.putValue(Action.NAME, "Select (Ctrl-A)");
         
-        final Keymap keymap = JTextComponent.addKeymap("TextAreaActions-KeyBindings", textComponent.getKeymap());
-
         this.undoManager = new UndoManager();
         undoManager.setLimit(300);
-        final Action[] undoRedo = addUndoManagement(textComponent, undoManager, keymap);
+        final Action[] undoRedo = addUndoManagement(textComponent, undoManager);
         this.undo = undoRedo[0]; // Ctrl-z
         this.redo = undoRedo[1]; // Ctrl-y
         
@@ -78,7 +76,7 @@ public class TextAreaActions extends FontActions
         };
         clear.putValue(Action.NAME, "Clear");
         
-        final JMenu fontMenu = buildFontMenu(keymap, textComponent);
+        final JMenu fontMenu = buildFontMenu(textComponent);
         
         contextMenu.add(cut);
         contextMenu.add(copy);
@@ -136,7 +134,8 @@ public class TextAreaActions extends FontActions
      * Adds an UndoManager and key bindings Ctrl-Z (undo) and Ctrl-Y (redo) to given textarea.
      * @return the two created actions (undo and redo) that can be used for buttons.
      */
-    private Action[] addUndoManagement(JTextComponent textComponent, UndoManager undoManager, Keymap keymap)   {
+    private Action[] addUndoManagement(JTextComponent textComponent, UndoManager undoManager)   {
+        // listen to document changes to add edits
         textComponent.getDocument().addUndoableEditListener(new UndoableEditListener()   {
             @Override
             public void undoableEditHappened(UndoableEditEvent e) {
@@ -144,25 +143,35 @@ public class TextAreaActions extends FontActions
             }
         });
 
+        // build undo action
         final Action undo = new AbstractAction("Undo (Ctrl-Z)")  {
             @Override
             public void actionPerformed(ActionEvent e)  {
                 try { undoManager.undo(); } catch (CannotUndoException ex)  {}
             }
         };
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK);
-        keymap.addActionForKeyStroke(key, undo);
+        KeyStrokeUtil.install(
+                textComponent, 
+                JComponent.WHEN_FOCUSED,
+                "magnifyFont", 
+                KeyEvent.VK_Z,
+                InputEvent.CTRL_DOWN_MASK,
+                undo);
 
+        // build redo action
         final Action redo = new AbstractAction("Redo (Ctrl-Y)")  {
             @Override
             public void actionPerformed(ActionEvent e)  {
                 try { undoManager.redo(); } catch (CannotRedoException ex)  {}
             }
         };
-        key = KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK);
-        keymap.addActionForKeyStroke(key, redo);
-
-        textComponent.setKeymap(keymap);
+        KeyStrokeUtil.install(
+                textComponent, 
+                JComponent.WHEN_FOCUSED,
+                "magnifyFont", 
+                KeyEvent.VK_Y,
+                InputEvent.CTRL_DOWN_MASK,
+                redo);
         
         return new Action[] { undo, redo };
     }

@@ -6,17 +6,17 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
-import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.Keymap;
 import javax.swing.text.Style;
 import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import fri.music.swingutils.KeyStrokeUtil;
 
 /**
  * This class relies on the <code>HtmlEView.css</code> stylesheet that
@@ -52,11 +52,12 @@ public class HtmlViewActions extends FontActions
     public HtmlViewActions(JEditorPane htmlView) {
         super(htmlView);
         
-        contextMenu.add(this.copy = buildCopyAction(htmlView.getKeymap()));
-        contextMenu.add(buildFontMenu(htmlView.getKeymap(), htmlView));
+        contextMenu.add(this.copy = buildCopyAction(htmlView));
         
-        // immediately adjust current fonts to fontSizes table
+        contextMenu.add(buildFontMenu(htmlView));
+        
         initializeFontSizes(htmlView);
+        updateFontSizes(htmlView); // immediately adjust current fonts to global table
     }
     
     @Override
@@ -103,12 +104,19 @@ public class HtmlViewActions extends FontActions
         return (int) Math.round((double) size * (double) magnifyPercent / (double) 100);
     }
     
-    private Action buildCopyAction(Keymap keymap)   {
-        final KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK);
+    private Action buildCopyAction(JComponent component)   {
         // EditorPane has no default copy-action in its actionMap, so create a new one
         final Action copyAction = new DefaultEditorKit.CopyAction();
         copyAction.putValue(Action.NAME, "Copy (Ctrl-C)");
-        keymap.addActionForKeyStroke(key, copyAction);
+        
+        KeyStrokeUtil.install(
+                component, 
+                JComponent.WHEN_FOCUSED,
+                "copyAction", 
+                KeyEvent.VK_C,
+                InputEvent.CTRL_DOWN_MASK,
+                copyAction);
+        
         return copyAction;
     }
 
@@ -123,7 +131,6 @@ public class HtmlViewActions extends FontActions
                 try {
                     final Integer fontSize = Integer.valueOf(attribute.toString());
                     fontSizes.put(elementName, fontSize);
-                    //System.out.println(elementName+" "+CSS.Attribute.FONT_SIZE+"="+fontSize);
                 }
                 catch (Exception e) { // NumberFormatException, NullPointerException
                     System.err.println("Could not decode font-size of element "+elementName+": "+e);
@@ -136,7 +143,7 @@ public class HtmlViewActions extends FontActions
      * Call this to set current font-sizes in given HTML view.
      * @param htmlView the HTML-area where to set mapped font-sizes.
      */
-    private void updateFontSizes(JEditorPane htmlView) {
+    public void updateFontSizes(JEditorPane htmlView) {
         final HTMLEditorKit editorKit = (HTMLEditorKit) htmlView.getEditorKit();
         final StyleSheet styleSheet = editorKit.getStyleSheet();
         

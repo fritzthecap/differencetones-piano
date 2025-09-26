@@ -11,15 +11,14 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.Keymap;
+import fri.music.swingutils.KeyStrokeUtil;
 
 /**
  * Base class for any <code>JTextComponent</code> to make bigger or smaller fonts.
  * Mind that the font menu will not be automatically in provided context-menu,
- * call <code>buildFontMenu()</code> to get it.
+ * call <code>buildFontMenu()</code> to get it to the intended menu position.
  */
 public abstract class FontActions
 {
@@ -66,15 +65,20 @@ public abstract class FontActions
      * To be called by sub-classes that want a font menu.
      * @param keymap the keyboard mapping of target JTextComponent.
      */
-    protected final JMenu buildFontMenu(Keymap keymap, final JTextComponent textComponent)  {
+    protected final JMenu buildFontMenu(final JTextComponent textComponent)  {
         final Action fontBigger = new AbstractAction("+ (Ctrl-Plus)") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 magnifyFont(true, textComponent);
             }
         };
-        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK);
-        keymap.addActionForKeyStroke(key, fontBigger);
+        KeyStrokeUtil.install(
+                textComponent, 
+                JComponent.WHEN_FOCUSED,
+                "magnifyFont", 
+                KeyEvent.VK_PLUS,
+                InputEvent.CTRL_DOWN_MASK,
+                fontBigger);
         
         final Action fontSmaller = new AbstractAction("- (Ctrl-Minus)") {
             @Override
@@ -82,8 +86,13 @@ public abstract class FontActions
                 magnifyFont(false, textComponent);
             }
         };
-        key = KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK);
-        keymap.addActionForKeyStroke(key, fontSmaller);
+        KeyStrokeUtil.install(
+                textComponent, 
+                JComponent.WHEN_FOCUSED,
+                "reduceFont", 
+                KeyEvent.VK_MINUS,
+                InputEvent.CTRL_DOWN_MASK,
+                fontSmaller);
         
         final JMenu fontMenu = new JMenu("Font Size");
         fontMenu.add(fontBigger);

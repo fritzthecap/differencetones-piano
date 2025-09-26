@@ -59,7 +59,7 @@ public class HtmlViewWithHeaders extends HtmlView
                     if (event.getPropertyName().equals("page")) {
                         removePropertyChangeListener(this); // stop listening
                         try {
-                            final List<HeaderElement> headers = getTableOfContents((HTMLDocument) getDocument());
+                            final List<HeaderElement> headers = getTableOfContents(getHtmlDocument());
                             headerListener.endLoadingPage(headers);
                         }
                         catch (Exception e) {
