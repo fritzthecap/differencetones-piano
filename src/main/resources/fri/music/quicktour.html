@@ -15,7 +15,7 @@
         
         <h2 id="NotesPiano">Notes Piano</h2>
         
-        <p>This is about composing difference-tone intervals for a melody.
+        <p>This is about composing difference-tone intervals for a melody.</p>
         
         <ol>
         <li>
@@ -25,7 +25,7 @@
         <li>
             <p>In the new window, right-click into the top <b>left</b> text-area 
             and click "Load Examples" in the context-menu. Select "Ode to Joy", 
-            this is in the key of F, use "Transpose" to move it to another key.</p>
+            this is in the key of F. You could use "Transpose" to move it to another key.</p>
             <p>Notes are in text-area now.
                 Interval lists fill the lower part of the UI that was initially empty.
                 Their number is the same as the number of notes in the melody.</p>
@@ -37,14 +37,14 @@
         <li>
             <p>Click "Auto-Compose" on the very right.
             The top <b>right</b> text-area is filled with intervals now.
-            In the interval lists below the auto-composed intervals are selected.</p>
+            In the interval lists below, the auto-composed intervals were selected.</p>
         </li>
         <ul><li>
             <p>Optionally you can play the intervals by clicking the "Play Notes" player button
             on top right. This will play the intervals, not the difference-tones.
             The piano keyboard displays any 'pressed' key and marks the resulting difference-tone
-            with a red border. (Although it looks like, it does NOT play it!)
-            Listen carefully. You should hear the melody sound below the intervals.</p>
+            with a red border. (Although it looks like, it does NOT play the difference-tone!)</p>
+            <p>Listen carefully. You should hear the melody sound below the intervals.</p>
         </li></ul>
         <li>
             <p>Click "ABC Export" below the top right text-area. A dialog opens.
@@ -62,7 +62,7 @@
         </li><br/>
         <li>
             <p>You can see that the intervals for 9th and 10th tone (F4) are quite high
-                in relation to all other notes. The algorithm's calculations went 'wrong'.
+                in relation to all other notes. The algorithm's calculations were 'too technical'.
                 You want to correct that manually.</p>
         </li><br/>
         <li>
@@ -75,7 +75,7 @@
             </p>
         </li><br/>
         <li>
-            <p>In the F4 list, click onto the second interval from top, which is "C6 F6".
+            <p>In the F4 list, click onto the second interval from top, which is [C6 F6].
                 All occurrences of F4 in the top right intervals text-area will change.
             </p>
         </li><br/>
@@ -92,7 +92,7 @@
             <p>Why is the "Tuning" on the notes?
                 Difference-tones depend on tuning. 
                 If you'd play these intervals in another tuning than <i>EqualTemperament</i>,
-                the melody would sound wrong.
+                the melody would sound out-of-tune.
                 You'd get different intervals if you chose a <i>JustIntonation</i>
                 tuning in the top bar on the left side. 
                 All three of "Tuning", "Deviation", "Narrowest/Widest Interval" 
@@ -103,14 +103,83 @@
         
         <h2 id="FrequencySliders">Frequency Sliders</h2>
     
+        <p>Sliders with a precision of 4 cent (one octave has 100 cent) 
+            give much more freedom than a 12-tone piano keyboard.</p>
+        
         <ul>
         <li>
-            <p></p>
+            <p>Click the top-right button <i>"See Intervals and Their Difference-Tones on Frequency Sliders"</i>.
+               A new window opens. Mind that its tuning is <i>LIMIT_5 JustIntonation</i>,
+               not <i>EqualTemperament</i>.</p>
         </li><br/>
         <li>
-            <p></p>
+            <p>There are two sliders that are set to D6 and C6 (interval MAJOR_SECOND), 
+               which gives a difference-tone of C3, shown in the 3rd bottom slider (disabled).
+               The exact match of a tone is shown in red color on every slider.
+               If you switch the "Tuning" to <i>EqualTemperament</i>,
+               you will see how the sliders move, and the  difference-tone of C3 disappears.
+            </p>
+        </li><br/>
+        <li>
+            <p>Switch the "Tuning" back to <i>LIMIT_5 JustIntonation</i>.
+                Click the "Play / Halt 1+2" button on top left.
+                The interval tones will start to sound and will generate the low difference-tone C3.
+                If you are not able to hear the low tone, click "Play / Halt 1+2" again to stop,
+                then click "Play 1-2" on bottom left to hear the low tone alone.
+        </li><br/>
+        <li>
+            <p>Start the interval again.
+                Now slowly move the C6 slider (the second from top) to the left.
+                You will hear the low difference-tone rise quite fast.
+                You can also see it rise on bottom on the disabled slider.
+                This slider coupling also works without sound.
+                The nearer the interval sliders are to each other, 
+                the deeper the difference tone will be, and vice-versa.
+            </p>
+        </li><br/>
+        <li>
+            <p>Stop the sound. Move the topmost C6 slider up to D6, so that
+                both interval tones are exactly the same.
+                Use a right mouse click to move it roughly near D6,
+                then continuously click with left button until it is getting red on D6.
+            </p>
+        </li><br/>
+        <li>
+            <p>Now start the sound again via "Play / Halt 1+2".
+               Use left mouse clicks to move the topmost slider slowly to the left (down). 
+               You will hear so-called beatings. The vibrations get stronger the more you move to the left,
+               until it reaches C6, here the difference tone C3 will start to rise again on the bottom slider.
+            </p>
+        </li><br/>
+        <li>
+            <p>If you want to adjust a slider to a certain tone, enter its IPN name
+                in one of the white text fields on top left.
+                </p>
+        </li><br/>
+        <li>
+            <p>If you are interested in just-intonation fractions, you can see them on top right
+                in the "Pure Fraction" field. If you want to set a certain fraction,
+                you can do it in the white "Enter Fraction" field to its right.
+                Pressing ENTER will shorten the fraction and set both sliders to that relation.
+                Just intonations are built on fractions.
+                </p>
+        </li><br/>
+        <li>
+            <p>Click onto the horizontal bar above the bottom slider (it has a triangle-arrow in its middle).
+                An area opens that shows the second and third difference tone,
+                you must resize the window to see it fully.
+                These can not really be heard, but the UI also calculates and displays them.
+                </p>
         </li><br/>
         </ul>
+        
+        <p>If you try out all the interval fractions in <i>EqualTemperament</i>,
+            you will find out that nearly none of difference-tones matches the 12-tone scale,
+            not even 2/3 (FOURTH) and 3/2 (FIFTH). The 5/4 (MAJOR_THIRD) and 6/5 (MINOR_THIRD)
+            are really far away, while all of them match perfectly in <i>LIMIT_5 JustIntonation</i>.
+            This is what I described as "We gave up harmony in favor of freedom"
+            (the shift from just-intonation to equal-temperament in the 20th century).
+        </p>
 
     </body>
 </html>
