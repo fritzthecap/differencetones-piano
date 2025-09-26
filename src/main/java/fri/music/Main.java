@@ -52,7 +52,7 @@ public final class Main
             Object firstFrame = FrameStarter.start(
                     "Welcome to the World of Difference-Tones!",
                     new Main().panel,
-                    new Dimension(1020, 700));
+                    new Dimension(1020, 640));
             // let apps start screen-centered instead of cascaded to first frame
             FrameStarter.remove(firstFrame);
         });
@@ -75,10 +75,9 @@ public final class Main
     private JComponent buildLeftButtons() {
         final JToolBar toolbar = new VerticalToolbar();
         toolbar.add(buildNotesWithDifferenceToneInversionsPianoPlayer());
-        toolbar.add(buildDifferenceToneInversionsPiano());
         toolbar.add(buildNotesWithDifferenceTonePianoPlayer());
         toolbar.add(buildDifferenceToneForIntervalPiano());
-        toolbar.add(buildNotesPianoPlayer());
+        toolbar.add(buildTriadPlayingPiano());
         return toolbar;
     }
 
@@ -86,9 +85,8 @@ public final class Main
         final JToolBar toolbar = new VerticalToolbar();
         toolbar.add(buildFrequencyDifferenceSliders());
         toolbar.add(buildFrequencyChordSliders());
-        toolbar.add(buildIntervalPlayingPiano());
-        toolbar.add(buildTriadPlayingPiano());
         toolbar.add(buildJustIntonationCheckerConfiguration());
+        toolbar.add(buildMoreButton());
         return toolbar;
     }
     
@@ -123,21 +121,6 @@ public final class Main
         return action;
     }
 
-    private Action buildDifferenceToneInversionsPiano() {
-        final String title = HelpForIntervalLists.TITLE;
-        final Action action = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final DifferenceToneInversionsPiano piano = 
-                        new DifferenceToneInversionsPiano(wavePianoParams.config, wavePianoParams.soundChannel);
-                final JComponent panel = piano.getKeyboard();
-                FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
-            }
-        };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
-    }
-
     private Action buildNotesWithDifferenceTonePianoPlayer() {
         final String title = HelpForAutoCompose.TITLE;
         final Action action = new AbstractAction() {
@@ -160,23 +143,22 @@ public final class Main
             public void actionPerformed(ActionEvent e) {
                 final DifferenceToneForIntervalPiano piano = 
                         new DifferenceToneForIntervalPiano(wavePianoParams.config, wavePianoParams.soundChannel);
-                final JComponent panel = piano.getKeyboard();
-                FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
+                final JComponent keyboardPanel = piano.getKeyboard();
+                FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener(), null);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
         return action;
     }
 
-    private Action buildNotesPianoPlayer() {
-        final String title = HelpForNotes.TITLE;
+    private Action buildTriadPlayingPiano() {
+        final String title = "Explore Triad Beatings in Various Tunings";
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final NotesPianoPlayer player = new NotesPianoPlayer(
-                        new PianoWithVolume(wavePianoParams.config, wavePianoParams.soundChannel));
-                final JComponent playerPanel = player.getPlayer(NoteExamples.ODE_TO_JOY.notes());
-                FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
+                final PianoWithSound piano = new TriadPlayingPiano(wavePianoParams.config, wavePianoParams.soundChannel);
+                final JComponent keyboardPanel = piano.getKeyboard();
+                FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener(), null);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -211,35 +193,6 @@ public final class Main
         return action;
     }
 
-    private Action buildIntervalPlayingPiano() {
-        final String title = "Hear Interval Beatings in Various Tunings";
-        final Action action = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final PianoWithSound piano = 
-                        new IntervalPlayingPiano(wavePianoParams.config, wavePianoParams.soundChannel);
-                final JComponent panel = piano.getKeyboard();
-                FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
-            }
-        };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
-    }
-
-    private Action buildTriadPlayingPiano() {
-        final String title = "Hear Triad Beatings in Various Tunings";
-        final Action action = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final PianoWithSound piano = new TriadPlayingPiano(wavePianoParams.config, wavePianoParams.soundChannel);
-                final JComponent panel = piano.getKeyboard();
-                FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
-            }
-        };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
-    }
-
     private Action buildJustIntonationCheckerConfiguration() {
         final String title = "Check Just-Intonation Tunings for Purity";
         final Action action = new AbstractAction() {
@@ -252,12 +205,25 @@ public final class Main
         return action;
     }
 
+    private Action buildMoreButton() {
+        final String title = "More ....";
+        final Action action = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FrameStarter.start(title, false, new MoreLaunchers(), null, null);
+            }
+        };
+        action.putValue(Action.NAME, asHtml(title));
+        return action;
+    }
+
 
     /** Enables line breaks for long texts on buttons, instead of "...". */
     private String asHtml(String text) {
         return "<html>"+text+"</html>";
     }
 
+    
     private static class VerticalToolbar extends JToolBar
     {
         public VerticalToolbar() {
@@ -273,6 +239,58 @@ public final class Main
             button.setFont(buttonFont.deriveFont(buttonFont.getStyle(), buttonFont.getSize() + 3f));
             SizeUtil.forceSize(button, new Dimension(150, 130));
             return button;
+        }
+    }
+    
+    
+    private class MoreLaunchers extends JPanel
+    {
+        public MoreLaunchers() {
+        }
+        
+        private Action buildDifferenceToneInversionsPiano() {
+            final String title = HelpForIntervalLists.TITLE;
+            final Action action = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final DifferenceToneInversionsPiano piano = 
+                            new DifferenceToneInversionsPiano(wavePianoParams.config, wavePianoParams.soundChannel);
+                    final JComponent panel = piano.getKeyboard();
+                    FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
+                }
+            };
+            action.putValue(Action.NAME, asHtml(title));
+            return action;
+        }
+        
+        private Action buildNotesPianoPlayer() {
+            final String title = HelpForNotes.TITLE;
+            final Action action = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final NotesPianoPlayer player = new NotesPianoPlayer(
+                            new PianoWithVolume(wavePianoParams.config, wavePianoParams.soundChannel));
+                    final JComponent playerPanel = player.getPlayer(NoteExamples.ODE_TO_JOY.notes());
+                    FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
+                }
+            };
+            action.putValue(Action.NAME, asHtml(title));
+            return action;
+        }
+        
+        private Action buildIntervalPlayingPiano() {
+            final String title = "Hear Interval Beatings in Various Tunings";
+            final Action action = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final PianoWithSound piano = 
+                            new IntervalPlayingPiano(wavePianoParams.config, wavePianoParams.soundChannel);
+                    final JComponent panel = piano.getKeyboard();
+                    FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
+                }
+            };
+            action.putValue(Action.NAME, asHtml(title));
+            return action;
         }
     }
 }
