@@ -12,7 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
-import fri.music.swingutils.DialogUtil;
+import fri.music.swingutils.window.DialogStarter;
 
 /**
  * The toolbar for HTML browser.
@@ -84,7 +84,7 @@ public class HtmlBrowserToolbar extends JToolBar
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogUtil.showModelessHtmlDialog(
+                DialogStarter.showModelessHtmlDialog(
                         HelpForBrowser.TITLE, 
                         help, 
                         HelpForBrowser.URL,

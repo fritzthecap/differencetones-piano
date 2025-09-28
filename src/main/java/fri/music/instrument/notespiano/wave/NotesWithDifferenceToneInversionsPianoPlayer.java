@@ -34,7 +34,7 @@ import fri.music.player.notelanguage.NoteConnections;
 import fri.music.player.notelanguage.abc.AbcExport;
 import fri.music.player.notelanguage.abc.AbcTunesCombiner;
 import fri.music.swingutils.BorderUtil;
-import fri.music.swingutils.DialogUtil;
+import fri.music.swingutils.window.DialogStarter;
 
 /**
  * The most complex view of this project.
@@ -308,7 +308,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogUtil.showModelessHtmlDialog(
+                DialogStarter.showModelessHtmlDialog(
                         "Difference-Tone Composition User Guide", 
                         help, 
                         HelpForCompose.URL,

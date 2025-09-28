@@ -16,7 +16,7 @@ import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
 import fri.music.swingutils.ButtonUtil;
-import fri.music.swingutils.DialogUtil;
+import fri.music.swingutils.window.DialogStarter;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
 
@@ -67,7 +67,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogUtil.showModelessHtmlDialog(
+                DialogStarter.showModelessHtmlDialog(
                         "Piano Settings", 
                         help, 
                         HelpForPianoSettings.URL,

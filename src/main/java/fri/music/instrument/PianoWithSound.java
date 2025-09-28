@@ -265,7 +265,7 @@ public class PianoWithSound extends Piano
     
     
     /** The sound generator playing key presses, visible for sub-classes. */
-    private final SoundChannel soundChannel;
+    private /*final*/ SoundChannel soundChannel;
     /** The single mouse-handler for all piano views, visible for sub-classes. */
     private final MouseHandler mouseHandler;
     private JComponent pianoPanel;
@@ -370,6 +370,10 @@ public class PianoWithSound extends Piano
     public void destroyKeyboard(JComponent pianoPanel) {
         for (PianoWithSound.Keyboard.Key key : getKeys())
             key.removeMouseListener(getMouseHandler());
+        
         getSoundChannel().allNotesOff(); // closes all sound-channels
+        soundChannel = null;
+        
+        System.err.println("Freed sound resource of "+this);
     }
 }

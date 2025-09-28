@@ -44,9 +44,9 @@ import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.instrument.PianoWithSound;
 import fri.music.player.Note;
 import fri.music.swingutils.BorderUtil;
-import fri.music.swingutils.DialogUtil;
-import fri.music.swingutils.FlowLayoutForScrollPane;
+import fri.music.swingutils.layout.FlowLayoutForScrollPane;
 import fri.music.swingutils.layout.SizeUtil;
+import fri.music.swingutils.window.DialogStarter;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -453,7 +453,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogUtil.showModelessHtmlDialog(
+                DialogStarter.showModelessHtmlDialog(
                         "Interval Lists Description", 
                         help, 
                         HelpForIntervalLists.URL,
@@ -666,7 +666,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         setLayoutToIntervalListsPanel(true);
         
-        intervalListsDialog = DialogUtil.showModelessDialog( // detach frames
+        intervalListsDialog = DialogStarter.showModelessDialog( // detach frames
                 INTERVAL_LISTS_TITLE,
                 listsContainer,
                 listsScrollPane,

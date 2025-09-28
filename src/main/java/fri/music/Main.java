@@ -2,6 +2,7 @@ package fri.music;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.net.URL;
@@ -15,6 +16,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
+import fri.music.instrument.configuration.ConfiguredPianoFactoryStart;
 import fri.music.instrument.notespiano.HelpForNotes;
 import fri.music.instrument.notespiano.NoteExamples;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
@@ -32,9 +34,9 @@ import fri.music.instrument.wave.slider.AbstractFrequencySliders;
 import fri.music.instrument.wave.slider.FrequencyChordSliders;
 import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
 import fri.music.justintonation.swing.CheckLauncher;
-import fri.music.swingutils.FrameStarter;
 import fri.music.swingutils.layout.SizeUtil;
 import fri.music.swingutils.text.HtmlBrowser;
+import fri.music.swingutils.window.FrameStarter;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
 
@@ -49,12 +51,12 @@ public final class Main
     /** Application starter.*/
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Object firstFrame = FrameStarter.start(
+            JFrame firstFrame = FrameStarter.start(
                     "Welcome to the World of Difference-Tones!",
                     new Main().panel,
                     new Dimension(1020, 640));
             // let apps start screen-centered instead of cascaded to first frame
-            FrameStarter.remove(firstFrame);
+            FrameStarter.setNonLayoutRelevant(firstFrame);
         });
     }
     
@@ -193,24 +195,34 @@ public final class Main
         return action;
     }
 
+    private JFrame justIntonationCheckerFrame; // apps that have no sound-resources can be instance-singletons
+    
     private Action buildJustIntonationCheckerConfiguration() {
         final String title = "Check Just-Intonation Tunings for Purity";
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FrameStarter.start(title, false, new CheckLauncher(title).panel);
+                if (justIntonationCheckerFrame == null)
+                    justIntonationCheckerFrame = FrameStarter.start(title, false, new CheckLauncher(title).panel);
+                else
+                    justIntonationCheckerFrame.setVisible(true);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
         return action;
     }
 
+    private JFrame moreLauncherFrame;
+    
     private Action buildMoreButton() {
         final String title = "More ....";
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FrameStarter.start(title, false, new MoreLaunchers(), null, null);
+                if (moreLauncherFrame == null)
+                    moreLauncherFrame = FrameStarter.start(title, false, new MoreLaunchers(), null, null);
+                else
+                    moreLauncherFrame.setVisible(true);
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -223,8 +235,18 @@ public final class Main
         return "<html>"+text+"</html>";
     }
 
+    private JButton configureButton(JButton button) {
+        button.setToolTipText("Click to Launch App");
+        
+        final Font buttonFont = button.getFont();
+        button.setFont(buttonFont.deriveFont(buttonFont.getStyle(), buttonFont.getSize() + 3f));
+        SizeUtil.forceSize(button, new Dimension(150, 130));
+        
+        return button;
+    }
     
-    private static class VerticalToolbar extends JToolBar
+    
+    private class VerticalToolbar extends JToolBar
     {
         public VerticalToolbar() {
             super(JToolBar.VERTICAL);
@@ -232,13 +254,7 @@ public final class Main
         
         @Override
         protected JButton createActionComponent(Action action) {
-            final JButton button = super.createActionComponent(action);
-            button.setToolTipText("Click to Launch App");
-            
-            final Font buttonFont = button.getFont();
-            button.setFont(buttonFont.deriveFont(buttonFont.getStyle(), buttonFont.getSize() + 3f));
-            SizeUtil.forceSize(button, new Dimension(150, 130));
-            return button;
+            return configureButton(super.createActionComponent(action));
         }
     }
     
@@ -246,21 +262,16 @@ public final class Main
     private class MoreLaunchers extends JPanel
     {
         public MoreLaunchers() {
+            super(new FlowLayout());
+            
+            launcher(buildNotesPianoPlayer());
+            launcher(buildDifferenceToneInversionsPiano());
+            launcher(buildIntervalPlayingPiano());
+            launcher(buildConfiguredPianoFactory());
         }
         
-        private Action buildDifferenceToneInversionsPiano() {
-            final String title = HelpForIntervalLists.TITLE;
-            final Action action = new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    final DifferenceToneInversionsPiano piano = 
-                            new DifferenceToneInversionsPiano(wavePianoParams.config, wavePianoParams.soundChannel);
-                    final JComponent panel = piano.getKeyboard();
-                    FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
-                }
-            };
-            action.putValue(Action.NAME, asHtml(title));
-            return action;
+        private void launcher(Action action) {
+            add(configureButton(new JButton(action)));
         }
         
         private Action buildNotesPianoPlayer() {
@@ -278,6 +289,21 @@ public final class Main
             return action;
         }
         
+        private Action buildDifferenceToneInversionsPiano() {
+            final String title = HelpForIntervalLists.TITLE;
+            final Action action = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final DifferenceToneInversionsPiano piano = 
+                            new DifferenceToneInversionsPiano(wavePianoParams.config, wavePianoParams.soundChannel);
+                    final JComponent panel = piano.getKeyboard();
+                    FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
+                }
+            };
+            action.putValue(Action.NAME, asHtml(title));
+            return action;
+        }
+        
         private Action buildIntervalPlayingPiano() {
             final String title = "Hear Interval Beatings in Various Tunings";
             final Action action = new AbstractAction() {
@@ -287,6 +313,23 @@ public final class Main
                             new IntervalPlayingPiano(wavePianoParams.config, wavePianoParams.soundChannel);
                     final JComponent panel = piano.getKeyboard();
                     FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
+                }
+            };
+            action.putValue(Action.NAME, asHtml(title));
+            return action;
+        }
+        
+        private JFrame configuredPianoFactoryFrame;
+        
+        private Action buildConfiguredPianoFactory() {
+            final String title = "Configure Pianos (API Showcase)";
+            final Action action = new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (configuredPianoFactoryFrame == null)
+                        configuredPianoFactoryFrame = new ConfiguredPianoFactoryStart().frame;
+                    else
+                        configuredPianoFactoryFrame.setVisible(true);
                 }
             };
             action.putValue(Action.NAME, asHtml(title));

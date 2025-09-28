@@ -1,4 +1,7 @@
 
+- Bug: tied subsequent notes are rendered as their own interval list.
+    They should go with their lead tie.
+
 - For Main, it should be possible to choose the number of octaves for any piano,
     the lowest tone, probably also the initial tuning.
     Refactor and reuse PianoConfiguration for this.

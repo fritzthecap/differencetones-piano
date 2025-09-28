@@ -28,7 +28,7 @@ import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
-import fri.music.swingutils.DialogUtil;
+import fri.music.swingutils.window.DialogStarter;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -299,7 +299,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         view.abcExport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogUtil.showModelessDialog(
+                DialogStarter.showModelessDialog(
                         "Export to ABC",
                         view.notesText, // parent to show above
                         newAbcExportComponent(view), // fetches the view-owned text, with left-side tempo and time

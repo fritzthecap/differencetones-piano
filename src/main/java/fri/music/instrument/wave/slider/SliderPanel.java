@@ -192,6 +192,8 @@ public class SliderPanel
         closeWaveGenerator();
         amplitudeSlider.removeChangeListener(amplitudeChangeListener);
         gainSlider.removeChangeListener(gainChangeListener);
+        
+        System.err.println("Freed sound resource of "+this);
     }
     
     

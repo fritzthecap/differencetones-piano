@@ -1,8 +1,9 @@
-package fri.music.swingutils;
+package fri.music.swingutils.window;
 
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -19,10 +20,12 @@ import javax.swing.JFrame;
  */
 public class FrameStarter
 {
+    public static int titlebarHeight = 38;
     private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    private static int titlebarHeight = 32;
     
     private static List<JFrame> frames = new ArrayList<>();
+    private static List<JFrame> nonLayoutRelevantFrames = new ArrayList<>();
+    
     private static boolean exiting = false;
     
     /** Runs an EXIT_ON_CLOSE frame. */
@@ -37,7 +40,12 @@ public class FrameStarter
     
     /** Runs a frame configured by given parameters. */
     public static JFrame start(String title, boolean exitOnClose, JComponent content) {
-        return start(title, exitOnClose, content, null, null);
+        return start(title, exitOnClose, content, null);
+    }
+    
+    /** Runs a frame configured by given parameters. */
+    public static JFrame start(String title, boolean exitOnClose, JComponent content, WindowListener windowListener) {
+        return start(title, exitOnClose, content, windowListener, null);
     }
     
     /** Runs a frame configured by given parameters. */
@@ -49,7 +57,9 @@ public class FrameStarter
             Dimension dimension)
     {
         final JFrame frame = new JFrame(title);
+        
         frame.getContentPane().add(Objects.requireNonNull(content));
+        
         frame.setDefaultCloseOperation(exitOnClose ? JFrame.EXIT_ON_CLOSE : JFrame.DISPOSE_ON_CLOSE);
         
         if (windowListener != null)
@@ -62,16 +72,16 @@ public class FrameStarter
             public void windowClosing(WindowEvent e) {
                 final JFrame closingFrame = (JFrame) e.getSource();
                 frames.remove(closingFrame);
+                nonLayoutRelevantFrames.remove(closingFrame);
                 
                 final boolean wasExiting = exiting;
                 if (exiting == false)
                     exiting = (closingFrame.getDefaultCloseOperation() == JFrame.EXIT_ON_CLOSE);
                 
-                if (wasExiting == false && exiting == true) // must close open ones
+                if (wasExiting == false && exiting == true) // close all open frames and call their window-listeners
                     for (JFrame frame : new ArrayList<>(frames)) // avoid concurrent access of list
-                        for (WindowListener windowListener : frame.getWindowListeners())
-                            if (windowListener != this)
-                                windowListener.windowClosing(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                        if (frame.isVisible())
+                            frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
             }
         });
         
@@ -82,7 +92,7 @@ public class FrameStarter
         
         ensureVisibleSize(frame); // else tiny frame may be hard to find on screen
         
-        final JFrame previousFrame = (frames.size() > 0) ? frames.get(frames.size() - 1) : null;
+        final JFrame previousFrame = findLayoutRelevantFrame();
         frame.setLocation(nextCascadingPoint(previousFrame, frame));
         frame.setVisible(true);
         
@@ -90,19 +100,36 @@ public class FrameStarter
         return frame;
     }
 
-    /** In special cases you may want to remove some frame from the global list. */
-    public static void remove(Object frame) {
-        frames.remove(frame);
+    /** Call this to avoid that subsequent frames cascade to given frame. */
+    public static void setNonLayoutRelevant(JFrame frame) {
+        nonLayoutRelevantFrames.add(frame);
     }
 
     
-    private static void ensureVisibleSize(JFrame frame) {
-        final Dimension size = frame.getSize();
-        if (size.width < 30)
+    private static JFrame findLayoutRelevantFrame() {
+        for (int i = frames.size() - 1; i >= 0; i--) {
+            final JFrame frame = frames.get(i);
+            if (nonLayoutRelevantFrames.contains(frame) == false)
+                return frame;
+        }
+        return null;
+    }
+
+    private static void ensureVisibleSize(Window window) {
+        final Dimension size = window.getSize();
+        
+        boolean invalidated = false;
+        if (size.width < 30) {
             size.width = 200;
-        if (size.height < 30 + titlebarHeight) // title-bar height counts
+            invalidated = true;
+        }
+        if (size.height < 30 + titlebarHeight) { // title-bar height counts
             size.height = 200;
-        frame.setSize(size);
+            invalidated = true;
+        }
+        
+        if (invalidated)
+            window.setSize(size);
     }
 
     private static Point nextCascadingPoint(JFrame previousFrame, JFrame newFrame)    {
@@ -132,7 +159,7 @@ public class FrameStarter
 
     
     /*public static void main(String[] args) {
-        final JPanel content = new JPanel();
+        final javax.swing.JPanel content = new javax.swing.JPanel();
         final WindowListener closeListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

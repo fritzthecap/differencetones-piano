@@ -1,68 +1,50 @@
-package fri.music.instrument;
+package fri.music.instrument.configuration;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ScaleTypes;
-import fri.music.SoundChannel;
 import fri.music.ToneSystem;
-import fri.music.instrument.midi.MidiSynthesizer;
-import fri.music.instrument.midi.SynthesizerFactory;
-import fri.music.instrument.wave.DifferenceToneForIntervalPiano;
-import fri.music.instrument.wave.IntervalPlayingPiano;
-import fri.music.instrument.wave.TriadPlayingPiano;
+import fri.music.instrument.PianoWithSound;
 import fri.music.swingutils.layout.SmartComboBox;
-import fri.music.wavegenerator.GenericWaveSoundChannel;
-import fri.music.wavegenerator.WaveGenerator;
-import fri.music.wavegenerator.WaveNames;
-import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
- * A panel that lets configure all options for different
- * kinds of Piano implementations, and then run them.
- * <p/>
- * This is more an 'instrument' API guide than an application.
+ * A panel that lets configure most options for different
+ * kinds of Piano implementations.
  */
-public class ConfigurationPanel
+public class PianoConfigurationPanel
 {
     public final JPanel panel;
+    
+    protected final JPanel displayOptionsPanel;
     
     private JSlider octaves;
     private JComboBox<String> lowestToneBaseName;
     private JComboBox<String> lowestToneScaleName;
     private JSlider lowestToneOctave;
-    private JCheckBox isVertical;
     private JSlider blackKeyPixelWidth;
     private JCheckBox showIpnNameOnKey;
     private JCheckBox showMidiNumberAsTooltip;
     private JCheckBox colouredOctaves;
     
-    private JRadioButton radioButtonMidi;
-    private JRadioButton radioButtonWave;
-    private JComboBox<String> waveChoice;
-    
-    private JComboBox<PianoClassChoiceItem> pianoClassChoice;
-    
-    public ConfigurationPanel() {
+    public PianoConfigurationPanel() {
+        // field construction
         buildPianoConfigurationFields();
-        buildSoundChoiceFields();
         
+        // fields layout
         final JPanel lowestTonePanel = new JPanel();
         lowestTonePanel.setLayout(new BoxLayout(lowestTonePanel, BoxLayout.X_AXIS));
         lowestTonePanel.setBorder(BorderFactory.createTitledBorder(
@@ -72,25 +54,14 @@ public class ConfigurationPanel
         lowestTonePanel.add(lowestToneScaleName);
         lowestTonePanel.add(lowestToneOctave);
         
-        final JPanel displayOptionsPanel = new JPanel();
+        this.displayOptionsPanel = new JPanel();
         displayOptionsPanel.setLayout(new BoxLayout(displayOptionsPanel, BoxLayout.Y_AXIS));
         displayOptionsPanel.add(showIpnNameOnKey);
         displayOptionsPanel.add(showMidiNumberAsTooltip);
         displayOptionsPanel.add(colouredOctaves);
-        displayOptionsPanel.add(isVertical);
         final JPanel moveLeftOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         moveLeftOptionsPanel.setBorder(BorderFactory.createTitledBorder("Display Options"));
         moveLeftOptionsPanel.add(displayOptionsPanel);
-
-        final JPanel soundChoice = new JPanel();
-        soundChoice.setBorder(BorderFactory.createTitledBorder("Sound"));
-        soundChoice.setLayout(new BoxLayout(soundChoice, BoxLayout.Y_AXIS));
-        soundChoice.add(radioButtonWave);
-        soundChoice.add(radioButtonMidi);
-        final JPanel moveLeftSoundPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        moveLeftSoundPanel.add(soundChoice);
-        moveLeftSoundPanel.add(waveChoice);
-        moveLeftSoundPanel.add(pianoClassChoice);
 
         this.panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -98,66 +69,19 @@ public class ConfigurationPanel
         panel.add(lowestTonePanel);
         panel.add(moveLeftOptionsPanel);
         panel.add(blackKeyPixelWidth);
-        panel.add(moveLeftSoundPanel);
     }
 
-    /**
-     * Creates and returns the configured piano.
-     * Call <code>piano.getKeyboard()</code> for a visible UI panel.
-     * Install the </code>piano.getWindowClosingListener()</code> onto the parent frame.
-     */
-    public PianoWithSound getPiano() {
-        final PianoWithSound.Configuration configuration = getPianoConfiguration();
-        
-        if (radioButtonWave.isSelected()) {
-            final SoundChannel soundChannel = getSoundChannel();
-            final Class<? extends PianoWithSound> pianoClass = 
-                    ((PianoClassChoiceItem) pianoClassChoice.getSelectedItem()).pianoClass;
-            
-            Constructor<? extends PianoWithSound> constructor;
-            try {
-                constructor = pianoClass.getConstructor(PianoWithSound.Configuration.class, SoundChannel.class);
-            }
-            catch (NoSuchMethodException e) {
-                try {
-                    constructor = pianoClass.getConstructor(PianoWithSound.Configuration.class, WaveSoundChannel.class);
-                }
-                catch (Exception e1) {
-                    throw new RuntimeException(e1);
-                }
-            }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            
-            try {
-                return constructor.newInstance(configuration, soundChannel);
-            }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            return new MidiSynthesizer(configuration, SynthesizerFactory.getOpenSynthesizer());
-        }
-    }
-    
-    private PianoWithSound.Configuration getPianoConfiguration() {
+    /** @return a piano configuration built from all UI fields. */
+    public PianoWithSound.Configuration getPianoConfiguration() {
         return new PianoWithSound.Configuration(
             octaves.getValue(),
             ""+lowestToneBaseName.getSelectedItem()+lowestToneOctave.getValue(),
-            isVertical.isEnabled() && isVertical.isSelected(),
+            false,
             blackKeyPixelWidth.getValue(),
             showIpnNameOnKey.isSelected(),
             showMidiNumberAsTooltip.isSelected(),
             colouredOctaves.isSelected()
         );
-    }
-    
-    private SoundChannel getSoundChannel() {
-        final String waveName = (String) waveChoice.getSelectedItem();
-        final Class<? extends WaveGenerator> waveClass = WaveNames.getClass(waveName);
-        return new GenericWaveSoundChannel(null, waveClass);
     }
     
     
@@ -227,9 +151,6 @@ public class ConfigurationPanel
         lowestToneOctave.setMajorTickSpacing(1);
         lowestToneOctave.addChangeListener(octavesListener);
         
-        this.isVertical = new JCheckBox("Vertical Orientation"); // selected = false by default
-        isVertical.setToolTipText("Not supported by all pianos. Please select 'PianoWithSound' to test vertical orientation!");
-        
         this.blackKeyPixelWidth = new JSlider(4, 60, 16);
         blackKeyPixelWidth.setBorder(BorderFactory.createTitledBorder("Black Key Pixel Width"));
         blackKeyPixelWidth.setToolTipText("Bigger or Smaller Keyboard Keys");
@@ -250,65 +171,5 @@ public class ConfigurationPanel
         colouredOctaves.setSelected(false);
         
         octavesListener.stateChanged(null);
-    }
-    
-    private void buildSoundChoiceFields() {
-        this.radioButtonWave = new JRadioButton("Wave Generator", true);
-        radioButtonWave.setToolTipText("Wave Generators Support Different Tunings");
-        this.radioButtonMidi = new JRadioButton("MIDI Synthesizer", false);
-        radioButtonMidi.setToolTipText("Java Sound Framework, no Support for Different Tunings");
-        
-        final ButtonGroup radioGroup = new ButtonGroup(); // exclusive selection
-        radioGroup.add(radioButtonWave);
-        radioGroup.add(radioButtonMidi);
-        
-        final ActionListener soundSelectionListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final boolean waveSelected = radioButtonWave.isSelected();
-                waveChoice.setEnabled(waveSelected);
-                pianoClassChoice.setEnabled(waveSelected);
-
-                final PianoClassChoiceItem selectedPiano = waveSelected ? (PianoClassChoiceItem) pianoClassChoice.getSelectedItem() : null;
-                final boolean canDisplayVertical = (selectedPiano != null && selectedPiano.pianoClass == PianoWithSound.class);
-                isVertical.setEnabled(canDisplayVertical);
-            }
-        };
-        radioButtonWave.addActionListener(soundSelectionListener);
-        radioButtonMidi.addActionListener(soundSelectionListener);
-        
-        this.waveChoice = new JComboBox<>(WaveNames.getNames());
-        waveChoice.setBorder(BorderFactory.createTitledBorder("Wave Type"));
-        waveChoice.setToolTipText("Different Piano Sounds");
-        
-        final PianoClassChoiceItem[] pianoClasses = new PianoClassChoiceItem[] {
-                new PianoClassChoiceItem(PianoWithSound.class),
-                new PianoClassChoiceItem(PianoWithHold.class),
-                new PianoClassChoiceItem(PianoWithVolume.class),
-                new PianoClassChoiceItem(IntervalPlayingPiano.class),
-                new PianoClassChoiceItem(TriadPlayingPiano.class),
-                new PianoClassChoiceItem(DifferenceToneForIntervalPiano.class),
-            };
-        pianoClassChoice = new JComboBox<>(pianoClasses);
-        pianoClassChoice.setBorder(BorderFactory.createTitledBorder("Piano Type"));
-        pianoClassChoice.setToolTipText("Capabilities of Piano (Java Class)");
-        pianoClassChoice.addActionListener(soundSelectionListener);
-        
-        soundSelectionListener.actionPerformed(null); // enable choice according to current setting
-    }
-    
-    
-    private static class PianoClassChoiceItem
-    {
-        public final Class<? extends PianoWithSound> pianoClass;
-        
-        PianoClassChoiceItem(Class<? extends PianoWithSound> pianoClass) {
-            this.pianoClass = pianoClass;
-        }
-        
-        @Override
-        public String toString() {
-            return pianoClass.getSimpleName();
-        }
     }
 }

@@ -12,8 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.text.TextAreaActions;
+import fri.music.swingutils.window.DialogStarter;
 
 public class CheckLauncher
 {
@@ -51,7 +51,7 @@ public class CheckLauncher
                 fontActions.magnifyFont(true, textArea);
                 fontActions.magnifyFont(true, textArea);
                 
-                DialogUtil.showModelessDialog(
+                DialogStarter.showModelessDialog(
                         dialogTitle, 
                         panel, 
                         new JScrollPane(textArea), 

@@ -12,7 +12,8 @@ import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
 /**
- * Provides extracted header information about HTML elements H1-H5.
+ * Provides extracted header information about HTML elements H1 - H6 and all elements with an id, 
+ * but ignores any heading (H1 - H6) if it contains an anchor element with href attribute.
  */
 public class HtmlViewWithHeaders extends HtmlView
 {
@@ -39,6 +40,7 @@ public class HtmlViewWithHeaders extends HtmlView
         /** Called when view has scanned headers on fully loaded page. */
         void endLoadingPage(List<HeaderElement> headers);
     }
+    
     
     private final HeaderListener headerListener;
     
@@ -85,13 +87,13 @@ public class HtmlViewWithHeaders extends HtmlView
     
     private void scanHeaders(HTMLDocument document, Element element, List<HeaderElement> headers) throws BadLocationException {
         if (element.isLeaf())
-            return;
+            return; // BranchElement is where the HTML tags are
         
         final boolean isChapterHeading = isChapterHeading(element);
         final String id = getId(element);
         
-        if (isChapterHeading || id != null) {
-            final int level;
+        if (isChapterHeading || id != null) { // we want H1-H5 and any element with an id, like <li>
+            final int level; // will be indentation of choice items
             if (isChapterHeading) {
                 currentChapterLevel = Integer.valueOf(element.getName().substring(1));
                 level = currentChapterLevel;
@@ -100,10 +102,12 @@ public class HtmlViewWithHeaders extends HtmlView
                 level = currentChapterLevel + 1;
             }
             
-            final String textContent = getText(document, element);
-            if (textContent.length() > 0) {
-                final HeaderElement header = new HeaderElement(level, id, textContent, element.getStartOffset());
-                headers.add(header);
+            if (isChapterHeading == false || containsHyperlink(element) == false) { // ignore headings that contain a hyperlink
+                final String textContent = getText(document, element);
+                if (textContent.length() > 0) { // ignore elements that have no text to display in "Chapters" overview
+                    final HeaderElement header = new HeaderElement(level, id, textContent, element.getStartOffset());
+                    headers.add(header);
+                }
             }
         }
         
@@ -113,10 +117,38 @@ public class HtmlViewWithHeaders extends HtmlView
     }
     
     private String getId(Element element) throws BadLocationException {
-        if (element.getAttributes().isDefined(HTML.Attribute.ID) == false)
+        return getAttribute(element, HTML.Attribute.ID);
+    }
+
+    private String getAttribute(Element element, HTML.Attribute attribute) throws BadLocationException {
+        if (element.getAttributes().isDefined(attribute) == false)
             return  null; // fix: getAttribute() would ask parent for inherited value
-        final Object id = element.getAttributes().getAttribute(HTML.Attribute.ID);
-        return (id == null) ? null : id.toString();
+        final Object value = element.getAttributes().getAttribute(attribute);
+        return (value == null) ? null : value.toString();
+    }
+
+    private String getHyperlink(Element element) throws BadLocationException {
+        final String hyperlink = getTag(element, HTML.Tag.A);
+        if (hyperlink == null)
+            return null;
+        return hyperlink.substring(hyperlink.indexOf('=') + 1); // "href=#apps"
+    }
+
+    private String getTag(Element element, HTML.Tag tag) throws BadLocationException {
+        if (element.getAttributes().isDefined(tag) == false)
+            return  null; // fix: getAttribute() would ask parent for inherited value
+        final Object value = element.getAttributes().getAttribute(tag);
+        return (value == null) ? null : value.toString();
+    }
+
+    private boolean containsHyperlink(Element element) throws BadLocationException {
+        for (int i = 0; i < element.getElementCount(); i++) {
+            final Element subElement = element.getElement(i);
+            final String hyperlink = getHyperlink(subElement);
+            if (hyperlink != null && hyperlink.length() > 0)
+                return true;
+        }
+        return false;
     }
 
     private boolean isChapterHeading(Element element) {
@@ -126,7 +158,8 @@ public class HtmlViewWithHeaders extends HtmlView
           name.equals(HTML.Tag.H2.toString()) ||
           name.equals(HTML.Tag.H3.toString()) ||
           name.equals(HTML.Tag.H4.toString()) ||
-          name.equals(HTML.Tag.H5.toString());
+          name.equals(HTML.Tag.H5.toString()) ||
+          name.equals(HTML.Tag.H6.toString());
     }
 
     private String getText(HTMLDocument document, Element element) throws BadLocationException {

@@ -22,9 +22,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.text.JTextComponent;
 import fri.music.ToneSystem;
 import fri.music.player.Note;
-import fri.music.swingutils.DialogUtil;
 import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.swingutils.layout.SmartPanel;
+import fri.music.swingutils.window.DialogStarter;
 
 /** Full view of NotesPianoPlayer with time-signature and tempo controls. */
 public class NotesTextPanel extends NotesTextPanelBase
@@ -83,7 +83,7 @@ public class NotesTextPanel extends NotesTextPanelBase
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogUtil.showModelessHtmlDialog(
+                DialogStarter.showModelessHtmlDialog(
                         "Notes Edit Help", 
                         help, // parent
                         HelpForNotes.URL, 

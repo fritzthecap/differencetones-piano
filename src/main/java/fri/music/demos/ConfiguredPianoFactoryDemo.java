@@ -16,22 +16,22 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import fri.music.instrument.ConfigurationPanel;
 import fri.music.instrument.PianoWithSound;
+import fri.music.instrument.configuration.ConfiguredPianoFactory;
 
-public class PianoConfigurationDemo
+public class ConfiguredPianoFactoryDemo
 {
     private static List<JFrame> frames = new ArrayList<>();
     
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            final ConfigurationPanel configurationPanel = new ConfigurationPanel();
+            final ConfiguredPianoFactory configuredPianoFactory = new ConfiguredPianoFactory();
             
             final JButton showPianoButton = new JButton("Show Piano");
             showPianoButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    final PianoWithSound piano = configurationPanel.getPiano();
+                    final PianoWithSound piano = configuredPianoFactory.getPiano();
                     final JComponent pianoPanel = piano.getKeyboard();
                     
                     final JFrame frame = startFrame(
@@ -48,7 +48,7 @@ public class PianoConfigurationDemo
             buttonPanel.add(showPianoButton);
             
             final JPanel mainPanel = new JPanel(new BorderLayout());
-            mainPanel.add(configurationPanel.panel, BorderLayout.CENTER);
+            mainPanel.add(configuredPianoFactory.panel, BorderLayout.CENTER);
             mainPanel.add(buttonPanel, BorderLayout.SOUTH);
             
             final JFrame mainFrame = startFrame("Piano Configuration Showcase", mainPanel, WindowConstants.EXIT_ON_CLOSE);

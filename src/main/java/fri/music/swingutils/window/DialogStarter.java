@@ -1,4 +1,4 @@
-package fri.music.swingutils;
+package fri.music.swingutils.window;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -15,12 +15,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import fri.music.HtmlResources;
+import fri.music.swingutils.KeyStrokeUtil;
 import fri.music.swingutils.text.HtmlBrowser;
 
 /**
  * Shows text in non-modal dialogs.
  */
-public class DialogUtil
+public class DialogStarter
 {
     /**
      * Opens a non-modal dialog showing given HTML text in a scroll-pane.
@@ -54,7 +55,7 @@ public class DialogUtil
      * @return the created dialog window.
      */
     public static JDialog showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size, Point location, boolean relativeToParent) {
-        final Window window = SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
+        final Window window = (parent instanceof Window) ? (Window) parent : SwingUtilities.windowForComponent(Objects.requireNonNull(parent));
         final JDialog dialog = new JDialog(Objects.requireNonNull(window), title);
         dialog.getContentPane().add(componentToShow);
         
@@ -71,15 +72,9 @@ public class DialogUtil
                     }
                 });
         
-        dialog.setSize(size != null ? size : new Dimension(760, 580));
-        
-        if (location == null)
-            dialog.setLocationRelativeTo(relativeToParent ? parent : window);
-        else
-            dialog.setLocation(location);
-        
+        setSize(dialog, componentToShow, size);
+        setLocation(dialog, location, relativeToParent ? parent : window);
         dialog.setVisible(true);
-        
         componentToShow.requestFocusInWindow(); // for immediately sizing font by keyboard
         
         return dialog;
@@ -107,5 +102,30 @@ public class DialogUtil
         textArea.setText(text);
         textArea.setCaretPosition(0); // scroll back to top
         return new JScrollPane(textArea);
+    }
+    
+    private static void setSize(JDialog dialog, JComponent componentToShow, Dimension size) {
+        if (size != null) {
+            dialog.setSize(size);
+        }
+        else {
+            final Dimension sizeToSet;
+            final Dimension preferredContentSize = componentToShow.getPreferredSize();
+            if (preferredContentSize.width < 30 || preferredContentSize.height < (30 + FrameStarter.titlebarHeight)) {
+                sizeToSet = new Dimension(760, 580);
+            }
+            else {
+                sizeToSet = new Dimension(
+                        preferredContentSize.width,
+                        preferredContentSize.height + FrameStarter.titlebarHeight);
+            }
+            dialog.setSize(sizeToSet);
+        }
+    }
+    private static void setLocation(JDialog dialog, Point location, Component relativeToComponent) {
+        if (location != null)
+            dialog.setLocation(location);
+        else
+            dialog.setLocationRelativeTo(relativeToComponent);
     }
 }

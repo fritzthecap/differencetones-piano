@@ -83,7 +83,8 @@ public class TuningComponent
         };
         tuningChoice.addActionListener(actionListener);
         
-        SwingUtilities.invokeLater(() -> actionListener.actionPerformed(null)); // let callers initialize first
+        if (initialTuning != null)
+            SwingUtilities.invokeLater(() -> actionListener.actionPerformed(null)); // let callers initialize first
         
         return this.tuningChoice = tuningChoice;
     }
