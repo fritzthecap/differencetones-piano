@@ -6,47 +6,17 @@
     the lowest tone, probably also the initial tuning.
     Refactor and reuse PianoConfiguration for this.
 
-- For all frames there must be a Help button that gives hints
-    how to use the UI. Some already exist, but others not.
-    
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 
-- The titles of demo apps should be also visible when running
-    pianos from ConfigurationPanel.
-    A "Help" button in configuration panel should document the 
-    different pianos available here.
-    
 - Configuration and display UI for:
-    NotesPianoPlayer and all sub-classes
     Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
     Difference tones in different tunings (DifferenceToneDemo)
     Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
     
 - Documentation UI, leading through different topics.
-    This should be in foreground initially, but can be made optional
-    for all introduction-dialogs through a checkbox "Never show introductions".
-    When this checkbox gets clicked, not a single introduction 
-    dialog will show anywhere anymore. Main menu offers an action to
-    reverse that setting.
-
-    Running the application opens main documentation. Then different
-    buttons provide insights:
-    "See and Hear Difference Tones" (FrequencyDifferenceSliders, DifferenceToneForIntervalPiano), 
-    "Explore Beatings in Intervals of Different Tunings" (IntervalPlayingPiano),
-    "Test Chords in Different Tunings" (TriadPlayingPiano, FrequencyChordSliders),
-    "See Difference Tones on Piano" (DifferenceTonePiano), 
+    Running the application opens main documentation. Then different buttons provide insights:
     "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" (EqualTemperamentDemo, JustIntonationDemo, ...), 
-    "Check Just Intonation" (JustIntonationChecker), 
-    "Translate a Melody into Difference Tones" (DifferenceToneInversions, DefaultComposer, NotesWithDifferenceTonePianoPlayer), 
-    "Look at Pianos" (PianoConfiguration), 
-    "Try out Wave Generators" (WavePianoDemo, PianoConfiguration), 
-    TODO: there is more!
-
-- Introduce the option to use IPN note names like "Eb", "Gb", ...
-    Will be really complicated, because Note.ipnName is public and
-    was used in many many places ...
-    DONE: will not do this, really hard to implement, for what?.
 
 ==============================
 
