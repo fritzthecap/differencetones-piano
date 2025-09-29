@@ -9,6 +9,9 @@
     <body>
         <h2>Glossary</h2>
         
+        <p>The terms defined here are used by this application 
+            and may differ from common definitions.</p>
+        
         <table>
             <tr>
                 <th>
@@ -26,30 +29,34 @@
                 <td>
                     An artificial dimension of pitch (tone height).
                     One octave is divided into 1200 Cent, so one semitone is 100 Cent.
-                    You can not convert Cents directly into Hertz,
+                    Humans can perceive inaccuracies of about 4 Cent.
+                    You can't convert Hertz (frequency) directly into Cents,
                     because Hertz increase logarithmically and Cents linearly.
                 </td>
             </tr>
             <tr>
                 <td>
-                    <a href="https://en.wikipedia.org/wiki/Combination_tone">Combination Tone</a>
+                    <a href="https://en.wikipedia.org/wiki/Combination_tone">Combination Tones</a>
                 </td>
                 <td>
-                    The set of difference tones and sum tones. 
+                    The set of difference-tones and sum tones. 
                 </td>
             </tr>
             <tr>
                 <td>
-                    Difference Tone
+                    Difference-Tone
                 </td>
                 <td>
-                    The tone that sounds with the frequency difference of two different tones, 
+                    The tone that sounds with the frequency difference of two distinct tones, 
                     i.e. <code>highTone.frequency - lowTone.frequency</code>.
+                    Barely audible further difference-tones are
+                    the secondary with <code>2 * lowTone.frequency - highTone.frequency</code>
+                    and the tertiary with <code>3 * lowTone.frequency - 2 * highTone.frequency</code>.
                 </td>
             </tr>
             <tr>
                 <td>
-                    Difference Tone Inversion
+                    Difference-Tone Inversion
                 </td>
                 <td>
                     A difference-tone can be produced by various intervals,
@@ -57,6 +64,106 @@
                     depending on the tuning of the used 12-tone scale.
                     The interval [C5 G5] thus is called a difference-tone inversion,
                     or a difference-tone interval.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Equal Temperament
+                </td>
+                <td>
+                    A 12-tone scale that uses equal distances between semitones (100 cents).
+                    The most popular tuning of our times, because it provides the most freedom
+                    for modulations into other keys.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Interval
+                </td>
+                <td>
+                    Two distinct tones.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="https://en.wikipedia.org/wiki/Scientific_pitch_notation">IPN</a>
+                </td>
+                <td>
+                    International Pitch Notation, a standard naming scheme for 12-tone scales.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Just Intonation
+                </td>
+                <td>
+                    A 12-tone scale that uses different distances between semitones.
+                    It is calculated by fractions like 3/2 for fifth, 4/3 for fourth,
+                    5/4 for major third, ...
+                    The 5-limit tuning is the most popular, well suited for music
+                    where harmony is most important.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Melody
+                </td>
+                <td>
+                    A sequence of single-voiced notes. 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Note
+                </td>
+                <td>
+                    A tone with duration and volume.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Scale
+                </td>
+                <td>
+                    A subdivision of an octave into various numbers of tone steps.
+                    12-tone scales divide an octave into 12 steps.
+                    "Modal" scales divide an octave into 7 steps.
+                    Both use equal or various step distances.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Tone
+                </td>
+                <td>
+                    A sound at a certain frequency that has a name. 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Triad
+                </td>
+                <td>
+                    Three distinct tones, mostly in major/minor thirds distance.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Tuning
+                </td>
+                <td>
+                    A certain intonation or temperament, see Equal Temperament and Just Intonation.
+                    Instruments need to be tuned to that before a performance.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Wave Generator
+                </td>
+                <td>
+                    Electronic wave generators produce very clean tones with a minimum of overtones.
+                    They are particularly well suited for producing difference tones.
+                    Popular wave forms are Sine (the cleanest), Triangle, Sawtooth, Square.
                 </td>
             </tr>
             
