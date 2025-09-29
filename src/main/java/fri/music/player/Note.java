@@ -184,7 +184,7 @@ public class Note extends Tone
         this.beatInfo = note.beatInfo;
     }
     
-    /** A rest. */
+    /** Rest constructor. */
     public Note(int durationMilliseconds, boolean emphasized, String lengthNotation, BeatInfo beatInfo) {
         super(ToneSystem.REST_SYMBOL, -1.0, -1, -1);
         
