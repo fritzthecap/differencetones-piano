@@ -28,7 +28,7 @@ public class RestIgnoringNoteIterator implements Iterator<Note[]>
         final Note[] next = notes[index];
         
         // START keep order
-        skipTies(); // read away tied follower notes
+        skipTies(); // read away tied follower notes, excluding last
         index++; // skip to next note
         skipRests(); // read away rests
         // END keep order

@@ -54,7 +54,7 @@ public final class Main
             JFrame firstFrame = FrameStarter.start(
                     "Welcome to the World of Difference-Tones!",
                     new Main().panel,
-                    new Dimension(1020, 640));
+                    new Dimension(1040, 640));
             // let apps start screen-centered instead of cascaded to first frame
             FrameStarter.setNonLayoutRelevant(firstFrame);
         });
