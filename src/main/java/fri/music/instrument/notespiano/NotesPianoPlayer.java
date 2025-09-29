@@ -28,6 +28,7 @@ import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
+import fri.music.swingutils.text.TextAreaUtil;
 import fri.music.swingutils.window.DialogStarter;
 import fri.music.wavegenerator.WaveSoundChannel;
 
@@ -81,8 +82,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
 
         final boolean activateWriteToNotesCheckbox;
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
-            melodyView().notesText.setText(melody); // triggers check via DocumentListener
-            melodyView().notesText.setCaretPosition(melody.length()); // ready to append notes
+            TextAreaUtil.setText(melodyView().notesText, melody); // triggers check via DocumentListener
             activateWriteToNotesCheckbox = false;
         }
         else {
@@ -383,7 +383,6 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         }
         else {
             view.error.setText(e.getMessage());
-            view.error.setCaretPosition(0); // scroll back to start of possibly long message
             view.playButtons.setEnabled(false);
             view.formatBars.setEnabled(false);
             view.abcExport.setEnabled(false);
@@ -425,6 +424,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     melodyView().notesText.setText(melody.notes());
+                    melodyView().notesText.setCaretPosition(0);
                 }
             });
             menu.add(item);
@@ -438,8 +438,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         final Note[][] notes = readNotesFromTextAreaCatchExceptions(playController, view);
         if (notes != null) {
             final String formatted = formatNotes(notes, newMelodyFactory());
-            view.notesText.setText(formatted);
-            view.notesText.requestFocus();
+            TextAreaUtil.setText(view.notesText, formatted);
         }
     }
     

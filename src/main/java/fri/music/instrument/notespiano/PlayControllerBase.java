@@ -1,5 +1,6 @@
 package fri.music.instrument.notespiano;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingUtilities;
@@ -164,11 +165,11 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     /** @return the current player position, counted without rests. */
     protected int getCurrentIndexIgnoringRests() {
         int index = 0;
-        for (int i = 0; i < currentSoundIndex && i < sounds.length; i++) {
-            final Note[] chord = sounds[i];
-            if (chord[0].isRest() == false)
-                index++;
-        }
+        final Note[][] currentlyPlayedSounds = Arrays.copyOf(sounds, currentSoundIndex);
+        for (RestIgnoringNoteIterator notesIterator = new RestIgnoringNoteIterator(currentlyPlayedSounds);
+                notesIterator.hasNext();
+                notesIterator.next())
+            index++;
         return index;
     }
     
@@ -373,9 +374,10 @@ public class PlayControllerBase implements PlayControlButtons.Listener
             }
             while (startIndex != currentSoundIndex && 
                     sounds[currentSoundIndex][0].isRest() || sounds[currentSoundIndex][0].durationMilliseconds <= 0);
+                    // skips rests and tied notes
             
             final Note firstNote = sounds[currentSoundIndex][0];
-            if (firstNote.isRest() == false) {
+            if (firstNote.isRest() == false) { // there could be nothing than rests
                 enableUiOnPlaying(false, sounds);
                 
                 for (Note note : sounds[currentSoundIndex]) // starts playing all notes of chord
@@ -384,7 +386,8 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         }
         else { // button released
             if (sounds != null && sounds.length > 0 && 
-                    currentSoundIndex >= 0 && sounds[currentSoundIndex][0].isRest() == false)
+                    currentSoundIndex >= 0 && currentSoundIndex < sounds.length &&
+                    sounds[currentSoundIndex][0].isRest() == false)
             {
                 for (Note note : sounds[currentSoundIndex]) // stops playing all notes of chord
                     playOrStopNote(pianoKeyConnector(), note, false);

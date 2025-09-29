@@ -42,6 +42,7 @@ import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.instrument.PianoWithSound;
+import fri.music.instrument.notespiano.RestIgnoringNoteIterator;
 import fri.music.player.Note;
 import fri.music.swingutils.BorderUtil;
 import fri.music.swingutils.layout.FlowLayoutForScrollPane;
@@ -217,25 +218,22 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
     
     /** Melody notes text has changed. Rebuild all interval lists for given notes. */
-    public void manageIntervalListFrames(Note[] singleNotes) {
+    public void manageIntervalListFrames(Note[][] melody) {
         final List<IntervalListFrame> frames = removeAllIntervalFrames();
         
-        for (int i = 0; i < singleNotes.length; i++) {
-            final Note note = singleNotes[i];
+        for (RestIgnoringNoteIterator notesIterator = new RestIgnoringNoteIterator(melody); notesIterator.hasNext(); ) {
+            final Note note = notesIterator.next()[0];
+            final IntervalListFrame frameForNote = frames.stream()
+                .filter(frame -> frame.ipnNoteName.equals(note.ipnName))
+                .findFirst()
+                .orElse(null);
             
-            if (note.isRest() == false) {
-                boolean done = false;
-                
-                if (i < frames.size()) {
-                    final IntervalListFrame frame = frames.get(i);
-                    if (frame.ipnNoteName.equals(note.ipnName)) { // reuse frame
-                        addOrRemoveIntervalListFrame(frame, true);
-                        done = true;
-                    }
-                }
-                    
-                if (done == false)
-                    addIntervalListFrame(note.ipnName, note.midiNumber);
+            if (frameForNote != null) { // reuse frame
+                frames.remove(frameForNote); // can not be reused more than once
+                addOrRemoveIntervalListFrame(frameForNote, true);
+            }
+            else {
+                addIntervalListFrame(note.ipnName, note.midiNumber);
             }
         }
     }
@@ -332,13 +330,13 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                 mouseDown);
         
         if (mouseDown && intervalSelectionListener != null) {
-            int index;
+            int intervalFrameIndex;
             if (reuseOpenLists.isSelected())
-                index = -1;
+                intervalFrameIndex = -1;
             else
-                index = activeFrame.getIndex();
+                intervalFrameIndex = activeFrame.getIndex();
             
-            intervalSelectionListener.intervalSelected(activeFrame.ipnNoteName, interval, index);
+            intervalSelectionListener.intervalSelected(activeFrame.ipnNoteName, interval, intervalFrameIndex);
         }
     }
 
@@ -526,6 +524,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         }
         else if (previousIntervalLists != null) { // use memorized template when not null
             currentIntervalLists = merge(currentIntervalLists, previousIntervalLists);
+            previousIntervalLists = null; // garbage-collect
         }
         
         for (IntervalListFrame frame : currentIntervalLists)
@@ -545,7 +544,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             if (inCurrent != null)
                 result.add(inCurrent);
         }
-        this.previousIntervalLists = null; // garbage-collect
         return result;
     }
 
