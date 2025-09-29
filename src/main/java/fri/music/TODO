@@ -1,6 +1,6 @@
 
-- Bug: tied subsequent notes are rendered as their own interval list.
-    They should go with their lead tie.
+- Find out why the first interval in auto-composed "When the Saints" is so high.
+    Maybe the tone-range calculation is wrong or could be improved?
 
 - For Main, it should be possible to choose the number of octaves for any piano,
     the lowest tone, probably also the initial tuning.
@@ -21,6 +21,11 @@
 ==============================
 
 Fixed Bugs:
+
+- Bug: tied subsequent notes are rendered as their own interval list.
+    They should go with their lead tie.
+    Reproduction: load "When the saints", click "Auto-Compose".
+    DONE: fixed via RestIgnoringNoteIterator.
 
 - Bug: ESCAPE on dialogs does not work anymore - DialogUtil.
     DONE: replaced KeyListener by getInputMap and getActionMap calls. 
