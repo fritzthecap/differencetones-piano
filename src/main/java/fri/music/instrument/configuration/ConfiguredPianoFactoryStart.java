@@ -16,6 +16,9 @@ import fri.music.swingutils.window.DialogStarter;
 import fri.music.swingutils.window.FrameStarter;
 import fri.music.swingutils.window.WindowClosingManager;
 
+/**
+ * The piano configuration showcase.
+ */
 public class ConfiguredPianoFactoryStart
 {
     public final JFrame frame;

@@ -31,7 +31,7 @@ import fri.music.wavegenerator.WaveSoundChannel;
  * <p/>
  * This is more an 'instrument' API guide than an application.
  */
-public class ConfiguredPianoFactory extends PianoConfigurationPanel
+class ConfiguredPianoFactory extends PianoConfigurationPanel
 {
     private JCheckBox isVertical;
     
@@ -41,8 +41,8 @@ public class ConfiguredPianoFactory extends PianoConfigurationPanel
     
     private JComboBox<PianoClassChoiceItem> pianoClassChoice;
     
-    public ConfiguredPianoFactory() {
-        super();
+    ConfiguredPianoFactory() {
+        super(new PianoWithSound.Configuration(5, "C3")); // number of octaves
         
         this.isVertical = new JCheckBox("Vertical Orientation"); // selected = false by default
         isVertical.setToolTipText("Not supported by all pianos. Please select 'PianoWithSound' to test vertical orientation!");

@@ -17,6 +17,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ScaleTypes;
+import fri.music.TextUtil;
 import fri.music.ToneSystem;
 import fri.music.instrument.PianoWithSound;
 import fri.music.swingutils.layout.SmartComboBox;
@@ -27,6 +28,7 @@ import fri.music.swingutils.layout.SmartComboBox;
  */
 public class PianoConfigurationPanel
 {
+    /** The user-interface panel to add to some frame or dialog. */
     public final JPanel panel;
     
     protected final JPanel displayOptionsPanel;
@@ -40,9 +42,9 @@ public class PianoConfigurationPanel
     private JCheckBox showMidiNumberAsTooltip;
     private JCheckBox colouredOctaves;
     
-    public PianoConfigurationPanel() {
+    public PianoConfigurationPanel(PianoWithSound.Configuration configuration) {
         // field construction
-        buildPianoConfigurationFields();
+        buildPianoConfigurationFields(configuration);
         
         // fields layout
         final JPanel lowestTonePanel = new JPanel();
@@ -85,8 +87,12 @@ public class PianoConfigurationPanel
     }
     
     
-    private void buildPianoConfigurationFields() {
-        final int INITIAL_NUMBER_OF_OCTAVES= 5;
+    private void buildPianoConfigurationFields(PianoWithSound.Configuration configurationParam) {
+        final PianoWithSound.Configuration configuration;
+        if (configurationParam == null)
+            configuration = new PianoWithSound.Configuration(7, "C2");
+        else
+            configuration = configurationParam;
         
         final ChangeListener octavesListener = new ChangeListener() {
             @Override
@@ -98,13 +104,13 @@ public class PianoConfigurationPanel
                 final boolean isMaximum = (octaves.getValue() == octaves.getMaximum());
                 octaves.setMaximum(maximumPossibleOctaves);
                 // try to keep a good value
-                if (isMaximum && maximumPossibleOctaves <= INITIAL_NUMBER_OF_OCTAVES)
+                if (isMaximum && maximumPossibleOctaves <= configuration.octaves)
                     octaves.setValue(maximumPossibleOctaves);
             }
         };
         
-        this.octaves = new JSlider(1, ToneSystem.MAXIMUM_OCTAVES, INITIAL_NUMBER_OF_OCTAVES);
-        octaves.setBorder(BorderFactory.createTitledBorder("Number of Octaves (Maximum 10)"));
+        this.octaves = new JSlider(1, ToneSystem.MAXIMUM_OCTAVES, configuration.octaves);
+        octaves.setBorder(BorderFactory.createTitledBorder("Number of Octaves (Maximum "+ToneSystem.MAXIMUM_OCTAVES+")"));
         octaves.setSnapToTicks(true);
         octaves.setPaintLabels(true);
         octaves.setPaintTicks(true);
@@ -142,7 +148,13 @@ public class PianoConfigurationPanel
             }
         });
         
-        this.lowestToneOctave = new JSlider(ToneSystem.LOWEST_OCTAVE, ToneSystem.MAXIMUM_OCTAVES - 1, 3);
+        final String lowestToneWithoutOctave = TextUtil.getUntilFirstNumber(configuration.lowestToneIpnName);
+        lowestToneBaseName.setSelectedItem(lowestToneWithoutOctave);
+        
+        this.lowestToneOctave = new JSlider(
+                ToneSystem.LOWEST_OCTAVE, 
+                ToneSystem.MAXIMUM_OCTAVES - 1, 
+                configuration.lowestToneOctaveBasedOnC);
         lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Start Octave"));
         lowestToneOctave.setToolTipText("The Lowest (Leftmost) Octave of the Keyboard");
         lowestToneOctave.setSnapToTicks(true);
@@ -151,7 +163,7 @@ public class PianoConfigurationPanel
         lowestToneOctave.setMajorTickSpacing(1);
         lowestToneOctave.addChangeListener(octavesListener);
         
-        this.blackKeyPixelWidth = new JSlider(4, 60, 16);
+        this.blackKeyPixelWidth = new JSlider(4, 60, configuration.blackKeyWidth);
         blackKeyPixelWidth.setBorder(BorderFactory.createTitledBorder("Black Key Pixel Width"));
         blackKeyPixelWidth.setToolTipText("Bigger or Smaller Keyboard Keys");
         blackKeyPixelWidth.setPaintLabels(true);
@@ -160,15 +172,15 @@ public class PianoConfigurationPanel
         
         this.showIpnNameOnKey = new JCheckBox("IPN-Names on Keys");
         showIpnNameOnKey.setToolTipText("Show Note Names on Piano Keys");
-        showIpnNameOnKey.setSelected(true);
+        showIpnNameOnKey.setSelected(configuration.showIpnNameOnKey);
         
         this.showMidiNumberAsTooltip = new JCheckBox("MIDI-Numbers as Tooltips");
         showMidiNumberAsTooltip.setToolTipText("Show MIDI-Numbers as Tooltips on Piano Keys (e.g. C4 is 60)");
-        showMidiNumberAsTooltip.setSelected(false);
+        showMidiNumberAsTooltip.setSelected(configuration.showMidiNumberAsTooltip);
         
         this.colouredOctaves = new JCheckBox("Coloured Octaves");
         colouredOctaves.setToolTipText("Show Every Octave with a Different Color");
-        colouredOctaves.setSelected(false);
+        colouredOctaves.setSelected(configuration.colouredOctaves);
         
         octavesListener.stateChanged(null);
     }
