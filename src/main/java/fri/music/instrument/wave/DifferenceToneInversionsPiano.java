@@ -392,8 +392,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             }
         });
         
-        this.reuseOpenLists = new JCheckBox("Reuse Open Lists", true);
-        reuseOpenLists.setToolTipText("When OFF, Every Note Will Have Its Own Interval List");
+        this.reuseOpenLists = new JCheckBox("Reuse Lists", true);
+        reuseOpenLists.setToolTipText("When OFF, Every Note Will Have Its Own Interval List, else Every List May Refer to Several Notes");
         final ActionListener reuseActionListener = new ActionListener() {
             /** Switching off reuse of open lists  makes sortIntervalFrames useless. */
             @Override
