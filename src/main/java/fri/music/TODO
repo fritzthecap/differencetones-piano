@@ -2,10 +2,6 @@
 - Find out why the first interval in auto-composed "When the Saints" is so high.
     Maybe the tone-range calculation is wrong or could be improved?
 
-- For Main, it should be possible to choose the number of octaves for any piano,
-    the lowest tone, probably also the initial tuning.
-    Refactor and reuse PianoConfiguration for this.
-
 - Selection of notes while playing, for NotesPianoPlayer.
     This should work only in single-step mode.
 
@@ -17,6 +13,8 @@
 - Documentation UI, leading through different topics.
     Running the application opens main documentation. Then different buttons provide insights:
     "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" (EqualTemperamentDemo, JustIntonationDemo, ...), 
+
+- Test, test, test! And fix found bugs.
 
 ==============================
 
