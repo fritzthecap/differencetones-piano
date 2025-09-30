@@ -1,18 +1,22 @@
 
+- Create deployment: Maven packer job to generate JAR file.
+    Try out JAR file (whether hyperlink resolution works).
+    
 - Find out why the first interval in auto-composed "When the Saints" is so high.
     Maybe the tone-range calculation is wrong or could be improved?
-
-- Selection of notes while playing, for NotesPianoPlayer.
-    This should work only in single-step mode.
 
 - Configuration and display UI for:
     Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
     Difference tones in different tunings (DifferenceToneDemo)
     Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
     
-- Documentation UI, leading through different topics.
-    Running the application opens main documentation. Then different buttons provide insights:
-    "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" (EqualTemperamentDemo, JustIntonationDemo, ...), 
+- Documentation:
+    Write empty HTML docs.
+    New docs for "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" 
+    (EqualTemperamentDemo, JustIntonationDemo, ...). 
+
+- Selection of notes in text-area while playing, for NotesPianoPlayer.
+    This should work only in single-step mode.
 
 - Test, test, test! And fix found bugs.
 
@@ -53,30 +57,27 @@ Fixed Bugs:
           Could not replace the vertical strut (heightHolder) by setPreferredSize(),
           then scrollbars would never show!
     
-    - Bug NotesWithDifferenceTonePianoPlayer: LIMIT_17, FOURTH-FIFTH, deviation 76 %.
-        A4 and D#5 should generate G3, but no difference tone appears on piano.
-        
-        Fixed by removing the assumptive calculation of derivation when 
-        no deeper tone is present than the one in quest. Returning null in that case now.
-        Had to adapt a DefaultComposerTest case for this.
+- Bug NotesWithDifferenceTonePianoPlayer: LIMIT_17, FOURTH-FIFTH, deviation 76 %.
+    A4 and D#5 should generate G3, but no difference tone appears on piano.
     
-    - Bug in Piano ConfigurationPanel, happens when you choose 10 octaves starting on 5th:
-        Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: 
-        The midiNoteNumber 197 could not be found in Tones, 10 octaves, range C0(12) - C10(132)
-        
-        DONE: by restricting the octave sliders to mutual maximum values.
+    Fixed by removing the assumptive calculation of derivation when 
+    no deeper tone is present than the one in quest. Returning null in that case now.
+    Had to adapt a DefaultComposerTest case for this.
 
-    - Big problem: where does a triplet end?
-        Every note of the triplet has a length and the triplet tag,
-        but when there are two triplet groups in succession, where does the first triplet group end?
-    
-    - NotesPianoPlayer bug: Format button does not auto-break too long notes
-        across bar end.
-        
-        DONE: exception is thrown in this case by MelodyFactory.
+- Bug in Piano ConfigurationPanel, happens when you choose 10 octaves starting on 5th:
+    Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: 
+    The midiNoteNumber 197 could not be found in Tones, 10 octaves, range C0(12) - C10(132)
+    DONE: by restricting the octave sliders to mutual maximum values.
 
-    - Bug: dotted chords are wrongly translated to ABC,
-        the ">" has to be appended to chord, not to notes inside.
-        
-        DONE: see unit-test severalDottedChords()
-    
+- Big problem: where does a triplet end?
+    Every note of the triplet has a length and the triplet tag,
+    but when there are two triplet groups in succession, where does the first triplet group end?
+
+- Bug NotesPianoPlayer: Format button does not auto-break too long notes
+    across bar end.
+    DONE: exception is thrown in this case by MelodyFactory.
+
+- Bug: dotted chords are wrongly translated to ABC,
+    the ">" has to be appended to chord, not to notes inside.
+    DONE: see unit-test severalDottedChords()
+

@@ -27,7 +27,7 @@ public class HtmlViewActions extends FontActions
     private static final int MINIMAL_FONT_SIZE = 8;
     private static final int MAXIMAL_FONT_SIZE = 50;
     
-    /** The HTML element names whose font-sizes are managed here.*/
+    /** The HTML element names whose font-sizes are managed here. See also HtmlView.css. */
     private static final String [] fontElements = new String[] {
           "h1", // header elements
           "h2",
