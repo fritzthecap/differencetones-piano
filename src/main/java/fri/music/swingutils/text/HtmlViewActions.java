@@ -35,6 +35,8 @@ public class HtmlViewActions extends FontActions
           "h4",
           "h5",
           "p", // paragraph elements
+          "td", // table cells
+          "th", // table header cells
           "li", // list elements
     };
     /** Font size mapping, name = HTML element tag, value = integer font-size of this element. */
