@@ -1,5 +1,6 @@
 package fri.music.swingutils.text;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -97,6 +98,7 @@ public class HtmlBrowserToolbar extends JToolBar
         add(new JLabel(" Chapters: "));
         headersChoice = new JComboBox<HtmlViewWithHeaders.HeaderElement>();
         headersChoice.setMaximumRowCount(25);
+        headersChoice.setBackground(Color.WHITE);
         headersChoice.addItemListener(referenceItemListener);
         add(headersChoice);
     }
