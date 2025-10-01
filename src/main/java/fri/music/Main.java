@@ -150,8 +150,7 @@ public final class Main
                 FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener());
             }
         };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
+        return setActionNameAsHtml(title, action);
     }
 
     private Action buildNotesWithDifferenceTonePianoPlayer() {
@@ -165,8 +164,7 @@ public final class Main
                 FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener());
             }
         };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
+        return setActionNameAsHtml(title, action);
     }
 
     private Action buildDifferenceToneForIntervalPiano() {
@@ -180,8 +178,7 @@ public final class Main
                 FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener());
             }
         };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
+        return setActionNameAsHtml(title, action);
     }
 
     private Action buildTriadPlayingPiano() {
@@ -194,8 +191,7 @@ public final class Main
                 FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener());
             }
         };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
+        return setActionNameAsHtml(title, action);
     }
 
     // right buttons
@@ -234,8 +230,7 @@ public final class Main
                 FrameStarter.start(title, false, sliders.panel, sliders.getWindowClosingListener(), new Dimension(1200, 410));
             }
         };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
+        return setActionNameAsHtml(title, action);
     }
 
     private Action buildFrequencyChordSliders() {
@@ -247,8 +242,7 @@ public final class Main
                 FrameStarter.start(title, false, sliders.panel, sliders.getWindowClosingListener(), new Dimension(1200, 510));
             }
         };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
+        return setActionNameAsHtml(title, action);
     }
 
     private JFrame justIntonationCheckerFrame; // instance-singleton
@@ -264,8 +258,7 @@ public final class Main
                     justIntonationCheckerFrame.setVisible(true);
             }
         };
-        action.putValue(Action.NAME, asHtml(title));
-        return action;
+        return setActionNameAsHtml(title, action);
     }
 
     private JFrame moreLauncherFrame;
@@ -281,16 +274,16 @@ public final class Main
                     moreLauncherFrame.setVisible(true);
             }
         };
-        action.putValue(Action.NAME, asHtml(title));
+        return setActionNameAsHtml(title, action);
+    }
+
+    
+    
+    private Action setActionNameAsHtml(String title, Action action) {
+        action.putValue(Action.NAME, "<html>"+title+"</html>");
         return action;
     }
-
-
-    /** Enables line breaks for long texts on buttons, instead of "...". */
-    private String asHtml(String text) {
-        return "<html>"+text+"</html>";
-    }
-
+    
     private JButton configureTopButton(JButton button, String tooltip) {
         button.setToolTipText(tooltip);
         
@@ -313,6 +306,7 @@ public final class Main
     }
     
     
+    
     private class VerticalToolbar extends JToolBar
     {
         public VerticalToolbar() {
@@ -324,6 +318,7 @@ public final class Main
             return configureLauncherButton(super.createActionComponent(action));
         }
     }
+    
     
     
     private class MoreLaunchers extends JPanel
@@ -352,8 +347,7 @@ public final class Main
                     FrameStarter.start(moreLauncherFrame, title, playerPanel, player.getWindowClosingListener());
                 }
             };
-            action.putValue(Action.NAME, asHtml(title));
-            return action;
+            return setActionNameAsHtml(title, action);
         }
         
         private Action buildDifferenceToneInversionsPiano() {
@@ -367,8 +361,7 @@ public final class Main
                     FrameStarter.start(moreLauncherFrame, title, panel, piano.getWindowClosingListener());
                 }
             };
-            action.putValue(Action.NAME, asHtml(title));
-            return action;
+            return setActionNameAsHtml(title, action);
         }
         
         private Action buildIntervalPlayingPiano() {
@@ -382,8 +375,7 @@ public final class Main
                     FrameStarter.start(moreLauncherFrame, title, panel, piano.getWindowClosingListener());
                 }
             };
-            action.putValue(Action.NAME, asHtml(title));
-            return action;
+            return setActionNameAsHtml(title, action);
         }
         
         private JFrame configuredPianoFactoryFrame;
@@ -399,8 +391,7 @@ public final class Main
                         configuredPianoFactoryFrame.setVisible(true);
                 }
             };
-            action.putValue(Action.NAME, asHtml(title));
-            return action;
+            return setActionNameAsHtml(title, action);
         }
     }
 }
