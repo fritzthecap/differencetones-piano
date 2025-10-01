@@ -1,4 +1,6 @@
 
+- NotesWithDifferenceTonePianoPlayer must export both intervals and notes to ABC.
+
 - Create deployment: Maven packer job to generate JAR file.
     Try out JAR file (whether hyperlink resolution works).
     

@@ -212,7 +212,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     
     /** Factory method for AbcExportComponent, to be overridden. */
     protected AbcExportComponent newAbcExportComponent(NotesTextPanelBase view) {
-        return new AbcExportComponent(view.notesText.getText(), newMelodyFactory(), false);
+        return new AbcExportComponent(view.notesText.getText().trim(), newMelodyFactory(), false);
     }
     
     /** @return whether permanentNotesCheck is ON. */

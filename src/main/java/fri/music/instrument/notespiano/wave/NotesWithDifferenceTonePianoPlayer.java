@@ -9,9 +9,13 @@ import fri.music.differencetones.composer.DefaultComposer;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
 import fri.music.instrument.notespiano.NotesTextPanelBase;
 import fri.music.instrument.notespiano.PlayController;
+import fri.music.instrument.notespiano.abc.AbcExportComponent;
 import fri.music.instrument.wave.DifferenceToneForNotesPiano;
 import fri.music.player.Note;
 import fri.music.player.NotesUtil;
+import fri.music.player.notelanguage.MelodyFactory;
+import fri.music.player.notelanguage.abc.AbcExport;
+import fri.music.player.notelanguage.abc.AbcTunesCombiner;
 
 /**
  * Plays the tune in notes-area as difference-tones.
@@ -36,7 +40,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         final JComponent playerPanel = super.getPlayer(melody);
         
         this.convertToDifferenceTones = new JCheckBox("Play Difference Tones", true);
-        convertToDifferenceTones.setToolTipText("Play Written Notes as Difference Tones");
+        convertToDifferenceTones.setToolTipText("Play Notes in Textarea as Difference Tones, Turn This OFF to Hear Simple Notes");
         final ActionListener resetPlayerListener = new ActionListener() {
             /** Reload player when changing. */
             @Override
@@ -79,6 +83,24 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         return playController;
     }
     
+    @Override
+    protected AbcExportComponent newAbcExportComponent(NotesTextPanelBase view) {
+        return new AbcExportComponent(melodyView().notesText.getText(), newMelodyFactory(), true) {
+            @Override
+            protected String export(AbcExport.Configuration configuration, String notesText, boolean includeTuning) {
+                final String intervalsText = generateIntervals(notesText, melodyFactory);
+                final String intervalsAbcText = super.export(configuration, intervalsText, true); // intervals always need tuning
+                if (includeMelody == null || includeMelody.isSelected() == false)
+                    return intervalsAbcText;
+                
+                final String melodyAbcText = super.export(configuration, notesText, true);
+                return new AbcTunesCombiner().combine(
+                        "Intervals name=\"Intervals\"", intervalsAbcText, 
+                        "Melody name=\"Difference Tones\"", melodyAbcText);
+            }
+        };
+    }
+    
     /** Overridden to alternatively generate difference-tone intervals when playing. */
     @Override
     protected Note[][] convertNotes(Note[][] notesArray) {
@@ -106,6 +128,14 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         return super.convertNotes(notesArray);
     }
 
+
+    private String generateIntervals(String notesText, MelodyFactory melodyFactory) {
+        final Note[][] melodyNotes = melodyFactory.translate(notesText);
+        final Note[][] intervalNotes = convertNotes(melodyNotes);
+        final String intervalsText = melodyFactory.formatBarLines(intervalNotes, false, false);
+        return intervalsText;
+    }
+    
     private DifferenceToneForNotesPiano getDifferenceTonePiano() {
         return (DifferenceToneForNotesPiano) piano;
     }
