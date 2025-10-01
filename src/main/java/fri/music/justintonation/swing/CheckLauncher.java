@@ -56,7 +56,6 @@ public class CheckLauncher
                         panel, 
                         new JScrollPane(textArea), 
                         null, 
-                        null, 
                         true);
             }
         });

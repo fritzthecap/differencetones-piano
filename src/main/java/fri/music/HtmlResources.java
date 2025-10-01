@@ -1,5 +1,6 @@
 package fri.music;
 
+import java.awt.Dimension;
 import java.net.URL;
 
 /**
@@ -11,4 +12,6 @@ public interface HtmlResources
     static URL getUrl(Class<?> htmlResourceClass) {
         return htmlResourceClass.getResource(htmlResourceClass.getSimpleName()+".html");
     }
+    
+    Dimension DEFAULT_FRAME_SIZE = new Dimension(830, 620);
 }

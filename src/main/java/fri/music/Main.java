@@ -213,7 +213,12 @@ public final class Main
                 else {
                     final URL url = HtmlResources.class.getResource("quicktour.html");
                     final HtmlBrowser htmlBrowser = new HtmlBrowser(url, HtmlResources.class);
-                    quickTourFrame = FrameStarter.start("Quick Tour", false, htmlBrowser, null, new Dimension(830, 620));
+                    quickTourFrame = FrameStarter.start(
+                            "Quick Tour", 
+                            false, // no exit on close
+                            htmlBrowser, 
+                            null, 
+                            HtmlResources.DEFAULT_FRAME_SIZE);
                 }
             }
         });

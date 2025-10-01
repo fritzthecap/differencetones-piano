@@ -11,9 +11,11 @@ import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
-import fri.music.swingutils.window.DialogStarter;
+import fri.music.HtmlResources;
+import fri.music.swingutils.window.FrameStarter;
 
 /**
  * The toolbar for HTML browser.
@@ -29,6 +31,8 @@ public class HtmlBrowserToolbar extends JToolBar
     public final Action reload;
     
     private JComboBox<HtmlViewWithHeaders.HeaderElement> headersChoice;
+
+    private JFrame helpFrame; // instance-singleton
     
     public HtmlBrowserToolbar(final HtmlBrowser browser, ItemListener referenceItemListener) {
         this.back = new AbstractAction() {
@@ -85,11 +89,18 @@ public class HtmlBrowserToolbar extends JToolBar
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogStarter.showModelessHtmlDialog(
-                        HelpForBrowser.TITLE, 
-                        help, 
-                        HelpForBrowser.URL,
-                        null);
+                if (helpFrame != null) {
+                    helpFrame.setVisible(true);
+                }
+                else {
+                    final HtmlBrowser htmlBrowser = new HtmlBrowser(HelpForBrowser.URL, HtmlResources.class);
+                    helpFrame = FrameStarter.start(
+                            HelpForBrowser.TITLE, 
+                            false, // no exit on close
+                            htmlBrowser, 
+                            null, 
+                            HtmlResources.DEFAULT_FRAME_SIZE);
+                }
             }
         });
         add(help);

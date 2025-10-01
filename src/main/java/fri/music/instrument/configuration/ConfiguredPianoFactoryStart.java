@@ -45,8 +45,6 @@ public class ConfiguredPianoFactoryStart
                         title,
                         frame,
                         pianoPanel,
-                        null,
-                        null,
                         true);
                 closeListener.add(dialog, piano.getWindowClosingListener());
             }
