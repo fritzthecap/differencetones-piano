@@ -51,7 +51,7 @@ public class CheckLauncher
                 fontActions.magnifyFont(true, textArea);
                 fontActions.magnifyFont(true, textArea);
                 
-                DialogStarter.showModelessDialog(
+                DialogStarter.start(
                         dialogTitle, 
                         panel, 
                         new JScrollPane(textArea), 

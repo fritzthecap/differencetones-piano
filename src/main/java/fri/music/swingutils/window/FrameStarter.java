@@ -30,13 +30,18 @@ public class FrameStarter
     private static boolean exiting = false;
     
     /** Runs an EXIT_ON_CLOSE frame. */
-    public static JFrame start(String title, JComponent content) {
-        return start(title, true, content);
-    }
-    
-    /** Runs an EXIT_ON_CLOSE frame. */
     public static JFrame start(String title, JComponent content, Dimension dimension) {
         return start(title, true, content, null, dimension);
+    }
+    
+    /** Runs a DISPOSE_ON_CLOSE frame configured by given parameters. */
+    public static JFrame start(String title, JComponent content) {
+        return start(title, false, content);
+    }
+    
+    /** Runs a DISPOSE_ON_CLOSE frame configured by given parameters. */
+    public static JFrame start(String title, JComponent content, WindowListener windowListener) {
+        return start(title, false, content, windowListener);
     }
     
     /** Runs a frame configured by given parameters. */
@@ -47,6 +52,20 @@ public class FrameStarter
     /** Runs a frame configured by given parameters. */
     public static JFrame start(String title, boolean exitOnClose, JComponent content, WindowListener windowListener) {
         return start(title, exitOnClose, content, windowListener, null);
+    }
+    
+    /** Runs a parent-dependent frame configured by given parameters. */
+    public static JFrame start(JFrame parentLauncher, String title, JComponent content, WindowListener windowListener) {
+        final JFrame frame = start(title, content, windowListener);
+        if (parentLauncher != null)
+            parentLauncher.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                    frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSED));
+                }
+            });
+        return frame;
     }
     
     /** Runs a frame configured by given parameters. */

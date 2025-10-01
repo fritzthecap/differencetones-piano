@@ -147,7 +147,7 @@ public final class Main
                         new NotesWithDifferenceToneInversionsPianoPlayer(
                             new DifferenceToneInversionsPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel));
                 final JComponent playerPanel = player.getPlayer(null);
-                FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
+                FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener());
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -162,7 +162,7 @@ public final class Main
                 final NotesWithDifferenceTonePianoPlayer player = new NotesWithDifferenceTonePianoPlayer(
                         new DifferenceToneForNotesPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel));
                 final JComponent playerPanel = player.getPlayer(NoteExamples.AUGUSTIN.notes());
-                FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
+                FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener());
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -177,7 +177,7 @@ public final class Main
                 final DifferenceToneForIntervalPiano piano = 
                         new DifferenceToneForIntervalPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel);
                 final JComponent keyboardPanel = piano.getKeyboard();
-                FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener(), null);
+                FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener());
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -191,7 +191,7 @@ public final class Main
             public void actionPerformed(ActionEvent e) {
                 final PianoWithSound piano = new TriadPlayingPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel);
                 final JComponent keyboardPanel = piano.getKeyboard();
-                FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener(), null);
+                FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener());
             }
         };
         action.putValue(Action.NAME, asHtml(title));
@@ -259,7 +259,7 @@ public final class Main
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (justIntonationCheckerFrame == null)
-                    justIntonationCheckerFrame = FrameStarter.start(title, false, new CheckLauncher(title).panel);
+                    justIntonationCheckerFrame = FrameStarter.start(title, new CheckLauncher(title).panel);
                 else
                     justIntonationCheckerFrame.setVisible(true);
             }
@@ -276,7 +276,7 @@ public final class Main
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (moreLauncherFrame == null)
-                    moreLauncherFrame = FrameStarter.start(title, false, new MoreLaunchers(), null, null);
+                    moreLauncherFrame = FrameStarter.start(title, new MoreLaunchers());
                 else
                     moreLauncherFrame.setVisible(true);
             }
@@ -349,7 +349,7 @@ public final class Main
                     final NotesPianoPlayer player = new NotesPianoPlayer(
                             new PianoWithVolume(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel));
                     final JComponent playerPanel = player.getPlayer(NoteExamples.ODE_TO_JOY.notes());
-                    FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener(), null);
+                    FrameStarter.start(moreLauncherFrame, title, playerPanel, player.getWindowClosingListener());
                 }
             };
             action.putValue(Action.NAME, asHtml(title));
@@ -364,7 +364,7 @@ public final class Main
                     final DifferenceToneInversionsPiano piano = 
                             new DifferenceToneInversionsPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel);
                     final JComponent panel = piano.getKeyboard();
-                    FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
+                    FrameStarter.start(moreLauncherFrame, title, panel, piano.getWindowClosingListener());
                 }
             };
             action.putValue(Action.NAME, asHtml(title));
@@ -379,7 +379,7 @@ public final class Main
                     final PianoWithSound piano = 
                             new IntervalPlayingPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel);
                     final JComponent panel = piano.getKeyboard();
-                    FrameStarter.start(title, false, panel, piano.getWindowClosingListener(), null);
+                    FrameStarter.start(moreLauncherFrame, title, panel, piano.getWindowClosingListener());
                 }
             };
             action.putValue(Action.NAME, asHtml(title));
@@ -394,7 +394,7 @@ public final class Main
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (configuredPianoFactoryFrame == null)
-                        configuredPianoFactoryFrame = new ConfiguredPianoFactoryStart().frame;
+                        configuredPianoFactoryFrame = new ConfiguredPianoFactoryStart(moreLauncherFrame).frame;
                     else
                         configuredPianoFactoryFrame.setVisible(true);
                 }

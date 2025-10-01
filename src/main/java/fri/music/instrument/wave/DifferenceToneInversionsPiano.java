@@ -39,6 +39,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import fri.music.HtmlResources;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.instrument.PianoWithSound;
@@ -451,11 +452,11 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogStarter.showModelessHtmlDialog(
+                DialogStarter.htmlDialog(
                         "Interval Lists Description", 
                         help, 
                         HelpForIntervalLists.URL,
-                        null);
+                        HtmlResources.DEFAULT_FRAME_SIZE);
             }
         });
         return help;
@@ -664,7 +665,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         setLayoutToIntervalListsPanel(true);
         
-        intervalListsDialog = DialogStarter.showModelessDialog( // detach frames
+        intervalListsDialog = DialogStarter.start( // detach frames
                 INTERVAL_LISTS_TITLE,
                 listsContainer,
                 listsScrollPane,

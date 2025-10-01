@@ -14,6 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.text.JTextComponent;
+import fri.music.HtmlResources;
 import fri.music.SoundChannel;
 import fri.music.Tone;
 import fri.music.ToneSystem;
@@ -321,11 +322,11 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogStarter.showModelessHtmlDialog(
+                DialogStarter.htmlDialog(
                         "Difference-Tone Composition User Guide", 
                         help, 
                         HelpForCompose.URL,
-                        null);
+                        HtmlResources.DEFAULT_FRAME_SIZE);
             }
         });
         return help;

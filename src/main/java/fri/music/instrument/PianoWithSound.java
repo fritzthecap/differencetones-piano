@@ -371,9 +371,10 @@ public class PianoWithSound extends Piano
         for (PianoWithSound.Keyboard.Key key : getKeys())
             key.removeMouseListener(getMouseHandler());
         
-        getSoundChannel().allNotesOff(); // closes all sound-channels
-        soundChannel = null;
-        
-        System.err.println("Freed sound resource of "+this);
+        if (getSoundChannel() != null) {
+            getSoundChannel().allNotesOff(); // closes all wave-channels
+            soundChannel = null;
+            System.err.println("Freed sound resource of "+this);
+        }
     }
 }

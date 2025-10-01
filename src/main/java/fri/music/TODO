@@ -1,6 +1,4 @@
 
-- The "More" launcher frame should terminate all its child windows when closing.
-
 - Create deployment: Maven packer job to generate JAR file.
     Try out JAR file (whether hyperlink resolution works).
     

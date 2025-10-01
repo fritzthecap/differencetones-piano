@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JToolBar;
 import javax.swing.border.Border;
+import fri.music.HtmlResources;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
@@ -67,11 +68,11 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogStarter.showModelessHtmlDialog(
+                DialogStarter.htmlDialog(
                         "Piano Settings", 
                         help, 
                         HelpForPianoSettings.URL,
-                        null);
+                        HtmlResources.DEFAULT_FRAME_SIZE);
             }
         });
         getControlPanel().add(Box.createHorizontalGlue(), -1);

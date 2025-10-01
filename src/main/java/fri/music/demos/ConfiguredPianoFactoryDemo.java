@@ -8,7 +8,7 @@ public class ConfiguredPianoFactoryDemo
 {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            final ConfiguredPianoFactoryStart configuredPianoFactoryStart = new ConfiguredPianoFactoryStart();
+            final ConfiguredPianoFactoryStart configuredPianoFactoryStart = new ConfiguredPianoFactoryStart(null);
             configuredPianoFactoryStart.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // this is a demo
         });
     }

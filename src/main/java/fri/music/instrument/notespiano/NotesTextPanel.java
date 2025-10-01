@@ -20,6 +20,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.JTextComponent;
+import fri.music.HtmlResources;
 import fri.music.ToneSystem;
 import fri.music.player.Note;
 import fri.music.swingutils.layout.SmartComboBox;
@@ -83,11 +84,11 @@ public class NotesTextPanel extends NotesTextPanelBase
         help.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogStarter.showModelessHtmlDialog(
+                DialogStarter.htmlDialog(
                         "Notes Edit Help", 
                         help, // parent
                         HelpForNotes.URL, 
-                        null);
+                        HtmlResources.DEFAULT_FRAME_SIZE);
             }
         });
         textareaToolbar.add(help);

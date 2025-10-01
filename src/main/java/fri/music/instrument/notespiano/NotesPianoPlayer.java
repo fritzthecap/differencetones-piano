@@ -299,7 +299,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         view.abcExport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogStarter.showModelessDialog(
+                DialogStarter.start(
                         "Export to ABC",
                         view.notesText, // parent to show above
                         newAbcExportComponent(view), // fetches the view-owned text, with left-side tempo and time

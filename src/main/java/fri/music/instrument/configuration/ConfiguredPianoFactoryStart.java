@@ -17,7 +17,7 @@ import fri.music.swingutils.window.FrameStarter;
 import fri.music.swingutils.window.WindowClosingManager;
 
 /**
- * The piano configuration showcase.
+ * The piano configuration API showcase.
  */
 public class ConfiguredPianoFactoryStart
 {
@@ -26,7 +26,7 @@ public class ConfiguredPianoFactoryStart
     private final WindowClosingManager closeListener;
     private int numberOfPianos;
     
-    public ConfiguredPianoFactoryStart() {
+    public ConfiguredPianoFactoryStart(JFrame parentFrame) {
         final ConfiguredPianoFactory configuredPianoFactory = new ConfiguredPianoFactory();
         
         this.closeListener = new WindowClosingManager();
@@ -41,7 +41,7 @@ public class ConfiguredPianoFactoryStart
                 numberOfPianos++;
                 final String title = piano.getClass().getSimpleName()+" "+numberOfPianos;
                 
-                final JDialog dialog = DialogStarter.showModelessDialog(
+                final JDialog dialog = DialogStarter.start(
                         title,
                         frame,
                         pianoPanel,
@@ -58,10 +58,6 @@ public class ConfiguredPianoFactoryStart
         mainPanel.add(configuredPianoFactory.panel, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        this.frame = FrameStarter.start(
-                "Piano Configuration Showcase", 
-                false, // no exit on close
-                mainPanel,
-                closeListener);
+        this.frame = FrameStarter.start(parentFrame, "Piano Configuration Showcase", mainPanel, closeListener);
     }
 }

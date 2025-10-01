@@ -110,6 +110,7 @@ public class PianoConfigurationPanel
         };
         
         this.octaves = new JSlider(1, ToneSystem.MAXIMUM_OCTAVES, configuration.octaves);
+        octaves.setToolTipText("The Number of Octaves above the Starting Octave");
         octaves.setBorder(BorderFactory.createTitledBorder("Number of Octaves (Maximum "+ToneSystem.MAXIMUM_OCTAVES+")"));
         octaves.setSnapToTicks(true);
         octaves.setPaintLabels(true);

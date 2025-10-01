@@ -32,23 +32,23 @@ public class DialogStarter
     /**
      * Opens a non-modal dialog showing given HTML text in a scroll-pane.
      * @param title the text to show in the dialog's title bar.
-     * @param htmlText the text to render in returned JTextPane.
+     * @param htmlUrl the address of the HTML document to render.
      * @param parent required, a parent Component in same Window where to locate dialog relatively.
      * @param size optional, the wanted dimension.
      */
-    public static void showModelessHtmlDialog(String title, Component parent, URL htmlUrl, Dimension size) {
-        showModelessDialog(title, parent, buildHtmlView(htmlUrl), size, false);
+    public static void htmlDialog(String title, Component parent, URL htmlUrl, Dimension size) {
+        start(title, parent, buildHtmlView(htmlUrl), size, false);
     }
 
     /**
      * Opens a non-modal dialog showing given plain text in a scroll-pane.
      * @param title the text to show in the dialog's title bar.
-     * @param plainText the text to render in returned JTextPane.
+     * @param plainText the text to render.
      * @param parent required, a parent Component in same Window where to locate dialog relatively.
      * @param size optional, the dimension when different from 600 x 460.
      */
-    public static void showModelessTextDialog(String title, Component parent, String plainText, Dimension size) {
-        showModelessDialog(title, parent, buildPlainTextArea(plainText), size, true);
+    public static void textDialog(String title, Component parent, String plainText, Dimension size) {
+        start(title, parent, buildPlainTextArea(plainText), size, true);
     }
 
     /**
@@ -59,8 +59,8 @@ public class DialogStarter
      * @param relativeToParent true for showing dialog at location relative to parent (not window).
      * @return the created dialog window.
      */
-    public static JDialog showModelessDialog(String title, Component parent, JComponent componentToShow, boolean relativeToParent) {
-        return showModelessDialog(title, parent, componentToShow, null, relativeToParent);
+    public static JDialog start(String title, Component parent, JComponent componentToShow, boolean relativeToParent) {
+        return start(title, parent, componentToShow, null, relativeToParent);
     }
     
     /**
@@ -72,8 +72,8 @@ public class DialogStarter
      * @param relativeToParent true for showing dialog at location relative to parent (not window).
      * @return the created dialog window.
      */
-    public static JDialog showModelessDialog(String title, Component parent, JComponent componentToShow, Dimension size, boolean relativeToParent) {
-        return showModelessDialog(title, parent, componentToShow, size, null, relativeToParent);
+    public static JDialog start(String title, Component parent, JComponent componentToShow, Dimension size, boolean relativeToParent) {
+        return start(title, parent, componentToShow, size, null, relativeToParent);
     }
     
     /**
@@ -86,7 +86,7 @@ public class DialogStarter
      * @param relativeToParent true for showing dialog at location relative to parent (not window).
      * @return the created dialog window.
      */
-    public static JDialog showModelessDialog(
+    public static JDialog start(
             String title, 
             Component parent, 
             JComponent componentToShow, 
@@ -129,10 +129,10 @@ public class DialogStarter
             dialog.setLocationRelativeTo(relativeToComponent);
             
             final String dialogTitle = dialog.getTitle();
-            if (dialogTitle != null && dialogTitle.isEmpty() == false) { // check for cascading
+            if (dialogTitle != null && dialogTitle.trim().length() > 0) { // check for cascading
                 // cut off trailing numbers
-                final String title = TextUtil.getUntilFirstNumber(dialogTitle);
-                final Point locationForTitle = dialogMap.get(title);
+                final String titleWithoutNumber = TextUtil.getUntilFirstNumber(dialogTitle.trim());
+                final Point locationForTitle = dialogMap.get(titleWithoutNumber);
                 
                 if (locationForTitle != null) { // cascade window to next point
                     Point previousLocation = locationMap.get(locationForTitle);
@@ -142,12 +142,13 @@ public class DialogStarter
                 }
                 else { // initialize cascading
                     Point currentLocation = dialog.getLocation();
-                    dialogMap.put(title, currentLocation);
+                    dialogMap.put(titleWithoutNumber, currentLocation);
                     locationMap.put(currentLocation, currentLocation);
                 }
             }
         }
     }
+    
     /**
      * Builds a panel containing given HTML.
      * @param htmlUrl the HTML resource to render in returned component.
