@@ -1,8 +1,6 @@
 
-- NotesWithDifferenceTonePianoPlayer must export both intervals and notes to ABC.
-
-- Create deployment: Maven packer job to generate JAR file.
-    Try out JAR file (whether hyperlink resolution works).
+- "Help" buttons in pianos need instance-singletons, they should not 
+    open the same documentation twice!
     
 - Find out why the first interval in auto-composed "When the Saints" is so high.
     Maybe the tone-range calculation is wrong or could be improved?

@@ -2,32 +2,71 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
 >
-    <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion> <!-- Maven model version -->
 
     <groupId>fri.music</groupId>
     <artifactId>differencetones-piano</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <jupiter-version>6.0.0</jupiter-version>
     
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <dependencies>
-
         <!-- main scope -->
 
         <!-- test scope -->
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.12.0-M1</version>
             <scope>test</scope>
         </dependency>
-        
     </dependencies>
 
+    <dependencyManagement>
+        <!-- According to 
+            https://docs.junit.org/current/user-guide/#running-tests-build-maven
+            the junit-bom is needed for aligning all junit-jupiter dependencies -->
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${jupiter-version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+    <build>
+        <plugins>
+            <!-- JAR plugin is needed to add MANIFEST.MF with application main class -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest> <!-- The application main class -->
+                            <mainClass>fri.music.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire plugin is needed to find junit-jupiter tests when run from commandline -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version><!-- 3.0.0 is minimum for junit-jupiter 6.0.0-->
+            </plugin>
+            
+        </plugins>
+    </build>
+    
 </project>
