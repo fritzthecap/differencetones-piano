@@ -6,7 +6,7 @@
 
     <groupId>fri.music</groupId>
     <artifactId>differencetones-piano</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
