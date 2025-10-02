@@ -2,7 +2,6 @@ package fri.music.swingutils.text;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.util.List;
 import javax.swing.AbstractAction;
@@ -11,11 +10,8 @@ import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
-import fri.music.HtmlResources;
-import fri.music.swingutils.window.FrameStarter;
 
 /**
  * The toolbar for HTML browser.
@@ -32,8 +28,6 @@ public class HtmlBrowserToolbar extends JToolBar
     
     private JComboBox<HtmlViewWithHeaders.HeaderElement> headersChoice;
 
-    private JFrame helpFrame; // instance-singleton
-    
     public HtmlBrowserToolbar(final HtmlBrowser browser, ItemListener referenceItemListener) {
         this.back = new AbstractAction() {
             @Override
@@ -86,23 +80,7 @@ public class HtmlBrowserToolbar extends JToolBar
         
         final JButton help = new JButton("Help");
         help.setToolTipText(HelpForBrowser.TITLE);
-        help.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (helpFrame != null) {
-                    helpFrame.setVisible(true);
-                }
-                else {
-                    final HtmlBrowser htmlBrowser = new HtmlBrowser(HelpForBrowser.URL, HtmlResources.class);
-                    helpFrame = FrameStarter.start(
-                            HelpForBrowser.TITLE, 
-                            false, // no exit on close
-                            htmlBrowser, 
-                            null, 
-                            HtmlResources.DEFAULT_FRAME_SIZE);
-                }
-            }
-        });
+        help.addActionListener(event -> HelpWindowSingleton.start(browser, HelpForBrowser.TITLE, HelpForBrowser.URL));
         add(help);
         
         add(Box.createHorizontalGlue());

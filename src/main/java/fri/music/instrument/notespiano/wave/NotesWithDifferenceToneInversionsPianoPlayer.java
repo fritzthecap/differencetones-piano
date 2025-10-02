@@ -14,7 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.text.JTextComponent;
-import fri.music.HtmlResources;
 import fri.music.SoundChannel;
 import fri.music.Tone;
 import fri.music.ToneSystem;
@@ -37,8 +36,8 @@ import fri.music.player.notelanguage.NoteConnections;
 import fri.music.player.notelanguage.abc.AbcExport;
 import fri.music.player.notelanguage.abc.AbcTunesCombiner;
 import fri.music.swingutils.BorderUtil;
+import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.swingutils.text.TextAreaUtil;
-import fri.music.swingutils.window.DialogStarter;
 
 /**
  * The most complex view of this project.
@@ -279,12 +278,15 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         
         intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
         
-        final JComponent helpButton = buildHelpButton();
-        helpButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        final JButton help = new JButton("Help");
+        help.setToolTipText("Difference-Tone Composition User Guide");
+        help.addActionListener(event -> HelpWindowSingleton.start(intervalNotes, "Difference-Tone Composition User Guide", HelpForCompose.URL));
+        
+        help.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         final JToolBar helpBar = new JToolBar();
         helpBar.setFloatable(false);
         helpBar.setBorder(null);
-        helpBar.add(helpButton);
+        helpBar.add(help);
         intervalNotes.notesControlPanel.add(helpBar);
         
         intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
@@ -315,23 +317,6 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         return intervalNotes;
     }
     
-    
-    private JComponent buildHelpButton() {
-        final JButton help = new JButton("Help");
-        help.setToolTipText("Difference-Tone Composition User Guide");
-        help.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DialogStarter.htmlDialog(
-                        "Difference-Tone Composition User Guide", 
-                        help, 
-                        HelpForCompose.URL,
-                        HtmlResources.DEFAULT_FRAME_SIZE);
-            }
-        });
-        return help;
-    }
-
     
     // callbacks
     

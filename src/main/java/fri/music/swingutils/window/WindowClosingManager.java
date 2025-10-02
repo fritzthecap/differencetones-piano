@@ -7,6 +7,10 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A window-listener that can aggregate windows that all
+ * get closed as soon as the listener receives <code>windowClosing()</code>.
+ */
 public class WindowClosingManager extends WindowAdapter
 {
     private List<Window> windows = new ArrayList<>();

@@ -20,12 +20,11 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.text.JTextComponent;
-import fri.music.HtmlResources;
 import fri.music.ToneSystem;
 import fri.music.player.Note;
 import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.swingutils.layout.SmartPanel;
-import fri.music.swingutils.window.DialogStarter;
+import fri.music.swingutils.text.HelpWindowSingleton;
 
 /** Full view of NotesPianoPlayer with time-signature and tempo controls. */
 public class NotesTextPanel extends NotesTextPanelBase
@@ -81,16 +80,7 @@ public class NotesTextPanel extends NotesTextPanelBase
         
         final JButton help = new JButton("Help");
         help.setToolTipText("Notes Syntax Documentation");
-        help.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DialogStarter.htmlDialog(
-                        "Notes Edit Help", 
-                        help, // parent
-                        HelpForNotes.URL, 
-                        HtmlResources.DEFAULT_FRAME_SIZE);
-            }
-        });
+        help.addActionListener(event -> HelpWindowSingleton.start(textareaToolbar, "Notes Edit Help", HelpForNotes.URL));
         textareaToolbar.add(help);
     }
     

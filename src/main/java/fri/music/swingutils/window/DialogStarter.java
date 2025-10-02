@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Map;
@@ -36,8 +37,8 @@ public class DialogStarter
      * @param parent required, a parent Component in same Window where to locate dialog relatively.
      * @param size optional, the wanted dimension.
      */
-    public static void htmlDialog(String title, Component parent, URL htmlUrl, Dimension size) {
-        start(title, parent, buildHtmlView(htmlUrl), size, false);
+    public static JDialog htmlDialog(String title, Component parent, URL htmlUrl, Dimension size) {
+        return start(title, parent, buildHtmlView(htmlUrl), size, false);
     }
 
     /**
@@ -47,8 +48,8 @@ public class DialogStarter
      * @param parent required, a parent Component in same Window where to locate dialog relatively.
      * @param size optional, the dimension when different from 600 x 460.
      */
-    public static void textDialog(String title, Component parent, String plainText, Dimension size) {
-        start(title, parent, buildPlainTextArea(plainText), size, true);
+    public static JDialog textDialog(String title, Component parent, String plainText, Dimension size) {
+        return start(title, parent, buildPlainTextArea(plainText), size, true);
     }
 
     /**
@@ -106,8 +107,7 @@ public class DialogStarter
                 new AbstractAction() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        dialog.setVisible(false);
-                        try { dialog.dispose(); } catch (Exception ex) {}
+                        dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
                     }
                 });
         

@@ -39,7 +39,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import fri.music.HtmlResources;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.instrument.PianoWithSound;
@@ -48,6 +47,7 @@ import fri.music.player.Note;
 import fri.music.swingutils.BorderUtil;
 import fri.music.swingutils.layout.FlowLayoutForScrollPane;
 import fri.music.swingutils.layout.SizeUtil;
+import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.swingutils.window.DialogStarter;
 import fri.music.wavegenerator.WaveSoundChannel;
 
@@ -435,9 +435,12 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         intervalListsToolbar.add(detachIntervalFrames);
         intervalListsToolbar.add(closeAllIntervalFrames);
         
-        // add "Help" button at right side
-        intervalListsToolbar.add(Box.createHorizontalGlue(), -1); // -1: append to end
-        intervalListsToolbar.add(buildHelpButton(), -1);
+        intervalListsToolbar.add(Box.createHorizontalGlue(), -1); // -1: append help button to right side end
+        
+        final JButton help = new JButton("Help");
+        help.setToolTipText("Interval Lists Description");
+        help.addActionListener(event -> HelpWindowSingleton.start(intervalListsPanel, "Interval Lists Description", HelpForIntervalLists.URL));
+        intervalListsToolbar.add(help, -1);
         
         this.listsContainer = new JPanel(new BorderLayout());
         addIntervalListsToInternalScrollPane();
@@ -446,22 +449,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         return listsContainer;
     }
 
-    private JComponent buildHelpButton() {
-        final JButton help = new JButton("Help");
-        help.setToolTipText("Interval Lists Description");
-        help.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DialogStarter.htmlDialog(
-                        "Interval Lists Description", 
-                        help, 
-                        HelpForIntervalLists.URL,
-                        HtmlResources.DEFAULT_FRAME_SIZE);
-            }
-        });
-        return help;
-    }
-    
     private void addIntervalListsToInternalScrollPane() {
         setLayoutToIntervalListsPanel(false);
         

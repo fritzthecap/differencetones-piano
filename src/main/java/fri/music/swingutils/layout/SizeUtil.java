@@ -5,10 +5,11 @@ import java.awt.Dimension;
 
 public class SizeUtil
 {
-    public static void forceSize(Component component, Dimension size) {
+    public static <C extends Component> C forceSize(C component, Dimension size) {
         component.setPreferredSize(size);
         component.setMinimumSize(size);
         component.setMaximumSize(size);
+        return component;
     }
 
 }

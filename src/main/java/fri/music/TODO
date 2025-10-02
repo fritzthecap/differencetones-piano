@@ -1,7 +1,4 @@
 
-- "Help" buttons in pianos need instance-singletons, they should not 
-    open the same documentation twice!
-    
 - Find out why the first interval in auto-composed "When the Saints" is so high.
     Maybe the tone-range calculation is wrong or could be improved?
 
