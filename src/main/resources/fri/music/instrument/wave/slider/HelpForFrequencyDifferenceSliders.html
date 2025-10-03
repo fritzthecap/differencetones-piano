@@ -5,11 +5,104 @@
 <h1>See Intervals and Their Difference-Tones on Frequency Sliders</h1>
 
 <p>
-    You find information about this topic also in <a href="quicktour.html">Quick Tour</a>.
+    You find information about this topic also in <a href="quicktour.html#FrequencySliders">Quick Tour</a>.
 </p>
 
+<h2>Tuning and Sound</h2>
+
 <p>
-    TODO
+    The top bar contains tuning and sound controls.
+    Mind that the preset tuning is not <i>EqualTemperament</i> but <i>JustIntonation</i>, 
+    because the latter mostly produces cleaner difference-tones.
+</p><p>
+    If you change the "Tuning", the frequencies of the slider scales change.
+    That is the reason why the slider knobs move in that case.
+    The tone C6 (second slider from top) has 1056.000 Hertz in <i>JustIntonation</i>,
+    but 1046.502 Hertz in <i>EqualTemperament</i>.
+    A4 would not move, as both tunings are calculated from 440 Hertz.
+    What actually moves is the scale, not the knob.
+    The application tries to keep the frequency of the slider knob,
+    but has to move to 1056.874 because its precision is 4 cent only.
+    If you constantly left-click onto the slider to the left of C6,
+    the knob will get red when it reaches 1046.502 Hertz.
+    The tone name getting red is a sign that it matches the tuned scale tone.
+</p><p>
+    The "Wave Form" lets you choose different sounds.
+    You can change the sound "on the fly" while the sliders are playing.
+    Note that "Sine" is the best wave to produce clean difference-tones,
+    as it contains no overtones. 
+</p><p>
+    Amplitude is the measure of the deflection of the sine wave, 
+    this basically can be understood as loudness or volume.
+</p><p>
+    Gain is the <a href="https://en.wikipedia.org/wiki/Sound_power">sound power</a>
+    of the tone. Be careful with that to not ruin your speakers.
+</p>
+
+<h2>Control Fields</h2>
+
+<p>
+    The second row from top contains display- and control-fields.
+    They are connected to the sliders bidirectionally.
+</p><p>
+    The "Play / Halt 1+2" button starts and stops the sound of the "Play 1" and "Play 2" sliders.
+</p><p>
+    If you enter IPN note names in "Note 1" and "Note 2" fields,
+    the according slider will jump to the frequency of that note.
+    The resulting difference-tone will be displayed in "Note 1-2".
+    The corresponding "Frequency" fields to the right will show the according frequencies in Hertz.
+    You can use CURSOR-UP and -DOWN to jump between semitones.
+    When a field is empty it means that the current slider frequency
+    does not match the frequency of a regular semitone in the chosen tuning. 
+</p><p>
+    The "Octaves" field displays the number of octaves the two tones are apart.
+    The "Nearest Pure Interval" displays the name of the nearest interval the two tones are apart.
+    When it is enclosed in brackets, like e.g. ">FOURTH<", it is a precise matchof the interval.
+    It is possible that some intervals never get matched in some tunings, 
+    especially in <i>EqualTemperament</i>, because its fractions are not rational
+    like those in <i>JustIntonation</i>.  
+</p><p>
+    The fractions of the intervals are display in the "Pure Fraction" field to the very right.
+    If you want to see a certain interval fraction, write it into the "Enter Fraction" field
+    and press ENTER. The top slider will then jump to the according position.
+</p>
+
+<h2>Interval Sliders</h2>
+
+<p>
+    <b>The accuracy of the sliders is approximately 4 cents</b>, 
+    which is roughly the limit of human perception.
+    A semitone has 100 cent.
+</p><p>
+    The "Play 1" and "Play 2" fields turn on and off the sound of the according slider.
+    The sliders to the right show 12-tone scale note names (IPN) and the frequency 
+    where the slider knob currently resides.
+    If a note name is red it means that the frequency is exactly the one of the note.
+    Semitones have just an arrow ^ as name, but are displayed fully in the text fields on top.
+</p><p>
+    You can move the the two sliders by mouse drag, 
+    or by left mouse click (moves 4 cent in mouse-direction),
+    or by right mouse click onto the desired position.
+    Once focussed, the slider knob can also be moved by CURSOR-LEFT and CURSOR_RIGHT.
+</p>
+
+<h2>Difference-Tone Slider(s)</h2>
+
+<p>
+    On bottom you see the frequency of the difference-tone
+    that the two interval frequency sliders produce.
+    You can start its sound by the "Play 1-2" button. 
+</p><p>
+    If you move one of the two interval sliders on top, 
+    you see that the difference-tone gets higher when the interval gets wider,
+    and that it gets lower when the interval gets narrower.
+</p><p>
+    If you click on the expand bar on top of this slider,
+    a panel showing also the secondary and tertiary difference-tone gets visible.
+    You may have to size the window to see them fully.
+    These are barely audible and are here just for completeness.
+    Their formulas are in class <code>DifferenceToneMath</code>, see also 
+    <a href="glossary.html">glossary</a>.
 </p>
 
 </body>
