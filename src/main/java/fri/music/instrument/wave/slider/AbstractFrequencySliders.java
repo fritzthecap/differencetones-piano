@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.JustIntonation;
@@ -183,6 +185,10 @@ public abstract class AbstractFrequencySliders
         for (SliderPanel sliderPanel : getSliderPanels())
             sliderPanel.close();
     }
+    
+    protected abstract ActionListener createHelpActionListener();
+    
+    
 
     private JSlider createAmplitudeSlider() {
         final JSlider amplitudeSlider = new JSlider();
@@ -287,6 +293,13 @@ public abstract class AbstractFrequencySliders
         settingsPanel.add(waveChoice);
         settingsPanel.add(amplitudeSlider);
         settingsPanel.add(gainSlider);
+        
+        final JButton help = new JButton("Help");
+        help.addActionListener(createHelpActionListener());
+        JToolBar layoutToolbar = new JToolBar();
+        layoutToolbar.setFloatable(false);
+        layoutToolbar.add(help);
+        settingsPanel.add(layoutToolbar);
 
         final JPanel infoAndSettingsPanel = new JPanel();
         infoAndSettingsPanel.setLayout(new BoxLayout(infoAndSettingsPanel, BoxLayout.Y_AXIS));

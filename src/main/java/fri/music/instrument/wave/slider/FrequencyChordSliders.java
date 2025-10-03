@@ -20,6 +20,7 @@ import fri.music.ToneSystem;
 import fri.music.swingutils.ButtonUtil;
 import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.swingutils.layout.SmartSlider;
+import fri.music.swingutils.text.HelpWindowSingleton;
 
 /**
  * Lets try out 4 frequencies combined.
@@ -66,6 +67,11 @@ public class FrequencyChordSliders extends AbstractFrequencySliders
         };
     }
 
+    @Override
+    protected ActionListener createHelpActionListener() {
+        return (ActionEvent event) -> HelpWindowSingleton.start(panel, "Chord Frequency Sliders", HelpForFrequencyChordSliders.URL);
+    }
+    
     /** Creates "Start / Stop All" button and chord selection. */
     @Override
     protected JComponent createInfoPanel() {

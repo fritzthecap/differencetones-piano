@@ -25,6 +25,7 @@ import fri.music.MathUtils;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.swingutils.ButtonUtil;
+import fri.music.swingutils.text.HelpWindowSingleton;
 
 /**
  * Displays two frequency sliders and their difference-tone.
@@ -54,6 +55,11 @@ public class FrequencyDifferenceSliders extends AbstractFrequencySliders
     protected void initializeTones(ToneSystem toneSystem) {
         super.initializeTones(toneSystem);
         initializeJustIntervals(toneSystem);
+    }
+    
+    @Override
+    protected ActionListener createHelpActionListener() {
+        return (ActionEvent event) -> HelpWindowSingleton.start(panel, "Difference-Tone Frequency Sliders", HelpForFrequencyDifferenceSliders.URL);
     }
     
     private void initializeJustIntervals(ToneSystem toneSystem) {

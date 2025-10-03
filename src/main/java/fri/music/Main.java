@@ -38,6 +38,8 @@ import fri.music.instrument.wave.TriadPlayingPiano;
 import fri.music.instrument.wave.slider.AbstractFrequencySliders;
 import fri.music.instrument.wave.slider.FrequencyChordSliders;
 import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
+import fri.music.instrument.wave.slider.HelpForFrequencyChordSliders;
+import fri.music.instrument.wave.slider.HelpForFrequencyDifferenceSliders;
 import fri.music.justintonation.swing.CheckLauncher;
 import fri.music.swingutils.layout.SizeUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;
@@ -210,7 +212,7 @@ public final class Main
     }
 
     private Action buildFrequencyDifferenceSliders() {
-        final String title = "See Intervals and Their Difference-Tones on Frequency Sliders";
+        final String title = HelpForFrequencyDifferenceSliders.TITLE;
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -222,7 +224,7 @@ public final class Main
     }
 
     private Action buildFrequencyChordSliders() {
-        final String title = "Study Chord Beatings in Various Tunings with Frequency Sliders";
+        final String title = HelpForFrequencyChordSliders.TITLE;
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
