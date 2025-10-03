@@ -17,7 +17,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.JustIntonation;
@@ -26,6 +25,7 @@ import fri.music.Tones;
 import fri.music.instrument.wave.TuningComponent;
 import fri.music.swingutils.ButtonUtil;
 import fri.music.swingutils.layout.SmartComboBox;
+import fri.music.swingutils.layout.ToolBarUtil;
 import fri.music.wavegenerator.SineWaveGenerator;
 import fri.music.wavegenerator.WaveGenerator;
 import fri.music.wavegenerator.WaveNames;
@@ -296,10 +296,7 @@ public abstract class AbstractFrequencySliders
         
         final JButton help = new JButton("Help");
         help.addActionListener(createHelpActionListener());
-        JToolBar layoutToolbar = new JToolBar();
-        layoutToolbar.setFloatable(false);
-        layoutToolbar.add(help);
-        settingsPanel.add(layoutToolbar);
+        settingsPanel.add(ToolBarUtil.getHelpButtonLookWrapper(help));
 
         final JPanel infoAndSettingsPanel = new JPanel();
         infoAndSettingsPanel.setLayout(new BoxLayout(infoAndSettingsPanel, BoxLayout.Y_AXIS));

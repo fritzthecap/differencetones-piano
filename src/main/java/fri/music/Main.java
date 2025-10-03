@@ -40,7 +40,8 @@ import fri.music.instrument.wave.slider.FrequencyChordSliders;
 import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyChordSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyDifferenceSliders;
-import fri.music.justintonation.swing.CheckLauncher;
+import fri.music.justintonation.swing.HelpForJustIntonationChecker;
+import fri.music.justintonation.swing.TuningsCheckLauncher;
 import fri.music.swingutils.layout.SizeUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.swingutils.text.HtmlBrowser;
@@ -235,17 +236,17 @@ public final class Main
         return setActionNameAsHtml(title, action);
     }
 
-    private JFrame justIntonationCheckerFrame; // instance-singleton
+    private JFrame fractionBasedTuningsCheckerFrame; // instance-singleton
     
     private Action buildJustIntonationCheckerConfiguration() {
-        final String title = "Check Just-Intonation Tunings for Purity";
+        final String title = HelpForJustIntonationChecker.TITLE;
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (justIntonationCheckerFrame == null)
-                    justIntonationCheckerFrame = FrameStarter.start(title, new CheckLauncher(title).panel);
+                if (fractionBasedTuningsCheckerFrame == null)
+                    fractionBasedTuningsCheckerFrame = FrameStarter.start(title, new TuningsCheckLauncher(title).panel);
                 else
-                    justIntonationCheckerFrame.setVisible(true);
+                    fractionBasedTuningsCheckerFrame.setVisible(true);
             }
         };
         return setActionNameAsHtml(title, action);

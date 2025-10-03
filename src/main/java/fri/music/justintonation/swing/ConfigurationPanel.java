@@ -73,7 +73,7 @@ public class ConfigurationPanel
         
         final JComponent checkedJustIntonationTuningsScrollPane = new JScrollPane(checkedJustIntonationTunings);
         checkedJustIntonationTunings.setVisibleRowCount(5);
-        checkedJustIntonationTuningsScrollPane.setBorder(BorderFactory.createTitledBorder("Just-Intonation Tuning(s) to check"));
+        checkedJustIntonationTuningsScrollPane.setBorder(BorderFactory.createTitledBorder("Tuning(s) to check"));
         
         panel.add(moveLeftUpperPanel);
         panel.add(moveLeftLowerPanel);

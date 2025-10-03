@@ -36,6 +36,7 @@ import fri.music.player.notelanguage.NoteConnections;
 import fri.music.player.notelanguage.abc.AbcExport;
 import fri.music.player.notelanguage.abc.AbcTunesCombiner;
 import fri.music.swingutils.BorderUtil;
+import fri.music.swingutils.layout.ToolBarUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.swingutils.text.TextAreaUtil;
 
@@ -283,11 +284,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         help.addActionListener(event -> HelpWindowSingleton.start(intervalNotes, "Difference-Tone Composition User Guide", HelpForCompose.URL));
         
         help.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        final JToolBar helpBar = new JToolBar();
-        helpBar.setFloatable(false);
-        helpBar.setBorder(null);
-        helpBar.add(help);
-        intervalNotes.notesControlPanel.add(helpBar);
+        intervalNotes.notesControlPanel.add(ToolBarUtil.getHelpButtonLookWrapper(help));
         
         intervalNotes.notesControlPanel.add(piano.config.isVertical ? Box.createHorizontalGlue() : Box.createVerticalGlue());
         

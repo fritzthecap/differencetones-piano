@@ -12,14 +12,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JToolBar;
+import fri.music.swingutils.layout.ToolBarUtil;
+import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.swingutils.text.TextAreaActions;
 import fri.music.swingutils.window.DialogStarter;
 
-public class CheckLauncher
+/**
+ * UI for checking the purity of fraction-based tunings
+ * with ConfigurationPanel.
+ */
+public class TuningsCheckLauncher
 {
     public JComponent panel;
     
-    public CheckLauncher(final String dialogTitle) {
+    public TuningsCheckLauncher(final String dialogTitle) {
         final ConfigurationPanel configurationPanel = new ConfigurationPanel();
         
         final JButton showDiagnosisButton = new JButton("Check Purity");
@@ -27,6 +34,10 @@ public class CheckLauncher
         final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true));
         buttonPanel.add(showDiagnosisButton);
+        
+        final JButton help = new JButton("Help");
+        help.addActionListener(event -> HelpWindowSingleton.start(configurationPanel.panel, "Check Fraction-Based Tunings for Purity", HelpForJustIntonationChecker.URL));
+        buttonPanel.add(ToolBarUtil.getHelpButtonLookWrapper(help));
         
         this.panel = new JPanel(new BorderLayout());
         panel.add(configurationPanel.panel, BorderLayout.CENTER);

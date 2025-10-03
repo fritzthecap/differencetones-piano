@@ -4,7 +4,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import fri.music.justintonation.swing.CheckLauncher;
+import fri.music.justintonation.swing.TuningsCheckLauncher;
 
 public class JustIntonationCheckerConfigurationDemo
 {
@@ -12,7 +12,7 @@ public class JustIntonationCheckerConfigurationDemo
         SwingUtilities.invokeLater(() -> {
             startFrame(
                     "Check Just-Intonation Tunings for Purity",
-                    new CheckLauncher("Check Just-Intonation Tunings for Purity").panel,
+                    new TuningsCheckLauncher("Check Just-Intonation Tunings for Purity").panel,
                     WindowConstants.EXIT_ON_CLOSE);
         });
     }

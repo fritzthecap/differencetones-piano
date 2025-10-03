@@ -15,6 +15,7 @@ import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
 import fri.music.swingutils.ButtonUtil;
+import fri.music.swingutils.layout.ToolBarUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
@@ -64,13 +65,8 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         final JButton help = new JButton("Help");
         help.setToolTipText("Piano Settings Description");
         help.addActionListener(event -> HelpWindowSingleton.start(pianoPanel, "Piano Settings", HelpForPianoSettings.URL));
-
         getControlPanel().add(Box.createHorizontalGlue(), -1);
-        final JToolBar toolbar = new JToolBar(); // configure same look&feel as other Help buttons in toolbars
-        toolbar.setFloatable(false);
-        toolbar.setBorder(null);
-        toolbar.add(help);
-        getControlPanel().add(toolbar);
+        getControlPanel().add(ToolBarUtil.getHelpButtonLookWrapper(help));
         
         return this.pianoPanel = pianoPanel;
     }
