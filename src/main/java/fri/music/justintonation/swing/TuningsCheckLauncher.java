@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JToolBar;
 import fri.music.swingutils.layout.ToolBarUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.swingutils.text.TextAreaActions;

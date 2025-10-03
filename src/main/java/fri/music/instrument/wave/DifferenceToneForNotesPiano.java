@@ -9,7 +9,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;

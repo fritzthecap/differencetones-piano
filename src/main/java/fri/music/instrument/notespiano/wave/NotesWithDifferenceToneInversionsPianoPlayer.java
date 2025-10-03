@@ -12,7 +12,6 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
 import javax.swing.text.JTextComponent;
 import fri.music.SoundChannel;
 import fri.music.Tone;
