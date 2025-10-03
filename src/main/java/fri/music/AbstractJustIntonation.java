@@ -193,7 +193,7 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
         final String lowestInZeroOctave = ((CacheKey) getCacheKey()).lowestInZeroOctave();
         final Interval[] intervals = chromaticScale.intervals();
         
-        // for IPN-names and MIDI-numbers, get EDO-12 tones starting at lowest tone
+        // for IPN-names and MIDI-numbers, get ET-12 tones starting at lowest tone
         final Tone[] templateTones = new EqualTemperament(lowestInZeroOctave).tones();
         final double baseToneFrequency = calculateBaseToneFrequency(intervals, templateTones, unisonInterval);
         

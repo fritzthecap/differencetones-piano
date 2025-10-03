@@ -5,7 +5,129 @@
 <h1>Check Fraction-Based Tunings for Purity</h1>
 
 <p>
-    TODO
+    To understand fraction-based frequency calculation, look at table below.
+    It lists all notes calculated from C4 (264 Hertz) up to B4 with their fraction and frequency,
+    using the fractions of <i>JustIntonation.LIMIT_5_SYMMETRIC</i> tuning.
+    (You can verify this using the "Difference-Tones on Frequency Sliders" app.)
+</p>
+
+<table>
+    <tr>
+        <th>Interval Name</th>
+        <th>Fraction</th>
+        <th>Note</th>
+        <th>Calculation = </th>
+        <th>Frequency</th>
+    </tr>
+    
+    <tr>
+        <td>UNISON</td>
+        <td>1/1</td>
+        <td>C4</td>
+        <td>264.000 * 1/1 =</td>
+        <td>264.000</td>
+    </tr>
+    <tr>
+        <td>MINOR_SECOND</td>
+        <td>16/15</td>
+        <td>C#4</td>
+        <td>264.000 * 16/15 =</td>
+        <td>281.600</td>
+    </tr>
+    <tr>
+        <td>MAJOR_SECOND</td>
+        <td>9/8</td>
+        <td>D4</td>
+        <td>264.000 * 9/8 =</td>
+        <td>297.000</td>
+    </tr>
+    <tr>
+        <td>MINOR_THIRD</td>
+        <td>6/5</td>
+        <td>D#4</td>
+        <td>264.000 * 6/5 =</td>
+        <td>316.800</td>
+    </tr>
+    <tr>
+        <td>MAJOR_THIRD</td>
+        <td>5/4</td>
+        <td>E4</td>
+        <td>264.000 * 5/4 =</td>
+        <td>330.000</td>
+    </tr>
+    <tr>
+        <td>FOURTH</td>
+        <td>4/3</td>
+        <td>F4</td>
+        <td>264.000 * 4/3 =</td>
+        <td>352.000</td>
+    </tr>
+    <tr>
+        <td>TRITONE</td>
+        <td>45/32</td>
+        <td>F#4</td>
+        <td>264.000 * 45/32 =</td>
+        <td>371.250</td>
+    </tr>
+    <tr>
+        <td>FIFTH</td>
+        <td>3/2</td>
+        <td>G4</td>
+        <td>264.000 * 3/2 =</td>
+        <td>396.000</td>
+    </tr>
+    <tr>
+        <td>MINOR_SIXTH</td>
+        <td>8/5</td>
+        <td>G#4</td>
+        <td>264.000 * 8/5 =</td>
+        <td>422.400</td>
+    </tr>
+    <tr>
+        <td>MAJOR_SIXTH</td>
+        <td>5/3</td>
+        <td>A4</td>
+        <td>264.000 * 5/3 =</td>
+        <td>440.000</td>
+    </tr>
+    <tr>
+        <td>MINOR_SEVENTH</td>
+        <td>16/9</td>
+        <td>A#4</td>
+        <td>264.000 * 16/9 =</td>
+        <td>469.333</td>
+    </tr>
+    <tr>
+        <td>MAJOR_SEVENTH</td>
+        <td>15/8</td>
+        <td>B4</td>
+        <td>264.000 * 15/8 =</td>
+        <td>495.000</td>
+    </tr>
+</table>
+
+<h2>Interval Cent Distances</h2>
+
+<p>
+    We have three major thirds in a C-major scale,
+    [C-E], [F-A] and [G-B].
+    The question rises: has [C-E] the same Cent-distance as [F-A],
+    and has [F-A] the same as [G-B]?
+    This question rises for every interval.
+</p><p>
+    For <i>EqualTemperament</i>, all Cent-distances are the same,
+    because all semitones have a distance of 100 Cent.
+    Its frequencies are calculated by the formula 
+</p><p style="margin-left: 20;">
+    <code>frequency = frequencyOfA4 * (12th root of 2 power semitoneOffsetFromA4)</code>
+</p>
+<p>
+    In fraction-based tunings it is different,
+    because the Cent-distances depend on integer-fractions. 
+    Some chords will sound out-of-tune in <i>JustIntonation</i>,
+    while others will sound much better than in <i>EqualTemperament</i>.
+    This checker app helps to find out which intervals and triads will sound dirty.
+</p><p>
 </p>
 
 </body>
