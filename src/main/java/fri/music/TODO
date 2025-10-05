@@ -1,10 +1,4 @@
 
-- Frequency slider for chords should not move the slider knobs when
-    tuning changes, they should stay, so that beatings can be perceived
-    while switching between tunings.
-    Mind that this will most likely collide with the slider implementation of
-    frequency sliders for difference tones!
-    
 - Any documentation must reference the Java class of the app it describes.
 
 - Find out why the first interval in auto-composed "When the Saints" is so high.

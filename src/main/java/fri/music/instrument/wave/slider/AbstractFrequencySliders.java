@@ -104,6 +104,11 @@ public abstract class AbstractFrequencySliders
         return null;
     }
 
+    
+    private record SliderState(String ipnNoteName, Double frequency)
+    {
+    }
+    
     /**
      * Called when user chooses a new tuning. 
      * Fetch state from sliders, remove them create new ones, set their state, add them.
@@ -123,11 +128,11 @@ public abstract class AbstractFrequencySliders
 
         // collect old states
         final List<Boolean> wasPlaying = new ArrayList<>();
-        final List<Double> oldFrequency = new ArrayList<>();
+        final List<SliderState> oldState = new ArrayList<>();
 
         for (SliderPanel oldSliderPanel : oldSliderPanels) {
             wasPlaying.add(oldSliderPanel.isPlaying());
-            oldFrequency.add(oldSliderPanel.getValue());
+            oldState.add(new SliderState(oldSliderPanel.getNote(), oldSliderPanel.getValue()));
 
             oldSliderPanel.close(); // could be playing
             parent.remove(oldSliderPanel.sliderPanel);
@@ -141,8 +146,13 @@ public abstract class AbstractFrequencySliders
         for (int i = 0; i < newSliderPanels.length; i++) {
             final SliderPanel newSliderPanel = newSliderPanels[i];
             parent.add(newSliderPanel.sliderPanel);
-            if (shouldRestoreSliderState(newSliderPanel))
-                newSliderPanel.setValue(oldFrequency.get(i));
+            if (shouldRestoreSliderState(newSliderPanel)) {
+                final SliderState old = oldState.get(i);
+                if (old.ipnNoteName.isEmpty())
+                    newSliderPanel.setValue(old.frequency);
+                else
+                    newSliderPanel.setNote(old.ipnNoteName);
+            }
         }
 
         afterRecreateFrequencySliderPanels();

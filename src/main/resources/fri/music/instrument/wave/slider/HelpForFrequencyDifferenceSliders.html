@@ -15,17 +15,15 @@
     Mind that the preset tuning is not <i>EqualTemperament</i> but <i>JustIntonation</i>, 
     because the latter mostly produces cleaner difference-tones.
 </p><p>
-    If you change the "Tuning", the frequencies of the slider scales change.
-    That is the reason why the slider knobs move in that case.
-    The tone C6 (second slider from top) has 1056.000 Hertz in <i>JustIntonation</i>,
+    If you change the "Tuning", the frequencies of the sliders may change.
+    The tone C6 (second slider from top) has 1056.000 Hertz in <i>LIMIT_5_SYMMETRIC_1 JustIntonation</i>,
     but 1046.502 Hertz in <i>EqualTemperament</i>.
-    A4 would not move, as both tunings are calculated from 440 Hertz.
-    What actually moves is the scale, not the knob.
-    The application tries to keep the frequency of the slider knob,
-    but has to move to 1056.874 because its precision is 4 cent only.
-    If you constantly left-click onto the slider to the left of C6,
-    the knob will get red when it reaches 1046.502 Hertz.
-    The tone name getting red is a sign that it matches the tuned scale tone.
+    Any "A" (A2, A3, A4, A5, ...) would stay on its frequency, 
+    as all tunings are calculated from 440 Hertz (A4), 
+    and octave is the only interval that is the same in all tunings.
+    On tuning change, the application tries to keep the note (IPN-name) when it is red (exact note match), 
+    or else the frequency when the slider knob is somewhere in-between.
+    Only in the latter case the slider knob will jump to another position.
 </p><p>
     The "Wave Form" lets you choose different sounds.
     You can change the sound "on the fly" while the sliders are playing.

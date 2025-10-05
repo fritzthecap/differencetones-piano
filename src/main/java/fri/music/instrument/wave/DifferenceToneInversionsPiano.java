@@ -385,7 +385,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         intervalListsPanel.add(initialHeightHolder);
         
         this.sortListsByPitch = new JCheckBox("Sort Lists by Pitch", true);
-        sortListsByPitch.setToolTipText("Insert New Interval-Lists Sorted by Difference-Tone Pitch");
+        sortListsByPitch.setToolTipText("Insert New Interval-Lists Sorted by Difference-Tone Height");
         sortListsByPitch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
