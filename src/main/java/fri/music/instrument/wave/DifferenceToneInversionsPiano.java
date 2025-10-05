@@ -290,7 +290,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     @Override
     protected DeviationComponent newDeviationComponent(double deviation, boolean isVertical) {
         final DeviationComponent deviationComponent = super.newDeviationComponent(deviation, isVertical);
-        final JSlider deviationSlider = deviationComponent.getSlider();
+        final JSlider deviationSlider = deviationComponent.deviationSlider;
         deviationSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {

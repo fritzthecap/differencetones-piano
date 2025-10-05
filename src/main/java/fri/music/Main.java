@@ -317,9 +317,9 @@ public final class Main
         public MoreLaunchers() {
             super(new FlowLayout());
             
-            launcher(buildNotesPianoPlayer());
             launcher(buildIntervalPlayingPiano());
             launcher(buildTriadPlayingPiano());
+            launcher(buildNotesPianoPlayer());
             launcher(buildConfiguredPianoFactory());
         }
         

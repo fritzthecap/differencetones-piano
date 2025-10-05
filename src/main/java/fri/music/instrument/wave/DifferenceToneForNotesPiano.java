@@ -50,7 +50,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         getControlPanel().add(tuningComponent.getChoice(null), index++);
         
         this.deviationComponent = newDeviationComponent(DifferenceTones.DEFAULT_DEVIATION, config.isVertical);
-        getControlPanel().add(deviationComponent.getSlider(), index++);
+        getControlPanel().add(deviationComponent.deviationSlider, index++);
         
         this.intervalRange = new IntervalRangeComponent(null, null);
         getControlPanel().add(intervalRange.getNarrowestChoice(), index++);
@@ -104,7 +104,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
     }
     
     public void setDifferenceToneParametersEnabled(boolean enable) {
-        deviationComponent.getSlider().setEnabled(enable);
+        deviationComponent.deviationSlider.setEnabled(enable);
         intervalRange.getNarrowestChoice().setEnabled(enable);
         intervalRange.getWidestChoice().setEnabled(enable);
     }

@@ -9,7 +9,7 @@ import javax.swing.event.ChangeListener;
 
 public class DeviationComponent
 {
-    private JSlider deviationSlider;
+    public JSlider deviationSlider;
     
     public DeviationComponent(double defaultDeviation, boolean isVertical) {
         this.deviationSlider = buildDeviationSlider(doubleToDeviationPercent(defaultDeviation), isVertical);
@@ -17,14 +17,8 @@ public class DeviationComponent
     
     /** @return the current deviation value from slider as floating-point number from 0 to 0.5. */
     public double getDeviation() {
-        return deviationPercentToDouble(getSlider().getValue());
+        return deviationPercentToDouble(deviationSlider.getValue());
     }
-    
-    /** @return the slider component, displaying integer deviation percentage towards quarter-tone. */
-    public JSlider getSlider() {
-        return deviationSlider;
-    }
-    
     
     private JSlider buildDeviationSlider(int defaultDeviationPercent, boolean isVertical) {
         final String title = "Deviation Tolerance: ";

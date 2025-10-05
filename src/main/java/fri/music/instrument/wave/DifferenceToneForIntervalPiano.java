@@ -1,6 +1,8 @@
 package fri.music.instrument.wave;
 
 import java.util.Iterator;
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
@@ -8,6 +10,8 @@ import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
+import fri.music.swingutils.layout.ToolBarUtil;
+import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -31,7 +35,7 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
         final JComponent pianoPanel = super.getKeyboard();
         
         this.deviationComponent = new DeviationComponent(DifferenceTones.DEFAULT_DEVIATION, config.isVertical);
-        final JSlider deviationSlider = deviationComponent.getSlider();
+        final JSlider deviationSlider = deviationComponent.deviationSlider;
         getControlPanel().add(deviationSlider, 4); // add after "Tuning" choice
         deviationSlider.addChangeListener(new ChangeListener() {
             /** Must change playing keys according to deviation. */
@@ -40,6 +44,11 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
                 ((DifferenceToneMouseHandler) getMouseHandler()).reviseDifferenceTone();
             }
         });
+        
+        final JButton help = new JButton("Help");
+        help.setToolTipText("Description of Difference-Tone Displaying Piano");
+        help.addActionListener(event -> HelpWindowSingleton.start(pianoPanel, "Difference-Tone Displaying Piano", HelpForDifferenceToneForIntervalsPiano.URL));
+        getControlPanel().add(ToolBarUtil.getHelpButtonLookWrapper(help));
         
         return this.pianoPanel = pianoPanel;
     }
