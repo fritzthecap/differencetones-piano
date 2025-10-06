@@ -332,8 +332,8 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         
         if (mouseDown && intervalSelectionListener != null) {
             int intervalFrameIndex;
-            if (reuseOpenLists.isSelected())
-                intervalFrameIndex = -1;
+            if (reuseOpenLists.isSelected() || (sortListsByPitch.isEnabled() && sortListsByPitch.isSelected()))
+                intervalFrameIndex = -1; // interval lists are not of size and not in order of melody notes
             else
                 intervalFrameIndex = activeFrame.getIndex();
             
