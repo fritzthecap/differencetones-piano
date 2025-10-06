@@ -374,7 +374,7 @@ public class PianoWithSound extends Piano
         if (getSoundChannel() != null) {
             getSoundChannel().allNotesOff(); // closes all wave-channels
             soundChannel = null;
-            System.err.println("Freed sound resource of "+this);
+            //System.err.println("Freed sound resource of "+this);
         }
     }
 }

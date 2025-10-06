@@ -190,10 +190,9 @@ public class SliderPanel
     
     public void close() {
         closeWaveGenerator();
+        //System.err.println("Freed sound resource of "+this);
         amplitudeSlider.removeChangeListener(amplitudeChangeListener);
         gainSlider.removeChangeListener(gainChangeListener);
-        
-        System.err.println("Freed sound resource of "+this);
     }
     
     
