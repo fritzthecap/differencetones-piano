@@ -90,7 +90,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         }
         
         if (activateWriteToNotesCheckbox != melodyView().writeToNotesCheckbox.isSelected())
-            melodyView().writeToNotesCheckbox.doClick(0); // triggers actionPerformed() to activate mouse listener
+            melodyView().writeToNotesCheckbox.doClick(0); // calls actionPerformed() to trigger notes-writing mouseListener
         
         readNotesFromTextAreaCatchExceptions(playController, melodyView()); // enable or disable player buttons
         

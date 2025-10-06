@@ -63,12 +63,12 @@ public final class Main
     /** Application starter.*/
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame firstFrame = FrameStarter.start(
+            final JFrame mainFrame = FrameStarter.start(
                     "Welcome to the World of Difference-Tones!",
                     new Main().panel,
                     new Dimension(1040, 700));
-            // let apps start screen-centered instead of cascaded to first frame
-            FrameStarter.setNonLayoutRelevant(firstFrame);
+            // let apps start screen-centered instead of cascaded to mainFrame
+            FrameStarter.setNonLayoutRelevant(mainFrame);
         });
     }
     

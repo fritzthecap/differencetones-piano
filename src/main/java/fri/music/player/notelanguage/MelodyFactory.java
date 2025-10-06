@@ -259,7 +259,7 @@ public class MelodyFactory
             
             for (int i = 0; i < chord.length; i++) { // mostly there will be just one note in chord
                 note = chord[i];
-                result.append(note.toString());
+                result.append(i == 0 ? note.toString() : note.ipnName);
                 
                 if (i < chord.length - 1)
                     result.append(" ");

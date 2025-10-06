@@ -204,7 +204,7 @@ public class FrameStarter
     }
     
     
-    public static void main(String[] args) {
+    /* public static void main(String[] args) {
         final javax.swing.JPanel content = new javax.swing.JPanel();
         final WindowListener closeListener = new WindowAdapter() {
             @Override
@@ -215,5 +215,5 @@ public class FrameStarter
         FrameStarter.start("DISPOSE Frame", false, content, closeListener, null);
         FrameStarter.start("EXIT 1 Frame", true, content, closeListener, null);
         FrameStarter.start("EXIT 2 Frame", true, content, closeListener, null);
-    }
+    } */
 }
