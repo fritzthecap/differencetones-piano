@@ -16,24 +16,7 @@ For rests there is the left-side "-/4" button
 that also has a right mouse click context menu.
 </p>
 
-<h2 id="Examples">Use Prepared Examples</h1>
-<p>
-To see examples, you can open the text-area's context-menu
-via right-mouse click and select "Load Examples". 
-There is a list of some short note sequences and melodies
-that you can use to get familiar with the notes syntax.
-Mind that this will overwrite anything being in text-area without warning.
-</p>
-
-<h2 id="ABC">Render Notes as ABC</h2>
-<p>
-The notes language used here is not designed for writing printable music scores. 
-Nevertheless you can export the content of the text-area to ABC language
-and then render the result on some free ABC converter page on the Internet. 
-If you click "ABC Export", a dialog will lead you through that.
-</p>
-
-<h1 id="Syntax">Notes Syntax</h1>
+<h2 id="Syntax">Notes Syntax</h2>
 <p>
 This notes syntax should make it easy to write readable melodies and intervals.
 It is not able to carry all the complexities traditional music notations have.
@@ -84,7 +67,7 @@ You can use the "Format" button to put every bar into a separate line.
 Use context-menu "Clear" or "Ctrl-A" with "DEL" to clear the text-area.
 </p>
 
-<h2 id="Ties">Ties</h2>
+<h3 id="Ties">Ties</h3>
 <p>
 Notes connected by a "tie" are notes of same pitch that are played as single note, 
 even across several bars.
@@ -92,7 +75,7 @@ Ties are started by an opened parenthesis "(" and ended by a closed ")",
 notes in between MUST NOT be enclosed in parentheses (no nested parentheses).
 </p>
 
-<h2 id="Slurs">Slurs</h2>
+<h3 id="Slurs">Slurs</h3>
 <p>
 Notes connected by a "slur" are notes of different pitch that are phrased together, 
 even across several bars.
@@ -101,7 +84,7 @@ notes in between MUST NOT be enclosed in "{...}" (no nested braces),
 because it is not clear how to phrase several notes that are all slurred together.
 </p>
 
-<h2 id="Chords">Chords</h2>
+<h3 id="Chords">Chords</h3>
 <p>
 Chord notes are two or more notes of different pitch that are played simultaneously.
 Chords are started by an opened bracket "[" and ended by closed "]", 
@@ -110,23 +93,26 @@ Ties and slurs from inside to outside of a chord are not allowed, but you can ti
 even across bars.
 </p>
 
-<h1 id="Editor">Editor Actions</h1>
-<p>
-With right mouse click you can open a context-menu that provides
-some useful text-area actions:
-</p>
-<ul>
-<li><b>Ctrl x</b> for "Cut" selection</li>
-<li><b>Ctrl c</b> for "Copy" selection</li>
-<li><b>Ctrl v</b> for "Paste" at caret position</li>
-<li><b>Ctrl z</b> for "Undo" last action</li>
-<li><b>Ctrl y</b> for "Redo" last "Undo"</li>
-<li><b>Ctrl a</b> for "Select All" text</li>
-<li><b>Ctrl +</b> for bigger font</li>
-<li><b>Ctrl -</b> for smaller font</li>
-</ul>
+<hr/>
 
-<h1 id="Player">Player Buttons</h1>
+<h2 id="Examples">Use Prepared Examples</h1>
+<p>
+To see examples, you can open the text-area's context-menu
+via right-mouse click and select "Load Examples". 
+There is a list of some short note sequences and melodies
+that you can use to get familiar with the notes syntax.
+Mind that this will overwrite anything being in text-area without warning.
+</p>
+
+<h2 id="ABC">Render Notes as ABC</h2>
+<p>
+The notes language used here is not designed for writing printable music scores. 
+Nevertheless you can export the content of the text-area to ABC language
+and then render the result on some free ABC converter page on the Internet. 
+If you click "ABC Export", a dialog will lead you through that.
+</p>
+
+<h2 id="Player">Player Buttons</h2>
 <p>
 The arrow buttons beside the text-area will play whatever is in the text-area.
 If there is no text or it is invalid, they will be disabled. 
@@ -145,7 +131,23 @@ From left to right:
 <li>"Go to End" will jump past the last note of the melody</li>
 </ul>
 
-<h1 id="References">References</h1>
+<h2 id="Editor">Editor Actions</h2>
+<p>
+With right mouse click you can open a context-menu that provides
+some useful text-area actions:
+</p>
+<ul>
+<li><b>Ctrl x</b> for "Cut" selection</li>
+<li><b>Ctrl c</b> for "Copy" selection</li>
+<li><b>Ctrl v</b> for "Paste" at caret position</li>
+<li><b>Ctrl z</b> for "Undo" last action</li>
+<li><b>Ctrl y</b> for "Redo" last "Undo"</li>
+<li><b>Ctrl a</b> for "Select All" text</li>
+<li><b>Ctrl +</b> for bigger font</li>
+<li><b>Ctrl -</b> for smaller font</li>
+</ul>
+
+<h1 id="References">External References</h1>
 <ul>
 <li><a href="https://www.flutopedia.com/octave_notation.htm">https://www.flutopedia.com/octave_notation.htm</a></li>
 <li><a href="https://abcnotation.com/wiki/abc:standard:v2.1">https://abcnotation.com/wiki/abc:standard:v2.1</a></li>
