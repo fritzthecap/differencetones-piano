@@ -1,7 +1,6 @@
 package fri.music.instrument.configuration;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -18,33 +16,34 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ScaleTypes;
 import fri.music.ToneSystem;
-import fri.music.instrument.PianoWithSound;
 import fri.music.swingutils.layout.SmartComboBox;
-import fri.music.utils.StringUtil;
 
 /**
- * A panel that lets configure most options for different
- * kinds of Piano implementations.
+ * A panel that lets configure some common options for
+ * ToneSystem implementations.
  */
-public class ToneSystemConfigurationPanel
+public class ToneRangeConfigurationPanel
 {
+    protected static final int DEFAULT_OCTAVES = 7;
+    protected static final int DEFAULT_LOWEST_TONE_OCTAVE = 2;
+    protected static final String DEFAULT_LOWEST_TONE_BASENAME = "C";
+    protected static final String DEFAULT_LOWEST_TONE_IPNNAME = DEFAULT_LOWEST_TONE_BASENAME + DEFAULT_LOWEST_TONE_OCTAVE;
+    
     /** The user-interface panel to add to some frame or dialog. */
     public final JPanel panel;
-    
-    protected final JPanel displayOptionsPanel;
     
     private JSlider octaves;
     private JComboBox<String> lowestToneBaseName;
     private JComboBox<String> lowestToneScaleName;
     private JSlider lowestToneOctave;
-    private JSlider blackKeyPixelWidth;
-    private JCheckBox showIpnNameOnKey;
-    private JCheckBox showMidiNumberAsTooltip;
-    private JCheckBox colouredOctaves;
     
-    public ToneSystemConfigurationPanel(PianoWithSound.Configuration configuration) {
+    public ToneRangeConfigurationPanel(int octavesParam, String lowestToneBaseNameParam, int lowestToneOctaveParam) {
+        this(octavesParam, lowestToneBaseNameParam, lowestToneOctaveParam, true);
+    }
+    
+    public ToneRangeConfigurationPanel(int octavesParam, String lowestToneBaseNameParam, int lowestToneOctaveParam, boolean addScaleNameChoice) {
         // field construction
-        buildPianoConfigurationFields(configuration);
+        buildConfigurationFields(octavesParam, lowestToneBaseNameParam, lowestToneOctaveParam, addScaleNameChoice);
         
         // fields layout
         final JPanel lowestTonePanel = new JPanel();
@@ -53,82 +52,42 @@ public class ToneSystemConfigurationPanel
                         BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true),
                         "Lowest Tone"));
         lowestTonePanel.add(lowestToneBaseName);
-        lowestTonePanel.add(lowestToneScaleName);
+        if (lowestToneScaleName != null)
+            lowestTonePanel.add(lowestToneScaleName);
         lowestTonePanel.add(lowestToneOctave);
         
-        this.displayOptionsPanel = new JPanel();
-        displayOptionsPanel.setLayout(new BoxLayout(displayOptionsPanel, BoxLayout.Y_AXIS));
-        displayOptionsPanel.add(showIpnNameOnKey);
-        displayOptionsPanel.add(showMidiNumberAsTooltip);
-        displayOptionsPanel.add(colouredOctaves);
-        final JPanel moveLeftOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        moveLeftOptionsPanel.setBorder(BorderFactory.createTitledBorder("Display Options"));
-        moveLeftOptionsPanel.add(displayOptionsPanel);
-
         this.panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
         panel.add(octaves);
         panel.add(lowestTonePanel);
-        panel.add(moveLeftOptionsPanel);
-        panel.add(blackKeyPixelWidth);
-    }
-
-    /** @return a piano configuration built from all UI fields. */
-    public PianoWithSound.Configuration getPianoConfiguration() {
-        return new PianoWithSound.Configuration(
-            octaves.getValue(),
-            ""+lowestToneBaseName.getSelectedItem()+lowestToneOctave.getValue(),
-            false,
-            blackKeyPixelWidth.getValue(),
-            showIpnNameOnKey.isSelected(),
-            showMidiNumberAsTooltip.isSelected(),
-            colouredOctaves.isSelected()
-        );
     }
     
+    public int getOctaves() {
+        return octaves.getValue();
+    }
     
-    private void buildPianoConfigurationFields(PianoWithSound.Configuration configurationParam) {
-        final PianoWithSound.Configuration configuration;
-        if (configurationParam == null)
-            configuration = new PianoWithSound.Configuration(7, "C2");
-        else
-            configuration = configurationParam;
-        
-        final ChangeListener octavesListener = new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (e != null && ((JSlider) e.getSource()).getValueIsAdjusting())
-                    return;
-                final int startOctave = lowestToneOctave.getValue();
-                final int maximumPossibleOctaves = ToneSystem.MAXIMUM_OCTAVES - startOctave;
-                final boolean isMaximum = (octaves.getValue() == octaves.getMaximum());
-                octaves.setMaximum(maximumPossibleOctaves);
-                // try to keep a good value
-                if (isMaximum && maximumPossibleOctaves <= configuration.octaves)
-                    octaves.setValue(maximumPossibleOctaves);
-            }
-        };
-        
-        this.octaves = new JSlider(1, ToneSystem.MAXIMUM_OCTAVES, configuration.octaves);
-        octaves.setToolTipText("The Number of Octaves above the Starting Octave");
-        octaves.setBorder(BorderFactory.createTitledBorder("Number of Octaves (Maximum "+ToneSystem.MAXIMUM_OCTAVES+")"));
-        octaves.setSnapToTicks(true);
-        octaves.setPaintLabels(true);
-        octaves.setPaintTicks(true);
-        octaves.setMajorTickSpacing(1);
-        octaves.addChangeListener(octavesListener);
-        
-        final List<String> ipnBaseNamesList = Stream.of(ToneSystem.IPN_BASE_NAMES)
+    public String getLowestToneIpnName() {
+        return "" + lowestToneBaseName.getSelectedItem() + lowestToneOctave.getValue();
+    }
+    
+    protected int getLowestToneOctave() {
+        return lowestToneOctave.getValue();
+    }
+    
+    protected final String[] getToneBaseNames() {
+        final List<String> toneBaseNamesList = Stream.of(ToneSystem.IPN_BASE_NAMES)
             .filter(ipnName -> ipnName.indexOf(ToneSystem.SHARP_CHAR) < 0)
             .collect(Collectors.toList());
-        final String[] ipnBaseNames = ipnBaseNamesList.toArray(new String[ipnBaseNamesList.size()]);
-        this.lowestToneBaseName = new SmartComboBox(ipnBaseNames);
-        lowestToneBaseName.setBorder(BorderFactory.createTitledBorder("Key"));
-        lowestToneBaseName.setToolTipText("Leftmost (and Rightmost) Tone of the Keyboard");
-        
+        return toneBaseNamesList.toArray(new String[toneBaseNamesList.size()]);
+    }
+    
+    /** @return alternative scale name choice for choosing a lowest tone. */
+    protected JComboBox<String> buildScaleNameChoice(final JComboBox<String> lowestToneBaseName) {
         final Set<String> scaleNamesSet = ScaleTypes.scaleToStartNote.sequencedKeySet();
         final String[] scaleNames = scaleNamesSet.toArray(new String[scaleNamesSet.size()]);
-        this.lowestToneScaleName = new SmartComboBox(scaleNames);
+        
+        final JComboBox<String> lowestToneScaleName = new JComboBox<>(scaleNames);
         lowestToneScaleName.setBorder(BorderFactory.createTitledBorder("or Scale"));
         lowestToneScaleName.setToolTipText("Modal Scale Type");
         
@@ -149,39 +108,68 @@ public class ToneSystemConfigurationPanel
             }
         });
         
-        final String lowestToneWithoutOctave = StringUtil.getUntilFirstNumber(configuration.lowestToneIpnName);
-        lowestToneBaseName.setSelectedItem(lowestToneWithoutOctave);
+        return lowestToneScaleName;
+    }
+
+    
+    private void buildConfigurationFields(
+            int octavesParam, 
+            String lowestToneBaseNameParam, 
+            int lowestToneOctaveParam, 
+            boolean addScaleNameChoice)
+    {
+       final int octavesParamFinal = (octavesParam <= 0) ? DEFAULT_OCTAVES : octavesParam;
+        
+        if (lowestToneBaseNameParam == null || lowestToneBaseNameParam.length() <= 0)
+            lowestToneBaseNameParam = DEFAULT_LOWEST_TONE_BASENAME;
+        
+        if (lowestToneOctaveParam <= 0)
+            lowestToneOctaveParam = DEFAULT_LOWEST_TONE_OCTAVE;
+        
+        final ChangeListener octavesListener = new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (e != null && ((JSlider) e.getSource()).getValueIsAdjusting())
+                    return;
+                final int startOctave = lowestToneOctave.getValue();
+                final int maximumPossibleOctaves = ToneSystem.MAXIMUM_OCTAVES - startOctave;
+                final boolean isMaximum = (octaves.getValue() == octaves.getMaximum());
+                octaves.setMaximum(maximumPossibleOctaves);
+                // try to keep a good value
+                if (isMaximum && maximumPossibleOctaves <= octavesParamFinal)
+                    octaves.setValue(maximumPossibleOctaves);
+            }
+        };
+        
+        this.octaves = new JSlider(1, ToneSystem.MAXIMUM_OCTAVES, octavesParamFinal);
+        octaves.setToolTipText("The Number of Octaves above the Starting Octave");
+        octaves.setBorder(BorderFactory.createTitledBorder("Number of Octaves (Maximum "+ToneSystem.MAXIMUM_OCTAVES+")"));
+        octaves.setSnapToTicks(true);
+        octaves.setPaintLabels(true);
+        octaves.setPaintTicks(true);
+        octaves.setMajorTickSpacing(1);
+        octaves.addChangeListener(octavesListener);
+        
+        this.lowestToneBaseName = new SmartComboBox(getToneBaseNames());
+        lowestToneBaseName.setBorder(BorderFactory.createTitledBorder("Key"));
+        lowestToneBaseName.setToolTipText("Lowest Tone of the Tonesystem");
+        
+        if (addScaleNameChoice)
+            this.lowestToneScaleName = buildScaleNameChoice(lowestToneBaseName);
+        
+        lowestToneBaseName.setSelectedItem(lowestToneBaseNameParam);
         
         this.lowestToneOctave = new JSlider(
                 ToneSystem.LOWEST_OCTAVE, 
                 ToneSystem.MAXIMUM_OCTAVES - 1, 
-                configuration.lowestToneOctaveBasedOnC);
+                lowestToneOctaveParam);
         lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Start Octave"));
-        lowestToneOctave.setToolTipText("The Lowest (Leftmost) Octave of the Keyboard");
+        lowestToneOctave.setToolTipText("Lowest Octave of the Tonesystem");
         lowestToneOctave.setSnapToTicks(true);
         lowestToneOctave.setPaintLabels(true);
         lowestToneOctave.setPaintTicks(true);
         lowestToneOctave.setMajorTickSpacing(1);
         lowestToneOctave.addChangeListener(octavesListener);
-        
-        this.blackKeyPixelWidth = new JSlider(4, 60, configuration.blackKeyWidth);
-        blackKeyPixelWidth.setBorder(BorderFactory.createTitledBorder("Black Key Pixel Width"));
-        blackKeyPixelWidth.setToolTipText("Bigger or Smaller Keyboard Keys");
-        blackKeyPixelWidth.setPaintLabels(true);
-        blackKeyPixelWidth.setPaintTicks(true);
-        blackKeyPixelWidth.setMajorTickSpacing(4);
-        
-        this.showIpnNameOnKey = new JCheckBox("IPN-Names on Keys");
-        showIpnNameOnKey.setToolTipText("Show Note Names on Piano Keys");
-        showIpnNameOnKey.setSelected(configuration.showIpnNameOnKey);
-        
-        this.showMidiNumberAsTooltip = new JCheckBox("MIDI-Numbers as Tooltips");
-        showMidiNumberAsTooltip.setToolTipText("Show MIDI-Numbers as Tooltips on Piano Keys (e.g. C4 is 60)");
-        showMidiNumberAsTooltip.setSelected(configuration.showMidiNumberAsTooltip);
-        
-        this.colouredOctaves = new JCheckBox("Coloured Octaves");
-        colouredOctaves.setToolTipText("Show Every Octave with a Different Color");
-        colouredOctaves.setSelected(configuration.colouredOctaves);
         
         octavesListener.stateChanged(null);
     }
