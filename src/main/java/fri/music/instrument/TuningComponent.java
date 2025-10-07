@@ -1,53 +1,46 @@
-package fri.music.instrument.wave;
+package fri.music.instrument;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
-import javax.swing.SwingUtilities;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
 import fri.music.swingutils.layout.SmartComboBox;
-import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
- * Lets change tunings on a wave-soundchannel, or notifies a listener.
+ * Lets choose tunings.
  */
 public class TuningComponent
 {
-    /** 
-     * If no sound-channel is given to constructor, 
-     * this listener will be notified on any tuning change.
-     * It is possible to use both listener and sound-channel.
-     */
-    public interface Listener
-    {
-        void tuningChanged(ToneSystem toneSystem);
-    }
-    
-    private final String lowestToneIpnName;
-    private final int octaves;
-    private final WaveSoundChannel soundChannel;
-    private final Listener listener;
+    private String lowestToneIpnName;
+    private int octaves;
+    private double frequencyOfA4;
+    private String modalScaleStartIpnName;
     
     private JComboBox<String> tuningChoice;
     
-    public TuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
-        this(lowestToneIpnName, octaves, soundChannel, null);
+    public TuningComponent(String lowestToneIpnName, int octaves) {
+        setLowestToneIpnName(lowestToneIpnName);
+        setOctaves(octaves);
+        setFrequencyOfA4(ToneSystem.DEFAULT_REFERENCE_FREQUENCY);
+        setModalScaleStartIpnName(lowestToneIpnName);
     }
-    public TuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel, Listener listener) {
-        if (soundChannel == null && listener == null)
-            throw new IllegalArgumentException("Need either sound-channel or tuning-listener!");
-        
-        this.lowestToneIpnName = lowestToneIpnName;
-        this.octaves = octaves;
-        this.soundChannel = soundChannel;
-        this.listener = listener;
+    
+    public final void setLowestToneIpnName(String lowestToneIpnName) {
+        this.lowestToneIpnName = (lowestToneIpnName != null) ? lowestToneIpnName : ToneSystem.DEFAULT_BASETONE_IPN_NAME;
+    }
+    public final void setOctaves(int octaves) {
+        this.octaves = (octaves > 0 && octaves <= ToneSystem.MAXIMUM_OCTAVES) ? octaves : ToneSystem.MAXIMUM_OCTAVES;
+    }
+    public final void setFrequencyOfA4(double frequencyOfA4) {
+        this.frequencyOfA4 = frequencyOfA4;
+    }
+    public final void setModalScaleStartIpnName(String modalScaleStartIpnName) {
+        this.modalScaleStartIpnName = (modalScaleStartIpnName != null) ? modalScaleStartIpnName : ToneSystem.DEFAULT_BASETONE_IPN_NAME;
     }
     
     /**
@@ -68,27 +61,31 @@ public class TuningComponent
         if (initialTuning != null)
             tuningChoice.setSelectedIndex(getInitiallySelectedIndex(initialTuning, tuningNames));
         
-        final ActionListener actionListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final String name = (String) tuningChoice.getSelectedItem();
-                final ToneSystem toneSystem = toTuning(name);
-                
-                if (soundChannel != null)
-                    soundChannel.setTones(toneSystem.tones());
-                
-                if (listener != null)
-                    listener.tuningChanged(toneSystem);
-            }
-        };
-        tuningChoice.addActionListener(actionListener);
+        addListeners(this.tuningChoice = tuningChoice, initialTuning != null);
         
-        if (initialTuning != null)
-            SwingUtilities.invokeLater(() -> actionListener.actionPerformed(null)); // let callers initialize first
-        
-        return this.tuningChoice = tuningChoice;
+        return this.tuningChoice;
     }
 
+    /** Called at end of getChoice(), does nothing, to be overridden by selection listeners. */
+    protected void addListeners(final JComboBox<String> tuningChoice, boolean initialTuningWasSet) {
+    }
+
+    /** @return the currently chosen tone-system. */
+    public final ToneSystem getTuning() {
+        final String chosenName = (String) tuningChoice.getSelectedItem();
+        if (chosenName.startsWith(EqualTemperament.class.getSimpleName()))
+            return new EqualTemperament(frequencyOfA4, lowestToneIpnName, octaves);
+        
+        final JustIntonation.ChromaticScale twelveToneScale = 
+            Stream.of(JustIntonation.ChromaticScales.values())
+                .filter(scale -> matchTuning(chosenName, scale.name()))
+                .findFirst()
+                .orElseThrow();
+        
+        return new JustIntonation(frequencyOfA4, lowestToneIpnName, modalScaleStartIpnName, octaves, twelveToneScale);
+    }
+    
+    
     /** Called once when building the choice. */
     private String[] getTuningNames() {
         final String SPACE = " ";
@@ -108,20 +105,6 @@ public class TuningComponent
                 .toList());
         
         return scales.toArray(new String[scales.size()]);
-    }
-    
-    /** Called every time an item was selected from choice. */
-    private ToneSystem toTuning(final String chosenName) {
-        if (chosenName.startsWith(EqualTemperament.class.getSimpleName()))
-            return new EqualTemperament(lowestToneIpnName, octaves);
-        
-        final JustIntonation.ChromaticScale twelveToneScale = 
-            Stream.of(JustIntonation.ChromaticScales.values())
-                .filter(scale -> matchTuning(chosenName, scale.name()))
-                .findFirst()
-                .orElseThrow();
-        
-        return new JustIntonation(lowestToneIpnName, octaves, twelveToneScale);
     }
     
     private int getInitiallySelectedIndex(ToneSystem initialTuning, final String[] tuningNames) {

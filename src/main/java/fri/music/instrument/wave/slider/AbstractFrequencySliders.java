@@ -22,7 +22,7 @@ import javax.swing.event.ChangeListener;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
 import fri.music.Tones;
-import fri.music.instrument.wave.TuningComponent;
+import fri.music.instrument.wave.WaveTuningComponent;
 import fri.music.swingutils.ButtonUtil;
 import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.swingutils.layout.ToolBarUtil;
@@ -265,14 +265,14 @@ public abstract class AbstractFrequencySliders
             final JSlider gainSlider, 
             final JComboBox<String> waveChoice)
     {
-        final TuningComponent.Listener listener = new TuningComponent.Listener() {
+        final WaveTuningComponent.Listener listener = new WaveTuningComponent.Listener() {
             @Override
             public void tuningChanged(ToneSystem toneSystem) {
                 initializeTones(toneSystem);
                 recreateFrequencySliderPanels(amplitudeSlider, gainSlider, waveChoice);
             }
         };
-        final TuningComponent tuning = new TuningComponent(
+        final WaveTuningComponent tuning = new WaveTuningComponent(
                 tones().getLowest().ipnName, 
                 tones().getOctaves(), 
                 null,

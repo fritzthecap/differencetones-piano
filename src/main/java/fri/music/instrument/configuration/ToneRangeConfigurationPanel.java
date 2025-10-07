@@ -63,19 +63,19 @@ public class ToneRangeConfigurationPanel
         panel.add(lowestTonePanel);
     }
     
-    public int getOctaves() {
+    public final int getOctaves() {
         return octaves.getValue();
     }
     
-    public String getLowestToneIpnName() {
+    public final String getLowestToneIpnName() {
         return "" + lowestToneBaseName.getSelectedItem() + lowestToneOctave.getValue();
     }
     
-    protected int getLowestToneOctave() {
+    protected final int getLowestToneOctave() {
         return lowestToneOctave.getValue();
     }
     
-    protected String getLowestToneBaseName() {
+    protected final String getLowestToneBaseName() {
         return (String) lowestToneBaseName.getSelectedItem();
     }
     

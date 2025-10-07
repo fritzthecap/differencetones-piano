@@ -41,7 +41,7 @@ public class IntervalPlayingPiano extends PianoWithHold
             "Octave");
     
     private JComponent pianoPanel;
-    private TuningComponent tuningComponent;
+    private WaveTuningComponent tuningComponent;
     private JComboBox<String> intervalChoice;
     private JCheckBox intervalActive;
     private int selectedSemitoneSteps = 0;
@@ -116,8 +116,8 @@ public class IntervalPlayingPiano extends PianoWithHold
     }
 
     /** Factory method called from getKeyboard(). To be overridden. */
-    protected TuningComponent newTuningComponent() {
-        return new TuningComponent(config.lowestToneIpnName, config.octaves, (WaveSoundChannel) getSoundChannel());
+    protected WaveTuningComponent newTuningComponent() {
+        return new WaveTuningComponent(config.lowestToneIpnName, config.octaves, (WaveSoundChannel) getSoundChannel());
     }
 
     protected String intervalChooserLabel() {

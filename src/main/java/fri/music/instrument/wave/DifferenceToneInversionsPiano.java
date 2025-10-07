@@ -271,15 +271,15 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     
     /** Overridden to listen to tuning changes. */
     @Override
-    protected TuningComponent newTuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
-        final TuningComponent.Listener listener = new TuningComponent.Listener() {
+    protected WaveTuningComponent newTuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
+        final WaveTuningComponent.Listener listener = new WaveTuningComponent.Listener() {
             @Override
             public void tuningChanged(ToneSystem toneSystem) {
                 selectedToneSystem = toneSystem;
                 tuningParametersHaveChanged();
             }
         };
-        return new TuningComponent(
+        return new WaveTuningComponent(
                 lowestToneIpnName, 
                 octaves, 
                 soundChannel,

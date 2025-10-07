@@ -16,6 +16,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
+import fri.music.instrument.TuningComponent;
 import fri.music.swingutils.layout.SmartComboBox;
 
 /**
@@ -29,6 +30,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
 
     private JSlider frequencyOfA4;
     private JComboBox<String> modalScaleStartBaseName;
+    private TuningComponent tuningComponent;
     
     private final NumberFormat decimalFormatLabels = new DecimalFormat("0");
     private final NumberFormat decimalFormatTooltip = new DecimalFormat("0.0");
@@ -43,8 +45,9 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         super(octaves, lowestToneBaseName, lowestToneOctave, false); // false: no scale names at lowest tone
         
         // field construction
-        buildToneSystemConfigurationFields(octaves, lowestToneBaseName, lowestToneOctave, frequencyOfA4Param);
+        buildToneSystemConfigurationFields(lowestToneBaseName, lowestToneOctave, frequencyOfA4Param, octaves);
         
+        // field layout
         panel.add(frequencyOfA4);
         
         final JPanel modalScaleStartTonePanel = new JPanel();
@@ -57,17 +60,19 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         modalScaleStartBaseName.setSelectedItem(modalScaleStartBaseNameParam);
 
         panel.add(modalScaleStartTonePanel);
+        
+        panel.add(tuningComponent.getChoice(null));
     }
     
-    public double getFrequencyOfA4() {
+    public final double getFrequencyOfA4() {
         return toDouble(frequencyOfA4.getValue());
     }
     
-    public String getModalScaleStartIpnName() {
+    public final String getModalScaleStartIpnName() {
         final String lowestToneBaseName = getLowestToneBaseName();
         final String modalStartBaseName = (String) modalScaleStartBaseName.getSelectedItem();
         
-        // modalStartBaseName must not be below lowestToneBaseName
+        // modalStartIpnName must not be below lowestToneIpnName
         final List<String> toneBaseNamesList = List.of(getToneBaseNames()); // always starts from C
         final int lowestToneIndex = toneBaseNamesList.indexOf(lowestToneBaseName);
         final int modalStartToneIndex = toneBaseNamesList.indexOf(modalStartBaseName);
@@ -76,12 +81,20 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         return modalStartBaseName + lowestToneOctave;
     }
     
+    public final ToneSystem getToneSystem() {
+        tuningComponent.setLowestToneIpnName(getLowestToneIpnName());
+        tuningComponent.setOctaves(getOctaves());
+        tuningComponent.setFrequencyOfA4(getFrequencyOfA4());
+        tuningComponent.setModalScaleStartIpnName(getModalScaleStartIpnName());
+        return tuningComponent.getTuning();
+    }
+    
 
     private void buildToneSystemConfigurationFields(
-            int octavesParam, 
             String lowestToneBaseNameParam, 
-            int lowestToneOctaveParam,
-            double frequencyOfA4Param)
+            int lowestToneOctave, 
+            double frequencyOfA4Param, 
+            int octavesParam)
     {
         final int A4_FREQ_MIN = toInt(A4_FREQUENCY_MINIMUM);
         final int A4_FREQ_MAX = toInt(A4_FREQUENCY_MAXIMUM);
@@ -117,6 +130,17 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         this.modalScaleStartBaseName = new SmartComboBox(getToneBaseNames());
         modalScaleStartBaseName.setBorder(BorderFactory.createTitledBorder("Key"));
         modalScaleStartBaseName.setToolTipText("Lowest Tone of the Chromatic Tonesystem to be Built");
+        
+        final String lowestToneIpnName;
+        if (lowestToneBaseNameParam != null) {
+            modalScaleStartBaseName.setSelectedItem(lowestToneBaseNameParam);
+            lowestToneIpnName = lowestToneBaseNameParam + lowestToneOctave;
+        }
+        else {
+            lowestToneIpnName = ToneSystem.DEFAULT_BASETONE_IPN_NAME;
+        }
+        
+        this.tuningComponent = new TuningComponent(lowestToneIpnName, octavesParam);
     }
 
     private Dictionary<Integer,JLabel> frequencyOfA4LableTable(int minimum, int maximum, int spacing) {
@@ -135,7 +159,20 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
     
     
     /*public static void main(String[] args) {
-        final JPanel panel = new ToneSystemConfigurationPanel(5, "D", 3, 435.6, "A").panel;
-        fri.music.swingutils.window.FrameStarter.start("Test", panel);
+        final ToneSystemConfigurationPanel config = new ToneSystemConfigurationPanel(5, "D", 3, 435.6, "A");
+        final javax.swing.JButton button = new javax.swing.JButton("Print Settings");
+        button.addActionListener(event -> {
+            System.out.println(
+                    "Octaves = "+config.getOctaves()+", "+
+                    "FrequencyOfA4 = "+config.getFrequencyOfA4()+", "+
+                    "LowestToneIpnName = "+config.getLowestToneIpnName()+", "+
+                    "ModalScaleStartIpnName = "+config.getModalScaleStartIpnName()+", "+
+                    "ToneSystem = \n"+config.getToneSystem()
+                );
+        });
+        final JPanel app = new JPanel(new java.awt.BorderLayout());
+        app.add(config.panel);
+        app.add(button, java.awt.BorderLayout.SOUTH);
+        fri.music.swingutils.window.FrameStarter.start("Tonesystem Settings Test", app, (java.awt.Dimension) null);
     }*/
 }

@@ -146,7 +146,7 @@ public abstract class AbstractToneSystem implements ToneSystem
         final boolean baseIsScaleStart = baseToneIpnName().equals(modalScaleStartIpnName);
         final String baseToneInfo = baseIsScaleStart
                 ? "lowest tone "+baseToneIpnName()
-                : "built upon "+baseToneIpnName()+", lowest tone "+modalScaleStartIpnName;
+                : "built upon "+baseToneIpnName()+", modal start tone "+modalScaleStartIpnName;
         return name()+", "+
                 baseToneInfo+
                 ", "+octaves+" octaves"+

@@ -55,14 +55,14 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
     
     /** Overridden to alter the tuning while intervals may be playing. */
     @Override
-    protected TuningComponent newTuningComponent() {
-        final TuningComponent.Listener tuningChangeListener = new TuningComponent.Listener() {
+    protected WaveTuningComponent newTuningComponent() {
+        final WaveTuningComponent.Listener tuningChangeListener = new WaveTuningComponent.Listener() {
             @Override
             public void tuningChanged(ToneSystem toneSystem) {
                 ((DifferenceToneMouseHandler) getMouseHandler()).reviseDifferenceTone();
             }
         };
-        return new TuningComponent(
+        return new WaveTuningComponent(
                 config.lowestToneIpnName, 
                 config.octaves, 
                 getWaveSoundChannel(), 

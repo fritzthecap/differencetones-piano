@@ -29,7 +29,7 @@ import fri.music.wavegenerator.WaveSoundChannel;
 public class DifferenceToneForNotesPiano extends PianoWithVolume
 {
     private JComponent pianoPanel;
-    private TuningComponent tuningComponent;
+    private WaveTuningComponent tuningComponent;
     private DeviationComponent deviationComponent;
     private IntervalRangeComponent intervalRange;
 
@@ -71,11 +71,8 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
     }
     
     /** To be overridden. */
-    protected TuningComponent newTuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
-        return new TuningComponent(
-                lowestToneIpnName, 
-                octaves, 
-                soundChannel);
+    protected WaveTuningComponent newTuningComponent(String lowestToneIpnName, int octaves, WaveSoundChannel soundChannel) {
+        return new WaveTuningComponent(lowestToneIpnName, octaves, soundChannel);
     }
 
     /** To be overridden. */
