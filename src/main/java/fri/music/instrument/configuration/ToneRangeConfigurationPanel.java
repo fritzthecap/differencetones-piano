@@ -75,6 +75,10 @@ public class ToneRangeConfigurationPanel
         return lowestToneOctave.getValue();
     }
     
+    protected String getLowestToneBaseName() {
+        return (String) lowestToneBaseName.getSelectedItem();
+    }
+    
     protected final String[] getToneBaseNames() {
         final List<String> toneBaseNamesList = Stream.of(ToneSystem.IPN_BASE_NAMES)
             .filter(ipnName -> ipnName.indexOf(ToneSystem.SHARP_CHAR) < 0)

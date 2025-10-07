@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -36,15 +37,15 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
             int octaves, 
             String lowestToneBaseName, 
             int lowestToneOctave,
-            double frequencyOfA4,
-            String modalScaleStartIpnName)
+            double frequencyOfA4Param,
+            String modalScaleStartBaseNameParam)
     {
-        super(octaves, lowestToneBaseName, lowestToneOctave, false);
+        super(octaves, lowestToneBaseName, lowestToneOctave, false); // false: no scale names at lowest tone
         
         // field construction
-        buildToneSystemConfigurationFields(octaves, lowestToneBaseName, lowestToneOctave, frequencyOfA4);
+        buildToneSystemConfigurationFields(octaves, lowestToneBaseName, lowestToneOctave, frequencyOfA4Param);
         
-        panel.add(this.frequencyOfA4);
+        panel.add(frequencyOfA4);
         
         final JPanel modalScaleStartTonePanel = new JPanel();
         modalScaleStartTonePanel.setLayout(new BoxLayout(modalScaleStartTonePanel, BoxLayout.X_AXIS));
@@ -53,7 +54,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
                         "Modal Scale Start Tone"));
         modalScaleStartTonePanel.add(modalScaleStartBaseName);
         modalScaleStartTonePanel.add(buildScaleNameChoice(modalScaleStartBaseName));
-        modalScaleStartBaseName.setSelectedItem(modalScaleStartIpnName);
+        modalScaleStartBaseName.setSelectedItem(modalScaleStartBaseNameParam);
 
         panel.add(modalScaleStartTonePanel);
     }
@@ -63,7 +64,16 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
     }
     
     public String getModalScaleStartIpnName() {
-        return (String) modalScaleStartBaseName.getSelectedItem() + getLowestToneOctave();
+        final String lowestToneBaseName = getLowestToneBaseName();
+        final String modalStartBaseName = (String) modalScaleStartBaseName.getSelectedItem();
+        
+        // modalStartBaseName must not be below lowestToneBaseName
+        final List<String> toneBaseNamesList = List.of(getToneBaseNames()); // always starts from C
+        final int lowestToneIndex = toneBaseNamesList.indexOf(lowestToneBaseName);
+        final int modalStartToneIndex = toneBaseNamesList.indexOf(modalStartBaseName);
+        final int lowestToneOctave = getLowestToneOctave() + (lowestToneIndex <= modalStartToneIndex ? 0 : 1);
+        
+        return modalStartBaseName + lowestToneOctave;
     }
     
 
