@@ -1,18 +1,18 @@
 
+- Configuration and display UI for:
+    Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
+    Difference tones in different tunings (DifferenceToneDemo)
+    Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
+    Documentation:
+    New docs for "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" 
+    (EqualTemperamentDemo, JustIntonationDemo, ...). 
+
 - Any documentation must reference the Java class of the app it describes.
 
 - Find out why the first interval in auto-composed "When the Saints" is so high.
     Maybe the tone-range calculation is wrong or could be improved?
 
-- Configuration and display UI for:
-    Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
-    Difference tones in different tunings (DifferenceToneDemo)
-    Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
-    
-- Documentation:
-    Write empty HTML docs.
-    New docs for "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" 
-    (EqualTemperamentDemo, JustIntonationDemo, ...). 
+- Ff the piano has colored keys, the selection color (difference tones!) should change to white.
 
 - Selection of notes in text-area while playing, for NotesPianoPlayer.
     This should work only in single-step mode.

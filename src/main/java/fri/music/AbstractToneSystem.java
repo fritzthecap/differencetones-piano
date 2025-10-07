@@ -28,7 +28,8 @@ public abstract class AbstractToneSystem implements ToneSystem
      *      It is the tone the chromaticScale is built upon, calculated from frequencyOfA4.
      * @param modalScaleStartIpnName the lowest note of the tone array resulting from a tones() call.
      *      When baseToneIpnName is "C0" and modalScaleStartIpnName is "A0" you will get an A-minor scale,
-     *      built upon a C-major scale (AEOLIAN mode). Thus it is the specifier for the modal scale you want.
+     *      built upon a C-major scale (AEOLIAN mode), thus it is the specifier for the modal scale you want.
+     *      This plays a role in just-intonation.
      *      By default it is <code>baseToneIpnName</code>.
      * @param octaves the 0-n number of octaves to return, plus one tone on top.
      *      When zero, just the lowest tone is returned,
