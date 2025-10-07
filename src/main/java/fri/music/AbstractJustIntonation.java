@@ -2,6 +2,7 @@ package fri.music;
 
 import java.util.Objects;
 import java.util.stream.IntStream;
+import fri.music.utils.MathUtil;
 
 /**
  * Interfaces and default implementations for just-intonations.
@@ -66,7 +67,7 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
         default String ratioString(int octave) {
             final int dividend = dividend(octave);
             final int divisor = divisor();
-            final int gcd = MathUtils.greatestCommonDivisor(dividend, divisor);
+            final int gcd = MathUtil.greatestCommonDivisor(dividend, divisor);
             return (dividend / gcd)+"/"+(divisor / gcd);
         }
                 
@@ -81,7 +82,7 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
         static long[] distance(Interval lower, int lowerOctave, Interval upper, int upperOctave) {
             final int dividend = upper.dividend(upperOctave) * lower.divisor();
             final int divisor = upper.divisor() * lower.dividend(lowerOctave);
-            return MathUtils.reduceFraction(dividend, divisor);
+            return MathUtil.reduceFraction(dividend, divisor);
         }
         
         /**
@@ -97,7 +98,7 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
             final int lowerDividend = lower.dividend(lowerOctave) * upper.divisor();
             final int upperDividend = upper.dividend(upperOctave) * lower.divisor();
             final int subtractedDividend = upperDividend - lowerDividend; // subtract tones
-            return MathUtils.reduceFraction(subtractedDividend, commonDivisor);
+            return MathUtil.reduceFraction(subtractedDividend, commonDivisor);
         }
         
         /**
@@ -143,7 +144,6 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
      * @param frequencyOfA4 the desired frequency of tone "A4" (IPN-name).
      * @param baseToneIpnName the build-note for the requested tone array e.g. "E3" or "G1".
      *      It is the tone the chromaticScale is built upon, calculated from <code>frequencyOfA4</code>.
-     *      This is NOT the <code>referenceIpnName</code>!
      * @param modalScaleStartIpnName the start-note of the tone array resulting from a tones() call.
      *      When baseToneIpnName is "C0" and modalScaleStartIpnName is "A0" you will get an A-minor scale,
      *      built upon a C-major scale (AEOLIAN mode). Thus it is the specifier for the modal scale you want.

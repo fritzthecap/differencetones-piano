@@ -1,26 +1,27 @@
-package fri.music;
+package fri.music.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import fri.music.utils.StringUtil;
 
-class TextUtilTest
+class StringUtilTest
 {
     @Test
     void getFirstNumber() {
-        assertEquals(4, TextUtil.getFirstNumber("F#4"));
-        assertEquals(10, TextUtil.getFirstNumber("A10/4"));
-        assertEquals(0, TextUtil.getFirstNumber("C0/16"));
-        assertEquals(2, TextUtil.getFirstNumber("C-2/16"));
-        assertEquals(55, TextUtil.getFirstNumber("C#55/16"));
+        assertEquals(4, StringUtil.getFirstNumber("F#4"));
+        assertEquals(10, StringUtil.getFirstNumber("A10/4"));
+        assertEquals(0, StringUtil.getFirstNumber("C0/16"));
+        assertEquals(2, StringUtil.getFirstNumber("C-2/16"));
+        assertEquals(55, StringUtil.getFirstNumber("C#55/16"));
     }
 
     @Test
     void getWithoutFirstNumber() {
-        assertEquals("D#", TextUtil.getUntilFirstNumber("D#5"));
-        assertEquals("C", TextUtil.getUntilFirstNumber("C10"));
-        assertEquals("", TextUtil.getUntilFirstNumber("2C"));
-        assertEquals("D", TextUtil.getUntilFirstNumber("D6E4"));
+        assertEquals("D#", StringUtil.getUntilFirstNumber("D#5"));
+        assertEquals("C", StringUtil.getUntilFirstNumber("C10"));
+        assertEquals("", StringUtil.getUntilFirstNumber("2C"));
+        assertEquals("D", StringUtil.getUntilFirstNumber("D6E4"));
     }
 
     @Test
@@ -37,8 +38,8 @@ class TextUtilTest
         
         final long startTime = System.currentTimeMillis();
         for (int i = 0; i < 4000; i++) {
-            TextUtil.getUntilFirstNumber(ipnName);
-            TextUtil.getFirstNumber(ipnName);
+            StringUtil.getUntilFirstNumber(ipnName);
+            StringUtil.getFirstNumber(ipnName);
         }
         final long endTime = System.currentTimeMillis();
         

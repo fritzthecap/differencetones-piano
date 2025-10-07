@@ -4,8 +4,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
-import fri.music.TextUtil;
 import fri.music.player.Note;
+import fri.music.utils.StringUtil;
 
 /**
  * Exports MelodyFactory notation to ABC notation.
@@ -115,7 +115,7 @@ public class AbcExport
                 timeSignature = meterChange(result, timeSignature, firstNote, barStart, gotoNextLine);
                 
             if (gotoNextLine) {
-                result.append(TextUtil.NEWLINE);
+                result.append(StringUtil.NEWLINE);
                 barCount = 0;
             }
             else if (barStart && false == meterChange)
@@ -258,7 +258,7 @@ public class AbcExport
     
     private void appendLine(StringBuilder stringBuilder,  String toAppend) {
         stringBuilder.append(toAppend);
-        stringBuilder.append(TextUtil.NEWLINE);
+        stringBuilder.append(StringUtil.NEWLINE);
     }
     
     private boolean isMeterChange(String timeSignature, Note firstNote) {
@@ -279,11 +279,11 @@ public class AbcExport
             result.append(ABC_BAR);
         
         final String escape = gotoNextLine ? "" : "\\"; // escape backslash when going to next ABC text line
-        result.append(escape+TextUtil.NEWLINE);
+        result.append(escape+StringUtil.NEWLINE);
         
         result.append("M:"+timeSignature); // no space allowed here in mid-tune!
         if (gotoNextLine == false)
-            result.append(TextUtil.NEWLINE);
+            result.append(StringUtil.NEWLINE);
         
         return timeSignature;
     }

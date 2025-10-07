@@ -1,6 +1,7 @@
 package fri.music;
 
 import java.util.stream.IntStream;
+import fri.music.utils.StringUtil;
 
 /**
  * Common usage of equal-temperament or just-intonation 12 tone systems.
@@ -141,8 +142,8 @@ public interface ToneSystem
     
     /** Converts an IPN-name with octave number to a MIDI tone number. */
     static int ipnNameToMidiNumber(String ipnName) {
-        final int octave = TextUtil.getFirstNumber(ipnName);
-        final String ipnBaseName = TextUtil.getUntilFirstNumber(ipnName);
+        final int octave = StringUtil.getFirstNumber(ipnName);
+        final String ipnBaseName = StringUtil.getUntilFirstNumber(ipnName);
         
         final int ipnBaseNameIndex = IntStream.range(0, IPN_BASE_NAMES.length)
                 .filter(i -> IPN_BASE_NAMES[i].equals(ipnBaseName))

@@ -26,7 +26,7 @@ import fri.music.utils.StringUtil;
  * A panel that lets configure most options for different
  * kinds of Piano implementations.
  */
-public class PianoConfigurationPanel
+public class ToneSystemConfigurationPanel
 {
     /** The user-interface panel to add to some frame or dialog. */
     public final JPanel panel;
@@ -42,7 +42,7 @@ public class PianoConfigurationPanel
     private JCheckBox showMidiNumberAsTooltip;
     private JCheckBox colouredOctaves;
     
-    public PianoConfigurationPanel(PianoWithSound.Configuration configuration) {
+    public ToneSystemConfigurationPanel(PianoWithSound.Configuration configuration) {
         // field construction
         buildPianoConfigurationFields(configuration);
         

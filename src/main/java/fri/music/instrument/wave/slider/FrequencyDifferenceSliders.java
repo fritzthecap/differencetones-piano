@@ -21,11 +21,11 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.JustIntonation;
-import fri.music.MathUtils;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.swingutils.ButtonUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;
+import fri.music.utils.MathUtil;
 
 /**
  * Displays two frequency sliders and their difference-tone.
@@ -322,7 +322,7 @@ public class FrequencyDifferenceSliders extends AbstractFrequencySliders
         }
         
         final double division = frequency1 / frequency2; // always greater zero
-        final long[] fraction = MathUtils.toFraction(division);
+        final long[] fraction = MathUtil.toFraction(division);
         final long octave = (fraction[0] / fraction[1]) - 1;
         final String nearestInterval = nearestInterval(fraction[0], fraction[1], octave);
         

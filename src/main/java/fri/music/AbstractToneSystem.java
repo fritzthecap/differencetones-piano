@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.stream.IntStream;
+import fri.music.utils.StringUtil;
 
 /**
  * Common implementations for all ToneSystem classes.
@@ -25,7 +26,6 @@ public abstract class AbstractToneSystem implements ToneSystem
      * @param frequencyOfA4 the desired frequency of tone "A4".
      * @param baseToneIpnName the build-note for the requested tone array e.g. "E3" or "G1".
      *      It is the tone the chromaticScale is built upon, calculated from frequencyOfA4.
-     *      This is NOT the <code>referenceIpnName</code>!
      * @param modalScaleStartIpnName the lowest note of the tone array resulting from a tones() call.
      *      When baseToneIpnName is "C0" and modalScaleStartIpnName is "A0" you will get an A-minor scale,
      *      built upon a C-major scale (AEOLIAN mode). Thus it is the specifier for the modal scale you want.
@@ -107,12 +107,12 @@ public abstract class AbstractToneSystem implements ToneSystem
     
     /** @return the given IPN-name without trailing octave-number. */
     protected final String removeOctave(String ipnName) {
-        return TextUtil.getUntilFirstNumber(ipnName);
+        return StringUtil.getUntilFirstNumber(ipnName);
     }
     
     /** @return the octave-number from given IPN-name. */
     protected final int getOctave(String ipnName) {
-        return TextUtil.getFirstNumber(ipnName);
+        return StringUtil.getFirstNumber(ipnName);
     }
     
     /**

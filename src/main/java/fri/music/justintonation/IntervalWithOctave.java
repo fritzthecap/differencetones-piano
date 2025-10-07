@@ -2,7 +2,7 @@ package fri.music.justintonation;
 
 import java.util.List;
 import fri.music.AbstractJustIntonation.Interval;
-import fri.music.MathUtils;
+import fri.music.utils.MathUtil;
 
 /**
  * Represents an interval and its octave number, which determines the calculation of its ratio.
@@ -37,11 +37,11 @@ public class IntervalWithOctave
         for (; (double) dividend / (double) divisor < firstToneRatio; octave++)
             dividend *= 2;
         
-        final long[] reducedDifferenceTone = MathUtils.reduceFraction(dividend, divisor);
+        final long[] reducedDifferenceTone = MathUtil.reduceFraction(dividend, divisor);
         
         for (int j = 0; j < scaleIntervals.size(); j++) {
             final IntervalWithOctave tone = scaleIntervals.get(j);
-            final long[] reducedTone = MathUtils.reduceFraction(tone.dividend(), tone.divisor());
+            final long[] reducedTone = MathUtil.reduceFraction(tone.dividend(), tone.divisor());
             
             if (reducedTone[0] == reducedDifferenceTone[0] && reducedTone[1] == reducedDifferenceTone[1])
                 return new IntervalWithOctave(

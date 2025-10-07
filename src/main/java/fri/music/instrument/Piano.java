@@ -12,8 +12,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import fri.music.ScaleTypes;
-import fri.music.TextUtil;
 import fri.music.ToneSystem;
+import fri.music.utils.StringUtil;
 
 /**
  * Piano keyboard user-interface with 12 keys per octave,
@@ -63,7 +63,7 @@ public class Piano
             
             this.lowestToneIpnName = (lowestToneIpnName == null) ? "C0" : lowestToneIpnName;
             // peel the "5" out of "C5" in lowestToneIpnName
-            this.lowestToneOctaveBasedOnC = TextUtil.getFirstNumber(this.lowestToneIpnName);
+            this.lowestToneOctaveBasedOnC = StringUtil.getFirstNumber(this.lowestToneIpnName);
             
             this.blackKeyWidth = (blackKeyWidthPixels <= 0) ? 16 : blackKeyWidthPixels;
             // for the black keys of a horizontal piano, 28 pixels are minimum to see the the IPN-name

@@ -16,8 +16,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import fri.music.JustIntonation;
 import fri.music.ScaleTypes;
-import fri.music.TextUtil;
 import fri.music.justintonation.JustIntonationChecker;
+import fri.music.utils.StringUtil;
 
 /**
  * Lets configure the <code>JustIntonationChecker</code> class
@@ -106,7 +106,7 @@ public class ConfigurationPanel
             final JustIntonationChecker.Result result = new JustIntonationChecker(configuration).check(chromaticScale);
             resultText.append(result.toString());
             if (i < selectedValues.size())
-                resultText.append(TextUtil.NEWLINE);
+                resultText.append(StringUtil.NEWLINE);
         }
         
         return new String[] { titleText.toString(), resultText.toString() };

@@ -18,9 +18,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import fri.music.HtmlResources;
-import fri.music.TextUtil;
 import fri.music.swingutils.KeyStrokeUtil;
 import fri.music.swingutils.text.HtmlBrowser;
+import fri.music.utils.StringUtil;
 
 /**
  * Shows text in non-modal dialogs.
@@ -131,7 +131,7 @@ public class DialogStarter
             final String dialogTitle = dialog.getTitle();
             if (dialogTitle != null && dialogTitle.trim().length() > 0) { // check for cascading
                 // cut off trailing numbers
-                final String titleWithoutNumber = TextUtil.getUntilFirstNumber(dialogTitle.trim());
+                final String titleWithoutNumber = StringUtil.getUntilFirstNumber(dialogTitle.trim());
                 final Point locationForTitle = dialogMap.get(titleWithoutNumber);
                 
                 if (locationForTitle != null) { // cascade window to next point

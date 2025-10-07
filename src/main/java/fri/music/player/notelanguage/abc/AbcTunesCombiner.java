@@ -1,6 +1,6 @@
 package fri.music.player.notelanguage.abc;
 
-import fri.music.TextUtil;
+import fri.music.utils.StringUtil;
 
 /**
  * Merges to ABC tunes to one with two voices.
@@ -21,8 +21,8 @@ public class AbcTunesCombiner
         
         final String header = upperHeaderAndNotes[0];
         
-        final String upperVoiceDefinition = "V: "+upperVoiceName+TextUtil.NEWLINE;
-        final String lowerVoiceDefinition = "V: "+lowerVoiceName+TextUtil.NEWLINE;
+        final String upperVoiceDefinition = "V: "+upperVoiceName+StringUtil.NEWLINE;
+        final String lowerVoiceDefinition = "V: "+lowerVoiceName+StringUtil.NEWLINE;
         
         final String upperTune = upperHeaderAndNotes[1];
         final String lowerTune = lowerHeaderAndNotes[1];
@@ -46,7 +46,7 @@ public class AbcTunesCombiner
             final char c1 = line.charAt(0);
             final char c2 = line.charAt(1);
             final boolean headerLine = (Character.isLetter(c1) && c2 == ':');
-            line = line + TextUtil.NEWLINE;
+            line = line + StringUtil.NEWLINE;
             if (headerLine)
                 header.append(line);
             else

@@ -44,11 +44,10 @@ public class JustIntonationDemo
                     ToneSystem.DEFAULT_BASETONE_IPN_NAME, // C0
                     ToneSystem.MAXIMUM_OCTAVES); // 10
             System.out.println(toneSystem);
-            System.out.println("IPN-Name (MIDI)\tFreq.\tRatio\tCent\tCent-Deviation");
             
-            final Tone[] tones = toneSystem.tones();
-            for (int i = 0; i < tones.length; i++)
-                System.out.println(tones[i]);
+            System.out.println("IPN-Name (MIDI)\tFreq.\tRatio\tCent\tCent-Deviation");
+            for (Tone tone : toneSystem.tones())
+                System.out.println(tone);
         }
     }
 

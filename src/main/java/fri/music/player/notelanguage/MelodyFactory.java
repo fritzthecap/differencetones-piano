@@ -2,12 +2,12 @@ package fri.music.player.notelanguage;
 
 import java.util.ArrayList;
 import java.util.List;
-import fri.music.TextUtil;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
 import fri.music.player.Multiplet;
 import fri.music.player.Note;
+import fri.music.utils.StringUtil;
 
 /**
  * Reads in a number of notes with length, headed by time-signature and tempo, 
@@ -27,7 +27,7 @@ public class MelodyFactory
     /** Maximum beats per bar is a dicussed topic. */
     public static final Integer MAXIMUM_BEATS_PER_BAR = 16; //32;
     
-    static final String NEWLINE = TextUtil.NEWLINE;
+    static final String NEWLINE = StringUtil.NEWLINE;
 
     /** Factor by which first note in bar should be louder than subsequent notes. */
     private static final double BAR_START_VOLUME_FACTOR = 1.8;
@@ -232,7 +232,7 @@ public class MelodyFactory
             // time-signature change can be attached to any note at bar-start
             if ((chordIndex > 0 || writeTimeSignature) && note.beatInfo.timeSignature() != null) // initial or changed bar-type
                 result.append(
-                    (chordIndex <= 0 || TextUtil.endsWithNewline(result) ? "" : NEWLINE) +
+                    (chordIndex <= 0 || StringUtil.endsWithNewline(result) ? "" : NEWLINE) +
                     note.beatInfo.timeSignature() +
                     (addNewline ? "" : NEWLINE)); // add newline only if it wouldn't be added later
             

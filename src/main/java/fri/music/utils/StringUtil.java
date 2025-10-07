@@ -1,6 +1,6 @@
-package fri.music;
+package fri.music.utils;
 
-public final class TextUtil
+public final class StringUtil
 {
     public static final String NEWLINE = System.getProperty("line.separator");
     
@@ -58,5 +58,5 @@ public final class TextUtil
         return sb.toString();
     }
 
-    private TextUtil() {} // do not instantiate
+    private StringUtil() {} // do not instantiate
 }

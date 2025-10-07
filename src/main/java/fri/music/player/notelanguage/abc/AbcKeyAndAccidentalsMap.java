@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-import fri.music.TextUtil;
 import fri.music.ToneSystem;
+import fri.music.utils.StringUtil;
 
 /**
  * Manages the mapping of notes from IPN-notation to ABC,
@@ -352,12 +352,12 @@ class AbcKeyAndAccidentalsMap
         final String abcName;
         if (isFlatKey)
             if ((keyOfTune.equals("Gb") || keyOfTune.equals("Ebm")) && ipnName.startsWith("B"))
-                abcName = makeCFlat(TextUtil.getFirstNumber(ipnName), IPN_NOTE_TO_ABC_FLAT);
+                abcName = makeCFlat(StringUtil.getFirstNumber(ipnName), IPN_NOTE_TO_ABC_FLAT);
             else
                 abcName = IPN_NOTE_TO_ABC_FLAT.get(ipnName);
         else
             if ((keyOfTune.equals("F#") || keyOfTune.equals("D#m")) && ipnName.startsWith("F") && ipnName.charAt(1) != ToneSystem.SHARP_CHAR)
-                abcName = makeESharp(TextUtil.getFirstNumber(ipnName), IPN_NOTE_TO_ABC_SHARP);
+                abcName = makeESharp(StringUtil.getFirstNumber(ipnName), IPN_NOTE_TO_ABC_SHARP);
             else
                 abcName = IPN_NOTE_TO_ABC_SHARP.get(ipnName);
         
@@ -389,19 +389,19 @@ class AbcKeyAndAccidentalsMap
     
     /** Searches an IPN name like "F#4" in a list with names like "F", "F#", .... (comparison without octave). */
     private boolean isIn(List<String> ipnNames, String ipnName) {
-        final String nameWithoutOctave = TextUtil.getUntilFirstNumber(ipnName);
+        final String nameWithoutOctave = StringUtil.getUntilFirstNumber(ipnName);
         return ipnNames.contains(nameWithoutOctave);
     }
 
     /** @return true if their octaves are the same and the given notes would be on same note line according to isFlatKey. */
     private boolean isOnSameNoteline(String precedingIpnNameNotInScale, String ipnNameInScale, boolean searchUpwards) {
         // check for same octave
-        if (TextUtil.getFirstNumber(precedingIpnNameNotInScale) != TextUtil.getFirstNumber(ipnNameInScale))
+        if (StringUtil.getFirstNumber(precedingIpnNameNotInScale) != StringUtil.getFirstNumber(ipnNameInScale))
             return false;
         
         // match would be preceding G#, current G, in sharp key like D,
         // or preceding Gb (as F#), current G, in flat key like Eb
-        final String precedingIpnBaseName = TextUtil.getUntilFirstNumber(precedingIpnNameNotInScale);
+        final String precedingIpnBaseName = StringUtil.getUntilFirstNumber(precedingIpnNameNotInScale);
         final String[] ipnBaseNames = ToneSystem.IPN_BASE_NAMES;
         int index = 0;
         while (index < ipnBaseNames.length && ipnBaseNames[index].equals(precedingIpnBaseName) == false)
@@ -414,7 +414,7 @@ class AbcKeyAndAccidentalsMap
         if (index < 0) // was counted to negative, go to end
             index = ipnBaseNames.length - 1;
         
-        final String ipnNameBaseName = TextUtil.getUntilFirstNumber(ipnNameInScale);
+        final String ipnNameBaseName = StringUtil.getUntilFirstNumber(ipnNameInScale);
         
         return ipnBaseNames[index % ipnBaseNames.length].equals(ipnNameBaseName);
     }

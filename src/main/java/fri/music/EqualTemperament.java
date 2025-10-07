@@ -45,7 +45,6 @@ public final class EqualTemperament extends AbstractToneSystem
     /**
      * @param frequencyOfA4 the desired frequency of tone "A4".
      * @param baseToneIpnName the lowest note of the requested tone array e.g. "E3" or "G1".
-     *      This is NOT the <code>referenceIpnName</code>!
      * @param octaves the 0-n number of octaves + 1 to return.
      *      When zero, just the lowest tone is returned,
      *      when less than zero, 9 octaves will be returned.

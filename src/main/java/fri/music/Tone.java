@@ -3,6 +3,7 @@ package fri.music;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Objects;
+import fri.music.utils.StringUtil;
 
 /**
  * One note or tone, given by frequency and a name that
@@ -34,12 +35,12 @@ public class Tone implements Comparable<Tone>
         this.frequency = frequency;
         this.midiNumber = midiNumber;
         this.cent = cent;
-        this.ipnOctave = TextUtil.getFirstNumber(ipnName);
+        this.ipnOctave = StringUtil.getFirstNumber(ipnName);
     }
     
     public String ipnNameWithoutOctave() {
         if (ipnNameWithoutOctave == null)
-            ipnNameWithoutOctave = TextUtil.getUntilFirstNumber(ipnName);
+            ipnNameWithoutOctave = StringUtil.getUntilFirstNumber(ipnName);
         return ipnNameWithoutOctave;
     }
     

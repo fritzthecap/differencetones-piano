@@ -12,11 +12,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import fri.music.AbstractJustIntonation.Interval;
+import fri.music.utils.MathUtil;
+import fri.music.utils.StringUtil;
 import fri.music.JustIntonation;
 import fri.music.AbstractJustIntonation.ChromaticScale;
-import fri.music.MathUtils;
 import fri.music.ScaleTypes;
-import fri.music.TextUtil;
 import fri.music.ToneSystem;
 
 /**
@@ -48,7 +48,7 @@ import fri.music.ToneSystem;
  */
 public class JustIntonationChecker
 {
-    static final String NEWLINE = TextUtil.NEWLINE;
+    static final String NEWLINE = StringUtil.NEWLINE;
     
     /** Options to pass to JustIntonationChecker constructor. */
     public static class Configuration
@@ -146,7 +146,7 @@ public class JustIntonationChecker
             final List<DiatonicScaleCheckResult> diatonicScaleResults = diatonicScaleCheckResults();
             final DiatonicScaleCheckResult firstResult = diatonicScaleResults.get(0); // all were checked against the same intervals
             
-            final int leastCommonMultiple = MathUtils.leastCommonMultipleInt(
+            final int leastCommonMultiple = MathUtil.leastCommonMultipleInt(
                     firstResult.diatonicScaleIntervals().stream().map(interval -> interval.divisor()));
             final String diatonicIntervalRatios = firstResult.diatonicScaleIntervals().stream()
                     .skip(1) // skip leading UNISON 1/1

@@ -1,4 +1,4 @@
-package fri.music;
+package fri.music.utils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-public final class MathUtils
+public final class MathUtil
 {
     /** 2, 3, 4 -> 12. */
     public static int leastCommonMultipleInt(Stream<Integer> numbers) {
@@ -174,9 +174,9 @@ public final class MathUtils
     
     
     
-    private MathUtils() {}
+    private MathUtil() {}
     
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         if (args.length < 2)
             throw new IllegalArgumentException("Expected at least 2 numbers to caclulate LCM and GCD from!");
         
@@ -185,10 +185,10 @@ public final class MathUtils
         for (int i = 0; i < args.length; i++)
             numbers[i] = Integer.valueOf(args[i]);
 
-        int lcm = MathUtils.leastCommonMultiple(numbers);
+        int lcm = MathUtil.leastCommonMultiple(numbers);
         System.out.println(lcm+" is the least common multiple of "+Arrays.toString(numbers));
         
-        int gcd = MathUtils.greatestCommonDivisor(numbers);
+        int gcd = MathUtil.greatestCommonDivisor(numbers);
         System.out.println(gcd+" is the greatest common divisor of "+Arrays.toString(numbers));
-    }
+    }*/
 }
