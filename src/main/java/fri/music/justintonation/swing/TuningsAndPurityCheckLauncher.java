@@ -76,7 +76,7 @@ public class TuningsAndPurityCheckLauncher
                 try {
                     final String title = tuningsConfigurationPanel.getToneSystem().name();
                     final String result = buildTuningDisplayText(tuningsConfigurationPanel, displayConfiguration);
-                    showResultInTextDialog(tuningsPanel, title, result, "Monospaced");
+                    showResultInTextDialog(tuningsPanel, title, result, Font.MONOSPACED);
                 }
                 catch (IllegalArgumentException e) {
                     JOptionPane.showMessageDialog(tuningsPanel, e.getMessage());

@@ -41,7 +41,6 @@ import fri.music.instrument.wave.slider.FrequencyChordSliders;
 import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyChordSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyDifferenceSliders;
-import fri.music.justintonation.swing.HelpForJustIntonationChecker;
 import fri.music.justintonation.swing.TuningsAndPurityCheckLauncher;
 import fri.music.swingutils.layout.SizeUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;

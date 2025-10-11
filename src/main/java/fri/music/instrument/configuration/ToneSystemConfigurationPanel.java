@@ -60,7 +60,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
             double frequencyOfA4Param,
             String modalScaleStartBaseNameParam)
     {
-        super(octaves, lowestToneBaseName, lowestToneOctave, false); // false: no scale names at lowest tone
+        super(octaves, lowestToneBaseName, lowestToneOctave, false); // false: no scale names at "Lowest Tone"
         
         // field construction
         buildToneSystemConfigurationFields(lowestToneBaseName, frequencyOfA4Param, octaves);
