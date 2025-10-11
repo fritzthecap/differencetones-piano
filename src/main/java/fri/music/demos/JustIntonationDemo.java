@@ -30,12 +30,12 @@ public class JustIntonationDemo
             for (int i = 0; i < args.length; i += 2) {
                 final String firstTone = args[i];
                 final String secondTone = args[i + 1];
-                final JustTone tone1 = (JustTone) tones.forIpnName(firstTone);
-                final JustTone tone2 = (JustTone) tones.forIpnName(secondTone);
+                final JustTone lowerTone = (JustTone) tones.forIpnName(firstTone);
+                final JustTone upperTone = (JustTone) tones.forIpnName(secondTone);
                 
-                final long[] distance = tone1.distance(tone2);
+                final long[] distance = lowerTone.distance(upperTone);
                 
-                System.out.println("Distance between "+tone1.ipnName+" and "+tone2.ipnName+" = "+(distance[0]+"/"+distance[1]));
+                System.out.println("Distance between "+lowerTone.ipnName+" and "+upperTone.ipnName+" = "+(distance[0]+"/"+distance[1]));
             }
         }
         else { // display a scale

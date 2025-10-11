@@ -15,25 +15,26 @@ public abstract class AbstractToneSystem implements ToneSystem
     public static final Map<Object,Tone[]> tonesCache = new Hashtable<>();
     
     /** The actual start tone of this tone-system, can be different from <code>baseToneIpnName()</code>. */
-    public final String modalScaleStartIpnName;
-    /** The actual number of octaves of this tone-system. */
-    public final int octaves;
+    protected final String modalScaleStartIpnName;
     
+    private final int octaves;
     private final double frequencyOfA4;
     private final String baseToneIpnName;
 
     /**
+     * All parameters are optional and will be replaced by defaults when null or out of range.
      * @param frequencyOfA4 the desired frequency of tone "A4".
-     * @param baseToneIpnName the build-note for the requested tone array e.g. "E3" or "G1".
-     *      It is the tone the chromaticScale is built upon, calculated from frequencyOfA4.
+     * @param baseToneIpnName e.g. "E3" or "G1", the tone the chromatic scale is calculated from,
+     *      using an equal-temperament scale at frequencyOfA4. The octave is not important, because
+     *      the tone will be lowered to the zero octave, but in case the modalScaleStartIpnName is
+     *      null, it will be its default.
      * @param modalScaleStartIpnName the lowest note of the tone array resulting from a tones() call.
      *      When baseToneIpnName is "C0" and modalScaleStartIpnName is "A0" you will get an A-minor scale,
-     *      built upon a C-major scale (AEOLIAN mode), thus it is the specifier for the modal scale you want.
-     *      This plays a role in just-intonation.
-     *      By default it is <code>baseToneIpnName</code>.
-     * @param octaves the 0-n number of octaves to return, plus one tone on top.
-     *      When zero, just the lowest tone is returned,
-     *      when less than zero, ToneSystem.MAXIMUM_OCTAVES octaves will be returned.
+     *      built upon a C-major scale (AEOLIAN mode), thus it is the specifier for the modal scale you
+     *      want. This plays a role in just-intonation only. Default is <code>baseToneIpnName</code>.
+     * @param octaves the 0-n number of octaves to return, plus one tone on top. When zero, just the lowest
+     *      tone will be returned, when less than zero or more than ToneSystem.MAXIMUM_OCTAVES,
+     *      ToneSystem.MAXIMUM_OCTAVES octaves will be returned.
      */
     protected AbstractToneSystem(double frequencyOfA4, String baseToneIpnName, String modalScaleStartIpnName, int octaves) {
         this.frequencyOfA4 = (frequencyOfA4 <= 0.0) ? ToneSystem.DEFAULT_REFERENCE_FREQUENCY : frequencyOfA4;
@@ -67,6 +68,12 @@ public abstract class AbstractToneSystem implements ToneSystem
     @Override
     public double referenceFrequency() {
         return frequencyOfA4;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public int octaves() {
+        return octaves;
     }
     
     /** {@inheritDoc} */

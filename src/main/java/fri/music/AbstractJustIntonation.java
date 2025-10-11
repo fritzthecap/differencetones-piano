@@ -175,7 +175,7 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
     
     @Override
     public Tone[] tones() {
-        return AbstractToneSystem.tones(getOrCreateCachedTones(), modalScaleStartIpnName, octaves);
+        return AbstractToneSystem.tones(getOrCreateCachedTones(), modalScaleStartIpnName, octaves());
     }
     
     
@@ -189,7 +189,7 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
         return new CacheKey(referenceFrequency(), lowestInZeroOctave, chromaticScale);
     }
     
-    protected Tone[] createTones(Interval unisonInterval, Interval octaveInterval) {
+    protected final Tone[] createTones(Interval unisonInterval, Interval octaveInterval) {
         final String lowestInZeroOctave = ((CacheKey) getCacheKey()).lowestInZeroOctave();
         final Interval[] intervals = chromaticScale.intervals();
         

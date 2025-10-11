@@ -10,17 +10,17 @@ class EqualTemperamentTest
         AbstractToneSystem toneSystem;
         
         toneSystem = new EqualTemperament();
-        assertEquals(ToneSystem.MAXIMUM_OCTAVES, toneSystem.octaves);
+        assertEquals(ToneSystem.MAXIMUM_OCTAVES, toneSystem.octaves());
         
         int octaves;
         toneSystem = new EqualTemperament(octaves = 4);
-        assertEquals(octaves, toneSystem.octaves);
+        assertEquals(octaves, toneSystem.octaves());
         
         toneSystem = new EqualTemperament(0);
         assertEquals(1, toneSystem.tones().length);
         
         toneSystem = new EqualTemperament("A7", octaves = 2); // 2 octaves is maximum for A7
-        assertEquals(octaves, toneSystem.octaves);
+        assertEquals(octaves, toneSystem.octaves());
         
         assertThrows(IllegalArgumentException.class, () -> {
             new EqualTemperament(ToneSystem.MAXIMUM_OCTAVES + 1).tones(); // just 12 octaves possible
@@ -30,7 +30,7 @@ class EqualTemperamentTest
         final int startOctave = 7;
         final int requestedOctaves = ToneSystem.MAXIMUM_OCTAVES - startOctave;
         toneSystem = new EqualTemperament("C"+startOctave, requestedOctaves);
-        assertEquals(requestedOctaves, toneSystem.octaves);
+        assertEquals(requestedOctaves, toneSystem.octaves());
         
         assertThrows(IllegalArgumentException.class, () -> {
             new EqualTemperament("C#7", requestedOctaves).tones(); // just 12 octaves possible
@@ -41,7 +41,7 @@ class EqualTemperamentTest
     void frequencies() {
         final double frequencyOfA4 = 436.0;
         final AbstractToneSystem toneSystem = new EqualTemperament(frequencyOfA4, "C4", 1);
-        assertEquals(1, toneSystem.octaves);
+        assertEquals(1, toneSystem.octaves());
         
         final Tone[] tones = toneSystem.tones();
         assertEquals(12 + 1, tones.length);

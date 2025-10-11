@@ -17,12 +17,12 @@ class JustIntonationTest
         final JustIntonation toneSystem = new JustIntonation(
                 frequencyOfA4, // Hertz of A4
                 "C"+(startOctave + 1), // scale build note
-                modalStartIpnName, // lowest scale note
+                modalStartIpnName, // lowest scale note, allowed to be below lowestToneIpnName
                 numberOfOctaves,
                 ChromaticScales.LIMIT_5_SYMMETRIC_1); // the parallel minor
         
         final Tone[] tones = toneSystem.tones();
-        assertEquals(numberOfOctaves, toneSystem.octaves);
+        assertEquals(numberOfOctaves, toneSystem.octaves());
         assertEquals(modalStartIpnName, tones[0].ipnName);
         assertEquals(startOctave, tones[0].ipnOctave);
         assertEquals(startOctave + 1, tones[12].ipnOctave);
@@ -39,11 +39,11 @@ class JustIntonationTest
         AbstractToneSystem toneSystem;
         
         toneSystem = new JustIntonation();
-        assertEquals(ToneSystem.MAXIMUM_OCTAVES, toneSystem.octaves);
+        assertEquals(ToneSystem.MAXIMUM_OCTAVES, toneSystem.octaves());
         
         final int OCTAVES = 4;
         toneSystem = new JustIntonation(OCTAVES);
-        assertEquals(OCTAVES, toneSystem.octaves);
+        assertEquals(OCTAVES, toneSystem.octaves());
         
         toneSystem = new JustIntonation(0);
         assertEquals(1, toneSystem.tones().length);
