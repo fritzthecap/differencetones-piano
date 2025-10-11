@@ -55,7 +55,7 @@ public class TuningComponent
             return this.tuningChoice;
 
         final String[] tuningNames = getTuningNames();
-        final JComboBox<String> tuningChoice = new SmartComboBox(tuningNames);
+        final JComboBox<String> tuningChoice = newTuningComboBox(tuningNames);
         tuningChoice.setBorder(BorderFactory.createTitledBorder("Tuning"));
         
         if (initialTuning != null)
@@ -64,6 +64,11 @@ public class TuningComponent
         addListeners(this.tuningChoice = tuningChoice, initialTuning != null);
         
         return this.tuningChoice;
+    }
+
+    /** Factory method called from getChoice(), determines the class of JComboBox to use. */
+    protected JComboBox<String> newTuningComboBox(String[] tuningNames) {
+        return new SmartComboBox(tuningNames);
     }
 
     /** Called at end of getChoice(), does nothing, to be overridden by selection listeners. */
