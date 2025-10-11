@@ -23,7 +23,7 @@ import fri.music.utils.StringUtil;
  * Lets configure the <code>JustIntonationChecker</code> class
  * to see data about just-intonation scales and their harmony issues.
  */
-public class ConfigurationPanel
+public class PurityCheckConfigurationPanel
 {
     public final JPanel panel;
     
@@ -39,7 +39,7 @@ public class ConfigurationPanel
     
     private JList<String> checkedJustIntonationTunings;
 
-    public ConfigurationPanel() {
+    public PurityCheckConfigurationPanel() {
         buildCheckerConfigurationFields();
         buildJustIntonationSelection();
         
@@ -68,12 +68,12 @@ public class ConfigurationPanel
         
         final JComponent checkedScaleNamesScrollPane = new JScrollPane(checkedScaleNames);
         checkedScaleNames.setVisibleRowCount(7);
-        checkedScaleNamesScrollPane.setBorder(BorderFactory.createTitledBorder("Scale(s)"));
+        checkedScaleNamesScrollPane.setBorder(BorderFactory.createTitledBorder("Modal Scale(s)"));
         moveLeftUpperPanel.add(checkedScaleNamesScrollPane);
         
         final JComponent checkedJustIntonationTuningsScrollPane = new JScrollPane(checkedJustIntonationTunings);
         checkedJustIntonationTunings.setVisibleRowCount(5);
-        checkedJustIntonationTuningsScrollPane.setBorder(BorderFactory.createTitledBorder("Tuning(s) to check"));
+        checkedJustIntonationTuningsScrollPane.setBorder(BorderFactory.createTitledBorder("Scale Tuning(s) to check"));
         
         panel.add(moveLeftUpperPanel);
         panel.add(moveLeftLowerPanel);

@@ -42,7 +42,7 @@ import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyChordSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyDifferenceSliders;
 import fri.music.justintonation.swing.HelpForJustIntonationChecker;
-import fri.music.justintonation.swing.TuningsCheckLauncher;
+import fri.music.justintonation.swing.TuningsAndPurityCheckLauncher;
 import fri.music.swingutils.layout.SizeUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.swingutils.text.HtmlBrowser;
@@ -101,7 +101,7 @@ public final class Main
         toolbar.add(buildQuickTourButton());
         toolbar.add(buildFrequencyDifferenceSliders());
         toolbar.add(buildFrequencyChordSliders());
-        toolbar.add(buildJustIntonationCheckerConfiguration());
+        toolbar.add(buildTuningDisplayAndPurityChecker());
         toolbar.add(buildMoreButton());
         return toolbar;
     }
@@ -210,7 +210,7 @@ public final class Main
                 HelpWindowSingleton.start(panel, "Quick Tour", HtmlResources.class.getResource("quicktour.html"));
             }
         });
-        return configureTopButton(quickTourButton, "Let a Brief Description Guide You Through the Application");
+        return configureTopButton(quickTourButton, "Brief Description of Two Functionalities of the Application");
     }
 
     private Action buildFrequencyDifferenceSliders() {
@@ -237,17 +237,20 @@ public final class Main
         return setActionNameAsHtml(title, action);
     }
 
-    private JFrame fractionBasedTuningsCheckerFrame; // instance-singleton
+    private JFrame tuningsAndPurityCheckerFrame; // instance-singleton
     
-    private Action buildJustIntonationCheckerConfiguration() {
-        final String title = HelpForJustIntonationChecker.TITLE;
+    private Action buildTuningDisplayAndPurityChecker() {
+        final String title = "Display Tunings, Check Fraction-Based Tunings for Purity";
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (fractionBasedTuningsCheckerFrame == null)
-                    fractionBasedTuningsCheckerFrame = FrameStarter.start(title, new TuningsCheckLauncher(title).panel);
+                if (tuningsAndPurityCheckerFrame == null)
+                    tuningsAndPurityCheckerFrame = FrameStarter.start(
+                            title, 
+                            new TuningsAndPurityCheckLauncher().panel);
+                            //new Dimension(940, 600));
                 else
-                    fractionBasedTuningsCheckerFrame.setVisible(true);
+                    tuningsAndPurityCheckerFrame.setVisible(true);
             }
         };
         return setActionNameAsHtml(title, action);

@@ -272,11 +272,11 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
     public static class JustTone extends Tone
     {
         /** The <code>modalScaleStartIpnName</code>-based octave number of the tone (not IPN-octave!). */
-        private final int octave;
+        public final int octave;
         /** The interval this tone was calculated from (as upper tone). **/
-        private final Interval interval;
+        public final Interval interval;
         /** The deviation from the standard cent count where 1 semi-tone = 100 cent. **/
-        private final int centDeviation;
+        public final int centDeviation;
         
         /**
          * @param tone the tone from equal-temperament to represent.
@@ -296,11 +296,15 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
             return Interval.distance(interval, octave, upperTone.interval, upperTone.octave);
         }
         
+        public String centDeviationString() {
+            return (centDeviation >= 0 ? "+" : "")+centDeviation; // negative would render itself
+        }
+        
         @Override
         public String toString() {
             return super.baseToString()+",\t"+
                     interval.ratioString(octave)+"\t"+
-                    centToString()+"\t("+(centDeviation >= 0 ? "+" : "")+centDeviation+")";
+                    centToString()+"\t("+centDeviationString()+")";
         }
     }
 

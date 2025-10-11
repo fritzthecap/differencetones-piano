@@ -55,7 +55,7 @@ public class TuningComponent
             return this.tuningChoice;
 
         final String[] tuningNames = getTuningNames();
-        final JComboBox<String> tuningChoice = newTuningComboBox(tuningNames);
+        final JComboBox<String> tuningChoice = new SmartComboBox(tuningNames);
         tuningChoice.setBorder(BorderFactory.createTitledBorder("Tuning"));
         
         if (initialTuning != null)
@@ -66,11 +66,6 @@ public class TuningComponent
         return this.tuningChoice;
     }
 
-    /** Factory method called from getChoice(), determines the class of JComboBox to use. */
-    protected JComboBox<String> newTuningComboBox(String[] tuningNames) {
-        return new SmartComboBox(tuningNames);
-    }
-
     /** Called at end of getChoice(), does nothing, to be overridden by selection listeners. */
     protected void addListeners(final JComboBox<String> tuningChoice, boolean initialTuningWasSet) {
     }
@@ -79,7 +74,10 @@ public class TuningComponent
     public final ToneSystem getTuning() {
         final String chosenName = (String) tuningChoice.getSelectedItem();
         if (chosenName.startsWith(EqualTemperament.class.getSimpleName()))
-            return new EqualTemperament(frequencyOfA4, lowestToneIpnName, octaves);
+            return new EqualTemperament(
+                    frequencyOfA4, 
+                    lowestToneIpnName, 
+                    octaves);
         
         final JustIntonation.ChromaticScale twelveToneScale = 
             Stream.of(JustIntonation.ChromaticScales.values())
@@ -87,7 +85,12 @@ public class TuningComponent
                 .findFirst()
                 .orElseThrow();
         
-        return new JustIntonation(frequencyOfA4, lowestToneIpnName, modalScaleStartIpnName, octaves, twelveToneScale);
+        return new JustIntonation(
+                frequencyOfA4,
+                lowestToneIpnName, 
+                modalScaleStartIpnName, 
+                octaves, 
+                twelveToneScale);
     }
     
     

@@ -1,6 +1,5 @@
 package fri.music.instrument.configuration;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -48,9 +47,7 @@ public class ToneRangeConfigurationPanel
         // fields layout
         final JPanel lowestTonePanel = new JPanel();
         lowestTonePanel.setLayout(new BoxLayout(lowestTonePanel, BoxLayout.X_AXIS));
-        lowestTonePanel.setBorder(BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true),
-                        "Lowest Tone"));
+        lowestTonePanel.setBorder(BorderFactory.createTitledBorder("Lowest Tone"));
         lowestTonePanel.add(lowestToneBaseName);
         if (lowestToneScaleName != null)
             lowestTonePanel.add(lowestToneScaleName);
@@ -70,6 +67,7 @@ public class ToneRangeConfigurationPanel
     public final String getLowestToneIpnName() {
         return "" + lowestToneBaseName.getSelectedItem() + lowestToneOctave.getValue();
     }
+    
     
     protected final int getLowestToneOctave() {
         return lowestToneOctave.getValue();
@@ -91,7 +89,7 @@ public class ToneRangeConfigurationPanel
         final Set<String> scaleNamesSet = ScaleTypes.scaleToStartNote.sequencedKeySet();
         final String[] scaleNames = scaleNamesSet.toArray(new String[scaleNamesSet.size()]);
         
-        final JComboBox<String> lowestToneScaleName = new JComboBox<>(scaleNames);
+        final JComboBox<String> lowestToneScaleName = new SmartComboBox(scaleNames);
         lowestToneScaleName.setBorder(BorderFactory.createTitledBorder("or Scale"));
         lowestToneScaleName.setToolTipText("Modal Scale Type");
         
@@ -127,7 +125,7 @@ public class ToneRangeConfigurationPanel
         if (lowestToneBaseNameParam == null || lowestToneBaseNameParam.length() <= 0)
             lowestToneBaseNameParam = DEFAULT_LOWEST_TONE_BASENAME;
         
-        if (lowestToneOctaveParam <= 0)
+        if (lowestToneOctaveParam < 0)
             lowestToneOctaveParam = DEFAULT_LOWEST_TONE_OCTAVE;
         
         final ChangeListener octavesListener = new ChangeListener() {

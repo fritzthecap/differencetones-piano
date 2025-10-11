@@ -1,4 +1,8 @@
 
+- Bug: call "Display Tunings", set 8 octaves, set "Lowest Tone" to "E",
+    set LIMIT_5 JustIntonation (another exception happens also with EqualTemperament),
+    click "Display": IllegalArgumentException: Requested number of octaves (8) is out of range!
+    
 - Configuration and display UI for:
     Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
     Difference tones in different tunings (DifferenceToneDemo)
@@ -12,7 +16,7 @@
 - Find out why the first interval in auto-composed "When the Saints" is so high.
     Maybe the tone-range calculation is wrong or could be improved?
 
-- Ff the piano has colored keys, the selection color (difference tones!) should change to white.
+- If the piano has colored keys, the selection color (difference tones!) should change to white.
 
 - Selection of notes in text-area while playing, for NotesPianoPlayer.
     This should work only in single-step mode.

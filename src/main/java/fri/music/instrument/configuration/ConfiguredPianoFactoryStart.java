@@ -51,7 +51,6 @@ public class ConfiguredPianoFactoryStart
         });
         
         final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true));
         buttonPanel.add(showPianoButton);
         
         final JPanel mainPanel = new JPanel(new BorderLayout());

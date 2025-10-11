@@ -1,13 +1,15 @@
 package fri.music.instrument.configuration;
 
-import java.awt.Color;
+import java.awt.FlowLayout;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -36,6 +38,11 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
     private final NumberFormat decimalFormatLabels = new DecimalFormat("0");
     private final NumberFormat decimalFormatTooltip = new DecimalFormat("0.0");
     
+    /** Default constructor. */
+    public ToneSystemConfigurationPanel() {
+        this(-1, null, -1, 0.0, null);
+    }
+    
     /**
      * All parameters are optional and will be replaced by defaults when null or out of range.
      * @param octaves number of octaves of the tone-system to construct.
@@ -56,24 +63,29 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         super(octaves, lowestToneBaseName, lowestToneOctave, false); // false: no scale names at lowest tone
         
         // field construction
-        buildToneSystemConfigurationFields(lowestToneBaseName, lowestToneOctave, frequencyOfA4Param, octaves);
+        buildToneSystemConfigurationFields(lowestToneBaseName, frequencyOfA4Param, octaves);
         
-        // field layout
-        panel.add(frequencyOfA4);
-        
-        final JPanel modalScaleStartTonePanel = new JPanel();
-        modalScaleStartTonePanel.setLayout(new BoxLayout(modalScaleStartTonePanel, BoxLayout.X_AXIS));
-        modalScaleStartTonePanel.setBorder(BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true),
-                        "Modal Scale Start Tone"));
-        modalScaleStartTonePanel.add(modalScaleStartBaseName);
-        modalScaleStartTonePanel.add(buildScaleNameChoice(modalScaleStartBaseName));
         if (modalScaleStartBaseNameParam != null)
             modalScaleStartBaseName.setSelectedItem(modalScaleStartBaseNameParam);
 
-        panel.add(modalScaleStartTonePanel);
+        // field layout
+        final JComponent tuningsChoice = tuningComponent.getChoice(null); // null: default tuning
+        final JPanel tuningsPanel = new JPanel();
+        tuningsPanel.setLayout(new BoxLayout(tuningsPanel, BoxLayout.X_AXIS));
+        tuningsPanel.add(tuningsChoice);
+        tuningsPanel.add(Box.createHorizontalGlue()); // to keep choice left-aligned
         
-        panel.add(tuningComponent.getChoice(null));
+        // set tunings choice on top
+        panel.add(tuningsPanel, 0); // null: default tuning
+        
+        panel.add(frequencyOfA4);
+        
+        final JPanel modalScaleStartTonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        modalScaleStartTonePanel.add(modalScaleStartBaseName);
+        modalScaleStartTonePanel.add(buildScaleNameChoice(modalScaleStartBaseName));
+        
+        modalScaleStartTonePanel.setBorder(BorderFactory.createTitledBorder("Modal Scale Start Tone"));
+        panel.add(modalScaleStartTonePanel);
     }
     
     public final double getFrequencyOfA4() {
@@ -96,7 +108,6 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
 
     private void buildToneSystemConfigurationFields(
             String lowestToneBaseNameParam, 
-            int lowestToneOctave, 
             double frequencyOfA4Param, 
             int octavesParam)
     {
@@ -118,9 +129,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         frequencyOfA4.setPaintLabels(true);
         frequencyOfA4.setPaintTicks(true);
         final String frequencyOfA4Title = "Frequency of A4: ";
-        frequencyOfA4.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true),
-                "Frequency of A4"));
+        frequencyOfA4.setBorder(BorderFactory.createTitledBorder("Frequency of A4"));
         final ChangeListener frequencyListener = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -144,13 +153,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
             lowestToneIpnName = ToneSystem.DEFAULT_BASETONE_IPN_NAME;
         }
         
-        this.tuningComponent = new TuningComponent(lowestToneIpnName, octavesParam) {
-            /** Overridden to make layout stretching. */
-            @Override
-            protected JComboBox<String> newTuningComboBox(String[] tuningNames) {
-                return new JComboBox<String>(tuningNames);
-            }
-        };
+        this.tuningComponent = new TuningComponent(lowestToneIpnName, octavesParam);
     }
 
     private Dictionary<Integer,JLabel> frequencyOfA4LableTable(int minimum, int maximum, int spacing) {
@@ -169,7 +172,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
     }
     
     
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         final ToneSystemConfigurationPanel config = new ToneSystemConfigurationPanel(5, "D", 3, 435.6, "A");
         final javax.swing.JButton button = new javax.swing.JButton("Print Settings");
         button.addActionListener(event -> {
@@ -185,5 +188,5 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         app.add(config.panel);
         app.add(button, java.awt.BorderLayout.SOUTH);
         fri.music.swingutils.window.FrameStarter.start("Tonesystem Settings Test", app, (java.awt.Dimension) null);
-    }
+    }*/
 }
