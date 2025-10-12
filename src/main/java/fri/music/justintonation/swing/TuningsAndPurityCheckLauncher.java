@@ -27,6 +27,7 @@ import fri.music.AbstractJustIntonation.JustTone;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.instrument.configuration.ToneSystemConfigurationPanel;
+import fri.music.swingutils.BorderUtil;
 import fri.music.swingutils.layout.SmartComboBox;
 import fri.music.swingutils.layout.ToolBarUtil;
 import fri.music.swingutils.text.HelpWindowSingleton;
@@ -45,15 +46,11 @@ public class TuningsAndPurityCheckLauncher
     public TuningsAndPurityCheckLauncher() {
         final JPanel tuningsPanel = new JPanel(new BorderLayout());
         buildTuningsPanel(tuningsPanel);
-        tuningsPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true),
-                "Tunings Display"));
+        tuningsPanel.setBorder(BorderUtil.titledBorder("Tunings Display", 4f));
         
         final JPanel checkerPanel = new JPanel(new BorderLayout());
         buildCheckerPanel(checkerPanel);
-        checkerPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 4, true),
-                "Purity Check"));
+        checkerPanel.setBorder(BorderUtil.titledBorder("Purity Check", 4f));
         
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setLeftComponent(tuningsPanel);
@@ -331,7 +328,7 @@ public class TuningsAndPurityCheckLauncher
             
             this.panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            panel.setBorder(BorderFactory.createTitledBorder("Displayed Values and Order"));
+            panel.setBorder(BorderFactory.createTitledBorder("Displayed Columns and Order"));
             
             final JPanel titleLayoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             titleLayoutPanel.add(title);
