@@ -5,38 +5,62 @@
 <h1>Tuning Parameters</h1>
 
 <p>
-    The tunings display can be customized by following parameters.
+    The tunings display can be customized by a number of parameters.
+    Clicking the button "Display Tuning" would open a text window showing the results.
+    You can close this window by either the pressing ESCAPE key or clicking the top right corner.
+    All open windows would automatically close when you close 
+    this configuration window.
 </p>
 
 
 <h2 id="Name">Tuning Name</h2>
 <p>
-    TODO
+    The 12-tone scale equal-temperament tuning
+    and a number of just-intonation tunings are available for inspection.
 </p>
 
 <h2 id="Octaves">Number of Octaves</h2>
 <p>
-    TODO
+    Choose how many octaves you want to display.
+    Maximum is 10, but this number also depends on the lowest tone 
+    and modal scale start tone you choose.
 </p>
 
 <h2 id="Lowest">Lowest Tone</h2>
 <p>
-    TODO
+    This is the calculation tone.
+    To get to the "Lowest Tone" of a just-intonation scale, 
+    first an equal-temperament scale is built, from which the name and frequency
+    of the chosen tone is taken.
+    Then the interval fractions are used to calculate the frequencies of
+    all semitones above that base-tone.
 </p>
 
 <h2 id="FrequencyA4">Frequency of A4</h2>
 <p>
-    TODO
+    You can determine the reference-frequency of note "A4" for all calculations,
+    be it for fraction-based ust-intonation or for equal-temperament.
+    By default "A4" has 440 Hertz.
 </p>
 
 <h2 id="Modal">Modal Scale Start Tone</h2>
 <p>
-    TODO
+    This would be the start tone, or lowest tone, of the constructed scale.
+    It is applied after all calculations were finished.
+    It is allowed to be below "Lowest Tone" because the calculation will always
+    create all tones starting from the zero-octave.
+    But the resulting scale will start with the modal scale start tone.
+    It is called "modal" because you can determine it also by choosing one
+    of the modal scale names line IONIAN, DORIAN, ...
+    Its octave will always be the same as the "Lowest Tone".
 </p>
 
 <h2 id="Columns">Displayed Tone Columns</h2>
 <p>
-    TODO
+    On this panel you can choose which tuning informations you want to see.
+    The title would be a headline reflecting your configuration settings.
+    Every choosable column can be activated or deactivated by its checkbox
+    and positioned by its left-side order number.
 </p>
 
 </body>

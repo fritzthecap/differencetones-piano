@@ -109,30 +109,45 @@
 <h2 id="EqualDistances">Equal Interval Distances</h2>
 
 <p>
-    Before <i>EqualTemperament</i> was introduced at the beginning of 20th century,
-    all music theory was fraction-oriented, because obviously the interval ratios
-    were crucial for harmonious sounds. But there is a flexibility problem.
+    For understanding the <i>Cent</i> unit, please see 
+    the <a href="glossary.html">glossary</a> or 
+    <a href="https://en.wikipedia.org/wiki/Cent_(music)">Wikipedia</a>.
+</p><p>
+    Before <i>EqualTemperament</i> was introduced at the beginning of the 20th century,
+    all harmony was 
+    <a href="harmony.html#SimpleRatios">fraction-oriented</a>, 
+    because obviously simple interval ratios
+    were crucial for harmonious sounds. But this opens is a flexibility problem,
+    more precisely a modulation problem.
 </p>
 <p>
     We have three major thirds in a C-major scale,
     [C-E], [F-A] and [G-B].
     The question rises: has [C-E] the same Cent-distance as [F-A],
     and has [F-A] the same as [G-B]?
-    (Basically this question rises for every interval!)
+    (Basically this question rises for <i>every</i> interval!)
+    The third [F-A] is the important sub-dominant of C-major,
+    and [G-B] the even more important dominant.
 </p><p>
     For <i>EqualTemperament</i>, all Cent-distances are the same,
     because all semitones have a distance of 100 Cent.
     Its frequencies are calculated by the formula 
 </p><p style="margin-left: 20;">
     <code>frequency = frequencyOfA4 * (12th root of 2 power semitoneOffsetFromA4)</code>
-</p>
-<p>
-    In fraction-based tunings it is different,
-    because the Cent-distances depend on integer-fractions (see table above). 
-    Some chords will sound out-of-tune in <i>JustIntonation</i>,
-    while others will sound better than in <i>EqualTemperament</i> due to less beatings.
 </p><p>
-    This checker-app helps to find out which intervals and triads will sound dirty.
+    Thus the <i>EqualTemperament</i> sub-dominant IV and dominant V
+    would sound as harmonious as the tonic I (which doesn't mean that they
+    ARE harmonious).
+</p><p>
+    In fraction-based tunings it is different,
+    because the Cent-distances are not equal for all semitones. 
+    Some chords will sound sightly out-of-tune in <i>JustIntonation</i>,
+    while others will sound better than in <i>EqualTemperament</i>.
+</p><p>
+    This checker-app helps to find out which intervals and triads will sound dirty
+    in <i>JustIntonation</i>. The <i>EqualTemperament</i> is not fraction-based
+    and thus not contained in this check. None of its intervals except the octave
+    is pure, not even the fifth.
 </p>
 
 
