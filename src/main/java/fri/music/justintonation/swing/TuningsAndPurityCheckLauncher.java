@@ -130,8 +130,6 @@ public class TuningsAndPurityCheckLauncher
     private void showResultInTextDialog(JComponent parent, String title, String text, String font) {
         final JTextArea textArea = new JTextArea(text);
         textArea.setEditable(false);
-        textArea.setTabSize(4);
-        textArea.setRows(32);
         if (font != null)
             textArea.setFont(Font.decode(font).deriveFont(Font.BOLD, 14f));
         else

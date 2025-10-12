@@ -40,7 +40,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
     
     /** Default constructor. */
     public ToneSystemConfigurationPanel() {
-        this(-1, null, -1, 0.0, null);
+        this(1, "C", 4, 0.0, null);
     }
     
     /**
