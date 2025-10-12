@@ -297,7 +297,7 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
         }
         
         public String centDeviationString() {
-            return (centDeviation >= 0 ? "+" : "")+centDeviation; // negative would render itself
+            return (centDeviation >= 0 ? "+" : "")+centDeviation+" ¢"; // negative would render itself
         }
         
         @Override

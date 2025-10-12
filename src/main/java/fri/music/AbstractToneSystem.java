@@ -40,10 +40,10 @@ public abstract class AbstractToneSystem implements ToneSystem
         this.frequencyOfA4 = (frequencyOfA4 <= 0.0) ? ToneSystem.DEFAULT_REFERENCE_FREQUENCY : frequencyOfA4;
         this.baseToneIpnName = (baseToneIpnName == null) ? ToneSystem.DEFAULT_BASETONE_IPN_NAME : baseToneIpnName;
         this.modalScaleStartIpnName = (modalScaleStartIpnName == null) ? this.baseToneIpnName : modalScaleStartIpnName;
-        this.octaves = checkForMaximumOctaves(octaves, this.modalScaleStartIpnName);
+        this.octaves = checkForMaximumOctaves(octaves);
     }
     
-    private int checkForMaximumOctaves(int octaves, String modalScaleStartIpnName) {
+    private int checkForMaximumOctaves(int octaves) {
         final int startNoteOctave = getOctave(modalScaleStartIpnName);
         final String startNoteWithoutOctave = removeOctave(modalScaleStartIpnName);
         final boolean isC = startNoteWithoutOctave.equals(ToneSystem.IPN_BASE_NAMES[0]);
@@ -53,7 +53,7 @@ public abstract class AbstractToneSystem implements ToneSystem
             return maximumOctaves;
         
         if (octaves > maximumOctaves)
-            throw new IllegalArgumentException(octaves+" octaves not possible for "+this.baseToneIpnName+", maximum is "+maximumOctaves);
+            throwNumberOfOctavesTooBig(octaves, baseToneIpnName());
 
         return octaves;
     }
@@ -143,9 +143,13 @@ public abstract class AbstractToneSystem implements ToneSystem
         
         final int endIndex = startIndex + (ToneSystem.SEMITONES_PER_OCTAVE * octaves) + 1;
         if (endIndex > tones.length)
-            throw new IllegalArgumentException("Requested number of octaves ("+octaves+") is out of range!");
+            throwNumberOfOctavesTooBig(octaves, lowestIpnName);
         
         return Arrays.copyOfRange(tones, startIndex, endIndex);
+    }
+
+    private static void throwNumberOfOctavesTooBig(int octaves, String baseToneIpnName) {
+        throw new IllegalArgumentException(octaves+" octaves not possible for lowest tone "+baseToneIpnName+", please choose a smaller number!");
     }
     
     @Override
