@@ -142,7 +142,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         
         this.modalScaleStartBaseName = new SmartComboBox(getToneBaseNames());
         modalScaleStartBaseName.setBorder(BorderFactory.createTitledBorder("Key"));
-        modalScaleStartBaseName.setToolTipText("Lowest Tone of the Chromatic Tonesystem to be Built");
+        modalScaleStartBaseName.setToolTipText("Start Tone of the Modal Scale to Build");
         
         final String lowestToneIpnName;
         if (lowestToneBaseNameParam != null) {

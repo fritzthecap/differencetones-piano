@@ -154,7 +154,7 @@ public class ToneRangeConfigurationPanel
         
         this.lowestToneBaseName = new SmartComboBox(getToneBaseNames());
         lowestToneBaseName.setBorder(BorderFactory.createTitledBorder("Key"));
-        lowestToneBaseName.setToolTipText("Lowest Tone of the Tonesystem");
+        lowestToneBaseName.setToolTipText("Calculation Start Tone of the Tonesystem");
         
         if (addScaleNameChoice)
             this.lowestToneScaleName = buildScaleNameChoice(lowestToneBaseName);
@@ -166,7 +166,7 @@ public class ToneRangeConfigurationPanel
                 ToneSystem.MAXIMUM_OCTAVES - 1, 
                 lowestToneOctaveParam);
         lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Start Octave"));
-        lowestToneOctave.setToolTipText("Lowest Octave of the Tonesystem");
+        lowestToneOctave.setToolTipText("Calculation Start Octave of the Tonesystem");
         lowestToneOctave.setSnapToTicks(true);
         lowestToneOctave.setPaintLabels(true);
         lowestToneOctave.setPaintTicks(true);
