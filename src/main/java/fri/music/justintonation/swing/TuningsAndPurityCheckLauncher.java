@@ -1,7 +1,6 @@
 package fri.music.justintonation.swing;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -135,7 +134,7 @@ public class TuningsAndPurityCheckLauncher
         else
             textArea.setFont(textArea.getFont().deriveFont(Font.BOLD, 14f));
         
-        final TextAreaActions fontActions = new TextAreaActions(textArea);
+        final TextAreaActions fontActions = new TextAreaActions(textArea); // adds context menu
         
         DialogStarter.start(title, parent, new JScrollPane(textArea), null, true);
     }
@@ -162,9 +161,14 @@ public class TuningsAndPurityCheckLauncher
     }
     
 
-    
+
+    /**
+     * Helper class that contains the UI column configuration
+     * and can format text according to it.
+     */
     private static class ColumnDisplayConfiguration
     {
+        /** The column-position choice. */
         private static class PositionChoice extends SmartComboBox
         {
             public PositionChoice(int position) {
@@ -179,9 +183,10 @@ public class TuningsAndPurityCheckLauncher
                 final String item = (String) getSelectedItem();
                 return Integer.valueOf(item);
             }
-        }
+        }   // end class PositionChoice
         
         
+        /** The column-activation checkbox and its position chooser. */
         private static class Column extends JPanel implements Comparable<Column>
         {
             public final Function<Tone,String> content;
@@ -228,10 +233,10 @@ public class TuningsAndPurityCheckLauncher
             private void checkboxChanged() {
                 positionChoice().setEnabled(isSelected());                
             }
-        }
+        }   // end class Column
         
         
-        /** Swaps positions of column checkboxes on change. */
+        /** Reorders columns when a position-choice gets changed by the user. */
         private class PositionChangeItemListener implements ItemListener
         {
             private Integer oldValue;
@@ -281,10 +286,12 @@ public class TuningsAndPurityCheckLauncher
 
             private void move(final Integer oldValue, final Integer newValue, PositionChoice positionChoice) {
                 final boolean movingLeft = (oldValue > newValue);
-                // change position choice values
+                // change all position choice values except event source
                 for (Column column : oldColumns) { // use old sort order!
-                    if (column.positionChoice() != positionChoice) { // do not touch the event source
-                        final Integer position = column.positionChoice().getPosition();
+                    final PositionChoice columnPositionChoice = column.positionChoice();
+                    
+                    if (columnPositionChoice != positionChoice) { // do not touch the event source
+                        final Integer position = columnPositionChoice.getPosition();
                         
                         if (movingLeft == true && position < oldValue && position >= newValue)
                             column.positionChoice().setSelectedItem(""+(position + 1));
@@ -292,10 +299,13 @@ public class TuningsAndPurityCheckLauncher
                             column.positionChoice().setSelectedItem(""+(position - 1));
                     }
                 }
+                // finished re-indexing, reorder and repaint
                 sortCheckboxesVisually();
             }
-        };
+        };  // end class PositionChangeItemListener
         
+        
+        // start class ColumnDisplayConfiguration
         
         private static final int NUMBER_OF_COLUMNS = 6;
         private static final int columnSeparation = 4; // blanks
@@ -367,11 +377,18 @@ public class TuningsAndPurityCheckLauncher
             table.add(leftPanel);
             table.add(rightPanel);
             
+            addOrReplaceCheckboxTable(table);
+        }
+        
+        private void addOrReplaceCheckboxTable(JPanel table) {
             final boolean revalidation = (this.checkboxTable != null);
-            int addIndex = -1;
+            final int addIndex;
             if (revalidation) {
                 addIndex = Arrays.asList(panel.getComponents()).indexOf(this.checkboxTable);
                 panel.remove(this.checkboxTable);
+            }
+            else {
+                addIndex = -1; // initially append to end
             }
 
             panel.add(this.checkboxTable = table, addIndex);
@@ -389,18 +406,20 @@ public class TuningsAndPurityCheckLauncher
         }
         
         private void appendColumn(String content, int maxLength, int blanksToAppend, StringBuilder sb) {
+            final int contentLength = content.length();
+            final int lessThanMaxLength = maxLength - contentLength;
+            for (int i = 0; i < lessThanMaxLength; i++)
+                sb.append(' '); // align any content to right
+            
             sb.append(content);
             
             if (blanksToAppend > 0) { // not end of columns
-                final int contentLength = content.length();
-                int lessThanMaxLength = maxLength - contentLength;
-                if (lessThanMaxLength < 0) {
+                if (lessThanMaxLength < 0) // subtract from blanks what is too much in content
                     blanksToAppend += lessThanMaxLength;
-                    lessThanMaxLength = 0;
-                }
-                for (int i = 0; i < lessThanMaxLength + blanksToAppend; i++)
+
+                for (int i = 0; i < blanksToAppend; i++)
                     sb.append(' ');
             }
         }
-    }
+    }   // end class ColumnDisplayConfiguration
 }
