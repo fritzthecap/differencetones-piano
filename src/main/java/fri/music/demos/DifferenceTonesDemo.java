@@ -29,7 +29,7 @@ public class DifferenceTonesDemo
                 isEdo12 ? DifferenceTones.TOLERANT_DEVIATION_EDO_12 : DifferenceTones.PRECISE_DEVIATION_JI;
         System.out.println("Finding difference tones with deviation tolerance = "+differenceToneDeviationTolerance);
         
-        System.out.println(toneSystem);
+        System.out.println(toneSystem.name());
     
         final Tone[] tones = toneSystem.tones();
         final boolean onlyPrimaryDifferenceTones = false;
@@ -51,8 +51,8 @@ public class DifferenceTonesDemo
             }
         }
         else { // present difference tones of all intervals in one octave
-            for (Tone tone : tones)
-                System.out.println(tone);
+            //for (Tone tone : tones)
+            //    System.out.println(tone);
             
             final List<String> ipnNamesLow = Arrays.asList(
                     "C5", "C#5", "D5", "D#5", "E5", "F5", "F#5", "G5", "G#5", "A5", "A#5", "B5");

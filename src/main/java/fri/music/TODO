@@ -1,11 +1,8 @@
 
 - Configuration and display UI for:
-    Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
-    Difference tones in different tunings (DifferenceToneDemo)
-    Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
-    Documentation:
-    New docs for "Explore Tone Systems", or "See Frequencies, Cent, IPN names and MIDI numbers" 
-    (EqualTemperamentDemo, JustIntonationDemo, ...). 
+    - Difference tones in different tunings (DifferenceToneDemo)
+    - Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
+    - Documentations for both.
 
 - Any documentation must reference the Java class of the app it describes.
 
