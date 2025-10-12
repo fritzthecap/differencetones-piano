@@ -9,32 +9,43 @@ public interface NoteExamples
         }
     }
     
+    // patterns
+    
+    Melody MOTIVE_1 = new Melody("Motive 1", """
+D4/4 F4/4 G4/4
+""");
+    
+    Melody MOTIVE_2 = new Melody("Motive 2", """
+D4/4 E4/4 G4/4
+""");
+    
+    Melody C_CHORD = new Melody("C Major Chord", """
+C4/4 E4/4 G4/4
+""");
+    
+    Melody AM_CHORD = new Melody("A Minor Chord", """
+A4/4 E4/4 C4/4
+""");
+    
     Melody PENTATONIC = new Melody("Pentatonic", """
 3/4
 C4/4 D4/4 E4/4 
 G4/4 A4/4 C5/4
-A4/4 G4/4 E4/4
-D4/4 C4/4 A3/4
-""");
-    
-    Melody C_CHORD = new Melody("C Major Chord", """
-C4/4 E4/4 G4/4 C5/4
-""");
-    
-    Melody AM_CHORD = new Melody("A Minor Chord", """
-A4/4 E4/4 C4/4 A3/4
 """);
     
     Melody C_MAJOR_SCALE = new Melody("C Major Scale", """
-C4/4 D4/4 E4/4 F4/4 G4/4 A4/4 B4/4 C5/4
+C4/4 D4/4 E4/4 F4/4 
+G4/4 A4/4 B4/4 C5/4
 """);
     
     Melody A_MINOR_HARMONIC = new Melody("A Minor Harmonic", """
-A4/4 B4/4 C5/4 D5/4 E5/4 F5/4 G5/4 A5/4
+A4/4 B4/4 C5/4 D5/4 
+E5/4 F5/4 G5/4 A5/4
 """);
     
     Melody A_MINOR_MELODIC = new Melody("A Minor Melodic", """
-A4/4 B4/4 C5/4 D5/4 E5/4 F5/4 G#5/4 A5/4
+A4/4 B4/4 C5/4 D5/4 
+E5/4 F5/4 G#5/4 A5/4
 """);
     
     Melody CHROMATIC_SCALE = new Melody("12 Tone Scale", """
@@ -42,6 +53,8 @@ C4/8 C#4/8 D4/8 D#4/8 E4/8 F4/8 F#4/8 G4/8
 G#4/8 A4/8 A#4/8 B4/8 C5/4      -/4
 """);
 
+    // melodies
+    
     Melody AUGUSTIN = new Melody("Augustin", true, """
 3/4
 G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
@@ -116,11 +129,14 @@ C4 E4 G4 A#4
 G4 D4 G3/2
 """);
 
-
+    
+    /** The list to be seen in application. */
     Melody[] MELODIES = new Melody[] {
-            PENTATONIC,
+            MOTIVE_1,
+            MOTIVE_2,
             C_CHORD,
             AM_CHORD,
+            PENTATONIC,
             C_MAJOR_SCALE,
             A_MINOR_HARMONIC,
             A_MINOR_MELODIC,
