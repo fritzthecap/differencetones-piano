@@ -1,8 +1,4 @@
 
-- Bug: call "Display Tunings", set 8 octaves, set "Lowest Tone" to "E",
-    set LIMIT_5 JustIntonation (another exception happens also with EqualTemperament),
-    click "Display": IllegalArgumentException: Requested number of octaves (8) is out of range!
-    
 - Configuration and display UI for:
     Tunings with frequency and cent (EqualTemperamentDemo, JustIntonationDemo)
     Difference tones in different tunings (DifferenceToneDemo)
@@ -27,6 +23,11 @@
 
 Fixed Bugs:
 
+- Bug: call "Display Tunings", set 8 octaves, set "Lowest Tone" to "E",
+    set LIMIT_5 JustIntonation (another exception happens also with EqualTemperament),
+    click "Display": IllegalArgumentException!
+    DONE: not fixed but caught with an error-dialog.
+    
 - Bug: tied subsequent notes are rendered as their own interval list.
     They should go with their lead tie.
     Reproduction: load "When the saints", click "Auto-Compose".

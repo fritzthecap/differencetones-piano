@@ -85,7 +85,7 @@ public abstract class AbstractToneSystem implements ToneSystem
     /** {@inheritDoc} */
     @Override
     public Tone[] tones() {
-        return AbstractToneSystem.tones(getOrCreateCachedTones(), baseToneIpnName(), octaves);
+        return AbstractToneSystem.tones(getOrCreateCachedTones(), baseToneIpnName(), baseToneIpnName(), octaves);
     }
     
     protected final Tone[] getOrCreateCachedTones() {
@@ -132,7 +132,7 @@ public abstract class AbstractToneSystem implements ToneSystem
      * @return all tones from given IPN-name up to given octaves + 1.
      * @throws IllegalArgumentException when given number of octaves is too big for given tones stock.
      */
-    public static Tone[] tones(Tone[] tones, String lowestIpnName, int octaves) {
+    public static Tone[] tones(Tone[] tones, String lowestIpnName, String baseToneIpnName, int octaves) {
         if (octaves < 0)
             throw new IllegalArgumentException("Number of octaves can not be negative: "+octaves);
         
@@ -143,13 +143,15 @@ public abstract class AbstractToneSystem implements ToneSystem
         
         final int endIndex = startIndex + (ToneSystem.SEMITONES_PER_OCTAVE * octaves) + 1;
         if (endIndex > tones.length)
-            throwNumberOfOctavesTooBig(octaves, lowestIpnName);
+            throwNumberOfOctavesTooBig(octaves, baseToneIpnName);
         
         return Arrays.copyOfRange(tones, startIndex, endIndex);
     }
 
     private static void throwNumberOfOctavesTooBig(int octaves, String baseToneIpnName) {
-        throw new IllegalArgumentException(octaves+" octaves not possible for lowest tone "+baseToneIpnName+", please choose a smaller number!");
+        throw new IllegalArgumentException(
+                octaves+" octaves not possible for "+baseToneIpnName+
+                ", please choose a smaller number or change the tone!");
     }
     
     @Override

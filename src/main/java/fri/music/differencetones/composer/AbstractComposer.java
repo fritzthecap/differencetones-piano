@@ -189,7 +189,7 @@ public abstract class AbstractComposer
         
         // melodyOctaves up to 1.3 -> 4 octaves, up to 2.3 -> 5, up to 3.3 -> 6, ...
         final int additionalOctavesTo4 = Math.min(0, (int) Math.ceil(melodyOctaves - 1.3));
-        toneStock = AbstractToneSystem.tones(toneStock, lowestIpnName, 4 + additionalOctavesTo4);
+        toneStock = AbstractToneSystem.tones(toneStock, lowestIpnName, lowestIpnName, 4 + additionalOctavesTo4);
         
         return new DifferenceToneInversions(
             new DifferenceToneInversions.Configuration(
