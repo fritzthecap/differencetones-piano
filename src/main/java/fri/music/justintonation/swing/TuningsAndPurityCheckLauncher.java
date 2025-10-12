@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -67,7 +68,9 @@ public class TuningsAndPurityCheckLauncher
         tuningsPanel.add(tuningsConfigurationPanel.panel, BorderLayout.NORTH);
         
         final ColumnDisplayConfiguration displayConfiguration = new ColumnDisplayConfiguration();
-        tuningsPanel.add(displayConfiguration.panel, BorderLayout.CENTER);
+        final JPanel nonStretchingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        nonStretchingPanel.add(displayConfiguration.panel);
+        tuningsPanel.add(nonStretchingPanel, BorderLayout.CENTER);
         
         final JButton displayTuningButton = new JButton("Display Tuning");
         displayTuningButton.addActionListener(new ActionListener() {
@@ -78,7 +81,7 @@ public class TuningsAndPurityCheckLauncher
                     final String result = buildTuningDisplayText(tuningsConfigurationPanel, displayConfiguration);
                     showResultInTextDialog(tuningsPanel, title, result, Font.MONOSPACED);
                 }
-                catch (IllegalArgumentException e) {
+                catch (Exception e) {
                     JOptionPane.showMessageDialog(tuningsPanel, e.getMessage());
                 }
             }
@@ -93,7 +96,6 @@ public class TuningsAndPurityCheckLauncher
         final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(displayTuningButton);
         buttonPanel.add(ToolBarUtil.getHelpButtonLookWrapper(help));
-        
         tuningsPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
 
@@ -131,26 +133,18 @@ public class TuningsAndPurityCheckLauncher
     private void showResultInTextDialog(JComponent parent, String title, String text, String font) {
         final JTextArea textArea = new JTextArea(text);
         textArea.setEditable(false);
-        
+        textArea.setTabSize(4);
+        textArea.setRows(32);
         if (font != null)
             textArea.setFont(Font.decode(font).deriveFont(Font.BOLD, 14f));
         else
             textArea.setFont(textArea.getFont().deriveFont(Font.BOLD, 14f));
-
-        textArea.setTabSize(4);
-        textArea.setRows(32);
         
         final TextAreaActions fontActions = new TextAreaActions(textArea);
         
-        DialogStarter.start(
-                title, 
-                parent, 
-                new JScrollPane(textArea), 
-                null, 
-                true);
+        DialogStarter.start(title, parent, new JScrollPane(textArea), null, true);
     }
 
-    
     private String buildTuningDisplayText(
             ToneSystemConfigurationPanel toneSystemConfiguration, 
             ColumnDisplayConfiguration displayConfiguration)
@@ -186,11 +180,12 @@ public class TuningsAndPurityCheckLauncher
                 setSelectedItem(""+position);
             }
             
-            public int getPosition() {
+            public Integer getPosition() {
                 final String item = (String) getSelectedItem();
                 return Integer.valueOf(item);
             }
         }
+        
         
         private static class Column extends JPanel implements Comparable<Column>
         {
@@ -203,6 +198,7 @@ public class TuningsAndPurityCheckLauncher
                 
                 checkBox.setToolTipText("Add or Remove Column from Display");
                 checkBox.addActionListener(event -> checkboxChanged());
+                checkBox.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 20));
                 
                 this.forJustTone = forJustTone;
                 this.content = content;
@@ -214,54 +210,37 @@ public class TuningsAndPurityCheckLauncher
                 checkboxChanged();
             }
             
-            public boolean isSelected() {
+            @Override
+            public int compareTo(Column other) {
+                return positionChoice().getPosition() - other.positionChoice().getPosition();
+            }
+            
+            @Override
+            public String toString() {
+                return getClass().getSimpleName()+" "+positionChoice().getPosition()+" '"+checkBox().getText()+"'";
+            }
+            
+            boolean isSelected() {
                 return checkBox().isSelected();
+            }
+            PositionChoice positionChoice() {
+                return (PositionChoice) getComponent(0);
             }
             
             private JCheckBox checkBox() {
                 return (JCheckBox) getComponent(1);
             }
-            
-            private PositionChoice positionChoice() {
-                return (PositionChoice) getComponent(0);
-            }
-            
             private void checkboxChanged() {
-                positionChoice().setEnabled(checkBox().isSelected());                
-            }
-            
-            @Override
-            public int compareTo(Column other) {
-                return positionChoice().getPosition() - ((Column) other).positionChoice().getPosition();
+                positionChoice().setEnabled(isSelected());                
             }
         }
         
-        private static final int NUMBER_OF_COLUMNS = 6;
         
-        private static final int columnSeparation = 4; // blanks
-        
-        private final JPanel panel;
-        
-        private final JCheckBox title = new JCheckBox("Title", false);
-        
-        private List<Column> columns = List.of(
-            new Column(
-                    1, false, new JCheckBox("IPN-Name", true),      t -> t.ipnName, 3), // max "C10"
-            new Column(
-                    2, false, new JCheckBox("MIDI-Number", false),  t -> ""+t.midiNumber, 3), // max "132"
-            new Column(
-                    3, false, new JCheckBox("Frequency", true),     t -> t.formattedFrequency(), 9), // max "16803.840"
-            new Column(
-                    4, false, new JCheckBox("Cents", false),        t -> ""+t.cent+" ¢", 7), // max "12000 c"
-            new Column(
-                    5, true, new JCheckBox("Fraction", true),       t -> ((JustTone) t).interval.ratioString(0), 7), // max "729/512"
-            new Column(
-                    6, true, new JCheckBox("Cent Deviation", true), t -> ((JustTone) t).centDeviationString(), 3) // max "+12"
-        );
-        
-        /** Swaps position with peer column when a position changes. */
-        private final ItemListener positionChangeListener = new ItemListener() {
-            private int oldValue;
+        /** Swaps positions of column checkboxes on change. */
+        private class PositionChangeItemListener implements ItemListener
+        {
+            private Integer oldValue;
+            private List<Column> oldColumns;
             private boolean working;
             
             @Override
@@ -269,25 +248,82 @@ public class TuningsAndPurityCheckLauncher
                 if (working) // ignore events coming from own setSelectedItem() call
                     return;
                 
+                // order of arriving events is not specified!
                 if (event.getStateChange() == ItemEvent.DESELECTED)
-                    oldValue = Integer.valueOf((String) event.getItem()).intValue();
+                    moveOrRememberOldValue(event);
                 else if (event.getStateChange() == ItemEvent.SELECTED)
-                    try {
-                        working = true;
-                        final int newValue = Integer.valueOf((String) event.getItem()).intValue();
-                        final PositionChoice positionChoice = (PositionChoice) event.getSource();
-                        final Column columnWithSamePosition = columns.stream()
-                            .filter(c -> c.positionChoice().getPosition() == newValue && c.positionChoice() != positionChoice)
-                            .findFirst()
-                            .get();
-                        columnWithSamePosition.positionChoice().setSelectedItem(""+oldValue);
+                    moveOrRememberOldValue(event);
+            }
+
+            private void moveOrRememberOldValue(ItemEvent event) {
+                if (oldValue == null)
+                    rememberState(event);
+                else
+                    move(event);
+            }
+
+            private void rememberState(ItemEvent event) {
+                oldValue = itemValue(event);
+                oldColumns = sortedColumnsClone();
+            }
+
+            private Integer itemValue(ItemEvent event) {
+                return Integer.valueOf((String) event.getItem());
+            }
+
+            private void move(ItemEvent event) {
+                working = true;
+                try {
+                    final PositionChoice positionChoice = (PositionChoice) event.getSource();
+                    move(oldValue, itemValue(event), positionChoice);
+                }
+                finally {
+                    oldValue = null;
+                    oldColumns = null;
+                    working = false;
+                }
+            }
+
+            private void move(final Integer oldValue, final Integer newValue, PositionChoice positionChoice) {
+                final boolean movingLeft = (oldValue > newValue);
+                // change position choice values
+                for (Column column : oldColumns) { // use old sort order!
+                    if (column.positionChoice() != positionChoice) { // do not touch the event source
+                        final Integer position = column.positionChoice().getPosition();
+                        
+                        if (movingLeft == true && position < oldValue && position >= newValue)
+                            column.positionChoice().setSelectedItem(""+(position + 1));
+                        else if (movingLeft == false && position > oldValue && position <= newValue)
+                            column.positionChoice().setSelectedItem(""+(position - 1));
                     }
-                    finally {
-                        working = false;
-                    }
+                }
+                sortCheckboxesVisually();
             }
         };
         
+        
+        private static final int NUMBER_OF_COLUMNS = 6;
+        private static final int columnSeparation = 4; // blanks
+        
+        public final JPanel panel;
+        
+        private final JCheckBox title = new JCheckBox("Title", false);
+        private List<Column> columns = List.of(
+            new Column(
+                    1, false, new JCheckBox("IPN-Name", true),       t -> t.ipnName, 3), // max "C10"
+            new Column(
+                    2, false, new JCheckBox("MIDI-Number", false),   t -> ""+t.midiNumber, 3), // max "132"
+            new Column(
+                    3, false, new JCheckBox("Frequency (Hz)", true), t -> t.formattedFrequency(), 9), // max "16803.840"
+            new Column(
+                    4, false, new JCheckBox("Cents", false),         t -> ""+t.cent+" ¢", 7), // max "12000 c"
+            new Column(
+                    5, true, new JCheckBox("Fraction", true),        t -> ((JustTone) t).interval.ratioString(0), 7), // max "729/512"
+            new Column(
+                    6, true, new JCheckBox("Cent Deviation", true),  t -> ((JustTone) t).centDeviationString(), 5) // max "+12 ¢""
+        );
+        private final ItemListener positionChangeListener = new PositionChangeItemListener();
+        private JComponent checkboxTable;
         
         ColumnDisplayConfiguration() {
             if (columns.size() != NUMBER_OF_COLUMNS)
@@ -295,49 +331,66 @@ public class TuningsAndPurityCheckLauncher
             
             this.panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            panel.setBorder(BorderFactory.createTitledBorder("Displayed Tone Columns"));
+            panel.setBorder(BorderFactory.createTitledBorder("Displayed Values and Order"));
             
-            final JPanel checkBoxLayoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            checkBoxLayoutPanel.add(title);
-            panel.add(checkBoxLayoutPanel);
+            final JPanel titleLayoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            titleLayoutPanel.add(title);
+            panel.add(titleLayoutPanel);
             title.setToolTipText("General Tuning Information as Header");
+            
+            sortCheckboxesVisually();
+            
+            for (Column column : columns)
+                column.positionChoice().addItemListener(positionChangeListener);
+        }
+
+        public void append(Tone tone, StringBuilder sb) {
+            final boolean isJustTone = (tone instanceof JustTone);
+            
+            for (Column column : sortedColumnsClone())
+                if (column.isSelected() && (isJustTone || column.forJustTone == isJustTone))
+                    appendColumn(column.content.apply(tone), column.maxLength, columnSeparation, sb);
+            
+            sb.append(StringUtil.NEWLINE);
+        }
+
+        void sortCheckboxesVisually() {
+            final List<Column> columns = sortedColumnsClone();
             
             final JPanel leftPanel = new JPanel();
             leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-            for (int i = 0; i < columns.size() / 2; i++) {
-                final Column column = columns.get(i);
-                leftPanel.add(column);
-            }
+            for (int i = 0; i < columns.size() / 2; i++)
+                leftPanel.add(columns.get(i));
             
             final JPanel rightPanel = new JPanel();
             rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-            for (int i = columns.size() / 2; i < columns.size(); i++) {
-                final Column column = columns.get(i);
-                rightPanel.add(column);
-            }
+            for (int i = columns.size() / 2; i < columns.size(); i++)
+                rightPanel.add(columns.get(i));
             
             final JPanel table = new JPanel();
             table.setLayout(new BoxLayout(table, BoxLayout.X_AXIS));
             table.add(leftPanel);
             table.add(rightPanel);
             
-            panel.add(table);
+            final boolean revalidation = (this.checkboxTable != null);
+            int addIndex = -1;
+            if (revalidation) {
+                addIndex = Arrays.asList(panel.getComponents()).indexOf(this.checkboxTable);
+                panel.remove(this.checkboxTable);
+            }
+
+            panel.add(this.checkboxTable = table, addIndex);
             
-            for (Column column : columns)
-                column.positionChoice().addItemListener(positionChangeListener);
+            if (revalidation) {
+                panel.revalidate();
+                panel.repaint();
+            }
         }
         
-        void append(Tone tone, StringBuilder sb) {
-            final boolean isJustTone = (tone instanceof JustTone);
-            
+        private List<Column> sortedColumnsClone() {
             final List<Column> sortedColumns = new ArrayList<>(columns);
             Collections.sort(sortedColumns);
-            
-            for (Column column : sortedColumns)
-                if (column.isSelected() && (isJustTone || column.forJustTone == isJustTone))
-                    appendColumn(column.content.apply(tone), column.maxLength, columnSeparation, sb);
-            
-            sb.append(StringUtil.NEWLINE);
+            return sortedColumns;
         }
         
         private void appendColumn(String content, int maxLength, int blanksToAppend, StringBuilder sb) {
