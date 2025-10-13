@@ -51,12 +51,12 @@ public class TuningsAndPurityCheckLauncher
         buildCheckerPanel(checkerPanel);
         checkerPanel.setBorder(BorderUtil.titledBorder("Purity Check", 4f));
         
-        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setLeftComponent(tuningsPanel);
-        splitPane.setRightComponent(checkerPanel);
-        splitPane.setResizeWeight(0.5);
+        final JSplitPane mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        mainPanel.setLeftComponent(tuningsPanel);
+        mainPanel.setRightComponent(checkerPanel);
+        mainPanel.setResizeWeight(0.5);
         
-        this.panel = splitPane;
+        this.panel = mainPanel;
     }
 
     private void buildTuningsPanel(JPanel tuningsPanel) {
@@ -172,7 +172,7 @@ public class TuningsAndPurityCheckLauncher
         private static class PositionChoice extends SmartComboBox
         {
             public PositionChoice(int position) {
-                setToolTipText("Column Sort Order Number");
+                setToolTipText("Column Position");
                 
                 for (int i = 1; i <= NUMBER_OF_COLUMNS; i++)
                     addItem(""+i);
@@ -196,7 +196,7 @@ public class TuningsAndPurityCheckLauncher
             public Column(int position, boolean forJustTone, JCheckBox checkBox, Function<Tone,String> content, int maxLength) {
                 super(new BorderLayout());
                 
-                checkBox.setToolTipText("Add or Remove Column from Display");
+                checkBox.setToolTipText("Click to Add or Remove Column from Display");
                 checkBox.addActionListener(event -> checkboxChanged());
                 checkBox.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 20));
                 
@@ -315,17 +315,17 @@ public class TuningsAndPurityCheckLauncher
         private final JCheckBox title = new JCheckBox("Title", false);
         private List<Column> columns = List.of(
             new Column(
-                    1, false, new JCheckBox("IPN-Name", true),       t -> t.ipnName, 3), // max "C10"
+                    1, false, new JCheckBox("IPN Note Name", true),       t -> t.ipnName, 3), // max "C10"
             new Column(
                     2, false, new JCheckBox("MIDI-Number", false),   t -> ""+t.midiNumber, 3), // max "132"
             new Column(
-                    3, false, new JCheckBox("Frequency (Hz)", true), t -> t.formattedFrequency(), 9), // max "16803.840"
+                    3, false, new JCheckBox("Frequency in Hertz", true), t -> t.formattedFrequency(), 9), // max "16803.840"
             new Column(
                     4, false, new JCheckBox("Cents", false),         t -> ""+t.cent+" ¢", 7), // max "12000 c"
             new Column(
                     5, true, new JCheckBox("Fraction", true),        t -> ((JustTone) t).interval.ratioString(0), 7), // max "729/512"
             new Column(
-                    6, true, new JCheckBox("Cent Deviation", true),  t -> ((JustTone) t).centDeviationString(), 5) // max "+12 ¢""
+                    6, true, new JCheckBox("Cent Deviation from ET-12", true),  t -> ((JustTone) t).centDeviationString(), 5) // max "+12 ¢""
         );
         private final ItemListener positionChangeListener = new PositionChangeItemListener();
         private JComponent checkboxTable;
