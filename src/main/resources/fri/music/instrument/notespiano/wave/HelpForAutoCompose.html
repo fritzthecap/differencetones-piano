@@ -11,7 +11,7 @@
     intervals that have been generated for these notes.
 </p>
 
-<h2 id="AutoCompose">The Auto-Compose Algorithm</h2>
+<h2 id="AutoCompose">Auto-Compose Rules</h2>
 <p>
     Now this is something I can't really document, because I am still thinking about it,
     and may be thinking about it even in a year.
@@ -21,9 +21,10 @@
     For this I implemented a strategy-pattern containing a number of rules,
     but it does not work good for all melodies. 
     Like artificial intelligence it makes horrible mistakes.
-    Because I consider this to be an artistical human work, I implemented the 
-    <a href="instrument/notespiano/wave/HelpForCompose.html">Difference-Tone Composer</a> for it.
-    But here are my rules, part of them are implemented.
+    (Because I consider this to be an artistic work, I implemented the 
+    <a href="instrument/notespiano/wave/HelpForCompose.html">Difference-Tone Composer</a> 
+    tool for humans.)
+    But here are my auto-compose rules, part of them are implemented.
 </p>
 
 <h3>Where to Start</h3>
@@ -31,35 +32,38 @@
     To find a beginning, the melody must be explored in advance.
     Its tone range must be measured, and the available intervals
     for each tone must be drawn from the given tuning or tone-system.
-    (different tunings provide different intervals for difference-tones).
+    (remember that different tunings provide different intervals for difference-tones).
 </p><p>
-    For a tone range of 1.3 octaves we would need 4 octaves above the lowest
+    For a tone range of 1.3 octaves we would need about 4 octaves above the lowest
     tone of the melody. For 2.3 octaves it would be 5 octaves, and so on.
 </p><p>
     For example, if we have a melody that ranges from C4 to E5 (1.3 octaves),
     and the first tone would be G4, which is about in the middle of the tone range,
     we could take an interval with a middle width (minor-third is narrow, major-sixth is wide).
-    Or if the melody starts with the deepest tone, we could start with the narrowest available interval,
+    Or, if the melody starts with the deepest tone C4, we could start with the narrowest available interval,
     because deep tones come from narrow intervals and high tones from wide intervals.
 </p>
 
 <h3>For a Repeated Note Use the Same Interval</h3>
 <p>
     When a melody note repeats, do not use a different interval for the repetition.
-    Although this may be good in some contexts, generally it would distort the melody too much.
+    Although this may be good in special contexts like a finale, 
+    generally it would distort the melody too much.
 </p>
 
 <h3>Avoid Parallel Moves</h3>
 <p>
     When the melody moves to another note, 
     never do a "parallel" interval-move by using the same interval as before.
-    This is an important rule the prevents from outlining a melody by fifths or fourths ony.
+    For example, when the melody goes from G4 to A4, 
+    do not use the two fifths [G5 D6] and [A5 E6] for that move.
+    This is an important rule that prevents from outlining a melody by always the same interval.
 </p>
 
 <h3>Do Minimal Moves</h3>
 <p>
     The interval is the puppet player, the melody is the puppet.
-    Thus the interval should do minimal moves, ideally the upper tone should
+    Thus the intervals should do minimal moves, ideally the upper tone should
     stay the same, or at least always do a smaller move than the lower tone.
 </p>
 

@@ -3,7 +3,6 @@
 <body>
 
 <h1>Tuning Parameters</h1>
-
 <p>
     The tunings display can be customized by a number of parameters.
     Clicking the button "Display Tuning" would open a text window showing the results.
@@ -11,7 +10,6 @@
     All open windows would automatically close when you close 
     this configuration window.
 </p>
-
 
 <h2 id="Name">Tuning Name</h2>
 <p>
@@ -28,31 +26,31 @@
 
 <h2 id="Lowest">Lowest Tone</h2>
 <p>
-    This is the calculation tone.
+    This is the <b>calculation base tone</b>, and the default start tone of the resulting scale.
+</p><p>
     To get to the "Lowest Tone" of a just-intonation scale, 
-    first an equal-temperament scale is built, from which the name and frequency
-    of the chosen tone is taken.
-    Then the interval fractions are used to calculate the frequencies of
-    all semitones above that base-tone.
+    first an equal-temperament scale is built, based on the zero-octave. 
+    From that scale, the name and frequency of the chosen "Lowest Tone" is taken,
+    then the interval fractions are applied to calculate the frequencies of
+    all semitones above it.
 </p>
 
 <h2 id="FrequencyA4">Frequency of A4</h2>
 <p>
     You can determine the reference-frequency of note "A4" for all calculations,
-    be it for fraction-based ust-intonation or for equal-temperament.
-    By default "A4" has 440 Hertz.
+    be it for fraction-based just-intonation or for equal-temperament calculations.
+    By default, "A4" has 440 Hertz. Historical tuning forks range from 409 to 455 Hertz.
 </p>
 
 <h2 id="Modal">Modal Scale Start Tone</h2>
 <p>
-    This would be the start tone, or lowest tone, of the constructed scale.
-    It is applied after all calculations were finished.
+    This would be the <b>effective start tone</b>, or lowest tone, of the constructed scale,
+    applied after all calculations were finished.
     It is allowed to be below "Lowest Tone" because the calculation will always
     create all tones starting from the zero-octave.
-    But the resulting scale will start with the modal scale start tone.
-    It is called "modal" because you can determine it also by choosing one
-    of the modal scale names line IONIAN, DORIAN, ...
-    Its octave will always be the same as the "Lowest Tone".
+    This tone is called "modal" because you can determine it also by choosing one
+    of the modal scale names like IONIAN, DORIAN, ...
+    Its octave will always be the same as the one of "Lowest Tone".
 </p>
 
 <h2 id="Columns">Displayed Tone Columns</h2>
