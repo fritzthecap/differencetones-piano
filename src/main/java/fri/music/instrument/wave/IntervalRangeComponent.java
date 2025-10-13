@@ -4,7 +4,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import fri.music.ToneSystem;
-import fri.music.swingutils.layout.SmartComboBox;
+import fri.music.utils.swing.layout.SmartComboBox;
 
 /**
  * Used for difference-tone interval construction.

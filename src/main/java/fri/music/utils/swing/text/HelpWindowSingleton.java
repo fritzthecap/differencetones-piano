@@ -1,4 +1,4 @@
-package fri.music.swingutils.text;
+package fri.music.utils.swing.text;
 
 import java.awt.Component;
 import java.awt.Window;
@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Hashtable;
 import java.util.Map;
 import fri.music.HtmlResources;
-import fri.music.swingutils.window.DialogStarter;
+import fri.music.utils.swing.window.DialogStarter;
 
 /**
  * Avoid help multiple "Help" windows for the same URL.

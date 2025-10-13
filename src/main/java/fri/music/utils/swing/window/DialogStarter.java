@@ -1,4 +1,4 @@
-package fri.music.swingutils.window;
+package fri.music.utils.swing.window;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -18,9 +18,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import fri.music.HtmlResources;
-import fri.music.swingutils.KeyStrokeUtil;
-import fri.music.swingutils.text.HtmlBrowser;
 import fri.music.utils.StringUtil;
+import fri.music.utils.swing.KeyStrokeUtil;
+import fri.music.utils.swing.text.HtmlBrowser;
 
 /**
  * Shows text in non-modal dialogs.

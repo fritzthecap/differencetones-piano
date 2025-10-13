@@ -1,4 +1,4 @@
-package fri.music.swingutils.slider;
+package fri.music.utils.swing.slider;
 
 import java.awt.event.MouseEvent;
 import javax.swing.JSlider;

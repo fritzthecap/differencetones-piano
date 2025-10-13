@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import fri.music.SoundChannel;
 import fri.music.instrument.PianoWithSound;
-import fri.music.swingutils.ButtonUtil;
+import fri.music.utils.swing.ButtonUtil;
 
 /**
  * Used as <code>SoundChannel</code> for <code>Player</code>, 

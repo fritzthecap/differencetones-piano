@@ -15,7 +15,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ScaleTypes;
 import fri.music.ToneSystem;
-import fri.music.swingutils.layout.SmartComboBox;
+import fri.music.utils.swing.layout.SmartComboBox;
 
 /**
  * A panel that lets configure some common options for

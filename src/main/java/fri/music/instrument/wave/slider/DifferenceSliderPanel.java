@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import fri.music.Tones;
 import fri.music.differencetones.DifferenceToneMath;
-import fri.music.swingutils.ButtonUtil;
+import fri.music.utils.swing.ButtonUtil;
 
 public class DifferenceSliderPanel extends SliderPanel
 {

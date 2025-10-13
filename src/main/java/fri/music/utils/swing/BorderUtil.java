@@ -1,4 +1,4 @@
-package fri.music.swingutils;
+package fri.music.utils.swing;
 
 import java.awt.Font;
 import javax.swing.BorderFactory;

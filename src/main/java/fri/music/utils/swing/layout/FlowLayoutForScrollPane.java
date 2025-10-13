@@ -1,4 +1,4 @@
-package fri.music.swingutils.layout;
+package fri.music.utils.swing.layout;
 
 import java.awt.*;
 import javax.swing.JScrollPane;

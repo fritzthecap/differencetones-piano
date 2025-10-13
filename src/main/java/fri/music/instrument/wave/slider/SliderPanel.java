@@ -22,8 +22,8 @@ import javax.swing.event.ChangeListener;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
-import fri.music.swingutils.slider.SliderMouseEventLocator;
-import fri.music.swingutils.slider.SliderRightClickMouseAdapter;
+import fri.music.utils.swing.slider.SliderMouseEventLocator;
+import fri.music.utils.swing.slider.SliderRightClickMouseAdapter;
 import fri.music.wavegenerator.WaveGenerator;
 
 /**

@@ -42,10 +42,10 @@ import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyChordSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyDifferenceSliders;
 import fri.music.justintonation.swing.TuningsAndPurityCheckLauncher;
-import fri.music.swingutils.layout.SizeUtil;
-import fri.music.swingutils.text.HelpWindowSingleton;
-import fri.music.swingutils.text.HtmlBrowser;
-import fri.music.swingutils.window.FrameStarter;
+import fri.music.utils.swing.layout.SizeUtil;
+import fri.music.utils.swing.text.HelpWindowSingleton;
+import fri.music.utils.swing.text.HtmlBrowser;
+import fri.music.utils.swing.window.FrameStarter;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
 

@@ -9,7 +9,7 @@ import javax.swing.JComboBox;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
-import fri.music.swingutils.layout.SmartComboBox;
+import fri.music.utils.swing.layout.SmartComboBox;
 
 /**
  * Lets choose tunings.

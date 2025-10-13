@@ -44,11 +44,11 @@ import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.notespiano.RestIgnoringNoteIterator;
 import fri.music.player.Note;
-import fri.music.swingutils.BorderUtil;
-import fri.music.swingutils.layout.FlowLayoutForScrollPane;
-import fri.music.swingutils.layout.SizeUtil;
-import fri.music.swingutils.text.HelpWindowSingleton;
-import fri.music.swingutils.window.DialogStarter;
+import fri.music.utils.swing.BorderUtil;
+import fri.music.utils.swing.layout.FlowLayoutForScrollPane;
+import fri.music.utils.swing.layout.SizeUtil;
+import fri.music.utils.swing.text.HelpWindowSingleton;
+import fri.music.utils.swing.window.DialogStarter;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**

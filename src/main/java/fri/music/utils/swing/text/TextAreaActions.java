@@ -1,4 +1,4 @@
-package fri.music.swingutils.text;
+package fri.music.utils.swing.text;
 
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -19,7 +19,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
-import fri.music.swingutils.KeyStrokeUtil;
+import fri.music.utils.swing.KeyStrokeUtil;
 
 /**
  * Text-area or text-field with cut/copy/paste/clear/undo/redo actions

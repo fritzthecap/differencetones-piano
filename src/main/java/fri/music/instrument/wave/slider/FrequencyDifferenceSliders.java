@@ -23,9 +23,9 @@ import javax.swing.event.ChangeListener;
 import fri.music.JustIntonation;
 import fri.music.Tone;
 import fri.music.ToneSystem;
-import fri.music.swingutils.ButtonUtil;
-import fri.music.swingutils.text.HelpWindowSingleton;
 import fri.music.utils.MathUtil;
+import fri.music.utils.swing.ButtonUtil;
+import fri.music.utils.swing.text.HelpWindowSingleton;
 
 /**
  * Displays two frequency sliders and their difference-tone.

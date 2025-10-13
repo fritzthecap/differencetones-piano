@@ -12,9 +12,9 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import fri.music.instrument.PianoWithSound;
-import fri.music.swingutils.window.DialogStarter;
-import fri.music.swingutils.window.FrameStarter;
-import fri.music.swingutils.window.WindowClosingManager;
+import fri.music.utils.swing.window.DialogStarter;
+import fri.music.utils.swing.window.FrameStarter;
+import fri.music.utils.swing.window.WindowClosingManager;
 
 /**
  * The piano configuration API showcase.

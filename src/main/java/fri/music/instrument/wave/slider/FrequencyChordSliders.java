@@ -17,10 +17,10 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
-import fri.music.swingutils.ButtonUtil;
-import fri.music.swingutils.layout.SmartComboBox;
-import fri.music.swingutils.layout.SmartSlider;
-import fri.music.swingutils.text.HelpWindowSingleton;
+import fri.music.utils.swing.ButtonUtil;
+import fri.music.utils.swing.layout.SmartComboBox;
+import fri.music.utils.swing.layout.SmartSlider;
+import fri.music.utils.swing.text.HelpWindowSingleton;
 
 /**
  * Lets try out 4 frequencies combined.

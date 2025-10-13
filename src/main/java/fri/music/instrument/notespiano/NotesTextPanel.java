@@ -22,9 +22,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.text.JTextComponent;
 import fri.music.ToneSystem;
 import fri.music.player.Note;
-import fri.music.swingutils.layout.SmartComboBox;
-import fri.music.swingutils.layout.SmartPanel;
-import fri.music.swingutils.text.HelpWindowSingleton;
+import fri.music.utils.swing.layout.SmartComboBox;
+import fri.music.utils.swing.layout.SmartPanel;
+import fri.music.utils.swing.text.HelpWindowSingleton;
 
 /** Full view of NotesPianoPlayer with time-signature and tempo controls. */
 public class NotesTextPanel extends NotesTextPanelBase

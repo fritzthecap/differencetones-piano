@@ -19,7 +19,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.player.notelanguage.abc.AbcExport;
-import fri.music.swingutils.text.TextAreaActions;
+import fri.music.utils.swing.text.TextAreaActions;
 
 /**
  * Provides ABC header fields and a text-area rendering the export result.

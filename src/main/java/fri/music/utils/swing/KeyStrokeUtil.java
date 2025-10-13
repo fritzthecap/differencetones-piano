@@ -1,4 +1,4 @@
-package fri.music.swingutils;
+package fri.music.utils.swing;
 
 import java.util.Objects;
 import javax.swing.Action;

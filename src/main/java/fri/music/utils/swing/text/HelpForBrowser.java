@@ -1,4 +1,4 @@
-package fri.music.swingutils.text;
+package fri.music.utils.swing.text;
 
 import java.net.URL;
 import fri.music.HtmlResources;

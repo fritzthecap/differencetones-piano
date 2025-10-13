@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
 import fri.music.instrument.PianoWithSound;
 import fri.music.player.Note;
-import fri.music.swingutils.MouseKeyAdapter;
+import fri.music.utils.swing.MouseKeyAdapter;
 
 /**
  * Writes notes from piano keyboard to text-area.

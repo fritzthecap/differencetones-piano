@@ -28,8 +28,8 @@ import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
-import fri.music.swingutils.text.TextAreaUtil;
-import fri.music.swingutils.window.DialogStarter;
+import fri.music.utils.swing.text.TextAreaUtil;
+import fri.music.utils.swing.window.DialogStarter;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**

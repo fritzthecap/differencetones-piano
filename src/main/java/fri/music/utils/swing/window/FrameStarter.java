@@ -1,4 +1,4 @@
-package fri.music.swingutils.window;
+package fri.music.utils.swing.window;
 
 import java.awt.Dimension;
 import java.awt.Point;

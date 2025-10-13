@@ -26,13 +26,13 @@ import fri.music.AbstractJustIntonation.JustTone;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.instrument.configuration.ToneSystemConfigurationPanel;
-import fri.music.swingutils.BorderUtil;
-import fri.music.swingutils.layout.SmartComboBox;
-import fri.music.swingutils.layout.ToolBarUtil;
-import fri.music.swingutils.text.HelpWindowSingleton;
-import fri.music.swingutils.text.TextAreaActions;
-import fri.music.swingutils.window.DialogStarter;
 import fri.music.utils.StringUtil;
+import fri.music.utils.swing.BorderUtil;
+import fri.music.utils.swing.layout.SmartComboBox;
+import fri.music.utils.swing.layout.ToolBarUtil;
+import fri.music.utils.swing.text.HelpWindowSingleton;
+import fri.music.utils.swing.text.TextAreaActions;
+import fri.music.utils.swing.window.DialogStarter;
 
 /**
  * UI for checking the purity of fraction-based tunings

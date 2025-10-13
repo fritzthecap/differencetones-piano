@@ -1,4 +1,4 @@
-package fri.music.swingutils.text;
+package fri.music.utils.swing.text;
 
 import javax.swing.JTextArea;
 

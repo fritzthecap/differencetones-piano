@@ -19,8 +19,8 @@ import javax.swing.SwingUtilities;
 import fri.music.ScaleTypes;
 import fri.music.SoundChannel;
 import fri.music.ToneSystem;
-import fri.music.swingutils.ButtonUtil;
-import fri.music.swingutils.MouseKeyAdapter;
+import fri.music.utils.swing.ButtonUtil;
+import fri.music.utils.swing.MouseKeyAdapter;
 
 /**
  * Piano keyboard user-interface with 12 white and black keys.

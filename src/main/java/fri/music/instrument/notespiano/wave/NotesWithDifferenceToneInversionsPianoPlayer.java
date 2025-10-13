@@ -34,10 +34,10 @@ import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.player.notelanguage.NoteConnections;
 import fri.music.player.notelanguage.abc.AbcExport;
 import fri.music.player.notelanguage.abc.AbcTunesCombiner;
-import fri.music.swingutils.BorderUtil;
-import fri.music.swingutils.layout.ToolBarUtil;
-import fri.music.swingutils.text.HelpWindowSingleton;
-import fri.music.swingutils.text.TextAreaUtil;
+import fri.music.utils.swing.BorderUtil;
+import fri.music.utils.swing.layout.ToolBarUtil;
+import fri.music.utils.swing.text.HelpWindowSingleton;
+import fri.music.utils.swing.text.TextAreaUtil;
 
 /**
  * The most complex view of this project.

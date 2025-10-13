@@ -10,8 +10,8 @@ import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
-import fri.music.swingutils.layout.ToolBarUtil;
-import fri.music.swingutils.text.HelpWindowSingleton;
+import fri.music.utils.swing.layout.ToolBarUtil;
+import fri.music.utils.swing.text.HelpWindowSingleton;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**

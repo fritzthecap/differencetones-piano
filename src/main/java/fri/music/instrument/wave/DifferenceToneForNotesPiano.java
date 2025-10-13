@@ -13,9 +13,9 @@ import javax.swing.border.Border;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
-import fri.music.swingutils.ButtonUtil;
-import fri.music.swingutils.layout.ToolBarUtil;
-import fri.music.swingutils.text.HelpWindowSingleton;
+import fri.music.utils.swing.ButtonUtil;
+import fri.music.utils.swing.layout.ToolBarUtil;
+import fri.music.utils.swing.text.HelpWindowSingleton;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;
 

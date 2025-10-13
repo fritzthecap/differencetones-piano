@@ -1,4 +1,4 @@
-package fri.music.swingutils.text;
+package fri.music.utils.swing.text;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -13,7 +13,7 @@ import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
-import fri.music.swingutils.KeyStrokeUtil;
+import fri.music.utils.swing.KeyStrokeUtil;
 
 /**
  * Base class for any <code>JTextComponent</code> to make bigger or smaller fonts.

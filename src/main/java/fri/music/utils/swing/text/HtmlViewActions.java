@@ -1,4 +1,4 @@
-package fri.music.swingutils.text;
+package fri.music.utils.swing.text;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -16,7 +16,7 @@ import javax.swing.text.html.CSS;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
-import fri.music.swingutils.KeyStrokeUtil;
+import fri.music.utils.swing.KeyStrokeUtil;
 
 /**
  * This class relies on the <code>HtmlEView.css</code> stylesheet that
