@@ -85,8 +85,9 @@ public abstract class AbstractToneSystem implements ToneSystem
     /** {@inheritDoc} */
     @Override
     public Tone[] tones() {
-        return AbstractToneSystem.tones(getOrCreateCachedTones(), baseToneIpnName(), baseToneIpnName(), octaves);
+        return AbstractToneSystem.tones(getOrCreateCachedTones(), modalScaleStartIpnName, baseToneIpnName(), octaves);
     }
+    
     
     protected final Tone[] getOrCreateCachedTones() {
         final Object hashKey = getCacheKey();

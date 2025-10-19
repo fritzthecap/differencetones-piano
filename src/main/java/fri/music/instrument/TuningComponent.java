@@ -77,6 +77,7 @@ public class TuningComponent
             return new EqualTemperament(
                     frequencyOfA4, 
                     lowestToneIpnName, 
+                    modalScaleStartIpnName, 
                     octaves);
         
         final JustIntonation.ChromaticScale twelveToneScale = 

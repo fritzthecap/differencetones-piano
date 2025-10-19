@@ -76,7 +76,7 @@ public interface ToneSystem
     /** @return the number of octaves of this tone-system. */
     int octaves();
     
-    /** @return the actual lowest note of this tone-system, for just-intonation the note the scale was built upon. */
+    /** @return the calculation start tone (low) of this tone-system, or the note the scale was calculated from. */
     String baseToneIpnName();
     
     /** @return all tones of requested octaves in this tone-system. */

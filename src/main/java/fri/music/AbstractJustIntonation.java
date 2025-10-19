@@ -173,11 +173,6 @@ public abstract class AbstractJustIntonation extends AbstractToneSystem
         return super.name()+" "+chromaticScale.name();
     }
     
-    @Override
-    public Tone[] tones() {
-        return AbstractToneSystem.tones(getOrCreateCachedTones(), modalScaleStartIpnName, baseToneIpnName(), octaves());
-    }
-    
     
     protected record CacheKey(double frequencyOfA4, String lowestInZeroOctave, ChromaticScale chromaticScale) {
     }

@@ -42,15 +42,19 @@ public final class EqualTemperament extends AbstractToneSystem
     public EqualTemperament(String baseToneIpnName, int octaves) {
         this(-1.0, baseToneIpnName, octaves);
     }
+    public EqualTemperament(double frequencyOfA4, String baseToneIpnName, int octaves) {
+        this(frequencyOfA4, baseToneIpnName, null, octaves);
+    }
     /**
      * @param frequencyOfA4 the desired frequency of tone "A4".
-     * @param baseToneIpnName the lowest note of the requested tone array e.g. "E3" or "G1".
+     * @param baseToneIpnName the calculation start tone of the requested tone array e.g. "E3" or "G1".
+     * @param modalScaleStartIpnName the effective lowest tone of the requested tone array after calculation.
      * @param octaves the 0-n number of octaves + 1 to return.
      *      When zero, just the lowest tone is returned,
      *      when less than zero, 9 octaves will be returned.
      */
-    public EqualTemperament(double frequencyOfA4, String baseToneIpnName, int octaves) {
-        super(frequencyOfA4, baseToneIpnName, baseToneIpnName, octaves);
+    public EqualTemperament(double frequencyOfA4, String baseToneIpnName, String modalScaleStartIpnName, int octaves) {
+        super(frequencyOfA4, baseToneIpnName, modalScaleStartIpnName, octaves);
     }
     
     /** Appends other popular names to super-imlementation. */
