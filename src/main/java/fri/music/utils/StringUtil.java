@@ -2,11 +2,15 @@ package fri.music.utils;
 
 public final class StringUtil
 {
-    public static final String NEWLINE = System.getProperty("line.separator");
+    /**
+     * The Java-internal newline, as used in JTextArea.
+     * No read or write from/to file-system happens in this application, so we don't need more.
+     */
+    public static final String NEWLINE = "\n"; // System.getProperty("line.separator");
     
     /**
      * @param stringBuilder the string to examine for ending with newline.
-     * @return true when end of string is a platform-newline ("line.separator"), else false.
+     * @return true when end of string is a newline, else false.
      */
     public static boolean endsWithNewline(StringBuilder stringBuilder) {
         final int newlineLength = NEWLINE.length();
@@ -19,6 +23,19 @@ public final class StringUtil
                 return false;
         
         return true;
+    }
+    
+    /**
+     * @param stringBuilder the text where to remove trailing blanks from all lines.
+     * @return the given text without trailing line blanks.
+     */
+    public static String removeTrailingLineBlanks(StringBuilder stringBuilder) {
+        final StringBuilder sb = new StringBuilder();
+        for (String line : stringBuilder.toString().lines().toList()) {
+            sb.append(line.stripTrailing());
+            sb.append(NEWLINE);
+        }
+        return sb.toString();
     }
     
     /**
@@ -45,7 +62,9 @@ public final class StringUtil
     /**
      * This is 10 times faster than <code>ipnName.replaceAll("[0-9]", "")</code>.
      * @param name some IPN note name like "C4".
-     * @return the name without first occurring number, e.g. "C" from "C4".
+     * @return the name without first occurring number, e.g. "C" from "C4",
+     *      or empty string if first character is digit,
+     *      or given name if no digit is in it.
      */
     public static String getUntilFirstNumber(String name) {
         final StringBuilder sb = new StringBuilder();

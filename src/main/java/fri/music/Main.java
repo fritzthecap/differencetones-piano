@@ -239,7 +239,7 @@ public final class Main
     private JFrame tuningsAndPurityCheckerFrame; // instance-singleton
     
     private Action buildTuningDisplayAndPurityChecker() {
-        final String title = "Display Tunings, Check Fraction-Based Tunings for Purity";
+        final String title = "Text Displays of Tunings, Difference-Tones and Purity Checks";
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {

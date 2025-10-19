@@ -1,8 +1,6 @@
 package fri.music.instrument.wave.slider;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -26,6 +24,7 @@ import fri.music.ToneSystem;
 import fri.music.utils.MathUtil;
 import fri.music.utils.swing.ButtonUtil;
 import fri.music.utils.swing.text.HelpWindowSingleton;
+import fri.music.utils.swing.text.TextFieldUtil;
 
 /**
  * Displays two frequency sliders and their difference-tone.
@@ -159,10 +158,24 @@ public class FrequencyDifferenceSliders extends AbstractFrequencySliders
                 }
             }
             @Override
+            public void keyTyped(KeyEvent e) {
+                final String text = ((JTextField) e.getSource()).getText();
+                final boolean matters = 
+                        text.length() <= 2 && // new character not yet added, maximum is "C10", there is no "C#10"
+                            ((e.getKeyChar() >= 'A' && e.getKeyChar() <= 'G') ||
+                            e.getKeyChar() == '#' ||
+                            (e.getKeyChar() >= '0' && e.getKeyChar() <= '9'));
+                if (matters == false)
+                    e.consume();
+            }
+            @Override
             public void keyReleased(KeyEvent e) {
                 final boolean matters = 
                         (e.getKeyCode() >= KeyEvent.VK_A && e.getKeyCode() <= KeyEvent.VK_G) ||
-                        (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_9);
+                        (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_9) ||
+                        e.getKeyCode() == KeyEvent.VK_NUMBER_SIGN ||
+                        e.getKeyCode() == KeyEvent.VK_BACK_SPACE ||
+                        e.getKeyCode() == KeyEvent.VK_DELETE;
                 if (matters) {
                     final Tone tone = tones().forIpnName(((JTextField) e.getSource()).getText());
                     if (tone != null)
@@ -283,17 +296,7 @@ public class FrequencyDifferenceSliders extends AbstractFrequencySliders
     }
     
     private JTextField createTextField(int width, String title, boolean editable) {
-        final JTextField textField = new JTextField();
-        textField.setEditable(editable);
-        textField.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
-        textField.setHorizontalAlignment(SwingConstants.CENTER);
-        textField.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 3, true), 
-                title));
-        final Dimension size = new Dimension(width, 48);
-        textField.setPreferredSize(size);
-        textField.setMaximumSize(size);
-        return textField;
+        return TextFieldUtil.sizedField(width, title, editable);
     }
 
     private JButton createStartStopBothButton() {

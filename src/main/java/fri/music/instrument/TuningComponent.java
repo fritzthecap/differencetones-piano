@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
 import fri.music.ToneSystem;
@@ -22,6 +26,10 @@ public class TuningComponent
     private String modalScaleStartIpnName;
     
     private JComboBox<String> tuningChoice;
+    
+    public TuningComponent() {
+        this(null, -1);
+    }
     
     public TuningComponent(String lowestToneIpnName, int octaves) {
         setLowestToneIpnName(lowestToneIpnName);
@@ -41,6 +49,15 @@ public class TuningComponent
     }
     public final void setModalScaleStartIpnName(String modalScaleStartIpnName) {
         this.modalScaleStartIpnName = (modalScaleStartIpnName != null) ? modalScaleStartIpnName : ToneSystem.DEFAULT_BASETONE_IPN_NAME;
+    }
+    
+    /** Left-aligned container for combo-box. */
+    public JComponent getLeftAlignedChoice() {
+        final JPanel tuningsPanel = new JPanel();
+        tuningsPanel.setLayout(new BoxLayout(tuningsPanel, BoxLayout.X_AXIS));
+        tuningsPanel.add(getChoice(null));
+        tuningsPanel.add(Box.createHorizontalGlue()); // to keep choice left-aligned
+        return tuningsPanel;
     }
     
     /**

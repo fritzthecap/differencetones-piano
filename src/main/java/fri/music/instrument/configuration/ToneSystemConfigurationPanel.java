@@ -1,21 +1,10 @@
 package fri.music.instrument.configuration;
 
 import java.awt.FlowLayout;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
 import fri.music.instrument.TuningComponent;
 import fri.music.utils.swing.layout.SmartComboBox;
@@ -26,19 +15,11 @@ import fri.music.utils.swing.layout.SmartComboBox;
  */
 public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
 {
-    private static final double A4_FREQUENCY_MINIMUM = 410.0;
-    private static final double A4_FREQUENCY_MAXIMUM = 460.0;
-    
-    private static final double SLIDER_MAGNIFICTION_FACTOR = 10.0;
-
-    private JSlider frequencyOfA4;
-    private JComboBox<String> modalScaleStartBaseName;
     private TuningComponent tuningComponent;
+    private FrequencyOfA4Component frequencyOfA4;
+    private JComboBox<String> modalScaleStartBaseName;
     
-    private final NumberFormat decimalFormatLabels = new DecimalFormat("0");
-    private final NumberFormat decimalFormatTooltip = new DecimalFormat("0.0");
-    
-    /** Default constructor. */
+    /** Default constructor for "C4" on 440 Hz with 1 octave. */
     public ToneSystemConfigurationPanel() {
         this(1, "C", 4, 0.0, null);
     }
@@ -69,16 +50,11 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
             modalScaleStartBaseName.setSelectedItem(modalScaleStartBaseNameParam);
 
         // field layout
-        final JComponent tuningsChoice = tuningComponent.getChoice(null); // null: default tuning
-        final JPanel tuningsPanel = new JPanel();
-        tuningsPanel.setLayout(new BoxLayout(tuningsPanel, BoxLayout.X_AXIS));
-        tuningsPanel.add(tuningsChoice);
-        tuningsPanel.add(Box.createHorizontalGlue()); // to keep choice left-aligned
-        
+        final JComponent tuningsPanel = tuningComponent.getLeftAlignedChoice(); // null: default tuning
         // set tunings choice on top
         panel.add(tuningsPanel, 0); // null: default tuning
         
-        panel.add(frequencyOfA4);
+        panel.add(frequencyOfA4.frequencySlider);
         
         final JPanel modalScaleStartTonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         modalScaleStartTonePanel.add(modalScaleStartBaseName);
@@ -89,7 +65,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
     }
     
     public final double getFrequencyOfA4() {
-        return toDouble(frequencyOfA4.getValue());
+        return frequencyOfA4.getValue();
     }
     
     public final String getModalScaleStartIpnName() {
@@ -111,34 +87,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
             double frequencyOfA4Param, 
             int octavesParam)
     {
-        final int A4_FREQ_MIN = toInt(A4_FREQUENCY_MINIMUM);
-        final int A4_FREQ_MAX = toInt(A4_FREQUENCY_MAXIMUM);
-        final int SPACING = toInt(5);// a tick every 5 Hertz
-        
-        final double finalFrequencyOfA4 = (frequencyOfA4Param >= A4_FREQUENCY_MINIMUM && frequencyOfA4Param <= A4_FREQUENCY_MAXIMUM)
-                ? frequencyOfA4Param
-                : ToneSystem.DEFAULT_REFERENCE_FREQUENCY;
-        
-        this.frequencyOfA4 = new JSlider(
-                A4_FREQ_MIN,
-                A4_FREQ_MAX,
-                toInt(finalFrequencyOfA4));
-        frequencyOfA4.setToolTipText("The Calculation Base for All Semitones in Tuning, Default "+ToneSystem.DEFAULT_REFERENCE_FREQUENCY);
-        frequencyOfA4.setLabelTable(frequencyOfA4LableTable(A4_FREQ_MIN, A4_FREQ_MAX, SPACING));
-        frequencyOfA4.setMajorTickSpacing(SPACING); 
-        frequencyOfA4.setPaintLabels(true);
-        frequencyOfA4.setPaintTicks(true);
-        final String frequencyOfA4Title = "Frequency of A4: ";
-        frequencyOfA4.setBorder(BorderFactory.createTitledBorder("Frequency of A4"));
-        final ChangeListener frequencyListener = new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                final String value = decimalFormatTooltip.format(toDouble(frequencyOfA4.getValue()));
-                ((TitledBorder) frequencyOfA4.getBorder()).setTitle(frequencyOfA4Title+value);
-            }
-        };
-        frequencyListener.stateChanged(null);
-        frequencyOfA4.addChangeListener(frequencyListener);
+        this.frequencyOfA4 = new FrequencyOfA4Component(frequencyOfA4Param);
         
         this.modalScaleStartBaseName = new SmartComboBox(getToneBaseNames());
         modalScaleStartBaseName.setBorder(BorderFactory.createTitledBorder("Key"));
@@ -156,21 +105,6 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         this.tuningComponent = new TuningComponent(lowestToneIpnName, octavesParam);
     }
 
-    private Dictionary<Integer,JLabel> frequencyOfA4LableTable(int minimum, int maximum, int spacing) {
-        final Hashtable<Integer,JLabel> table = new Hashtable<>();
-        for (int i = minimum; i <= maximum; i += spacing)
-            table.put(i, new JLabel(decimalFormatLabels.format(toDouble(i))));
-        return table;
-    }
-
-    private int toInt(double frequency) {
-        return (int) Math.round(frequency * SLIDER_MAGNIFICTION_FACTOR);
-    }
-    
-    private double toDouble(int frequencySliderValue) {
-        return ((double) frequencySliderValue) / SLIDER_MAGNIFICTION_FACTOR;
-    }
-    
     
     /*public static void main(String[] args) {
         final ToneSystemConfigurationPanel config = new ToneSystemConfigurationPanel(5, "D", 3, 435.6, "A");

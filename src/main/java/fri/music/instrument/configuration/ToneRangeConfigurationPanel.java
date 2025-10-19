@@ -47,7 +47,7 @@ public class ToneRangeConfigurationPanel
         // fields layout
         final JPanel lowestTonePanel = new JPanel();
         lowestTonePanel.setLayout(new BoxLayout(lowestTonePanel, BoxLayout.X_AXIS));
-        lowestTonePanel.setBorder(BorderFactory.createTitledBorder("Lowest Tone"));
+        lowestTonePanel.setBorder(BorderFactory.createTitledBorder("Calculation Start Tone"));
         lowestTonePanel.add(lowestToneBaseName);
         if (lowestToneScaleName != null)
             lowestTonePanel.add(lowestToneScaleName);
@@ -165,7 +165,7 @@ public class ToneRangeConfigurationPanel
                 ToneSystem.LOWEST_OCTAVE, 
                 ToneSystem.MAXIMUM_OCTAVES - 1, 
                 lowestToneOctaveParam);
-        lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Start Octave"));
+        lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Octave"));
         lowestToneOctave.setToolTipText("Calculation Start Octave of the Tonesystem");
         lowestToneOctave.setSnapToTicks(true);
         lowestToneOctave.setPaintLabels(true);

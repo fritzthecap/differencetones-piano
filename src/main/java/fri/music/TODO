@@ -1,4 +1,7 @@
-
+ 
+ - Erase intervals text also when Melody text gets erased or replaced as a whole.
+    Warning dialog should appear like it does on change of tuning parameters.
+ 
 - Configuration and display UI for:
     - Difference tones in different tunings (DifferenceToneDemo)
     - Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
@@ -19,6 +22,14 @@
 ==============================
 
 Fixed Bugs:
+
+ - Bug: FrequencyDifferenceToneSliders, edit D6 to D#6, the slider moves,
+    remove the '#' to set back to D6, the slider doesn't move!
+    DONE: fixed by also reacting on DELETE and BACKSPACE to move slider.
+ 
+- Bug: "Tunings Display", choosing "E" as "Lowest Tone" and
+    "D" as "Modal Scale Start Tone" yields a scale starting with "E".
+    DONE: fixed by adding EqualTemperament constructor with modalScaleStartTone parameter.
 
 - Bug: call "Display Tunings", set 8 octaves, set "Lowest Tone" to "E",
     set LIMIT_5 JustIntonation (another exception happens also with EqualTemperament),

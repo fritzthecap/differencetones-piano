@@ -27,17 +27,25 @@
 <h2 id="Lowest">Lowest Tone</h2>
 <p>
     This is the <b>calculation base tone</b>, and the default start tone of the resulting scale.
+    It being the start tone may be overridden by "Modal Scale Start Tone",
+    but the latter does not play a role in frequency calculations.
 </p><p>
-    To get to the "Lowest Tone" of a just-intonation scale, 
-    first an equal-temperament scale is built, based on the zero-octave. 
-    From that scale, the name and frequency of the chosen "Lowest Tone" is taken,
-    then the interval fractions are applied to calculate the frequencies of
-    all semitones above it.
+    For the <b>equal-temperament</b> scale, the frequency of each tone
+    is calculated from the parameter "Frequency of A4" (see below). 
+</p>
+</p><p>
+    For a <b>just-intonation</b> scale, the frequency of the "Lowest Tone"  
+    is taken from the parallel equal-temperament scale starting on the given tone in zero-octave. 
+    Then the interval fractions are applied to calculate the frequencies of
+    all semitones above it. Thus any <b>just-intonation</b> scale depends
+    on the frequency of the "Lowest Tone" in an equal-temperament scale, 
+    in other words, just-intonation scales are "relative to" some base tone frequency,
+    while the equal-temperament scale is "absolute to" the frequency of A4. 
 </p>
 
 <h2 id="FrequencyA4">Frequency of A4</h2>
 <p>
-    You can determine the reference-frequency of note "A4" for all calculations,
+    You can determine the reference-frequency of note "A4" for all frequency calculations,
     be it for fraction-based just-intonation or for equal-temperament calculations.
     By default, "A4" has 440 Hertz. Historical tuning forks range from 409 to 455 Hertz.
 </p>
@@ -47,7 +55,8 @@
     This would be the <b>effective start tone</b>, or lowest tone, of the constructed scale,
     applied after all calculations were finished.
     It is allowed to be different from and even below the "Lowest Tone",
-    because the calculation will always create all 10 octaves <b>starting from the zero-octave</b>.
+    because the equal-temperament frequncy calculation will always create 
+    all 10 octaves starting from the zero-octave. 
     This tone is called "modal" because you can determine it also by choosing one
     of the modal scale names like IONIAN, DORIAN, ...
     Its octave will always be the same as the one of "Lowest Tone".

@@ -173,6 +173,7 @@ public class PurityCheckConfigurationPanel
         checkedJustIntonationTunings = new JList<>(justIntonationNames);
         checkedJustIntonationTunings.setToolTipText("Select the just-intonation tuning(s) you want to examine. Use Ctrl- and Shift-Click to select!");
         checkedJustIntonationTunings.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        checkedJustIntonationTunings.setSelectedIndices(new int[] { 0, 1, 2 }); // all LIMIT_5
+        checkedJustIntonationTunings.setSelectedIndices(new int[] { 0 }); // LIMIT_5_SYMMETRIC_1
+        //checkedJustIntonationTunings.setSelectedIndices(new int[] { 0, 1, 2 }); // all LIMIT_5
     }
 }
