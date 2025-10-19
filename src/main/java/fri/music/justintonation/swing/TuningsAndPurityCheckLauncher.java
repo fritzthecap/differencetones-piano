@@ -169,6 +169,7 @@ public class TuningsAndPurityCheckLauncher
     
     private void showResultInTextDialog(JComponent parent, String title, String text, String font) {
         final JTextArea textArea = new JTextArea(text);
+        textArea.setTabSize(2);
         textArea.setEditable(false);
         if (font != null)
             textArea.setFont(Font.decode(font).deriveFont(Font.BOLD, 14f));
@@ -215,7 +216,6 @@ public class TuningsAndPurityCheckLauncher
         final StringBuilder sb = new StringBuilder();
         appendLine(configurationPanel.getHeadingLines(), sb);
         
-        final int columnSeparatorBlanks = 2;
         for (int i = 0; i < tartiniTones.length; i++) {
             final Tone tone = tartiniTones[i];
             final String prefix = (onlyPrimaryDifferenceTones ? "" : (i + 1)+": ");
@@ -223,17 +223,20 @@ public class TuningsAndPurityCheckLauncher
             
             final String name = (tone != null) ? tone.ipnName : "-";
             final String frequency = (tone != null) ? tone.formattedFrequency() : "";
-            appendColumn(name, 3, columnSeparatorBlanks, sb);
-            appendColumn(frequency, 9, columnSeparatorBlanks, sb);
+            appendColumn(name, 3, columnSeparation, sb);
+            appendColumn(frequency, 9, columnSeparation, sb);
             if (tone instanceof JustTone) {
                 final JustTone justTone = (JustTone) tone;
-                appendColumn(justTone.centDeviationString(), 5, columnSeparatorBlanks, sb);
+                appendColumn(justTone.centDeviationString(), 5, columnSeparation, sb);
+                appendColumn(justTone.interval.ratioString(0), 7, columnSeparation, sb);
             }
             sb.append(StringUtil.NEWLINE);
         }
         return StringUtil.removeTrailingLineBlanks(sb);
     }
     
+    
+    private static final int columnSeparation = 2; // blanks
     
     /** Right-aligned columns with separator-blanks. */
     private static void appendColumn(String content, int maxLength, int blanksToAppend, StringBuilder sb) {
@@ -400,7 +403,6 @@ public class TuningsAndPurityCheckLauncher
         // start class ColumnDisplayConfiguration
         
         private static final int NUMBER_OF_COLUMNS = 6;
-        private static final int columnSeparation = 4; // blanks
         
         public final JPanel panel;
         
@@ -415,9 +417,9 @@ public class TuningsAndPurityCheckLauncher
             new Column(
                     4, false, new JCheckBox("Cents", false),         t -> ""+t.cent+" ¢", 7), // max "12000 c"
             new Column(
-                    5, true, new JCheckBox("Fraction", true),        t -> ((JustTone) t).interval.ratioString(0), 7), // max "729/512"
+                    5, true, new JCheckBox("Cent Deviation from 12-ET", true),  t -> ((JustTone) t).centDeviationString(), 5), // max "+12 ¢""
             new Column(
-                    6, true, new JCheckBox("Cent Deviation from 12-ET", true),  t -> ((JustTone) t).centDeviationString(), 5) // max "+12 ¢""
+                    6, true, new JCheckBox("Fraction", true),        t -> ((JustTone) t).interval.ratioString(0), 7) // max "729/512"
         );
         private final ItemListener positionChangeListener = new PositionChangeItemListener();
         private JComponent checkboxTable;
