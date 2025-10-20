@@ -21,6 +21,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,12 +31,16 @@ import javax.swing.JTextField;
 import fri.music.AbstractJustIntonation.JustTone;
 import fri.music.Tone;
 import fri.music.ToneSystem;
+import fri.music.differencetones.DifferenceToneInversions;
+import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.TuningComponent;
 import fri.music.instrument.configuration.FrequencyOfA4Component;
 import fri.music.instrument.configuration.ToneSystemConfigurationPanel;
 import fri.music.instrument.wave.DeviationComponent;
+import fri.music.instrument.wave.IntervalRangeComponent;
 import fri.music.utils.StringUtil;
+import fri.music.utils.swing.BorderUtil;
 import fri.music.utils.swing.layout.SmartComboBox;
 import fri.music.utils.swing.layout.ToolBarUtil;
 import fri.music.utils.swing.text.HelpWindowSingleton;
@@ -61,18 +66,31 @@ public class TuningsAndPurityCheckLauncher
         final JPanel checkerPanel = new JPanel(new BorderLayout());
         buildCheckerPanel(checkerPanel);
         
-        final JTabbedPane mainPanel = new JTabbedPane();
-        final Font font = mainPanel.getFont(); // bigger tab titles
-        mainPanel.setFont(font.deriveFont(font.getSize2D() + 4f));
+        final JTabbedPane tabbedPane = new JTabbedPane() {
+            @Override
+            public void setSelectedIndex(int index) {
+                if (index == 3) // "Help" tab
+                    HelpWindowSingleton.start(
+                            panel, 
+                            HelpForTextDisplay.TITLE, 
+                            HelpForTextDisplay.URL);
+                else
+                    super.setSelectedIndex(index);
+                    
+            }
+        };
+        final Font font = tabbedPane.getFont(); // bigger tab titles
+        tabbedPane.setFont(font.deriveFont(font.getSize2D() + 4f));
         
-        mainPanel.add("Tunings Display", tuningsPanel);
-        mainPanel.setToolTipTextAt(0, "Frequencies and Cents for Different Tunings");
-        mainPanel.add("Difference-Tones", differenceTonesPanel);
-        mainPanel.setToolTipTextAt(1, "Difference Tones and Intervals");
-        mainPanel.add("Purity Check", checkerPanel);
-        mainPanel.setToolTipTextAt(2, "Check Fraction-Based Tunings for Purity");
+        tabbedPane.addTab("Tunings", tuningsPanel);
+        tabbedPane.setToolTipTextAt(0, "Frequencies and Cents for Different Tunings");
+        tabbedPane.addTab("Difference-Tones", differenceTonesPanel);
+        tabbedPane.setToolTipTextAt(1, "Difference Tones and Intervals");
+        tabbedPane.addTab("Purity Check", checkerPanel);
+        tabbedPane.setToolTipTextAt(2, "Check Fraction-Based Tunings for Purity");
+        tabbedPane.addTab("Help", new JLabel()); // dummy tab component
         
-        this.panel = mainPanel;
+        this.panel = tabbedPane;
     }
 
     private void buildTuningsPanel(final JPanel tuningsPanel) {
@@ -113,27 +131,28 @@ public class TuningsAndPurityCheckLauncher
 
     private void buildDifferenceTonesPanel(final JPanel differenceTonesPanel) {
         final DifferenceTonesConfiguration configurationPanel = new DifferenceTonesConfiguration();
-        differenceTonesPanel.add(configurationPanel.panel, BorderLayout.NORTH);
+        differenceTonesPanel.add(configurationPanel.panel, BorderLayout.CENTER);
         
-        final JButton displayDifferenceTonesButton = new JButton("Difference-Tones");
-        displayDifferenceTonesButton.addActionListener(new ActionListener() {
+        final ActionListener actionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
+                final boolean isDifferenceTonesButton = (event.getSource() == configurationPanel.differenceTonesButton);
                 try {
-                    final String title = configurationPanel.getTitle();
-                    final String result = buildDifferenceTonesDisplayText(configurationPanel);
+                    final String title = isDifferenceTonesButton
+                            ? configurationPanel.getDifferenceTonesTitle()
+                            : configurationPanel.getIntervalsTitle();
+                    final String result = isDifferenceTonesButton
+                            ? buildDifferenceTonesDisplayText(configurationPanel)
+                            : buildIntervalsDisplayText(configurationPanel);
                     showResultInTextDialog(differenceTonesPanel, title, result, Font.MONOSPACED);
                 }
                 catch (Exception e) {
-                    e.printStackTrace();
                     JOptionPane.showMessageDialog(differenceTonesPanel, e.getMessage());
                 }
             }
-        });
-        
-        final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.add(displayDifferenceTonesButton);
-        differenceTonesPanel.add(buttonPanel, BorderLayout.SOUTH);
+        };
+        configurationPanel.differenceTonesButton.addActionListener(actionListener);
+        configurationPanel.intervalsButton.addActionListener(actionListener);
     }
 
     private void buildCheckerPanel(JComponent checkerPanel) {
@@ -181,6 +200,7 @@ public class TuningsAndPurityCheckLauncher
         DialogStarter.start(title, parent, new JScrollPane(textArea), null, true);
     }
 
+    
     private String buildTuningDisplayText(
             ToneSystemConfigurationPanel toneSystemConfiguration, 
             ColumnDisplayConfiguration displayConfiguration)
@@ -197,48 +217,102 @@ public class TuningsAndPurityCheckLauncher
         return StringUtil.removeTrailingLineBlanks(sb);
     }
 
-    private void appendLine(String line, StringBuilder sb) {
-        sb.append(line);
-        sb.append(StringUtil.NEWLINE);
-    }
     
     private String buildDifferenceTonesDisplayText(DifferenceTonesConfiguration configurationPanel) {
-        final ToneSystem toneSystem = configurationPanel.getToneSystem();
-        final double deviation = configurationPanel.getDeviation();
-        final boolean onlyPrimaryDifferenceTones = configurationPanel.showOnlyPrimaryDifferenceTone();
+        final String lowerToneIpnName = configurationPanel.getLowerToneIpnName();
+        final String upperToneIpnName = configurationPanel.getUpperToneIpnName();
+        if (lowerToneIpnName.trim().length() <= 0 || upperToneIpnName.trim().length() <= 0)
+            throw new IllegalArgumentException("Please enter two valid IPN tone names!");
         
-        final DifferenceTones differenceTones = 
-                new DifferenceTones(toneSystem.tones(), deviation, onlyPrimaryDifferenceTones);
-        final Tone[] tartiniTones = differenceTones.findDifferenceTones(
-                configurationPanel.getLowerToneIpnName(),
-                configurationPanel.getUpperToneIpnName());
+        final boolean onlyPrimaryDifferenceTones = configurationPanel.showOnlyPrimaryDifferenceTone();
+        final DifferenceTones differenceTones = new DifferenceTones(
+                configurationPanel.getToneSystem().tones(), 
+                configurationPanel.getDeviation(), 
+                onlyPrimaryDifferenceTones);
+        
+        final Tone lowerTone = differenceTones.forIpnName(lowerToneIpnName);
+        final Tone upperTone = differenceTones.forIpnName(upperToneIpnName);
+        if (lowerTone == null)
+            throw new IllegalArgumentException("An invalid IPN tone name was entered: "+lowerToneIpnName);
+        if (upperTone == null)
+            throw new IllegalArgumentException("An invalid IPN tone name was entered: "+upperToneIpnName);
         
         final StringBuilder sb = new StringBuilder();
-        appendLine(configurationPanel.getHeadingLines(), sb);
+        appendLine(configurationPanel.getDifferenceTonesHeadingLines(lowerTone, upperTone), sb);
         
+        final Tone[] tartiniTones = differenceTones.findDifferenceTones(lowerTone, upperTone);
         for (int i = 0; i < tartiniTones.length; i++) {
             final Tone tone = tartiniTones[i];
             final String prefix = (onlyPrimaryDifferenceTones ? "" : (i + 1)+": ");
             sb.append(prefix);
             
-            final String name = (tone != null) ? tone.ipnName : "-";
+            final String name = (tone != null) ? tone.ipnName : "(None)";
             final String frequency = (tone != null) ? tone.formattedFrequency() : "";
-            appendColumn(name, 3, columnSeparation, sb);
-            appendColumn(frequency, 9, columnSeparation, sb);
-            if (tone instanceof JustTone) {
+            appendColumn(name, 3, sb);
+            appendColumn(frequency, 9, sb);
+            if (tone instanceof JustTone) { // null would give false
                 final JustTone justTone = (JustTone) tone;
-                appendColumn(justTone.centDeviationString(), 5, columnSeparation, sb);
-                appendColumn(justTone.interval.ratioString(0), 7, columnSeparation, sb);
+                appendColumn(justTone.centDeviationString(), 5, sb);
+                appendColumn(justTone.interval.ratioString(0), 7, sb);
             }
             sb.append(StringUtil.NEWLINE);
         }
         return StringUtil.removeTrailingLineBlanks(sb);
+    }
+
+    
+    private String buildIntervalsDisplayText(DifferenceTonesConfiguration configurationPanel) {
+        final String differenceToneIpnName = configurationPanel.getDifferenceToneIpnName();
+        if (differenceToneIpnName.length() <= 0)
+            throw new IllegalArgumentException("Please enter a valid IPN tone name!");
+        
+        final DifferenceToneInversions differenceToneInversions = new DifferenceToneInversions(
+                new DifferenceToneInversions.Configuration(
+                        configurationPanel.getToneSystem().tones(),
+                    ToneSystem.semitoneSteps(configurationPanel.getNarrowestInterval()),
+                    ToneSystem.semitoneSteps(configurationPanel.getWidestInterval()),
+                    configurationPanel.getDeviation())
+            );
+        differenceToneInversions.removeDissonant(false);
+
+        final Tone differenceTone = differenceToneInversions.forIpnName(differenceToneIpnName);
+        if (differenceTone == null)
+            throw new IllegalArgumentException("An invalid IPN tone name was entered: "+differenceToneIpnName);
+        
+        final List<TonePair> intervals = differenceToneInversions.getIntervalsGenerating(differenceTone);
+        
+        final String headingLines = configurationPanel.getIntervalHeadingLines(differenceTone);
+        final StringBuilder sb = new StringBuilder(headingLines + StringUtil.NEWLINE);
+        if (intervals != null) {
+            for (TonePair interval : intervals) {
+                appendColumn(interval.intervalName(), 13, sb); // maximum "MAJOR_SEVENTH"
+                appendColumn(interval.lowerTone().ipnName, 3, sb); // maximum "C10"
+                appendColumn(interval.upperTone().ipnName, 3, sb);
+                appendColumn(interval.lowerTone().formattedFrequency(), 9, sb);
+                appendColumn(interval.upperTone().formattedFrequency(), 9, sb);
+                sb.append(StringUtil.NEWLINE);
+            }
+        }
+        else {
+            appendColumn("(None)", 13, sb); // empty indicator
+        }
+        
+        return sb.toString();
+    }
+
+    
+    private void appendLine(String line, StringBuilder sb) {
+        sb.append(line);
+        sb.append(StringUtil.NEWLINE);
     }
     
     
     private static final int columnSeparation = 2; // blanks
     
     /** Right-aligned columns with separator-blanks. */
+    private static void appendColumn(String content, int maxLength, StringBuilder sb) {
+        appendColumn(content, maxLength, columnSeparation, sb);
+    }
     private static void appendColumn(String content, int maxLength, int blanksToAppend, StringBuilder sb) {
         final int contentLength = content.length();
         final int lessThanMaxLength = maxLength - contentLength;
@@ -448,7 +522,7 @@ public class TuningsAndPurityCheckLauncher
             
             for (Column column : sortedColumnsClone())
                 if (column.isSelected() && (isJustTone || column.forJustTone == isJustTone))
-                    appendColumn(column.content.apply(tone), column.maxLength, columnSeparation, sb);
+                    appendColumn(column.content.apply(tone), column.maxLength, sb);
             
             sb.append(StringUtil.NEWLINE);
         }
@@ -507,54 +581,93 @@ public class TuningsAndPurityCheckLauncher
         private static KeyListener toneNameListener;
         
         public final JPanel panel;
+        public final JButton differenceTonesButton;
+        public final JButton intervalsButton;
         
         private final TuningComponent tuning;
         private final FrequencyOfA4Component frequencyOfA4;
         private final DeviationComponent deviation;
-        private final JCheckBox onlyPrimaryDifferenceTone;
+        
         private final JTextField lowerIntervalTone;
         private final JTextField upperIntervalTone;
+        private final JCheckBox onlyPrimaryDifferenceTone;
+        
+        private final JTextField differenceTone;
+        private final IntervalRangeComponent intervalRange;
      
         public DifferenceTonesConfiguration() {
-            this.panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            // global configuration panel
+            final JPanel tuningPanel = new JPanel();
+            tuningPanel.setLayout(new BoxLayout(tuningPanel, BoxLayout.Y_AXIS));
             
             this.tuning = new TuningComponent();
-            panel.add(tuning.getLeftAlignedChoice());
+            tuningPanel.add(tuning.getLeftAlignedChoice());
             
             this.frequencyOfA4 = new FrequencyOfA4Component();
-            panel.add(frequencyOfA4.frequencySlider);
+            tuningPanel.add(frequencyOfA4.frequencySlider);
             
             this.deviation = new DeviationComponent(DifferenceTones.DEFAULT_DEVIATION, false);
-            panel.add(deviation.deviationSlider);
+            tuningPanel.add(deviation.deviationSlider);
+            
+            // upper panel
+            final JPanel differenceTonesPanel = new JPanel();
+            differenceTonesPanel.setLayout(new BoxLayout(differenceTonesPanel, BoxLayout.Y_AXIS));
+            differenceTonesPanel.setBorder(BorderUtil.titledBorder("Difference-Tones of Interval", 4f, 3));
             
             this.lowerIntervalTone = configureToneField("Lower Tone", "C6");
             this.upperIntervalTone = configureToneField("Upper Tone", "D6");
-            final JPanel textFieldsPanel = new JPanel();
-            textFieldsPanel.setLayout(new BoxLayout(textFieldsPanel, BoxLayout.X_AXIS));
+            final JPanel textFieldsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             textFieldsPanel.add(lowerIntervalTone);
             textFieldsPanel.add(upperIntervalTone);
-            textFieldsPanel.add(Box.createHorizontalGlue());
-            panel.add(textFieldsPanel);
+            differenceTonesPanel.add(textFieldsPanel);
             
-            this.onlyPrimaryDifferenceTone = new JCheckBox("Show Only Primary Difference-Tone", true);
+            this.onlyPrimaryDifferenceTone = new JCheckBox("Display Only Primary", true);
             onlyPrimaryDifferenceTone.setToolTipText("Do Not Show Secondary and Tertiary Difference-Tones");
-            final JPanel moveLeftUpperPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            moveLeftUpperPanel.add(onlyPrimaryDifferenceTone);
-            panel.add(moveLeftUpperPanel);
+            onlyPrimaryDifferenceTone.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            final JPanel bottomCenterPanel1 = new JPanel();
+            bottomCenterPanel1.setLayout(new BoxLayout(bottomCenterPanel1, BoxLayout.Y_AXIS));
+            bottomCenterPanel1.add(onlyPrimaryDifferenceTone);
+            
+            this.differenceTonesButton = new JButton("Display Difference-Tone(s)");
+            differenceTonesButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            bottomCenterPanel1.add(differenceTonesButton);
+            
+            differenceTonesPanel.add(bottomCenterPanel1);
+            differenceTonesPanel.add(Box.createVerticalGlue());
+            
+            // lower panel
+            final JPanel intervalsPanel = new JPanel();
+            intervalsPanel.setLayout(new BoxLayout(intervalsPanel, BoxLayout.Y_AXIS));
+            intervalsPanel.setBorder(BorderUtil.titledBorder("Intervals of Difference-Tone", 4f, 3));
+            
+            this.differenceTone = configureToneField("Difference-Tone", "C3", 120);
+            differenceTone.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            intervalsPanel.add(differenceTone);
+            
+            this.intervalRange = new IntervalRangeComponent();
+            final JPanel choicePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            intervalRange.getNarrowestChoice().setSelectedItem(ToneSystem.MAJOR_SECOND);
+            intervalRange.getWidestChoice().setSelectedItem(ToneSystem.MINOR_SEVENTH);
+            choicePanel.add(intervalRange.getNarrowestChoice());
+            choicePanel.add(intervalRange.getWidestChoice());
+            
+            this.intervalsButton = new JButton("Display Intervals");
+            intervalsButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            
+            intervalsPanel.add(choicePanel);
+            intervalsPanel.add(intervalsButton);
+            intervalsPanel.add(Box.createVerticalGlue());
+            
+            // build together all
+            this.panel = new JPanel();
+            this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.Y_AXIS));
+            this.panel.add(tuningPanel);
+            this.panel.add(Box.createVerticalGlue());
+            this.panel.add(differenceTonesPanel);
+            this.panel.add(intervalsPanel);
         }
         
-        public String getTitle() {
-            return getLowerToneIpnName()+"-"+getUpperToneIpnName()+
-                    " Difference-Tone"+(showOnlyPrimaryDifferenceTone() ? "" : "s");
-        }
-        
-        public String getHeadingLines() {
-            return  "Interval:  "+getLowerToneIpnName()+" - "+getUpperToneIpnName()+StringUtil.NEWLINE+
-                    "Tuning:    "+tuning.getChoice(null).getSelectedItem()+StringUtil.NEWLINE+
-                    "A4:        "+frequencyOfA4.getValue()+" Hertz"+StringUtil.NEWLINE+
-                    "Deviation: "+deviation.deviationSlider.getValue()+" %"+StringUtil.NEWLINE;
-        }
+        // global methods
         
         public ToneSystem getToneSystem() {
             tuning.setFrequencyOfA4(frequencyOfA4.getValue());
@@ -562,6 +675,19 @@ public class TuningsAndPurityCheckLauncher
         }
         public double getDeviation() {
             return deviation.getDeviation();
+        }
+        
+        // difference tone methods
+        
+        public String getDifferenceTonesTitle() {
+            return getLowerToneIpnName()+"-"+getUpperToneIpnName()+
+                    " Difference-Tone"+(showOnlyPrimaryDifferenceTone() ? "" : "s");
+        }
+        public String getDifferenceTonesHeadingLines(Tone lowerTone, Tone upperTone) {
+            return getGlobalHeadingLines()+
+                "Interval:   "+lowerTone.ipnName+" ("+lowerTone.formattedFrequency()+") - "
+                              +upperTone.ipnName+" ("+upperTone.formattedFrequency()+")"+StringUtil.NEWLINE+
+                "Difference: "+(Tone.frequencyFormat.format(Math.abs(upperTone.frequency - lowerTone.frequency)))+StringUtil.NEWLINE;
         }
         public boolean showOnlyPrimaryDifferenceTone() {
             return onlyPrimaryDifferenceTone.isSelected();
@@ -573,11 +699,42 @@ public class TuningsAndPurityCheckLauncher
             return lowerIntervalTone.getText().toUpperCase();
         }
         
+        // intervals methods
+        
+        public String getIntervalsTitle() {
+            return getDifferenceToneIpnName()+" Intervals";
+        }
+        public String getIntervalHeadingLines(Tone differenceTone) {
+            return getGlobalHeadingLines()+
+                "Tone:       "+differenceTone.ipnName+" ("+differenceTone.formattedFrequency()+")"+StringUtil.NEWLINE;
+        }
+        public String getDifferenceToneIpnName() {
+            return differenceTone.getText().toUpperCase();
+        }
+        public String getNarrowestInterval() {
+            return (String) intervalRange.getNarrowestChoice().getSelectedItem();
+        }
+        public String getWidestInterval() {
+            return (String) intervalRange.getWidestChoice().getSelectedItem();
+        }
+        
+        // privates
+        
+        private String getGlobalHeadingLines() {
+            return 
+                "Tuning:     "+tuning.getChoice(null).getSelectedItem()+StringUtil.NEWLINE+
+                "A4:         "+frequencyOfA4.getValue()+" Hertz"+StringUtil.NEWLINE+
+                "Deviation:  "+deviation.deviationSlider.getValue()+" %"+StringUtil.NEWLINE;
+        }
         
         private JTextField configureToneField(String title, String content) {
-            final JTextField toneField = TextFieldUtil.sizedField(90, title, true);
+            return configureToneField(title, content, 90);
+        }
+        private JTextField configureToneField(String title, String content, int pixelWidth) {
+            final JTextField toneField = TextFieldUtil.sizedField(pixelWidth, title, true);
             toneField.setText(content);
             toneField.addKeyListener(keyListener());
+            toneField.setToolTipText("Use CURSOR-UP and CURSOR-DOWN Keys to Scroll to the Next Available Tone");
             return toneField;
         }
 

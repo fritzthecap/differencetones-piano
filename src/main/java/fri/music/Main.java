@@ -41,6 +41,7 @@ import fri.music.instrument.wave.slider.FrequencyChordSliders;
 import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyChordSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyDifferenceSliders;
+import fri.music.justintonation.swing.HelpForTextDisplay;
 import fri.music.justintonation.swing.TuningsAndPurityCheckLauncher;
 import fri.music.utils.swing.layout.SizeUtil;
 import fri.music.utils.swing.text.HelpWindowSingleton;
@@ -239,7 +240,7 @@ public final class Main
     private JFrame tuningsAndPurityCheckerFrame; // instance-singleton
     
     private Action buildTuningDisplayAndPurityChecker() {
-        final String title = "Text Displays of Tunings, Difference-Tones and Purity Checks";
+        final String title = HelpForTextDisplay.TITLE;
         final Action action = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -247,7 +248,6 @@ public final class Main
                     tuningsAndPurityCheckerFrame = FrameStarter.start(
                             title, 
                             new TuningsAndPurityCheckLauncher().panel);
-                            //new Dimension(940, 600));
                 else
                     tuningsAndPurityCheckerFrame.setVisible(true);
             }
