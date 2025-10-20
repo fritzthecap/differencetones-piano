@@ -55,7 +55,7 @@ public class FrequencyOfA4Component
             
             @Override
             public void stateChanged(ChangeEvent e) {
-                final String value = decimalFormat.format(toDouble(frequencySlider.getValue()));
+                final String value = decimalFormat.format(toDouble(frequencySlider.getValue()))+" Hertz";
                 ((TitledBorder) frequencySlider.getBorder()).setTitle(frequencyOfA4Title+value);
             }
         };
