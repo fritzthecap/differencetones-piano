@@ -33,6 +33,10 @@ public class IntervalRangeComponent
     private JComboBox<String> narrowestIntervalChoice;
     private JComboBox<String> widestIntervalChoice;
 
+    public IntervalRangeComponent() {
+        this(null, null);
+    }
+    
     public IntervalRangeComponent(ActionListener narrowestListener, ActionListener widestListener) {
         this.narrowestIntervalChoice = new SmartComboBox(narrowestIntervalNames);
         narrowestIntervalChoice.setBorder(BorderFactory.createTitledBorder("Narrowest Interval"));
