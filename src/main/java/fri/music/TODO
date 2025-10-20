@@ -1,11 +1,3 @@
- 
- - Erase intervals text also when Melody text gets erased or replaced as a whole.
-    Warning dialog should appear like it does on change of tuning parameters.
- 
-- Configuration and display UI for:
-    - Difference tones in different tunings (DifferenceToneDemo)
-    - Difference tone inversions in different tunings (DifferenceToneInversionsDemo)
-    - Documentations for both.
 
 - Any documentation must reference the Java class of the app it describes.
 
