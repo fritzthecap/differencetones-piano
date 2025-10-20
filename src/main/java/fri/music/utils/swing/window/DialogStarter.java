@@ -131,7 +131,7 @@ public class DialogStarter
             final String dialogTitle = dialog.getTitle();
             if (dialogTitle != null && dialogTitle.trim().length() > 0) { // check for cascading
                 // cut off trailing numbers
-                final String titleWithoutNumber = StringUtil.getUntilFirstNumber(dialogTitle.trim());
+                final String titleWithoutNumber = StringUtil.getUntilLastNumber(dialogTitle.trim());
                 final Point locationForTitle = dialogMap.get(titleWithoutNumber);
                 
                 if (locationForTitle != null) { // cascade window to next point
