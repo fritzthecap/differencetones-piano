@@ -25,6 +25,15 @@ class StringUtilTest
     }
 
     @Test
+    void getWithoutLastNumber() {
+        assertEquals("D#", StringUtil.getUntilLastNumber("D#5"));
+        assertEquals("C", StringUtil.getUntilLastNumber("C10"));
+        assertEquals("2C", StringUtil.getUntilLastNumber("2C"));
+        assertEquals("D6E", StringUtil.getUntilLastNumber("D6E4"));
+        assertEquals("Piano (", StringUtil.getUntilLastNumber("Piano (3)"));
+    }
+
+    @Test
     @Disabled // proof of concept, not a test
     void performance() {
         final String ipnName = "G#6";

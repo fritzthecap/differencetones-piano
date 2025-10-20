@@ -77,5 +77,21 @@ public final class StringUtil
         return sb.toString();
     }
 
+    /**
+     * @param title some name with digits or non-letters at end.
+     * @return the name until last number (will NOT end with digit).
+     */
+    public static String getUntilLastNumber(String title) {
+        boolean foundDigit = false;
+        for (int i = title.length() - 1; i >= 0; i--) {
+            char c = title.charAt(i);
+            if (Character.isDigit(c))
+                foundDigit = true;
+            else if (Character.isLetter(c) || foundDigit)
+                return title.substring(0, i + 1);
+        }
+        return title;
+    }
+    
     private StringUtil() {} // do not instantiate
 }
