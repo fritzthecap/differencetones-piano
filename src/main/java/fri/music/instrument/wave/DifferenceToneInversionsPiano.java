@@ -276,7 +276,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             @Override
             public void tuningChanged(ToneSystem toneSystem) {
                 selectedToneSystem = toneSystem;
-                tuningParametersHaveChanged();
+                tuningParametersHaveChanged(false);
             }
         };
         return new WaveTuningComponent(
@@ -294,7 +294,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         deviationSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                tuningParametersHaveChanged();
+                tuningParametersHaveChanged(deviationSlider.getValueIsAdjusting());
             }
         });
         return deviationComponent;
@@ -354,7 +354,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
         addIntervalRangeActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tuningParametersHaveChanged();
+                tuningParametersHaveChanged(false);
             }
         });
         
@@ -362,7 +362,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
     }
 
     /** Calculated difference-tone inversions are not valid anymore, replace or remove them. */
-    private void tuningParametersHaveChanged() {
+    private void tuningParametersHaveChanged(boolean valueIsAdjusting) {
         this.differenceToneInversions = null; // force new calculation by getDifferenceToneInversions()
         
         for (IntervalListFrame frame : getIntervalListFrames())
@@ -371,7 +371,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
 
         refreshListsContainer();
         
-        if (tuningParametersChangeListener != null)
+        if (tuningParametersChangeListener != null && valueIsAdjusting == false)
             tuningParametersChangeListener.tuningParametersChanged();
     }
     

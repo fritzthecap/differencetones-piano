@@ -1,5 +1,6 @@
 package fri.music.instrument.notespiano.wave;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,7 +10,9 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.text.JTextComponent;
@@ -52,6 +55,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     private JButton autoCompose;
     private JButton generateMelody;
     private JCheckBox writeToIntervalsCheckbox;
+    private Boolean eraseIntervalsText;
     
     public NotesWithDifferenceToneInversionsPianoPlayer(DifferenceToneInversionsPiano piano) {
         super(piano);
@@ -60,16 +64,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             /** When tuning changes, difference-tone intervals are no more valid. */
             @Override
             public void tuningParametersChanged() {
-                if (intervalNotes.notesText.getDocument().getLength() <= 0)
-                    return;
-                int answer = JOptionPane.showConfirmDialog(
-                        intervalNotes.notesText, 
-                        "Changing the Tuning invalidates the Intervals.\nDiscard them?", 
-                        "title", 
-                        JOptionPane.YES_NO_OPTION, 
-                        JOptionPane.WARNING_MESSAGE);
-                if (answer == JOptionPane.YES_OPTION)
-                    intervalNotes.notesText.setText("");
+                askForEraseIntervalsText();
             }
         });
     }
@@ -321,12 +316,55 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             melody = readNotesFromTextAreaCatchExceptions(getPlayController(), melodyView());
         
         if (melody != null) {
-            // open interval chooser lists for all notes of melody
+            // open or close interval chooser lists for all notes of melody
             getDifferenceToneInversionsPiano().manageIntervalListFrames(melody);
+            if (melody.length <= 0)
+                askForEraseIntervalsText();
         }
         return melody;
     }
     
+    private void askForEraseIntervalsText() {
+        if (intervalNotes.notesText.getDocument().getLength() <= 0 || Boolean.FALSE.equals(eraseIntervalsText))
+            return;
+        
+        final boolean doErase;
+        
+        if (Boolean.TRUE.equals(eraseIntervalsText)) {
+            doErase = true;
+        }
+        else {
+            final String messageText = 
+                    "<html>"+
+                    "<p style='width: 240;'>"+
+                    "Erasing the melody or changing tuning parameters invalidates the intervals. "+
+                    "Discard them?</p>"+
+                    "<hr/>"+
+                    "</html>";
+            final JLabel label = new JLabel(messageText);
+            final JPanel panel = new JPanel(new BorderLayout());
+            final JCheckBox rememberAnswer = new JCheckBox("Remember That and Don't Ask Any More", false);
+            panel.add(label, BorderLayout.CENTER);
+            panel.add(rememberAnswer, BorderLayout.SOUTH);
+            final Object message = panel;
+            
+            int answer = JOptionPane.showConfirmDialog(
+                    intervalNotes.notesText, 
+                    message, 
+                    "Confirm Erase Intervals Text", 
+                    JOptionPane.YES_NO_OPTION, 
+                    JOptionPane.WARNING_MESSAGE);
+            
+            doErase = (answer == JOptionPane.YES_OPTION); // dialog has been answered
+            
+            if (rememberAnswer.isSelected())
+                eraseIntervalsText = Boolean.valueOf(doErase);
+        }
+        
+        if (doErase)
+            intervalNotes.notesText.setText("");
+    }
+
     private void autoCompose() {
         final Note[][] melody = manageIntervalListsOnMelodyChange(null);
         
