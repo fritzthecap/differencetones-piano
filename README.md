@@ -8,9 +8,9 @@ To run this __desktop-application__, you need at least [Java 17](https://openjdk
 
     java -jar differenctones-piano-1.0.jar
 
-On WINDOWS it may be possible to run the application by a double click in file-explorer. There are also _run.sh_ and _run.bat_ scripts. Please mind that this application does not read/write anything from/to your file-system (hard-disk), so please save your creative work by using an text-editor (that preserves UNIX newlines).
+On WINDOWS it may be possible to run the application by a double click in file-explorer. There are also _run.sh_ and _run.bat_ scripts. Please mind that this application does not read/write anything from/to your file-system (hard-disk), so please save your creative work by using a text-editor of your choice (that preserves UNIX newlines).
 
-This project is a Maven 3.6 / Java 21 project (minimum Java 17), developed on LINUX 6.8.0. Integration into Eclipse or any other IDE should be easy, there are no external dependencies except junit-jupiter 6 in test-scope.
+This project is a Maven 3.6 / Java 21 project (minimum Java 17), developed on LINUX 6.8.0 with Eclipse 2024-09. Integration into any IDE should be easy, there are no external dependencies except junit-jupiter 6 in test-scope.
 
 Here are some screenshots:
 
@@ -24,3 +24,4 @@ Here are some screenshots:
 
 <img width="1206" height="733" alt="Compose_Difference-Tone_Intervals" src="https://github.com/user-attachments/assets/d2d505eb-5934-496e-9a91-2582da4a4daf" />
 
+<img width="592" height="482" alt="theater-moiree_cover" src="https://github.com/user-attachments/assets/ffa3752d-51ea-4f04-96b2-e644a98ed002" />
