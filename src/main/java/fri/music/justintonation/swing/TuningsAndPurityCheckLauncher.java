@@ -51,6 +51,13 @@ import fri.music.utils.swing.window.DialogStarter;
 /**
  * UI for checking the purity of fraction-based tunings
  * with ConfigurationPanel.
+ * <p/>
+ * TODO: this class goes beyond justintonation and 
+ *  thus is in the wrong package. Mind that you
+ *  have to move also HelpForTextDisplay.java and
+ *  HelpForTextDisplay.html to its new package, and then
+ *  adjust all "justintonation/swing/HelpForTextDisplay.html" 
+ *  relative paths in all HTML documentations!
  */
 public class TuningsAndPurityCheckLauncher
 {
@@ -614,8 +621,8 @@ public class TuningsAndPurityCheckLauncher
             differenceTonesPanel.setLayout(new BoxLayout(differenceTonesPanel, BoxLayout.Y_AXIS));
             differenceTonesPanel.setBorder(BorderUtil.titledBorder("Difference-Tones of Interval", 4f, 3));
             
-            this.lowerIntervalTone = configureToneField("Lower Tone", "C6");
-            this.upperIntervalTone = configureToneField("Upper Tone", "D6");
+            this.lowerIntervalTone = configureToneField("Tone 1", "C6");
+            this.upperIntervalTone = configureToneField("Tone 2", "D6");
             final JPanel textFieldsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             textFieldsPanel.add(lowerIntervalTone);
             textFieldsPanel.add(upperIntervalTone);

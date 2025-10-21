@@ -104,23 +104,4 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
         
         this.tuningComponent = new TuningComponent(lowestToneIpnName, octavesParam);
     }
-
-    
-    /*public static void main(String[] args) {
-        final ToneSystemConfigurationPanel config = new ToneSystemConfigurationPanel(5, "D", 3, 435.6, "A");
-        final javax.swing.JButton button = new javax.swing.JButton("Print Settings");
-        button.addActionListener(event -> {
-            System.out.println(
-                    "Octaves = "+config.getOctaves()+", "+
-                    "FrequencyOfA4 = "+config.getFrequencyOfA4()+", "+
-                    "LowestToneIpnName = "+config.getLowestToneIpnName()+", "+
-                    "ModalScaleStartIpnName = "+config.getModalScaleStartIpnName()+", "+
-                    "ToneSystem = \n"+config.getToneSystem()
-                );
-        });
-        final JPanel app = new JPanel(new java.awt.BorderLayout());
-        app.add(config.panel);
-        app.add(button, java.awt.BorderLayout.SOUTH);
-        fri.music.swingutils.window.FrameStarter.start("Tonesystem Settings Test", app, (java.awt.Dimension) null);
-    }*/
 }
