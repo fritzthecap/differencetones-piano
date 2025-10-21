@@ -4,7 +4,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import fri.music.justintonation.swing.TuningsAndPurityCheckLauncher;
+import fri.music.instrument.configuration.TuningsAndPurityCheckLauncher;
 
 public class JustIntonationCheckerConfigurationDemo
 {

@@ -1,4 +1,4 @@
-package fri.music.justintonation.swing;
+package fri.music.instrument.configuration;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -35,10 +35,10 @@ import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.TuningComponent;
-import fri.music.instrument.configuration.FrequencyOfA4Component;
-import fri.music.instrument.configuration.ToneSystemConfigurationPanel;
 import fri.music.instrument.wave.DeviationComponent;
 import fri.music.instrument.wave.IntervalRangeComponent;
+import fri.music.justintonation.swing.HelpForJustIntonationChecker;
+import fri.music.justintonation.swing.PurityCheckConfigurationPanel;
 import fri.music.utils.StringUtil;
 import fri.music.utils.swing.BorderUtil;
 import fri.music.utils.swing.layout.SmartComboBox;

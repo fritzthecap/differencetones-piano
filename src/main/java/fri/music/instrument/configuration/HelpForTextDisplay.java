@@ -1,4 +1,4 @@
-package fri.music.justintonation.swing;
+package fri.music.instrument.configuration;
 
 import java.net.URL;
 import fri.music.HtmlResources;

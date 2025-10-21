@@ -20,8 +20,10 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
-import fri.music.instrument.configuration.ConfiguredPianoFactoryStart;
+import fri.music.instrument.configuration.ConfiguredPianoFactoryLauncher;
+import fri.music.instrument.configuration.HelpForTextDisplay;
 import fri.music.instrument.configuration.PianoConfigurationPanel;
+import fri.music.instrument.configuration.TuningsAndPurityCheckLauncher;
 import fri.music.instrument.notespiano.HelpForNotes;
 import fri.music.instrument.notespiano.NoteExamples;
 import fri.music.instrument.notespiano.NotesPianoPlayer;
@@ -41,8 +43,6 @@ import fri.music.instrument.wave.slider.FrequencyChordSliders;
 import fri.music.instrument.wave.slider.FrequencyDifferenceSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyChordSliders;
 import fri.music.instrument.wave.slider.HelpForFrequencyDifferenceSliders;
-import fri.music.justintonation.swing.HelpForTextDisplay;
-import fri.music.justintonation.swing.TuningsAndPurityCheckLauncher;
 import fri.music.utils.swing.layout.SizeUtil;
 import fri.music.utils.swing.text.HelpWindowSingleton;
 import fri.music.utils.swing.text.HtmlBrowser;
@@ -380,7 +380,7 @@ public final class Main
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (configuredPianoFactoryFrame == null)
-                        configuredPianoFactoryFrame = new ConfiguredPianoFactoryStart(moreLauncherFrame).frame;
+                        configuredPianoFactoryFrame = new ConfiguredPianoFactoryLauncher(moreLauncherFrame).frame;
                     else
                         configuredPianoFactoryFrame.setVisible(true);
                 }

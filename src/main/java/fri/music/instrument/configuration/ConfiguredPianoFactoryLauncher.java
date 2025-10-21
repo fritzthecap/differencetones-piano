@@ -1,11 +1,9 @@
 package fri.music.instrument.configuration;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -19,14 +17,14 @@ import fri.music.utils.swing.window.WindowClosingManager;
 /**
  * The piano configuration API showcase.
  */
-public class ConfiguredPianoFactoryStart
+public class ConfiguredPianoFactoryLauncher
 {
     public final JFrame frame;
     
     private final WindowClosingManager closeListener;
     private int numberOfPianos;
     
-    public ConfiguredPianoFactoryStart(JFrame parentFrame) {
+    public ConfiguredPianoFactoryLauncher(JFrame parentFrame) {
         final ConfiguredPianoFactory configuredPianoFactory = new ConfiguredPianoFactory();
         
         this.closeListener = new WindowClosingManager();

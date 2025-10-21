@@ -2,21 +2,30 @@
 <head></head>
 <body>
 
-<h1 id="Overview">Listen to Auto-Composed Difference-Tone Intervals for Notes</h1>
+<h1 id="Overview">Listen to Auto-Composed Difference-Tone Intervals for a Melody</h1>
 
 <p>
     In this application you can enter a melody and then click "Play"
-    to hear it as auto-composed difference-tone intervals.
+    to hear it played by auto-composed difference-tone intervals.
     That means, playing the melody will not play the notes in text-area but
     intervals that have been generated for these notes.
+</p><p>
+    If you want to the piano write into the text-area, you need to have the
+    "Write Notes" checkbox activated. 
+    For handling of the left-side player and the text-area
+    please see the <a href="instrument/notespiano/HelpForNotes.html">Write Notes"</a> documentation.
+</p><p>
+    This player has an additional "Play Difference Tones" checkbox below the player buttons.
+    If you deactivate it, you will hear the monophonic melody in text-area. 
+    If you activate it, you will hear auto-composed difference-tone intervals for that melody.
 </p>
 
 <h2 id="AutoCompose">Auto-Compose Rules</h2>
 <p>
-    Now this is something I can't really document, because I am still thinking about it,
+    I actually can't document these rules, because I am still thinking about it,
     and may be thinking about it even in a year.
     The game is to find a good interval progression that is a counter-movement to the melody,
-    but without sounding completely absurd. 
+    but without sounding completely absurd and strange. 
 </p><p>
     For this I implemented a strategy-pattern containing a number of rules,
     but it does not work good for all melodies. 
