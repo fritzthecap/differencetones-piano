@@ -1,1 +1,1 @@
-java -jar differencetones-piano-1.0.0.jar
+java -jar differencetones-piano-1.0.jar
