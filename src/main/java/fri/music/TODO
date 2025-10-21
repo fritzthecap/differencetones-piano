@@ -15,6 +15,9 @@
 
 Fixed Bugs:
 
+ - Bug: NotesTextArea, Ctrl-Z and Ctrl-Y do not Undo/Redo but both magnify the font.
+    DONE: the unique identifier was "magnifyFont", that was a KeyStrokeUtil refactoring mistake.
+
  - Bug: FrequencyDifferenceToneSliders, edit D6 to D#6, the slider moves,
     remove the '#' to set back to D6, the slider doesn't move!
     DONE: fixed by also reacting on DELETE and BACKSPACE to move slider.

@@ -153,7 +153,7 @@ public class TextAreaActions extends FontActions
         KeyStrokeUtil.install(
                 textComponent, 
                 JComponent.WHEN_FOCUSED,
-                "magnifyFont", 
+                "undoAction", 
                 KeyEvent.VK_Z,
                 InputEvent.CTRL_DOWN_MASK,
                 undo);
@@ -168,7 +168,7 @@ public class TextAreaActions extends FontActions
         KeyStrokeUtil.install(
                 textComponent, 
                 JComponent.WHEN_FOCUSED,
-                "magnifyFont", 
+                "redoAction", 
                 KeyEvent.VK_Y,
                 InputEvent.CTRL_DOWN_MASK,
                 redo);
