@@ -8,7 +8,9 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Properties;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -62,9 +64,10 @@ public final class Main
     
     /** Application starter.*/
     public static void main(String[] args) {
+        final String version = readVersionFromMavenPomProperties();
         SwingUtilities.invokeLater(() -> {
             final JFrame mainFrame = FrameStarter.start(
-                    "Welcome to the World of Difference-Tones!",
+                    "Welcome to the World of Difference-Tones "+version,
                     new Main().panel,
                     new Dimension(1040, 700));
             // let apps start screen-centered instead of cascaded to mainFrame
@@ -72,7 +75,20 @@ public final class Main
         });
     }
     
-    
+    private static String readVersionFromMavenPomProperties() {
+        final String path = "/META-INF/maven/fri.music/differencetones-piano/pom.properties";
+        final Properties mavenPomProperties = new Properties();
+        try {
+            mavenPomProperties.load(Main.class.getResourceAsStream(path));
+            return mavenPomProperties.getProperty("version");
+        }
+        catch (Throwable e) {
+            e.printStackTrace();
+            return "!";
+        }
+    }
+
+
     private final JPanel panel = new JPanel(new BorderLayout());
     
     private Main() {
