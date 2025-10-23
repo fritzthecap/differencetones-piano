@@ -46,8 +46,8 @@ An ABC export example:
 </div>
 
 <p/>
-The application logo:
+The application main window:
 
 <div align="center">
-  <img width="592" height="482" alt="theater-moiree_cover" src="https://github.com/user-attachments/assets/ffa3752d-51ea-4f04-96b2-e644a98ed002" />
+<img width="1040" height="700" alt="DifferenceTonesPiano_MainWindow" src="https://github.com/user-attachments/assets/8523eded-8237-426b-a828-3e7d29fec16c" />
 </div>
