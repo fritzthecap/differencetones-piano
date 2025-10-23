@@ -17,7 +17,8 @@ import javax.swing.text.html.StyleSheet;
 /**
  * JEditorPane bug fix concerning URLs with "ref".
  * This view is HTML only, no RTF or other.
- * For CSS see <code>HtmlView.css</code> in <code>src/main/resources</code>.
+ * Please do NOT rename this class unless you also rename 
+ * <code>HtmlView.css</code> in <code>src/main/resources</code>.
  */
 public class HtmlView extends JEditorPane
 {
