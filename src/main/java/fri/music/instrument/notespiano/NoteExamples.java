@@ -91,6 +91,19 @@ F4/4 F4/4 G4/4 A4/4
 G4/4. F4/8 F4/2
 """);
     
+    Melody TURKISH_MARCH = new Melody("Turkish March", true, """
+180
+-/2 B5/8 A5/8 G#5/8 A5/8
+C6/2 D6/8 C6/8 B5/8 C6/8
+E6/2 F6/8 E6/8 D#6/8 E6/8
+B6/8 A6/8 G#6/8 A6/8 B6/8 A6/8 G#6/8 A6/8
+C7/2 A6/4 C7/4
+G6/32 A6/32 B6/8. A6/4 G6/4 A6/4
+G6/32 A6/32 B6/8. A6/4 G6/4 A6/4
+G6/32 A6/32 B6/8. A6/4 G6/4 F#6/4
+E6/2
+""");
+    
     Melody WEDDING_MARCH = new Melody("Wedding March", true, """
 100
 4/4
@@ -145,6 +158,7 @@ G4 D4 G3/2
             AUGUSTIN,
             WHEN_THE_SAINTS,
             ODE_TO_JOY,
+            TURKISH_MARCH,
             WEDDING_MARCH,
             MARSEILLAISE,
             BLUES
