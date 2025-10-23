@@ -2,9 +2,11 @@
 Equal temperament, just intonation, screen pianos, frequency sliders, wave generators - an educational Java/Swing project for musicians interested in difference tones. It also offers a new way for harmonising melodies, including export to ABC notation from where you can print traditional music scores.
 
 The documentation is also available inside the application, read it online at 
-- [src/main/resources/fri/music/introduction.html](https://html-preview.github.io/?url=https://github.com/fritzthecap/differencetones-piano/blob/main/src/main/resources/fri/music/introduction.html).
+- [src/main/resources/fri/music/introduction.html](https://html-preview.github.io/?url=https://github.com/fritzthecap/differencetones-piano/blob/main/src/main/resources/fri/music/introduction.html)
 
-To run this __desktop-application__, you need at least [Java 17](https://openjdk.org/projects/jdk/17/) or better [Java 21](https://openjdk.org/projects/jdk/21/) installed on your computer. Java virtual machines are freely available as "Open Java", the JRE (runtime-environment) is enough, don't need JDK (development kit) unless you want to write new code. Check that the executable interpreter (java.exe or java) is in the execution PATH of your computer. Run "java --version" to check your installed Java version. Then download the __differencetones-piano-1.0.jar__ file to your computer and launch the application via
+(Please mind that this was written for the internal document viewer and some links may not work in web.browsers!)
+
+To run the _differencetones-piano_ __desktop-application__, you need at least [Java 17](https://openjdk.org/projects/jdk/17/) or better [Java 21](https://openjdk.org/projects/jdk/21/) installed on your computer. Java virtual machines are freely available as "Open Java", the JRE (runtime-environment) is enough, don't need JDK (development kit) unless you want to write new code. Check that the executable interpreter (java.exe or java) is in the execution PATH of your computer. Run "java --version" to check your installed Java version. Then download the __differencetones-piano-1.0.jar__ file to your computer and launch the application via
 
     java -jar differenctones-piano-1.0.jar
 
