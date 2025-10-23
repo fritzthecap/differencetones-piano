@@ -49,5 +49,8 @@ An ABC export example:
 The application main window:
 
 <div align="center">
-<img width="1040" height="700" alt="DifferenceTonesPiano_MainWindow" src="https://github.com/user-attachments/assets/8523eded-8237-426b-a828-3e7d29fec16c" />
+<img width="1040" height="700" alt="DifferenceTonesPiano_MainWindow" src="https://github.com/user-attachments/assets/cef339b4-15d8-4024-a9f5-35a7a3b99935" />
 </div>
+
+
+
