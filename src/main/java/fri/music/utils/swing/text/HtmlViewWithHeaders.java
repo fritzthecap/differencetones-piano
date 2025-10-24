@@ -26,7 +26,7 @@ public class HtmlViewWithHeaders extends HtmlView
             final StringBuilder sb = new StringBuilder();
             for (int i = 1; i < level; i++)
                 sb.append("      ");
-            sb.append(textContent());
+            sb.append(textContent);
             return sb.toString();
         }
     }
@@ -131,7 +131,7 @@ public class HtmlViewWithHeaders extends HtmlView
         final String hyperlink = getTag(element, HTML.Tag.A);
         if (hyperlink == null)
             return null;
-        return hyperlink.substring(hyperlink.indexOf('=') + 1); // "href=#apps"
+        return hyperlink.substring(hyperlink.indexOf('=') + 1); // get "#apps" from "href=#apps"
     }
 
     private String getTag(Element element, HTML.Tag tag) throws BadLocationException {
@@ -162,12 +162,13 @@ public class HtmlViewWithHeaders extends HtmlView
           name.equals(HTML.Tag.H6.toString());
     }
 
+    /** @return just the first non-empty text of given element. */
     private String getText(HTMLDocument document, Element element) throws BadLocationException {
-        StringBuilder all = new StringBuilder();
-        for (int i = 0; all.length() <= 0 && i < element.getElementCount(); i++) { // take just first non-empty element
-            Element child = element.getElement(i);
-            int start = child.getStartOffset();
-            int end = child.getEndOffset();
+        final StringBuilder all = new StringBuilder();
+        for (int i = 0; all.length() <= 0 && i < element.getElementCount(); i++) {
+            final Element child = element.getElement(i);
+            final int start = child.getStartOffset();
+            final int end = child.getEndOffset();
             if (start < end) {
                 String content = document.getText(start, end - start);
                 all.append(content);

@@ -43,15 +43,15 @@ public class HtmlBrowserBase extends JPanel implements HyperlinkListener
 
     /** Called when user hovers or clicks a hyperlink in HTML-document. */
     @Override
-    public void hyperlinkUpdate(HyperlinkEvent event) {
+    public final void hyperlinkUpdate(HyperlinkEvent event) {
         final URL url = event.getURL();
         final String protocol = url.getProtocol();
         
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
-            if (protocol.startsWith("http")) // open hyperlink in external browser
-                gotoExternalHyperlink(url);
+            if (protocol.startsWith("http"))
+                gotoExternalHyperlink(url); // open in external HTML-browser
             else
-                gotoInternalHyperlink(url); // go to this page
+                gotoInternalHyperlink(url); // open in this HTML-browser
         else if (event.getEventType() == HyperlinkEvent.EventType.ENTERED)
             htmlView.setToolTipText(url.toExternalForm());
         else if (event.getEventType() == HyperlinkEvent.EventType.EXITED)

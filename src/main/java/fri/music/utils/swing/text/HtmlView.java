@@ -18,7 +18,7 @@ import javax.swing.text.html.StyleSheet;
  * JEditorPane bug fix concerning URLs with "ref".
  * This view is HTML only, no RTF or other.
  * Please do NOT rename this class unless you also rename 
- * <code>HtmlView.css</code> in <code>src/main/resources</code>.
+ * <code>HtmlView.css</code> in <code>src/main/resources/fri/music/utils/swing/text</code>.
  */
 public class HtmlView extends JEditorPane
 {
