@@ -29,25 +29,25 @@ To run the _differencetones-piano_ __desktop-application__, you need at least [J
 
 On some operating-systems it may be possible to run the application by a double click in some file-explorer. There are also _run.sh_ and _run.bat_ platform scripts. Mind that this application __does not read/write anything from/to your file-system__ (hard-disk), so please __save your creative work__ by using the text-editor of your choice (that should preserve UNIX-newlines).
 
-## Developer Info
+## Development
 
 This is a _Maven 3.6 / Java 21_ project (minimum _Java 17_), developed with _Eclipse 2024-09_. Integration into any Java-able IDE should be easy, there are no external dependencies except _junit-jupiter 6_ in _test_ scope.
 
 ## Screenshots
 
-### Displaying and playing difference-tones for intervals in various tunings:
+### Rendering and playing difference-tones for intervals in various tunings:
 
 <img width="1203" height="205" alt="Difference-Tones_Piano" src="https://github.com/user-attachments/assets/85f62dba-13df-4cfb-bc00-387cfeaa2634" />
 
 ----
 
-### A screen piano configured with the Java synthesizer: 
+### A screen piano configured with the Java built-in synthesizer: 
 
 ![MidiSynthesizer](https://github.com/user-attachments/assets/950eee6e-7b08-49ba-b56f-7284aece1320)
 
 ----
 
-### Frequency sliders with 4 Cent precision for perceiving stepless difference tones:
+### Frequency sliders with 4 Cent precision for perceiving stepless difference-tones:
 
 ![FrequencySliders](https://github.com/user-attachments/assets/22a1dcb5-e046-4a06-a44e-6e9e2b192cff)
 
@@ -67,7 +67,7 @@ This is a _Maven 3.6 / Java 21_ project (minimum _Java 17_), developed with _Ecl
 
 ----
 
-### The application main window:
+### The application's main-window:
 
 <div align="center">
 <img width="1040" height="700" alt="DifferenceTonesPiano_MainWindow" src="https://github.com/user-attachments/assets/cef339b4-15d8-4024-a9f5-35a7a3b99935" />
