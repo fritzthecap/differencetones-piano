@@ -1,4 +1,4 @@
-# differencetones-piano
+# DifferenceTones-Piano
 
 ![Static Badge](https://img.shields.io/badge/Topic-Music-green)
 ![Static Badge](https://img.shields.io/badge/Type-Desktop_App-blue)
