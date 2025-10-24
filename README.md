@@ -6,6 +6,8 @@
 
 ![Static Badge](https://img.shields.io/badge/Language-Java_17-orange)
 ![Static Badge](https://img.shields.io/badge/UI_System-Swing-orange)
+![Static Badge](https://img.shields.io/badge/JAR_Size-2.15_MB-orange)
+![Static Badge](https://img.shields.io/badge/Dependency_Hell-None-orange)
 
 Equal temperament, just intonation, screen pianos, frequency sliders, wave generators - an educational Java/Swing project for musicians interested in difference-tones. It also offers a new way for harmonising melodies, including export to ABC notation from where you can print traditional music scores.
 
