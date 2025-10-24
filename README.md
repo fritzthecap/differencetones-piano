@@ -1,13 +1,17 @@
 # DifferenceTones-Piano
 
-![Static Badge](https://img.shields.io/badge/Topic-Music-green?link=https://en.wikipedia.org/wiki/Music)
+![Static Badge](https://img.shields.io/badge/Topic-Music-blue?link=https://en.wikipedia.org/wiki/Music)
 ![Static Badge](https://img.shields.io/badge/Type-Desktop_App-blue?link=https://en.wikipedia.org/wiki/Desktop_computer)
-![Static Badge](https://img.shields.io/badge/License-MIT-yellow?link=https://github.com/fritzthecap/differencetones-piano/?tab=MIT-1-ov-file#readme)
+![Static Badge](https://img.shields.io/badge/Language-Java_17-darkgreen?link=https://openjdk.org/)
+![Static Badge](https://img.shields.io/badge/UI_System-Swing-darkgreen?link=https://docs.oracle.com/javase/tutorial/uiswing/index.html)
+![Static Badge](https://img.shields.io/badge/Application_JAR-2.15_MB-darkgreen)
 
-![Static Badge](https://img.shields.io/badge/Language-Java_17-orange?link=https://openjdk.org/)
-![Static Badge](https://img.shields.io/badge/UI_System-Swing-orange?link=https://docs.oracle.com/javase/tutorial/uiswing/index.html)
-![Static Badge](https://img.shields.io/badge/JAR_Size-2.15_MB-orange?link=)
-![Static Badge](https://img.shields.io/badge/Dependency_Hell-None-orange?link=)
+![Static Badge](https://img.shields.io/github/license/fritzthecap/differencetones-piano?color=pink)
+![GitHub Created At](https://img.shields.io/github/created-at/fritzthecap/differencetones-piano?color=pink)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/fritzthecap/differencetones-piano?color=pink)
+![GitHub repo size](https://img.shields.io/github/repo-size/fritzthecap/differencetones-piano?color=pink)
+![GitHub last commit](https://img.shields.io/github/last-commit/fritzthecap/differencetones-piano?color=pink)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/fritzthecap/differencetones-piano/total?color=pink)
 
 Equal temperament, just intonation, screen pianos, frequency sliders, wave generators - an educational Java/Swing project for musicians interested in difference-tones. It also offers a new way for harmonising melodies, including export to ABC notation from where you can print traditional music scores.
 
