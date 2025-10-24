@@ -8,7 +8,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 import javax.swing.AbstractAction;
@@ -99,7 +98,7 @@ public final class Main
 
     private HtmlBrowser buildHtmlBrowser() {
         final URL url = HtmlResources.class.getResource("introduction.html");
-        return new HtmlBrowser(url, HtmlResources.class);
+        return new HtmlBrowser(url);
     }
 
     private JComponent buildLeftButtons() {

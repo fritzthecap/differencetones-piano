@@ -155,7 +155,7 @@ public class DialogStarter
      * @return a scroll-able navigation-able panel containing given HTML resource.
      */
     private static JComponent buildHtmlView(URL htmlUrl) {
-        return new HtmlBrowser(htmlUrl, HtmlResources.class);
+        return new HtmlBrowser(htmlUrl);
     }
 
     /**

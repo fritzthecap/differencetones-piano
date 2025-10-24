@@ -5,6 +5,9 @@ import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +41,9 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
         }
     };
     
-    /**
-     * @param url required, the initial URL to load.
-     * @param htmlResourcesClass optional, a class that is the resource-loader
-     *      for all HTML resources, will be this class when null.
-     */
-    public HtmlBrowser(URL url, Class<?> htmlResourcesClass) {
-        super(url, htmlResourcesClass);
+    /** @param url required, the initial URL to load. */
+    public HtmlBrowser(URL url) {
+        super(url);
         
         this.toolbar = new HtmlBrowserToolbar(this, referenceItemListener); // navigation bar
         history.add(url);
@@ -122,7 +121,7 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
         htmlViewActions.updateFontSizes(htmlView); // may have been altered by another view
     }
 
-    /** Called when hyperlink clicked, not on navigation. */
+    /** Called on internal hyperlink click, not on navigation via "Back" and "Forward". */
     @Override
     protected void manageHistory(URL url) {
         if (canGoForward()) // navigating forward while different forward path exists, remove it
@@ -136,42 +135,39 @@ public class HtmlBrowser extends HtmlBrowserBase implements HtmlViewWithHeaders.
     }
 
 
+    private void gotoCurrentIndex() {
+        gotoUrl(history.get(currentHistoryIndex));
+    }
+    
+    /** Called when a header (h1-h6) is selected in combo-box on top. */
     private void gotoAnchorReference(String id, int startOffset) {
         if (id != null)
             gotoAnchorReference(id);
-        else
+        else // forgot to give the header an id?
             ((HtmlView) htmlView).scrollToStartOffset(startOffset);
     }
+    
+    private void gotoAnchorReference(String anchorRef) {
+        htmlView.scrollToReference(anchorRef);
+        manageHistory(toUrl(anchorRef));
+    }
+    
+    private final URL toUrl(String anchorRef) {
+        final String urlString = htmlView.getPage().toExternalForm();
+        final int hashIndex = urlString.indexOf('#');
+        final String baseUrl = (hashIndex >= 0) ? urlString.substring(0, hashIndex) : urlString;
+        try {
+            return new URI(baseUrl+"#"+anchorRef).toURL();
+        }
+        catch (MalformedURLException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     
     private Component newJMenuItem(Action action) {
         final JMenuItem item = new JMenuItem(action);
         item.setText((String) action.getValue(HtmlBrowserToolbar.MENU_ACTION_LABEL));
         return item;
     }
-
-    private void gotoCurrentIndex() {
-        gotoUrl(history.get(currentHistoryIndex));
-    }
-    
-   
-    /*public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            final Class<?> htmlResourcesClass = HtmlBrowser.class;
-            final URL url = htmlResourcesClass.getResource("mainBrowseTest.html");
-            try {
-                final URL urlWithRef = new java.net.URI(url.toExternalForm()+"#Three").toURL();
-                final HtmlBrowser htmlBrowser = new HtmlBrowser(urlWithRef, htmlResourcesClass);
-                
-                final javax.swing.JFrame frame = new javax.swing.JFrame("HTML Browse Test");
-                frame.getContentPane().add(htmlBrowser);
-                frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-                frame.setSize(new java.awt.Dimension(600, 400));
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-            catch (java.net.MalformedURLException | java.net.URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }*/
 }

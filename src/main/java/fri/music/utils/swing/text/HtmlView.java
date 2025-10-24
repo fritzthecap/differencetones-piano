@@ -67,14 +67,18 @@ public class HtmlView extends JEditorPane
     }
     
     /** Scrolls to an element's startOffset. */
-    public void scrollToStartOffset(int startOffset) {
+    public void scrollToStartOffset(int elementStartOffset) {
         try {
-            final Rectangle viewRectangle = (Rectangle) modelToView2D(startOffset);
-            if (viewRectangle != null) {
+            final Rectangle elementRectangle = (Rectangle) modelToView2D(elementStartOffset);
+            if (elementRectangle != null) {
                 final Rectangle visibleRectangle = getVisibleRect();
-                viewRectangle.height = visibleRectangle.height;
-                scrollRectToVisible(viewRectangle);
-                setCaretPosition(startOffset);
+                final Rectangle scrollToRectangle = new Rectangle(
+                        0,
+                        elementRectangle.y,
+                        visibleRectangle.width,
+                        visibleRectangle.height);
+                // seems to be necessary to defer the scroll to make it work
+                SwingUtilities.invokeLater(() -> scrollRectToVisible(scrollToRectangle));
             }
         }
         catch (BadLocationException e) {

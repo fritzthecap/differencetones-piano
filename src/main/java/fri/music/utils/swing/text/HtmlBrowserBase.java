@@ -3,9 +3,6 @@ package fri.music.utils.swing.text;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -26,17 +23,10 @@ public class HtmlBrowserBase extends JPanel implements HyperlinkListener
     protected final JEditorPane htmlView;
     protected final HtmlViewActions htmlViewActions;
     
-    private final Class<?> htmlResourcesClass;
-    
-    /**
-     * @param url required, the initial URL to load.
-     * @param htmlResourcesClass optional, a class that is the resource-loader
-     *      for all HTML resources, will be this class when null.
-     */
-    public HtmlBrowserBase(URL url, Class<?> htmlResourcesClass) {
+    /** @param url required, the initial URL to load. */
+    public HtmlBrowserBase(URL url) {
         super(new BorderLayout());
         
-        this.htmlResourcesClass = (htmlResourcesClass != null) ? htmlResourcesClass : this.getClass();
         this.htmlView = newHtmlView(url);
         
         htmlView.addHyperlinkListener(this);
@@ -54,47 +44,21 @@ public class HtmlBrowserBase extends JPanel implements HyperlinkListener
     /** Called when user hovers or clicks a hyperlink in HTML-document. */
     @Override
     public void hyperlinkUpdate(HyperlinkEvent event) {
-        final String linkDescription = event.getDescription();
-        final String[] fileAndReference = splitFileAndReference(linkDescription);
-        final String file = fileAndReference[0];
-        final String anchorRef = fileAndReference[1];
-        final boolean hasAnchorRef = (anchorRef.length() > 0);
+        final URL url = event.getURL();
+        final String protocol = url.getProtocol();
         
-        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            if (file.length() <= 0 && hasAnchorRef) { // url is an anchor-reference, stay on page
-                gotoAnchorReference(anchorRef);
-            }
-            else if (file.startsWith("http")) { // open hyperlink in external browser
-                gotoExternalHyperlink(linkDescription);
-            }
-            else {
-                final URL gotoUrl = htmlResourcesClass.getResource(file);
-                // mind that all links must be relative to htmlResourcesClass for this to work!
-                final URL gotoUrlWithRef = (hasAnchorRef && gotoUrl != null)
-                        ? toUrl(gotoUrl, anchorRef)
-                        : gotoUrl;
-                gotoInternalHyperlink(gotoUrlWithRef, file);
-            }
-        }
-        else if (event.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-            htmlView.setToolTipText(linkDescription);
-        }
-        else if (event.getEventType() == HyperlinkEvent.EventType.EXITED) {
+        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+            if (protocol.startsWith("http")) // open hyperlink in external browser
+                gotoExternalHyperlink(url);
+            else
+                gotoInternalHyperlink(url); // go to this page
+        else if (event.getEventType() == HyperlinkEvent.EventType.ENTERED)
+            htmlView.setToolTipText(url.toExternalForm());
+        else if (event.getEventType() == HyperlinkEvent.EventType.EXITED)
             htmlView.setToolTipText(null);
-        }
     }
 
-    /** Called on hyperlink click, does nothing, to be overridden by history manager (navigator). */
-    protected void manageHistory(URL url) {
-    }
-    
-    /** Called on hyperlink click onto an anchor-reference, or navigation via header list. */
-    protected void gotoAnchorReference(String anchorRef) {
-        htmlView.scrollToReference(anchorRef);
-        manageHistory(toUrl(null, anchorRef));
-    }
-    
-    /** Called on internal (relative) hyperlink click. */
+    /** Called on internal hyperlink click, sets a new page. */
     protected final void gotoUrl(URL url) {
         try {
             htmlView.setPage(url);
@@ -104,44 +68,22 @@ public class HtmlBrowserBase extends JPanel implements HyperlinkListener
         }
     }
     
-    private void gotoInternalHyperlink(URL url, String relativeFileName) {
-        if (url != null) {
-            gotoUrl(url);
-            manageHistory(url);
-        }
-        else
-            System.err.println("URL is not resolvable from "+htmlResourcesClass.getName()+": "+relativeFileName);
+    /** Called on internal hyperlink click, does nothing, to be overridden by history manager (navigator). */
+    protected void manageHistory(URL url) {
     }
     
-    private void gotoExternalHyperlink(String link) {
+    
+    private void gotoExternalHyperlink(URL url) {
         try {
-            Desktop.getDesktop().browse(URI.create(link));
+            Desktop.getDesktop().browse(url.toURI());
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace(); // may happen in environments that do not support Java/Swing Desktop
         }
     }
 
-    private final URL toUrl(URL url, String anchorRef) {
-        if (anchorRef == null)
-            return url;
-        
-        try {
-            final String externalForm = (url == null)
-                ? splitFileAndReference(htmlView.getPage().toString())[0]
-                : url.toExternalForm();
-            
-            return new URI(externalForm+"#"+anchorRef).toURL();
-        }
-        catch (MalformedURLException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String[] splitFileAndReference(String url) {
-        final int hashIndex = url.indexOf('#');
-        final String reference = (hashIndex >= 0) ? url.substring(hashIndex + 1) : "";
-        final String filename = (hashIndex >= 0) ? url.substring(0, hashIndex) : url;
-        return new String[] { filename, reference };
+    private void gotoInternalHyperlink(URL url) {
+        gotoUrl(url);
+        manageHistory(url);
     }
 }
