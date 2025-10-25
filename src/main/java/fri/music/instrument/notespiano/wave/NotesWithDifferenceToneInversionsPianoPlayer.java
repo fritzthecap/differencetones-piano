@@ -1,6 +1,5 @@
 package fri.music.instrument.notespiano.wave;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,9 +9,6 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.text.JTextComponent;
@@ -41,6 +37,7 @@ import fri.music.utils.swing.BorderUtil;
 import fri.music.utils.swing.layout.ToolBarUtil;
 import fri.music.utils.swing.text.HelpWindowSingleton;
 import fri.music.utils.swing.text.TextAreaUtil;
+import fri.music.utils.swing.window.DoNotAskAnymoreConfirmDialog;
 
 /**
  * The most complex view of this project.
@@ -55,7 +52,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     private JButton autoCompose;
     private JButton generateMelody;
     private JCheckBox writeToIntervalsCheckbox;
-    private Boolean eraseIntervalsText;
+    private DoNotAskAnymoreConfirmDialog eraseIntervalsConfirmDialog;
     
     public NotesWithDifferenceToneInversionsPianoPlayer(DifferenceToneInversionsPiano piano) {
         super(piano);
@@ -315,53 +312,27 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         if (melody == null)
             melody = readNotesFromTextAreaCatchExceptions(getPlayController(), melodyView());
         
-        if (melody != null) {
+        if (melody != null) { // no notes syntax error
             // open or close interval chooser lists for all notes of melody
             getDifferenceToneInversionsPiano().manageIntervalListFrames(melody);
-            if (melody.length <= 0)
+            
+            if (melody.length <= 0) // no error but empty
                 askForEraseIntervalsText();
         }
         return melody;
     }
     
     private void askForEraseIntervalsText() {
-        if (intervalNotes.notesText.getDocument().getLength() <= 0 || Boolean.FALSE.equals(eraseIntervalsText))
+        if (intervalNotes.notesText.getDocument().getLength() <= 0) // nothing to erase
             return;
         
-        final boolean doErase;
+        if (eraseIntervalsConfirmDialog == null)
+            eraseIntervalsConfirmDialog = new DoNotAskAnymoreConfirmDialog();
         
-        if (Boolean.TRUE.equals(eraseIntervalsText)) {
-            doErase = true;
-        }
-        else {
-            final String messageText = 
-                    "<html>"+
-                    "<p style='width: 240;'>"+
-                    "Erasing the melody or changing tuning parameters invalidates the intervals. "+
-                    "Discard them?</p>"+
-                    "<hr/>"+
-                    "</html>";
-            final JLabel label = new JLabel(messageText);
-            final JPanel panel = new JPanel(new BorderLayout());
-            final JCheckBox rememberAnswer = new JCheckBox("Remember That and Don't Ask Any More", false);
-            panel.add(label, BorderLayout.CENTER);
-            panel.add(rememberAnswer, BorderLayout.SOUTH);
-            final Object message = panel;
-            
-            int answer = JOptionPane.showConfirmDialog(
-                    intervalNotes.notesText, 
-                    message, 
-                    "Confirm Erase Intervals Text", 
-                    JOptionPane.YES_NO_OPTION, 
-                    JOptionPane.WARNING_MESSAGE);
-            
-            doErase = (answer == JOptionPane.YES_OPTION); // dialog has been answered
-            
-            if (rememberAnswer.isSelected())
-                eraseIntervalsText = Boolean.valueOf(doErase);
-        }
+        final String question = 
+                "Erasing the melody or changing tuning parameters invalidates the intervals. Discard them?";
         
-        if (doErase)
+        if (true == eraseIntervalsConfirmDialog.show(intervalNotes.notesText, question))
             intervalNotes.notesText.setText("");
     }
 
