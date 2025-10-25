@@ -17,7 +17,7 @@ import javax.swing.text.html.StyleSheet;
 /**
  * JEditorPane bug fix concerning URLs with "ref".
  * This view is HTML only, no RTF or other.
- * Please do NOT rename this class unless you also rename 
+ * Please do NOT move or rename this class unless you also move or rename 
  * <code>HtmlView.css</code> in <code>src/main/resources/fri/music/utils/swing/text</code>.
  */
 public class HtmlView extends JEditorPane
@@ -25,33 +25,34 @@ public class HtmlView extends JEditorPane
     public HtmlView(URL url) {
         super(); // do not pass URL before constructor is done
         
-        setEditable(false);
+        setEditable(false); // no editing support
         
-        // do not share CSS with all other HTML views like JLabel
+        // do not share CSS with all other HTML views like JLabel that will also use the global HtmlEditorKit
         final HtmlEditorKitWithLocalStyles editorKit = new HtmlEditorKitWithLocalStyles();
         final StyleSheet localStyleSheet = new StyleSheet();
         localStyleSheet.addStyleSheet(editorKit.getGlobalStyleSheet()); // merge JDK default styles into empty sheet
         editorKit.setStyleSheet(localStyleSheet);
         
-        setEditorKit(editorKit); // this replaces setContentType("text/html"); do not let setPage() do this!
+        setEditorKit(editorKit); // replaces setContentType("text/html"), do not leave this to setPage!
         
+        // load CSS styles from file with same name
         final InputStream css = getClass().getResourceAsStream(HtmlView.class.getSimpleName()+".css");
-        final StyleSheet styleSheet = ((HTMLEditorKit) getEditorKit()).getStyleSheet();
         try {
-            styleSheet.loadRules(new InputStreamReader(css), null);
-            
-            SwingUtilities.invokeLater(()-> { // let sub-classes finish their constructors before setPage()
-                try {
-                    setPage(url);
-                }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            localStyleSheet.loadRules(new InputStreamReader(css), null);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+        
+        // set the page
+        SwingUtilities.invokeLater(()-> { // let sub-classes finish their constructors before
+            try {
+                setPage(url);
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
     
     protected final HTMLDocument getHtmlDocument() {
