@@ -34,21 +34,25 @@ G4/4 A4/4 C5/4
 """);
     
     Melody C_MAJOR_SCALE = new Melody("C Major Scale", """
+4/4
 C4/4 D4/4 E4/4 F4/4 
 G4/4 A4/4 B4/4 C5/4
 """);
     
     Melody A_MINOR_HARMONIC = new Melody("A Minor Harmonic", """
+4/4
 A4/4 B4/4 C5/4 D5/4 
 E5/4 F5/4 G5/4 A5/4
 """);
     
     Melody A_MINOR_MELODIC = new Melody("A Minor Melodic", """
+4/4
 A4/4 B4/4 C5/4 D5/4 
 E5/4 F5/4 G#5/4 A5/4
 """);
     
     Melody CHROMATIC_SCALE = new Melody("12 Tone Scale", """
+4/4
 C4/8 C#4/8 D4/8 D#4/8 E4/8 F4/8 F#4/8 G4/8 
 G#4/8 A4/8 A#4/8 B4/8 C5/4      -/4
 """);
@@ -56,6 +60,7 @@ G#4/8 A4/8 A#4/8 B4/8 C5/4      -/4
     // melodies
     
     Melody AUGUSTIN = new Melody("Augustin", true, """
+120
 3/4
 G4/4. A4/8 G4/8 F4/8 E4/4 C4/4 C4/4
 D4/4 G3/4 G3/4 E4/4 C4/4 C4/4
@@ -93,6 +98,7 @@ G4/4. F4/8 F4/2
     
     Melody TURKISH_MARCH = new Melody("Turkish March", true, """
 180
+4/4
 -/2 B5/8 A5/8 G#5/8 A5/8
 C6/2 D6/8 C6/8 B5/8 C6/8
 E6/2 F6/8 E6/8 D#6/8 E6/8
@@ -128,6 +134,8 @@ G4/2 -/2
 """);
     
     Melody BLUES = new Melody("Blues", true, """
+120
+4/4
 C4 E4 G4 E4
 F4 A4 C5 A4
 C4 E4 G4 A4
