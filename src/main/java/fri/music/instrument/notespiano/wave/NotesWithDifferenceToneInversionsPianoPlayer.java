@@ -327,12 +327,11 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             return;
         
         if (eraseIntervalsConfirmDialog == null)
-            eraseIntervalsConfirmDialog = new DoNotAskAnymoreConfirmDialog();
+            eraseIntervalsConfirmDialog = new DoNotAskAnymoreConfirmDialog(
+                    "Confirm Erase Intervals Text",
+                    "Erasing the melody or changing tuning parameters invalidates the intervals. Discard them?");
         
-        final String question = 
-                "Erasing the melody or changing tuning parameters invalidates the intervals. Discard them?";
-        
-        if (true == eraseIntervalsConfirmDialog.show(intervalNotes.notesText, question))
+        if (true == eraseIntervalsConfirmDialog.answer(intervalNotes.notesText))
             intervalNotes.notesText.setText("");
     }
 
