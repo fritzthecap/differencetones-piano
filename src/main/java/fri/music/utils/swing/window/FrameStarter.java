@@ -119,7 +119,7 @@ public class FrameStarter
     public static void setNonLayoutRelevant(JFrame frame) {
         nonLayoutRelevantFrames.add(frame);
     }
-    
+
 
     // methods reused by DialogStarter
     
@@ -150,6 +150,16 @@ public class FrameStarter
     
     
     // private methods
+    
+    /** @return the platform-specific height of a JFrame title-bar. */
+    private static int getTitlebarHeight()   {
+        if (TITLEBAR_HEIGHT == null)   {
+            JFrame f = new JFrame();
+            f.pack();
+            TITLEBAR_HEIGHT = f.getRootPane().getLocation().y;
+        }
+        return TITLEBAR_HEIGHT;
+    }
     
     private static Point setLocation(Window newWindow, Point previousWindowLocation) {
         final Point point = nextCascadingPoint(previousWindowLocation, newWindow);
@@ -194,15 +204,6 @@ public class FrameStarter
         return null;
     }
 
-    private static int getTitlebarHeight()   {
-        if (TITLEBAR_HEIGHT == null)   {
-            JFrame f = new JFrame();
-            f.pack();
-            TITLEBAR_HEIGHT = f.getRootPane().getLocation().y;
-        }
-        return TITLEBAR_HEIGHT;
-    }
-    
     
     /* public static void main(String[] args) {
         final javax.swing.JPanel content = new javax.swing.JPanel();
