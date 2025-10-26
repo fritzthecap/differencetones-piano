@@ -19,6 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import fri.music.utils.swing.KeyStrokeUtil;
 import fri.music.utils.swing.layout.LocationUtil;
 
@@ -30,29 +31,23 @@ import fri.music.utils.swing.layout.LocationUtil;
  */
 public class Notification
 {
+    private final Component component;
     private final Window window;
     private final JDialog dialog;
-    private final JLabel linesLabel;
+    private final JLabel linesLabel = new JLabel();
+    private final List<String> lines = new ArrayList<>();
     
-    private Component component;
-    private List<String> lines = new ArrayList<>();
-    
+    /** @param parent required, the component to show over. */
     public Notification(Component parent) {
-        this(SwingUtilities.windowForComponent(parent), parent);
-    }
-    
-    private Notification(Window parentWindow, Component parent) {
-        this.window = Objects.requireNonNull(parentWindow);
         this.component = Objects.requireNonNull(parent);
-        
+        this.window = Objects.requireNonNull(SwingUtilities.windowForComponent(parent));
         this.dialog = new JDialog(window, "Undecorated");
         dialog.setUndecorated(true);
         
-        this.linesLabel = new JLabel();
         linesLabel.setBorder(
                 BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Color.BLUE, 3, true),
-                    BorderFactory.createEmptyBorder(8, 24, 8, 24)
+                    BorderFactory.createEmptyBorder(8, 24, 8, 24) // left and right is wider
                 )
             );
         KeyStrokeUtil.install(linesLabel, JComponent.WHEN_IN_FOCUSED_WINDOW, "closeAction", KeyEvent.VK_ENTER, new AbstractAction() {
@@ -89,7 +84,7 @@ public class Notification
         });
         
         dialog.add(linesLabel);
-        dialog.setOpacity(0.72f);
+        dialog.setOpacity(0.72f); // transparency
     }
     
     public void addLine(String line, int index) {
@@ -107,7 +102,14 @@ public class Notification
         lines.clear();
         refresh();
     }
+    
+    public void setBorder(Border border) {
+        linesLabel.setBorder(border);
+    }
 
+    public void setOpacity(float opacity) {
+        dialog.setOpacity(opacity);
+    }
     
     private void refresh() {
         if (lines.size() <= 0) {
@@ -129,41 +131,4 @@ public class Notification
         sb.append("</html>");
         return sb.toString();
     }
-    
-    
-    /*
-    public static void main(String[] args) {
-        final javax.swing.JFrame frame = new javax.swing.JFrame("Notification Test");
-        frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-        
-        final javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.BorderLayout());
-        panel.add(new JLabel(" "), java.awt.BorderLayout.CENTER);
-        
-        final javax.swing.JButton notificationButton1 = new javax.swing.JButton("Launch Notification");
-        final javax.swing.JButton notificationButton2 = new javax.swing.JButton("Launch Notification");
-        final javax.swing.JPanel buttonPanel = new javax.swing.JPanel(new java.awt.FlowLayout());
-        buttonPanel.add(notificationButton1);
-        buttonPanel.add(notificationButton2);
-        panel.add(buttonPanel, java.awt.BorderLayout.SOUTH);
-        
-        frame.getContentPane().add(panel);
-        
-        final Notification notification = new Notification(notificationButton1);
-        
-        final java.awt.event.ActionListener actionListener = new java.awt.event.ActionListener() {
-            private int count = 0;
-            
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                count++;
-                notification.addLine("Line "+count, -1);
-            }
-        };
-        notificationButton1.addActionListener(actionListener);
-        notificationButton2.addActionListener(actionListener);
-        
-        frame.setSize(new java.awt.Dimension(400, 400));
-        frame.setLocationByPlatform(true);
-        frame.setVisible(true);
-    }*/
 }

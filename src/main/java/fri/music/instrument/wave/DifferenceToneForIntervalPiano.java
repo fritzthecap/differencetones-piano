@@ -109,7 +109,7 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
         }
 
         private void ensureNotesListener() {
-            if (notification == null) {
+            if (notification == null) { // can not do this in constructor as keyboardPanel is not yet built there
                 notification = new Notification(piano.getKeyboardPanel());
                 soundChannel.setNoteListener(new WaveSoundChannel.NoteListener() {
                     @Override
