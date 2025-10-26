@@ -67,12 +67,12 @@ public class PianoWithHold extends PianoWithVolume
         /** Contains notes that play continuously due to activated "Hold" checkbox. */
         protected final SequencedSet<Keyboard.Key> holdPlayingNotes = new LinkedHashSet<>();
         private boolean isHoldActive;
-        private final Border redBorder;
+        private final Border holdBorder;
         private Border originalBorder;
         
         public HoldMouseHandler(PianoWithSound piano) {
             super(piano);
-            this.redBorder = BorderFactory.createLineBorder(Color.RED, 2);
+            this.holdBorder = BorderFactory.createLineBorder(Color.RED, 2);
         }
         
         /** Sets a new hold state (whether or not notes should play continuously) and calls reset(). */
@@ -100,7 +100,7 @@ public class PianoWithHold extends PianoWithVolume
         protected void noteOn(Keyboard.Key key) {
             if (isHoldActive()) {
                 holdPlayingNotes.add(key);
-                setRedBorder(key, true);
+                setHoldBorder(key, true);
             }
             super.noteOn(key);
         }
@@ -108,7 +108,7 @@ public class PianoWithHold extends PianoWithVolume
         protected void noteOff(Keyboard.Key key) {
             if (isHoldActive()) {
                 holdPlayingNotes.remove(key);
-                setRedBorder(key, false);
+                setHoldBorder(key, false);
             }
             super.noteOff(key);
         }
@@ -120,7 +120,7 @@ public class PianoWithHold extends PianoWithVolume
             
             if (originalBorder != null)
                 for (Keyboard.Key key : holdPlayingNotes)
-                    setRedBorder(key, false);
+                    setHoldBorder(key, false);
             
             holdPlayingNotes.clear();
         }
@@ -130,10 +130,10 @@ public class PianoWithHold extends PianoWithVolume
             return isHoldActive && pianoWithHold.holdCheckbox.isEnabled();
         }
         
-        private void setRedBorder(Keyboard.Key key, boolean select) {
+        private void setHoldBorder(Keyboard.Key key, boolean select) {
             if (originalBorder == null) // save original border for reset
                 originalBorder = key.getBorder();
-            key.setBorder(select ? redBorder : originalBorder);
+            key.setBorder(select ? holdBorder : originalBorder);
         }
         
         private boolean isPlaying(InputEvent e) {
