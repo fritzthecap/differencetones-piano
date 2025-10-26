@@ -130,7 +130,7 @@ public class PianoWithHold extends PianoWithVolume
             return isHoldActive && pianoWithHold.holdCheckbox.isEnabled();
         }
         
-        protected void setRedBorder(Keyboard.Key key, boolean select) {
+        private void setRedBorder(Keyboard.Key key, boolean select) {
             if (originalBorder == null) // save original border for reset
                 originalBorder = key.getBorder();
             key.setBorder(select ? redBorder : originalBorder);

@@ -1,10 +1,12 @@
 package fri.music.instrument.wave;
 
+import java.awt.Color;
 import java.util.Iterator;
-import javax.swing.Box;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JSlider;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fri.music.ToneSystem;
@@ -85,14 +87,21 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
     }
     
     
-    protected static class DifferenceToneMouseHandler extends AdditionalTonesPlayingMouseHandler
+    /**
+     * Mouse handler that marks difference-tones.
+     * CAUTION: this class and the DifferenceToneMouseHandler of DifferenceToneForNotesPiano are similar!
+     */
+    private static class DifferenceToneMouseHandler extends AdditionalTonesPlayingMouseHandler
     {
         private final WaveSoundChannel soundChannel;
+        private final Border differenceToneBorder;
+        private Border originalBorder;
         private Keyboard.Key selectedDifferenceKey;
         
         public DifferenceToneMouseHandler(PianoWithSound piano, WaveSoundChannel soundChannel) {
             super(piano);
             this.soundChannel = soundChannel;
+            this.differenceToneBorder = BorderFactory.createLineBorder(Color.GREEN.darker().darker(), 2);
         }
         
         /** Changes pressed and held keys "on the fly" when tuning changes. */
@@ -165,7 +174,10 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
         }
         
         private void selectDifferenceTone(Keyboard.Key key, boolean select) {
-            setRedBorder(key, select);
+            if (originalBorder == null) // save original border for reset
+                originalBorder = key.getBorder();
+            key.setBorder(select ? differenceToneBorder : originalBorder);
+            
             visualSelect(key, select);
         }
     }

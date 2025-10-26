@@ -129,19 +129,23 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
     }
     
     
-    /** When two notes are played together (interval), this listener displays their difference-tone red-bordered. */
+    /**
+     * When two notes are played together (interval), 
+     * this listener displays their difference-tone with a colored border.
+     * CAUTION: this class and the DifferenceToneMouseHandler of DifferenceToneForNotesPiano are similar!
+     */
     protected static class DifferenceToneMouseHandler extends MouseHandler
     {
         private final WaveSoundChannel soundChannel;
         private final SequencedSet<Keyboard.Key> playingNotes = new LinkedHashSet<>();
-        private final Border redBorder;
+        private final Border differenceToneBorder;
         private Border originalBorder;
         private Keyboard.Key selectedDifferenceKey;
         
         public DifferenceToneMouseHandler(DifferenceToneForNotesPiano piano, WaveSoundChannel soundChannel) {
             super(piano);
             this.soundChannel = soundChannel;
-            this.redBorder = BorderFactory.createLineBorder(Color.RED, 2);
+            this.differenceToneBorder = BorderFactory.createLineBorder(Color.GREEN.darker().darker(), 2);
         }
         
         @Override
@@ -194,15 +198,13 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         }
         
         private void selectDifferenceTone(Keyboard.Key key, boolean select) {
-            setRedBorder(key, select);
-            ButtonUtil.visualSelect(key, select);
-            key.paintImmediately(key.getVisibleRect());
-        }
-        
-        private void setRedBorder(Keyboard.Key key, boolean select) {
             if (originalBorder == null) // save original border for reset
                 originalBorder = key.getBorder();
-            key.setBorder(select ? redBorder : originalBorder);
+            key.setBorder(select ? differenceToneBorder : originalBorder);
+            
+            ButtonUtil.visualSelect(key, select);
+            
+            key.paintImmediately(key.getVisibleRect());
         }
         
         private DifferenceToneForNotesPiano getPiano() {
