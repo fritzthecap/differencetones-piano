@@ -145,7 +145,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         public DifferenceToneMouseHandler(DifferenceToneForNotesPiano piano, WaveSoundChannel soundChannel) {
             super(piano);
             this.soundChannel = soundChannel;
-            this.differenceToneBorder = BorderFactory.createLineBorder(Color.GREEN.darker().darker(), 2);
+            this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, 2);
         }
         
         @Override

@@ -72,7 +72,7 @@ public class PianoWithHold extends PianoWithVolume
         
         public HoldMouseHandler(PianoWithSound piano) {
             super(piano);
-            this.holdBorder = BorderFactory.createLineBorder(Color.RED, 2);
+            this.holdBorder = BorderFactory.createLineBorder(Color.BLUE, 2);
         }
         
         /** Sets a new hold state (whether or not notes should play continuously) and calls reset(). */

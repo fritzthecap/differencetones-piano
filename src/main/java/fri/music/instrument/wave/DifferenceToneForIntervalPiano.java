@@ -101,7 +101,7 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
         public DifferenceToneMouseHandler(PianoWithSound piano, WaveSoundChannel soundChannel) {
             super(piano);
             this.soundChannel = soundChannel;
-            this.differenceToneBorder = BorderFactory.createLineBorder(Color.GREEN.darker().darker(), 2);
+            this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, 2);
         }
         
         /** Changes pressed and held keys "on the fly" when tuning changes. */
