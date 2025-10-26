@@ -186,7 +186,7 @@ public class Piano
                 return new Dimension(width, height);
             }
 
-            /** @return false because black keys will overlap white keys. */
+            /** @return false because black keys will have to overlap white keys. */
             @Override
             public boolean isOptimizedDrawingEnabled() {
                 return false;
