@@ -39,7 +39,7 @@ This is a _Maven 3.6 / Java 21_ project (minimum _Java 17_), developed with _Ecl
 
 ### Rendering and playing difference-tones for intervals in various tunings:
 
-<img width="1203" height="205" alt="Difference-Tones_Piano" src="https://github.com/user-attachments/assets/85f62dba-13df-4cfb-bc00-387cfeaa2634" />
+<img width="1203" height="205" alt="Difference-Tones_Piano" src="https://github.com/user-attachments/assets/41c5a26b-eb80-4622-ba6e-eacbda27a884" />
 
 ----
 
@@ -51,7 +51,7 @@ This is a _Maven 3.6 / Java 21_ project (minimum _Java 17_), developed with _Ecl
 
 ### Frequency sliders with 4 Cent precision for perceiving stepless difference-tones:
 
-![FrequencySliders](https://github.com/user-attachments/assets/22a1dcb5-e046-4a06-a44e-6e9e2b192cff)
+<img width="1200" height="410" alt="Difference-Tones_FrequencySlider" src="https://github.com/user-attachments/assets/f80eba18-6290-42f8-a332-8b01ef4baf12" />
 
 ----
 
