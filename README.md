@@ -39,7 +39,7 @@ This is a _Maven 3.6 / Java 21_ project (minimum _Java 17_), developed with _Ecl
 
 ### Rendering and playing difference-tones for intervals in various tunings:
 
-<img width="1203" height="205" alt="Difference-Tones_Piano" src="https://github.com/user-attachments/assets/41c5a26b-eb80-4622-ba6e-eacbda27a884" />
+<img width="1203" height="205" alt="Difference-Tones_Piano" src="https://github.com/user-attachments/assets/b6aa0204-28ca-448b-a3ee-b02d4c7404a0" />
 
 ----
 
