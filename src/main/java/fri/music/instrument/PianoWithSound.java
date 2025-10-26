@@ -288,6 +288,11 @@ public class PianoWithSound extends Piano
         return pianoPanel = super.getKeyboard();
     }
     
+    /** @return the keyboard panel with black and white piano keys. */
+    public JComponent getKeyboardPanel() {
+        return pianoPanel;
+    }
+
     /**
      * This default implementation returns <code>getKeyboard()</code>.
      * @return a layout panel where something can be added to BorderLayout.CENTER.

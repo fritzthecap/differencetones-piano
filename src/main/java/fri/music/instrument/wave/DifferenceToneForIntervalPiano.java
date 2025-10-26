@@ -9,11 +9,13 @@ import javax.swing.JSlider;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.utils.swing.layout.ToolBarUtil;
 import fri.music.utils.swing.text.HelpWindowSingleton;
+import fri.music.utils.swing.window.Notification;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -94,14 +96,36 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
     private static class DifferenceToneMouseHandler extends AdditionalTonesPlayingMouseHandler
     {
         private final WaveSoundChannel soundChannel;
+        private Notification notification;
         private final Border differenceToneBorder;
         private Border originalBorder;
         private Keyboard.Key selectedDifferenceKey;
         
         public DifferenceToneMouseHandler(PianoWithSound piano, WaveSoundChannel soundChannel) {
             super(piano);
+            
             this.soundChannel = soundChannel;
             this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, 2);
+        }
+
+        private void ensureNotesListener() {
+            if (notification == null) {
+                notification = new Notification(piano.getKeyboardPanel());
+                soundChannel.setNoteListener(new WaveSoundChannel.NoteListener() {
+                    @Override
+                    public void noteOn(Tone tone) {
+                        notification.addLine(tone.ipnName, 0);
+                    }
+                    @Override
+                    public void noteOff(Tone tone) {
+                        notification.removeLine(tone.ipnName);
+                    }
+                    @Override
+                    public void allNotesOff() {
+                        notification.hide();
+                    }
+                });
+            }
         }
         
         /** Changes pressed and held keys "on the fly" when tuning changes. */
@@ -119,6 +143,7 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
         
         @Override
         protected void noteOn(Keyboard.Key key) {
+            ensureNotesListener();
             super.noteOn(key);
             handleDifferenceKey();
         }

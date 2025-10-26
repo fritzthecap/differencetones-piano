@@ -15,19 +15,30 @@ import fri.music.Tones;
  */
 public abstract class WaveSoundChannel implements SoundChannel
 {
+    /** Note on/off listeners implement this interface, e.g. for logging. */
+    public interface NoteListener
+    {
+        void noteOn(Tone tone);
+        void noteOff(Tone tone);
+        void allNotesOff();
+    }
+    
     /** Maximum tones playing simultaneously (without LineUnavailableException). */
     private static final int MAXIMUM_SOUND_GENERATORS = 12; // saw LineUnavailableException when 33 WaveGenerators
-    
-    /** Turn this on to see whether difference-tone intervals play the difference-tone or not. They do not. */
-    private static final boolean LOGGING = false;
     
     /** Key = MIDI note number, value = sound generator. */
     private final Map<Integer,WaveGenerator> generators = new Hashtable<>(MAXIMUM_SOUND_GENERATORS);
     /** Tone-system containing frequencies. */
     private Tones tones;
     
+    private NoteListener noteListener;
+    
     public WaveSoundChannel(Tone[] tones) {
         this.tones = new Tones(tones == null ? new EqualTemperament().tones() : tones);
+    }
+    
+    public void setNoteListener(NoteListener noteListener) {
+        this.noteListener = noteListener;
     }
 
     /** Factory method for sound wave generators. To be implemented by sub-classes. */
@@ -57,8 +68,8 @@ public abstract class WaveSoundChannel implements SoundChannel
         final double frequency = midiNoteNumberToFrequency(midiNoteNumber);
         generator.start(frequency, amplitude);
         
-        if (LOGGING)
-            System.out.println("+ noteOn  "+midiNoteNumber);
+        if (noteListener != null)
+            noteListener.noteOn(tones.forMidiNoteNumber(midiNoteNumber));
         
         if (generators.size() > MAXIMUM_SOUND_GENERATORS) {
             cleanUp();
@@ -74,8 +85,8 @@ public abstract class WaveSoundChannel implements SoundChannel
         if (generator != null) { // stopGlissando may already have removed it
             generator.stop();
             
-            if (LOGGING)
-                System.out.println("- noteOff "+midiNoteNumber);
+            if (noteListener != null)
+                noteListener.noteOff(tones.forMidiNoteNumber(midiNoteNumber));
         }
     }
     
@@ -83,7 +94,11 @@ public abstract class WaveSoundChannel implements SoundChannel
     public void allNotesOff() {
         for (WaveGenerator generator : generators().values())
             generator.close();
+        
         generators().clear();
+        
+        if (noteListener != null)
+            noteListener.allNotesOff();
     }
     
     @Override
