@@ -61,8 +61,8 @@ public class HtmlView extends JEditorPane
     
     /** Fix: the JDK implementation is wrongly searching for hyperlink elements. */
     @Override
-    public void scrollToReference(String reference) {
-        final Element element = getHtmlDocument().getElement(reference);
+    public void scrollToReference(String referenceId) {
+        final Element element = getHtmlDocument().getElement(referenceId);
         if (element != null)
             scrollToStartOffset(element.getStartOffset());
     }

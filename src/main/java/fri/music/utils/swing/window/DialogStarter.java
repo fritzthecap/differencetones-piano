@@ -17,7 +17,6 @@ import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import fri.music.HtmlResources;
 import fri.music.utils.StringUtil;
 import fri.music.utils.swing.KeyStrokeUtil;
 import fri.music.utils.swing.text.HtmlBrowser;
