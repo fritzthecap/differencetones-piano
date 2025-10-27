@@ -96,10 +96,10 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
     private static class DifferenceToneMouseHandler extends AdditionalTonesPlayingMouseHandler
     {
         private final WaveSoundChannel soundChannel;
-        private Notification notification;
         private final Border differenceToneBorder;
         private Border originalBorder;
         private Keyboard.Key selectedDifferenceKey;
+        private Notification notification;
         
         public DifferenceToneMouseHandler(PianoWithSound piano, WaveSoundChannel soundChannel) {
             super(piano);
@@ -108,26 +108,6 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
             this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, 2);
         }
 
-        private void ensureNotesListener() {
-            if (notification == null) { // can not do this in constructor as keyboardPanel is not yet built there
-                notification = new Notification(piano.getKeyboardPanel());
-                soundChannel.setNoteListener(new WaveSoundChannel.NoteListener() {
-                    @Override
-                    public void noteOn(Tone tone) {
-                        notification.addLine(tone.ipnName, 0);
-                    }
-                    @Override
-                    public void noteOff(Tone tone) {
-                        notification.removeLine(tone.ipnName);
-                    }
-                    @Override
-                    public void allNotesOff() {
-                        notification.hide();
-                    }
-                });
-            }
-        }
-        
         /** Changes pressed and held keys "on the fly" when tuning changes. */
         public void reviseDifferenceTone() {
             handleDifferenceKey();
@@ -152,6 +132,26 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
         protected void noteOff(Keyboard.Key key) {
             super.noteOff(key);
             handleDifferenceKey();
+        }
+        
+        private void ensureNotesListener() {
+            if (notification == null) { // can not do this in constructor as keyboardPanel is not yet built there
+                notification = new Notification(piano.getKeyboardPanel());
+                soundChannel.setNoteListener(new WaveSoundChannel.NoteListener() {
+                    @Override
+                    public void noteOn(Tone tone) {
+                        notification.addLine(tone.ipnName, 0);
+                    }
+                    @Override
+                    public void noteOff(Tone tone) {
+                        notification.removeLine(tone.ipnName);
+                    }
+                    @Override
+                    public void allNotesOff() {
+                        notification.hide();
+                    }
+                });
+            }
         }
         
         private void handleDifferenceKey() {
