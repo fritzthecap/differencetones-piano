@@ -56,7 +56,7 @@ C4/4 E4/4 G4/4
 A3/4 C4/4 E4/4
 """);
     
-    Notes G_DIM_CHORD = new Notes("G Diminished", Notes.Type.Chord, """
+    Notes G_DIM_CHORD = new Notes("B Diminished", Notes.Type.Chord, """
 B3/4 D4/4 F4/4
 """);
     
