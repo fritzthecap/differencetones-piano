@@ -111,6 +111,7 @@ public class Notification
         dialog.setOpacity(opacity);
     }
     
+    
     private void refresh() {
         if (lines.size() <= 0) {
             linesLabel.setText("");
@@ -125,10 +126,14 @@ public class Notification
     }
     
     private String toHtml(List<String> lines) {
-        final StringBuilder sb = new StringBuilder("<html>");
+        final StringBuilder htmlBuilder = new StringBuilder(lines.size() * 3 + 24);
+        // each line has maximum 3 chars, HTML wrapper needs 24
+        
+        htmlBuilder.append("<html>");
         for (final String textLine : lines)
-            sb.append("<div>"+textLine+"</div>");
-        sb.append("</html>");
-        return sb.toString();
+            htmlBuilder.append("<div>"+textLine+"</div>");
+        htmlBuilder.append("</html>");
+        
+        return htmlBuilder.toString();
     }
 }
