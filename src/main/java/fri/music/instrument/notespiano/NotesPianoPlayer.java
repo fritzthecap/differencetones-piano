@@ -412,21 +412,26 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     
     private JMenu buildLoadMenuItems() {
         final JMenu menu = new JMenu("Load Examples");
-        boolean songSeparator = false;
-        for (final NoteExamples.Melody melody : NoteExamples.MELODIES) {
-            if (melody.isSong() && songSeparator == false) {
-                songSeparator = true;
-                menu.addSeparator();
-            }
-            final JMenuItem item = new JMenuItem(melody.title());
-            item.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    melodyView().notesText.setText(melody.notes());
-                    melodyView().notesText.setCaretPosition(0);
+        
+        for (final NoteExamples.Notes.Type notesType : NoteExamples.Notes.Type.values()) {
+            final JMenu subMenu = new JMenu(notesType.name());
+            
+            for (final NoteExamples.Notes notes : NoteExamples.NOTES) {
+                if (notes.type() == notesType) {
+                    final JMenuItem item = new JMenuItem(notes.title());
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            melodyView().notesText.setText(notes.notes());
+                            melodyView().notesText.setCaretPosition(0);
+                        }
+                    });
+                    subMenu.add(item);
                 }
-            });
-            menu.add(item);
+            }
+            
+            if (subMenu.getItemCount() > 0)
+                menu.add(subMenu);
         }
         return menu;
     }
