@@ -6,14 +6,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
 /**
- * Provides extracted header information about HTML elements H1 - H6 and all elements with an id, 
- * but ignores any heading (H1 - H6) if it contains an anchor element with href attribute.
+ * Provides extracted header information about HTML heading elements h1-h6 and 
+ * all elements with an id. Ignores any heading if it contains an anchor-element
+ * with <code>href</code> attribute (like it is in a hyperlinking table-of-content).
+ * Mind that this class makes no sense without a <code>HeaderListener</code> instance!
  */
 public class HtmlViewWithHeaders extends HtmlView
 {
@@ -44,46 +47,51 @@ public class HtmlViewWithHeaders extends HtmlView
     
     private final HeaderListener headerListener;
     
+    private int currentChapterLevel = 1;
+    
+    /**
+     * @param url optional, HTML location to render.
+     * @param headerListener required, consumer of heading list h1-h6.
+     */
     public HtmlViewWithHeaders(URL url, HeaderListener headerListener) {
         super(url);
-        this.headerListener = headerListener;
+        this.headerListener = Objects.requireNonNull(headerListener);
     }
     
     /** Overridden to catch event when page was fully loaded, scanning headers then. */
     @Override
     public void setPage(URL url) throws IOException {
-        if (headerListener != null) {
-            headerListener.startLoadingPage();
-            
-            final PropertyChangeListener loadFinishedListener = new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent event)   {
-                    if (event.getPropertyName().equals("page")) {
-                        removePropertyChangeListener(this); // stop listening
-                        try {
-                            final List<HeaderElement> headers = getTableOfContents(getHtmlDocument());
-                            headerListener.endLoadingPage(headers);
-                        }
-                        catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
+        headerListener.startLoadingPage();
+        
+        final PropertyChangeListener loadFinishedListener = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent event)   {
+                if (event.getPropertyName().equals("page")) { // no constant exists for this!
+                    removePropertyChangeListener(this); // stop listening
+                    try {
+                        final List<HeaderElement> headers = getTableOfContents(getHtmlDocument());
+                        headerListener.endLoadingPage(headers);
+                    }
+                    catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                 }
-            };
-            addPropertyChangeListener(loadFinishedListener);
-        }
+            }
+        };
+        addPropertyChangeListener(loadFinishedListener);
 
         super.setPage(url);
     }
 
 
     private List<HeaderElement> getTableOfContents(HTMLDocument document) throws BadLocationException, IOException {
+        currentChapterLevel = 1;
+        
         final List<HeaderElement> headers = new ArrayList<>();
         scanHeaders(document, document.getDefaultRootElement(), headers);
+        
         return headers;
     }
-    
-    private int currentChapterLevel = 1;
     
     private void scanHeaders(HTMLDocument document, Element element, List<HeaderElement> headers) throws BadLocationException {
         if (element.isLeaf())
@@ -92,17 +100,18 @@ public class HtmlViewWithHeaders extends HtmlView
         final boolean isChapterHeading = isChapterHeading(element);
         final String id = getId(element);
         
-        if (isChapterHeading || id != null) { // we want H1-H5 and any element with an id, like <li>
-            final int level; // will be indentation of choice items
+        if (isChapterHeading || id != null) { // we want H1-H6 and any element with an id, like <li>
+            final int level; // will be indentation of HeaderElements
             if (isChapterHeading) {
-                currentChapterLevel = Integer.valueOf(element.getName().substring(1));
+                currentChapterLevel = Integer.valueOf(element.getName().substring(1)); // get the 1 from "H1"
                 level = currentChapterLevel;
             }
-            else {
+            else { // being below some heading at an element with ID
                 level = currentChapterLevel + 1;
             }
             
-            if (isChapterHeading == false || containsHyperlink(element) == false) { // ignore headings that contain a hyperlink
+            final boolean elementWithId = (isChapterHeading == false);
+            if (elementWithId || containsHyperlink(element) == false) { // ignore table-of-content headings containing a hyperlink
                 final String textContent = getText(document, element);
                 if (textContent.length() > 0) { // ignore elements that have no text to display in "Chapters" overview
                     final HeaderElement header = new HeaderElement(level, id, textContent, element.getStartOffset());
@@ -111,9 +120,8 @@ public class HtmlViewWithHeaders extends HtmlView
             }
         }
         
-        for (int i = 0; i < element.getElementCount(); i++) {
+        for (int i = 0; i < element.getElementCount(); i++)
             scanHeaders(document, element.getElement(i), headers);
-        }
     }
     
     private String getId(Element element) throws BadLocationException {

@@ -22,6 +22,7 @@ import javax.swing.text.html.StyleSheet;
  */
 public class HtmlView extends JEditorPane
 {
+    /** @param url optional, HTML location to render. */
     public HtmlView(URL url) {
         super(); // do not pass URL before constructor is done
         
@@ -44,19 +45,16 @@ public class HtmlView extends JEditorPane
             throw new RuntimeException(e);
         }
         
-        // set the page
-        SwingUtilities.invokeLater(()-> { // let sub-classes finish their constructors before
-            try {
-                setPage(url);
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-    
-    protected final HTMLDocument getHtmlDocument() {
-        return (HTMLDocument) getDocument();
+        if (url != null)
+            // set the page
+            SwingUtilities.invokeLater(()-> { // let sub-classes finish their constructors before
+                try {
+                    setPage(url);
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
     
     /** Fix: the JDK implementation is wrongly searching for hyperlink elements. */
@@ -86,8 +84,13 @@ public class HtmlView extends JEditorPane
             UIManager.getLookAndFeel().provideErrorFeedback(this);
         }
     }
-    
 
+    /** @return the rendered HTML-document for convenience. */
+    protected final HTMLDocument getHtmlDocument() {
+        return (HTMLDocument) getDocument();
+    }
+    
+    
     /**
      * Bugfix for global styles that affect even JLabel HTML texts, see
      * https://stackoverflow.com/questions/43408539/how-does-one-properly-initialize-a-jtextpane-stylesheet-so-no-other-html-enable

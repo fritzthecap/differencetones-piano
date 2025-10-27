@@ -11,16 +11,16 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 /**
- * HTML documentation browser that can load hyperlinks but can not navigate.
- * HTTP links are opened in an external desktop browser, relative links in this view.
+ * HTML browser that can load hyperlinks but can not navigate in history ("Back", "Forward").
+ * HTTP links will be opened in an external desktop browser, relative links in this view.
  */
-public class HtmlBrowserBase extends JPanel implements HyperlinkListener
+public class HtmlLinkBrowser extends JPanel implements HyperlinkListener
 {
     protected final JEditorPane htmlView;
     protected final HtmlViewActions htmlViewActions;
     
-    /** @param url required, the initial URL to load. */
-    public HtmlBrowserBase(URL url) {
+    /** @param url optional, the initial URL to load. */
+    public HtmlLinkBrowser(URL url) {
         super(new BorderLayout());
         
         this.htmlView = newHtmlView(url);
@@ -44,10 +44,10 @@ public class HtmlBrowserBase extends JPanel implements HyperlinkListener
         final String protocol = url.getProtocol();
         
         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
-            if (protocol.startsWith("http"))
-                gotoExternalHyperlink(url); // open in external HTML-browser
+            if (protocol != null && protocol.toLowerCase().startsWith("http"))
+                gotoExternalHyperlink(url); // open in external web-browser
             else
-                gotoInternalHyperlink(url); // open in this HTML-browser
+                gotoInternalHyperlink(url); // open in this view
         else if (event.getEventType() == HyperlinkEvent.EventType.ENTERED)
             htmlView.setToolTipText(url.toExternalForm());
         else if (event.getEventType() == HyperlinkEvent.EventType.EXITED)
