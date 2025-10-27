@@ -1,6 +1,8 @@
 package fri.music.utils.swing.text;
 
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,16 +39,17 @@ public class HtmlView extends JEditorPane
         setEditorKit(editorKit); // replaces setContentType("text/html"), do not leave this to setPage!
         
         // load CSS styles from file with same name
-        final InputStream css = getClass().getResourceAsStream(HtmlView.class.getSimpleName()+".css");
+        final Class<?> clazz = HtmlView.class; // do NOT use getClass() here, there may be sub-classes!
+        final String cssFile = clazz.getSimpleName()+".css";
+        final InputStream css = clazz.getResourceAsStream(cssFile);
         try {
             localStyleSheet.loadRules(new InputStreamReader(css), null);
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        catch (Exception e) {
+            throw new IllegalArgumentException("Can not load "+cssFile+" as resource of "+clazz+": "+e);
         }
         
-        if (url != null)
-            // set the page
+        if (url != null) // set the page
             SwingUtilities.invokeLater(()-> { // let sub-classes finish their constructors before
                 try {
                     setPage(url);
@@ -84,16 +87,44 @@ public class HtmlView extends JEditorPane
             UIManager.getLookAndFeel().provideErrorFeedback(this);
         }
     }
+    
+    /** Overridden to catch event when page was fully loaded. */
+    @Override
+    public void setPage(URL url) throws IOException {
+        startLoadingPage();
+        
+        final PropertyChangeListener loadFinishedListener = new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent event)   {
+                if (event.getPropertyName().equals("page")) { // no constant exists for this!
+                    removePropertyChangeListener(this); // stop listening
+                    endLoadingPage();
+                }
+            }
+        };
+        addPropertyChangeListener(loadFinishedListener);
 
-    /** @return the rendered HTML-document for convenience. */
+        super.setPage(url);
+    }
+
+    /** Called from event dispatch thread when setPage() starts. Does nothing, to be overridden. */
+    protected void startLoadingPage() {
+    }
+
+    /** Called from event dispatch thread when setPage() has loaded all HTML. Does nothing, to be overridden. */
+    protected void endLoadingPage() {
+    }
+
+    /** @return the rendered HTML-document, applying the cast-operator. */
     protected final HTMLDocument getHtmlDocument() {
         return (HTMLDocument) getDocument();
     }
     
     
     /**
-     * Bugfix for global styles that affect even JLabel HTML texts, see
-     * https://stackoverflow.com/questions/43408539/how-does-one-properly-initialize-a-jtextpane-stylesheet-so-no-other-html-enable
+     * HTMLEditorKit with private local CSS styles.
+     * Bugfix for global styles in AppContext that affect even JLabel HTML texts.
+     * @see https://stackoverflow.com/questions/43408539/how-does-one-properly-initialize-a-jtextpane-stylesheet-so-no-other-html-enable
      */
     private static class HtmlEditorKitWithLocalStyles extends HTMLEditorKit
     {

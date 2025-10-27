@@ -58,31 +58,22 @@ public class HtmlViewWithHeaders extends HtmlView
         this.headerListener = Objects.requireNonNull(headerListener);
     }
     
-    /** Overridden to catch event when page was fully loaded, scanning headers then. */
     @Override
-    public void setPage(URL url) throws IOException {
+    protected void startLoadingPage() {
         headerListener.startLoadingPage();
-        
-        final PropertyChangeListener loadFinishedListener = new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent event)   {
-                if (event.getPropertyName().equals("page")) { // no constant exists for this!
-                    removePropertyChangeListener(this); // stop listening
-                    try {
-                        final List<HeaderElement> headers = getTableOfContents(getHtmlDocument());
-                        headerListener.endLoadingPage(headers);
-                    }
-                    catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        };
-        addPropertyChangeListener(loadFinishedListener);
-
-        super.setPage(url);
     }
-
+    
+    @Override
+    protected void endLoadingPage() {
+        try {
+            final List<HeaderElement> headers = getTableOfContents(getHtmlDocument());
+            headerListener.endLoadingPage(headers);
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
 
     private List<HeaderElement> getTableOfContents(HTMLDocument document) throws BadLocationException, IOException {
         currentChapterLevel = 1;
