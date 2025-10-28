@@ -28,7 +28,7 @@ public class HtmlView extends JEditorPane
     public HtmlView(URL url) {
         super(); // do not pass URL before constructor is done
         
-        setEditable(false); // no editing support
+        setEditable(false); // set read-only
         
         // do not share CSS with all other HTML views like JLabel that will also use the global HtmlEditorKit
         final HtmlEditorKitWithLocalStyles editorKit = new HtmlEditorKitWithLocalStyles();
