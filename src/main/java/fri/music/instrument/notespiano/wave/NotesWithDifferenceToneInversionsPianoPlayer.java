@@ -464,7 +464,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
 
     private void writeIntervalChangesToTextarea(Note[][] intervals, MelodyFactory melodyFactory) {
         final String intervalsText = melodyFactory.formatBarLines(intervals);
-        TextAreaUtil.setText(intervalNotes.notesText, intervalsText);
+        TextAreaUtil.setText(intervalNotes.notesText, intervalsText, true);
     }
 
     private boolean appendOneInterval(
@@ -548,7 +548,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
     }
     
 
-    private void generateMelody() {
+    private void generateMelody() { // button is enabled only when melody-area is empty
         final MelodyFactory melodyFactory = newMelodyFactory();
         final Note[][] intervals = translate(melodyFactory, intervalNotes);
         
@@ -577,7 +577,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
         }
         
         final String melodyText = melodyFactory.formatBarLines(melodyNotes);
-        TextAreaUtil.setText(melodyView().notesText, melodyText);
+        TextAreaUtil.setText(melodyView().notesText, melodyText, false);
     }
 
     

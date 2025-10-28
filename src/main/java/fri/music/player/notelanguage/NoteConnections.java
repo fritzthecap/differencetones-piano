@@ -3,8 +3,8 @@ package fri.music.player.notelanguage;
 /**
  * Symbols around notes like ties "(A4 (B4) C5)" or slurs "{A4 B4 C5}".
  * A slur is for 2-n notes of different pitch. A tie is for 2-n notes
- * with same pitch, but the parentheses must be repeated on any note within.
- * Slurs and ties can be combined, but slur must be the outer symbol, like "{(A4".
+ * with same pitch. Slurs and ties can be combined, but slur must be the 
+ * outer symbol, like "{(A4".
  */
 public class NoteConnections
 {
