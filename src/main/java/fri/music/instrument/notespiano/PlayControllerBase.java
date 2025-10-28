@@ -1,7 +1,9 @@
 package fri.music.instrument.notespiano;
 
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.swing.SwingUtilities;
 import fri.music.SoundChannel;
@@ -253,6 +255,16 @@ public class PlayControllerBase implements PlayControlButtons.Listener
                 player = null;
             }
             readNotesFromTextArea(false); // enable note controls
+            
+            final Map<Integer,Integer> noteIndexToCaretPositionMap = new Hashtable<>();
+            new InputTextScanner().noteIndexForDot(
+                    view.notesText.getText(), 
+                    -1, 
+                    noteIndexToCaretPositionMap);
+            final Integer newCaretPosition = noteIndexToCaretPositionMap.get(currentSoundIndex);
+            if (newCaretPosition != null)
+                view.notesText.setCaretPosition(recentCaretPosition = newCaretPosition);
+            
             view.notesText.requestFocus();
         }
     }
