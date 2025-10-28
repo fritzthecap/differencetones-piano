@@ -9,6 +9,7 @@ import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.wave.PianoKeyConnector;
 import fri.music.player.Note;
 import fri.music.player.Player;
+import fri.music.player.notelanguage.InputTextScanner;
 import fri.music.player.notelanguage.MelodyFactory;
 
 /**
@@ -25,6 +26,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     
     private Note[][] sounds; // playing notes, possibly polyphonic
     private int currentSoundIndex;
+    private int recentCaretPosition; // = 0 by Java default
     private boolean playingReverse;
     
     private SoundChannel pianoKeyConnector;
@@ -257,8 +259,9 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     
     /** Make sure to always call this synchronized(playerLock)! */
     private void startPlayer(Note[][] sounds, boolean reverse) {
-        // disable controls that may have been enabled by readNotesFromTextArea()
         onStartPlayer();
+        
+        // disable controls that may have been enabled by readNotesFromTextArea()
         view.formatBars.setEnabled(false);
         view.abcExport.setEnabled(false);
         
@@ -271,6 +274,17 @@ public class PlayControllerBase implements PlayControlButtons.Listener
             }
         };
 
+        final int caretPosition = view.notesText.getCaretPosition();
+        // initially this should be 0, see TextAreaUtil.setText()
+        if (caretPosition != recentCaretPosition) {
+            recentCaretPosition = caretPosition;
+            final int noteIndexAtDot = new InputTextScanner().noteIndexForDot(
+                    view.notesText.getText(), 
+                    caretPosition,
+                    null);
+            this.currentSoundIndex = noteIndexAtDot;
+        }
+        
         // to allow "Stop" while playing, all playing happens in a background thread
         final Thread playerThread = new Thread(() -> playNotes(sounds, reverse));
         playerThread.start();
@@ -349,7 +363,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
             currentSoundIndex = lastIndex;
         
         if (playingReverse == false && 
-                (currentSoundIndex >= lastIndex ||
+                (currentSoundIndex > lastIndex ||
                 currentSoundIndex < firstIndex))
             currentSoundIndex = firstIndex;
     }
@@ -401,7 +415,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     private void enableUiOnPlaying(boolean isStop, Note[][] sounds) {
         onEnableUiOnPlaying(isStop);
         
-        view.notesText.setEditable(isStop);
+        view.notesText.setEditable(isStop); // no editing during playback
         notesPianoPlayer.enableUiOnPlaying(isStop, sounds, currentSoundIndex, view);
     }
     
