@@ -494,7 +494,7 @@ public class MelodyFactory
         /**
          * This is needed to know where a triplet (multiplet) ends.
          * @param overallMultipletDuration gives the duration sum of this and all
-         *      subsequent multiplet notes, assuming they have same length.
+         *      subsequent multiplet notes.
          */
         public void setOverallMultipletDuration(int overallMultipletDuration, Integer multipletType) {
             this.overallMultipletDuration = overallMultipletDuration;

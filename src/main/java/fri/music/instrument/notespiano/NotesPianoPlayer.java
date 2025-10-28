@@ -30,6 +30,7 @@ import fri.music.player.Player;
 import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.utils.swing.text.TextAreaUtil;
 import fri.music.utils.swing.window.DialogStarter;
+import fri.music.utils.swing.window.DoNotAskAnymoreConfirmDialog;
 import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
@@ -54,6 +55,8 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
     
     private boolean permanentNotesCheck = true;
     
+    private DoNotAskAnymoreConfirmDialog overwriteMelodyOnLoadDialog;
+
     /** @param piano required, the piano on which to play notes. */
     public NotesPianoPlayer(PianoWithSound piano) {
         this.piano = Objects.requireNonNull(piano);
@@ -82,7 +85,7 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
 
         final boolean activateWriteToNotesCheckbox;
         if (melody != null && melody.length() > 0) { // put initial melody into text-area
-            TextAreaUtil.setText(melodyView().notesText, melody); // triggers check via DocumentListener
+            TextAreaUtil.setText(melodyView().notesText, melody, false); // triggers check via DocumentListener
             activateWriteToNotesCheckbox = false;
         }
         else {
@@ -422,8 +425,15 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
                     item.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            melodyView().notesText.setText(notes.notes());
-                            melodyView().notesText.setCaretPosition(0);
+                            if (melodyView().notesText.getDocument().getLength() > 0) {
+                                if (overwriteMelodyOnLoadDialog == null)
+                                    overwriteMelodyOnLoadDialog = new DoNotAskAnymoreConfirmDialog(
+                                            "Overwrite", 
+                                            "Overwrite Existing Notes?");
+                                if (overwriteMelodyOnLoadDialog.answer(melodyView().notesText) == false)
+                                    return;
+                            }
+                            TextAreaUtil.setText(melodyView().notesText, notes.notes(), false);
                         }
                     });
                     subMenu.add(item);
@@ -442,14 +452,14 @@ public class NotesPianoPlayer implements NotesTextPanel.TransposeListener
         final Note[][] notes = readNotesFromTextAreaCatchExceptions(playController, view);
         if (notes != null) {
             final String formatted = formatNotes(notes, newMelodyFactory());
-            TextAreaUtil.setText(view.notesText, formatted);
+            TextAreaUtil.setText(view.notesText, formatted, true);
         }
     }
     
     private String formatNotes(Note[][] notes, MelodyFactory melodyFactory) {
         return melodyFactory.formatBarLines(
                 notes, 
-                // write tempo and bar only when it was written in text, or when forceWriteTempoAndBar
+                // write tempo and bar only when it was written in text
                 melodyView().tempoSpinner.isEnabled() == false,
                 melodyView().timeSignatureChoice.isEnabled() == false);
     }
