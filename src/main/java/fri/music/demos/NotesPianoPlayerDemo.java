@@ -11,6 +11,18 @@ import fri.music.wavegenerator.SineWaveSoundChannel;
 
 public class NotesPianoPlayerDemo
 {
+    private static final String TUBULAR_BELLS = """
+155
+4/4
+-/2. -/8 e5/8 
+a5/8 e5/8 b5/8 e5/8 {g5/8 a5/8} e5/8 c6/8 
+3/4
+e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8
+4/4
+a5/8 e5/8 b5/8 e5/8 {g5/8 a5/8} e5/8 c6/8 
+e5/8 d6/8 e5/8 {b5/8 c6/8} e5/8 b5/8 e5/8
+""";
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             final int octaves = 7;
@@ -26,7 +38,7 @@ public class NotesPianoPlayerDemo
                     13);
             final SoundChannel soundChannel = new SineWaveSoundChannel(null);
             final NotesPianoPlayer player = new NotesPianoPlayer(new PianoWithVolume(config, soundChannel));
-            final JComponent playerPanel = player.getPlayer(NoteExamples.TUBULAR_BELLS);
+            final JComponent playerPanel = player.getPlayer(TUBULAR_BELLS);
             
             frame.addWindowListener(player.getWindowClosingListener());
             frame.getContentPane().add(playerPanel);
