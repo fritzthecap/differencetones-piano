@@ -3,6 +3,7 @@ package fri.music.differencetones.composer.strategy;
 import java.util.List;
 import fri.music.Tone;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
+import fri.music.player.Note;
 
 /**
  * Common functionality for strategies, 
@@ -23,13 +24,16 @@ public abstract class AbstractStrategy implements Strategy
     protected void initialize(StrategyContext context) {
         // get list of possible intervals, sorted by wideness of interval and pitch
         // narrow interval first, high pitch first
-        generatingIntervals = context.inversions().getIntervalsGenerating(context.note());
+        
+        final Note note = context.note();
+        final Tone tone = new Tone(note.ipnName, note.frequency, note.midiNumber, note.cent);
+        generatingIntervals = context.inversions().getIntervalsGenerating(tone);
         if (generatingIntervals == null || generatingIntervals.size() <= 0)
-            throw new IllegalArgumentException("Note '"+context.note()+"' could not be mapped to an interval!");
+            throw new IllegalArgumentException("Note '"+note+"' could not be mapped to an interval!");
         
         lastIntervalIndex = generatingIntervals.size() - 1;
         considerAlternatives = (lastIntervalIndex > 0 && context.previousInterval() != null);
-        isRepeatedNote = context.note().equals(context.previousNote());
+        isRepeatedNote = (context.previousNote() != null && note.ipnName.equals(context.previousNote().ipnName));
     }
 
 

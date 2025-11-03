@@ -35,8 +35,8 @@ public class OneNoteInCommon extends AbstractStrategy
         final Tone previousLower = previousInterval.lowerTone();
         NearestSearchResult searchResult = new NearestSearchResult();
         for (final TonePair tonePair : generatingIntervals) {
-            final boolean upperEqual = tonePair.upperTone().equals(previousUpper);
-            final boolean lowerEqual = tonePair.lowerTone().equals(previousLower);
+            final boolean upperEqual = tonePair.upperTone().ipnName.equals(previousUpper.ipnName);
+            final boolean lowerEqual = tonePair.lowerTone().ipnName.equals(previousLower.ipnName);
             if (upperEqual != lowerEqual) // only one of them is true
                 searchResult = getNearest(searchResult, previousInterval, tonePair);
         }

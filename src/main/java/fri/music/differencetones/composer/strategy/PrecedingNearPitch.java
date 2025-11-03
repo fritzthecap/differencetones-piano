@@ -21,7 +21,7 @@ public class PrecedingNearPitch extends AbstractByPitch
         // There could be several preceding solutions, none of them must be parallel to the current one.
         // Find the one that is nearest to current pitch, or the most recent.
         final List<TonePair> precedingMappings = context.result().reversed().entrySet().stream()
-                .filter(entry -> entry.getKey().tone().equals(context.note()))
+                .filter(entry -> entry.getKey().tone().ipnName.equals(context.note().ipnName))
                 .map(entry -> entry.getValue())
                 .collect(Collectors.toList());
         
