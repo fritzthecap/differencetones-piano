@@ -528,6 +528,24 @@ class MelodyFactoryTest
             assertEquals(2000, parsed[3][i].durationMilliseconds); // one bar with 2000 millis
     }
 
+    @Test
+    void allNotesInChordMustHaveSameLength() {
+        final String chords = "[C4/1 E4 G4/2]";
+        final MelodyFactory melodyFactory = new MelodyFactory();
+        assertThrows(IllegalArgumentException.class, () -> {
+            melodyFactory.translate(chords);
+        });
+    }
+
+    @Test
+    void allNotesInTieMustHaveSamePitch() {
+        final String chords = "( [C4/1 E4 G4] [C4/1 E4 A4] )";
+        final MelodyFactory melodyFactory = new MelodyFactory();
+        assertThrows(IllegalArgumentException.class, () -> {
+            melodyFactory.translate(chords);
+        });
+    }
+    
 
     private Note[] translate(MelodyFactory melodyFactory, String[] notesArray) {
         Note[][] notes = melodyFactory.translate(notesArray);

@@ -1,6 +1,7 @@
 package fri.music.player.notelanguage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import fri.music.Tone;
 import fri.music.ToneSystem;
@@ -431,6 +432,10 @@ public class MelodyFactory
         
         checkValidIpnName(noteAndLength.ipnName);
         
+        if (firstChordNoteLength != null && noteAndLength.length != null &&
+                firstChordNoteLength.equals(noteAndLength.length) == false)
+            throw new IllegalArgumentException("All notes in a chord must have same length: "+noteAndLength.length);
+        
         final String length = (firstChordNoteLength != null)
                 ? firstChordNoteLength
                 : (noteAndLength.length != null)
@@ -716,6 +721,8 @@ public class MelodyFactory
             final MelodyToken melodyToken = melodyTokens.get(i);
             final Note rawNote = rawNotes.get(i);
             
+            checkWrongStateForSymbol(inTie, inSlur, inChord, melodyToken, rawNote);
+            
             final boolean slurStart = (inSlur == false && melodyToken.noteConnections.isSlurStart());
             final boolean slurEnd   = (inSlur == true  && melodyToken.noteConnections.isSlurEnd());
             final Boolean slurred = slurEnd ? Boolean.FALSE : (slurStart || inSlur) ? Boolean.TRUE : null;
@@ -780,9 +787,10 @@ public class MelodyFactory
             inTie = tieStart ? true : tieEnd ? false : inTie;
             inChord = chordStart ? true : chordEnd ? false : inChord;
         }
-        return connectedNotes;
+        
+        return checkNotes(connectedNotes);
     }
-    
+
     private int sumTiedDurations(List<Note> rawNotes, int fromIndex, List<MelodyToken> melodyTokens, Boolean chord) {
         final Note startNote = rawNotes.get(fromIndex);
         int duration = startNote.durationMilliseconds;
@@ -810,5 +818,51 @@ public class MelodyFactory
         while (i < rawNotes.size() && connections != null && connections.isTieEnd() == false);
 
         return duration;
+    }
+    
+    private void checkWrongStateForSymbol(
+            boolean inTie, boolean inSlur, boolean inChord, 
+            final MelodyToken melodyToken, final Note rawNote)
+    {
+        if (melodyToken.noteConnections.isSlurEnd() && inSlur == false)
+            throw new IllegalArgumentException("Slur end without slur start: "+rawNote);
+        if (melodyToken.noteConnections.isTieEnd() && inTie == false)
+            throw new IllegalArgumentException("Tie end without tie start: "+rawNote);
+        if (melodyToken.noteConnections.isChordEnd() && inChord == false)
+            throw new IllegalArgumentException("Chord end without chord start: "+rawNote);
+    }
+    
+    private List<Note[]> checkNotes(List<Note[]> connectedNotes) {
+        boolean inTie = false;
+        Note[] firstInTie = new Note[0];
+        
+        for (Note[] chord : connectedNotes) {
+            final Note firstNote = chord[0];
+            final Note lastNote = chord[chord.length - 1];
+            final boolean wasInTie = inTie;
+            
+            if (Boolean.TRUE.equals(firstNote.connectionFlags.tied()))
+                inTie = true;
+            
+            if (inTie == true) // state changed
+                if (wasInTie == false) // tie starts
+                    firstInTie = chord;
+                else // in tie
+                    checkEqualityInTie(firstInTie, chord);
+            
+            if (Boolean.FALSE.equals(lastNote.connectionFlags.tied()))
+                inTie = false;
+        }
+        
+        return connectedNotes;
+    }
+
+    private void checkEqualityInTie(Note[] firstInTie, Note[] follower) {
+        if (firstInTie.length != follower.length)
+            throw new IllegalArgumentException("Chords mixed with notes in a tie are not allowed: "+Arrays.asList(follower));
+
+        for (int i = 0; i < firstInTie.length; i++)
+            if (firstInTie[i].ipnName.equals(follower[i].ipnName) == false)
+                throw new IllegalArgumentException("Different notes in a tie are not allowed: "+Arrays.asList(follower));
     }
 }
