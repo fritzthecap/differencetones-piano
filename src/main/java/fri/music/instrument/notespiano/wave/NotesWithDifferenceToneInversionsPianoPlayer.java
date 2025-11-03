@@ -506,7 +506,8 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                 if (note.ipnName.equals(ipnNoteName)) // collect any note within a tie
                     lengthList.add(note.lengthNotation); // within a tie, pitch is the same for all tied notes
                 
-                if (Boolean.FALSE.equals(note.connectionFlags.tied())) // a tie ends with FALSE
+                final Note lastNote = melodyNotes[i][melodyNotes[i].length - 1];
+                if (Boolean.FALSE.equals(lastNote.connectionFlags.tied())) // a tie ends with FALSE
                     inTie = false;
                 
                 if (inTie == false) // tie ended, or was not a tie
