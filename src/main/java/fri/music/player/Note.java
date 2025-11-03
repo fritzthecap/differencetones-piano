@@ -211,4 +211,16 @@ public class Note extends Tone
     public String toString() {
         return toString(ipnName, lengthNotation);
     }
+    
+    /* @Override
+    public boolean equals(Object other) {
+        if (super.equals(other) == false)
+            return false;
+        return Objects.equals(lengthNotation, ((Note) other).lengthNotation);
+    }
+    
+    @Override
+    public int hashCode() {
+        return super.hashCode() + Objects.hashCode(lengthNotation);
+    }*/
 }
