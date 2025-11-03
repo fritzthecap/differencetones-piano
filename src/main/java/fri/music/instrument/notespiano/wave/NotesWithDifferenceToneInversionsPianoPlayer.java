@@ -165,16 +165,17 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
             manageIntervalListsOnMelodyChange(sounds);
     }
     
-    /** Overridden to disallow chords. */
+    /** Overridden to disallow chords in the PlayController of "Melody" text-area. */
     @Override
     protected PlayController newPlayController() {
         final PlayController playController  = new PlayController(this) {
-            /** Overridden to let piano open interval list frames when a key was pressed. */
+            /** Overridden to let piano open an interval list frame (on empty notes-area) when a key was pressed. */
             @Override
             protected void onEmptyNotes() {
                 super.onEmptyNotes();
                 getDifferenceToneInversionsPiano().setOpenIntervalListWhenPianoKeyPressed(true);
             }
+            /** Overridden to NOT let piano open an interval list frame (on non-empty notes-area) when a key was pressed. */
             @Override
             protected void onNonEmptyNotes(String timeSignatureOnTop, Integer tempoOnTop) {
                 super.onNonEmptyNotes(timeSignatureOnTop, tempoOnTop);
@@ -188,6 +189,7 @@ public class NotesWithDifferenceToneInversionsPianoPlayer extends NotesPianoPlay
                     getDifferenceToneInversionsPiano().setFrameSelected(note, getCurrentIndexIgnoringRests());
             }
         };
+        
         playController.setDisallowChords(true);
         return playController;
     }
