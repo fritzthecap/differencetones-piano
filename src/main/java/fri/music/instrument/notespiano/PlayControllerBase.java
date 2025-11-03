@@ -279,7 +279,7 @@ public class PlayControllerBase implements PlayControlButtons.Listener
         
         // following assignment is synchronized because called from startOrStop()
         this.player = new Player(pianoKeyConnector()) {
-            /** Overridden to let catch the played note. */
+            /** Overridden to redirect any played note to override-able playOrStopNote(). */
             @Override
             protected void noteOnOrOff(SoundChannel soundChannel, Note note, boolean on) {
                 playOrStopNote(soundChannel, note, on);

@@ -113,18 +113,18 @@ public abstract class AbstractComposer
     }
 
     /** Puts Note objects into result, built from given tonePair and note. */
-    private void assignInterval(Note[][] result, int resultIndex, Note note, TonePair tonePair) {
+    private void assignInterval(Note[][] intervalsResult, int resultIndex, Note note, TonePair tonePair) {
         if (tonePair == null)
             throw new IllegalArgumentException("Note '"+note+"' at index "+resultIndex+" could not be mapped to an interval!");
         
         if (tonePair.isRest()) {
-            result[resultIndex] = new Note[1];
-            result[resultIndex][0] = note;
+            intervalsResult[resultIndex] = new Note[1];
+            intervalsResult[resultIndex][0] = note;
         }
         else {
-            result[resultIndex] = new Note[2];
-            result[resultIndex][0] = new Note(tonePair.lowerTone(), note);
-            result[resultIndex][1] = new Note(tonePair.upperTone(), note);
+            intervalsResult[resultIndex] = new Note[2];
+            intervalsResult[resultIndex][0] = new Note(tonePair.lowerTone(), note);
+            intervalsResult[resultIndex][1] = new Note(tonePair.upperTone(), note);
         }
     }
     

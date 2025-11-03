@@ -17,10 +17,14 @@ public class Note extends Tone
      * @param slurred a note that is "phrased" together with predecessor or successor 
      *      or both, having DIFFERENT pitches. Null means not slurred, 
      *      TRUE means slur start or continued, FALSE means slur end.
+     *      Mind that in a chord, it is always the <b>last chord note</b> that carries
+     *      the ending FALSE flag!
      * @param tied a note that is tied together with predecessor or successor
      *      or both, all having SAME pitch. Null means not tied, 
      *      TRUE means tie start or continued, FALSE means tie end.
      *      If a tie is not started but continued, the note's durationMilliseconds will be zero.
+     *      Mind that in a chord, it is always the <b>last chord note</b> that carries
+     *      the ending FALSE flag!
      * @param chord a note that is part of a chord. Null means not part of a chord,
      *      TRUE means chord start or continued, FALSE means chord end.
      * @param multiplet null for normal note, TRUE when triplet starts, FALSE when it ends.
