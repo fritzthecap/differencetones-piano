@@ -66,7 +66,7 @@ G3/4 B3/4 D#4/4
     
     // scales
     
-    Notes PENTATONIC = new Notes("Pentatonic", Notes.Type.Scales, """
+    Notes PENTATONIC = new Notes("C Pentatonic", Notes.Type.Scales, """
 3/4
 C4/4 D4/4 E4/4 
 G4/4 A4/4 C5/4
@@ -88,6 +88,12 @@ E5/4 F5/4 G5/4 A5/4
 4/4
 A4/4 B4/4 C5/4 D5/4 
 E5/4 F5/4 G#5/4 A5/4
+""");
+    
+    Notes G_BLUES = new Notes("G Blues", Notes.Type.Scales, """
+4/4
+G4/4 A#4/4 C5/4 C#5/4 
+D5/4 E5/4 F5/4 G5/4
 """);
     
     Notes CHROMATIC_SCALE = new Notes("12 Tones", Notes.Type.Scales, """
@@ -213,6 +219,7 @@ G4 D4 G3/2
             C_MAJOR_SCALE,
             A_MINOR_HARMONIC,
             A_MINOR_MELODIC,
+            G_BLUES,
             CHROMATIC_SCALE,
             AUGUSTIN,
             ODE_TO_JOY,
