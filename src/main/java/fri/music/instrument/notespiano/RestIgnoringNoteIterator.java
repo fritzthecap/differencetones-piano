@@ -37,9 +37,16 @@ public class RestIgnoringNoteIterator implements Iterator<Note[]>
     }
     
     private void skipTies() {
-        while (index < notes.length && Boolean.TRUE.equals(notes[index][0].connectionFlags.tied()))
-            index++; // FALSE would be the last tied note
+        while (index < notes.length) {
+            final Note[] chord = notes[index];
+            final Note lastNote = chord[chord.length - 1];
+            if (Boolean.TRUE.equals(lastNote.connectionFlags.tied())) // last tied note would be FALSE
+                index++;
+            else
+                return; // tied is null or FALSE
+        }
     }
+    
     private void skipRests() {
         while (index < notes.length && notes[index][0].isRest())
             index++; // being on note after rest

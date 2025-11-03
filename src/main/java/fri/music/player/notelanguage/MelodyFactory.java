@@ -221,6 +221,7 @@ public class MelodyFactory
         for (int chordIndex = 0; chordIndex < notes.length; chordIndex++) {
             final Note[] chord = notes[chordIndex];
             Note note = chord[0];
+            Note lastNote = chord[chord.length - 1];
             
             // tempo can be attached to first note only
             if (chordIndex == 0 && writeTempo)
@@ -268,12 +269,12 @@ public class MelodyFactory
             if (inChord)
                 result.append(NoteConnections.CHORD_END_SYMBOL);
             
-            if (Boolean.FALSE.equals(note.connectionFlags.tied())) {
+            if (Boolean.FALSE.equals(lastNote.connectionFlags.tied())) {
                 result.append(NoteConnections.TIE_END_SYMBOL);
                 inTie = false;
             }
             
-            if (Boolean.FALSE.equals(note.connectionFlags.slurred())) {
+            if (Boolean.FALSE.equals(lastNote.connectionFlags.slurred())) {
                 result.append(NoteConnections.SLUR_END_SYMBOL);
                 inSlur = false;
             }

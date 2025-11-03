@@ -571,7 +571,6 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
                     targetIndex++;
             }
             intervalListsPanel.add(frame, targetIndex);
-            //setFrameSelected(frame);
         }
         else {
             intervalListsPanel.remove(frame);
@@ -617,6 +616,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
             }
             index++;
         }
+        //throw new IllegalArgumentException("intervalIndex = "+intervalIndex+", index = "+index);
     }
 
     private List<IntervalListFrame> getIntervalListFrames() {
