@@ -7,15 +7,19 @@
 
     <groupId>fri.music</groupId>
     <artifactId>differencetones-piano</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.1</version>
+    
+    <organization>
+        <name>Fritz Ritzberger</name>
+    </organization>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         
         <jupiter-version>6.0.0</jupiter-version>
     
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -54,7 +58,8 @@
                 <configuration>
                     <archive>
                         <manifest> <!-- The application main class -->
-                            <mainClass>fri.music.Main</mainClass>
+                            <mainClass>fri.music.apps.DifferenceTonesPiano</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                 </configuration>
