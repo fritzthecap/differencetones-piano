@@ -1,6 +1,6 @@
 package fri.music.instrument.notespiano;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +27,11 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     private NotesTextPanelBase view;
     
     private Note[][] sounds; // playing notes, possibly polyphonic
-    private int currentSoundIndex;
-    private int recentCaretPosition; // = 0 by Java default
+    private int currentSoundIndex; // skipped index while playing
+    private Map<Integer,Integer> soundIndexToIndexIgnoringRests; // map from sound-index to interval-list-frame index
+    
+    private int recentCaretPosition; // text cursor position
+    
     private boolean playingReverse;
     
     private SoundChannel pianoKeyConnector;
@@ -117,8 +120,10 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     // methods called by player
 
     Note[][] readNotesFromTextArea(boolean clearCurrentSounds) throws IllegalArgumentException {
-        if (clearCurrentSounds)
+        if (clearCurrentSounds) {
             sounds = null; // currentSoundIndex stays on its value, to further support single-steps
+            soundIndexToIndexIgnoringRests = null;
+        }
         
         final String notesString = view.notesText.getText();
         final boolean enable;
@@ -166,15 +171,25 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     protected void onEnableUiOnPlaying(boolean isStop) {
     }
     
-    /** @return the current player position, counted without rests. */
+    
+    /** @return the currently playing sound, could be a rest or one or more notes. */
+    protected Note[] getCurrentSound() {
+        return sounds[currentSoundIndex];
+    }
+    
+    /** @return the current player position, counted without rests, skipping tied notes. */
     protected int getCurrentIndexIgnoringRests() {
-        int index = 0;
-        final Note[][] currentlyPlayedSounds = Arrays.copyOf(sounds, currentSoundIndex);
-        for (RestIgnoringNoteIterator notesIterator = new RestIgnoringNoteIterator(currentlyPlayedSounds);
-                notesIterator.hasNext();
-                notesIterator.next())
-            index++;
-        return index;
+        if (soundIndexToIndexIgnoringRests == null) {
+            soundIndexToIndexIgnoringRests = new HashMap<>(sounds.length);
+            int indexIgnoringRests = 0;
+            final RestIgnoringNoteIterator notesIterator = new RestIgnoringNoteIterator(sounds);
+            for ( ; notesIterator.hasNext(); notesIterator.next()) {
+                final int soundIndex = notesIterator.getIndex();
+                soundIndexToIndexIgnoringRests.put(soundIndex, indexIgnoringRests);
+                indexIgnoringRests++;
+            }
+        }
+        return soundIndexToIndexIgnoringRests.get(currentSoundIndex);
     }
     
     // helpers
@@ -383,9 +398,9 @@ public class PlayControllerBase implements PlayControlButtons.Listener
     
     private void skip(boolean forward, boolean buttonPressed) {
         if (buttonPressed) {
-            if (sounds == null) { // no "Play" was pressed before "Step Forward"
+            if (this.sounds == null) { // no "Play" was pressed before "Step Forward"
                 final Note[][] notesArray = readNotesFromTextArea(false);
-                sounds = notesPianoPlayer.convertNotes(notesArray);
+                this.sounds = notesPianoPlayer.convertNotes(notesArray);
                 if (sounds == null || sounds.length <= 0)
                     return;
                 

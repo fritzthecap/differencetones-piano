@@ -884,6 +884,7 @@ public class DifferenceToneInversionsPiano extends DifferenceToneForNotesPiano
 
         void selectItem(DifferenceToneInversions.TonePair tonePair) {
             intervalList.setSelectedValue(tonePair, true);
+            intervalList.paintImmediately(intervalList.getVisibleRect());
         }
         
         @Override

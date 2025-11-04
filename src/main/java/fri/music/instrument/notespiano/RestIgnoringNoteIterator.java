@@ -18,6 +18,11 @@ public class RestIgnoringNoteIterator implements Iterator<Note[]>
             skipRests();
     }
 
+    /** @return the current index in notes - call this BEFORE next() to get the real current! */
+    public int getIndex() {
+        return index;
+    }
+    
     @Override
     public boolean hasNext() {
         return notes != null && index < notes.length;
