@@ -1,4 +1,4 @@
-package fri.music;
+package fri.music.apps;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import fri.music.HtmlResources;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
 import fri.music.instrument.configuration.ConfiguredPianoFactoryLauncher;
@@ -53,32 +54,30 @@ import fri.music.wavegenerator.WaveSoundChannel;
 
 /**
  * The differencetones-piano application.
- * It exposes all the apps available in this project.
+ * This class exposes all the apps available in this project.
  * 
  * @author Fritz Ritzberger, Dec 2024 - Oct 2025
  */
-public final class Main
+public class DifferenceTonesPiano
 {
     private static final int APP_BUTTON_WIDTH = 150; // left and right toolbar widths
-    
-    /** Application starter.*/
+
+    /** Application starter. */
     public static void main(String[] args) {
         final String version = readVersionFromMavenPomProperties();
         SwingUtilities.invokeLater(() -> {
-            final JFrame mainFrame = FrameStarter.start(
-                    "Welcome to the World of Difference-Tones "+version,
-                    new Main().panel,
-                    new Dimension(1040, 700));
+            final JFrame mainFrame = FrameStarter.start("Welcome to the World of Difference-Tones " + version,
+                    new DifferenceTonesPiano().panel, new Dimension(1040, 700));
             // let apps start screen-centered instead of cascaded to mainFrame
             FrameStarter.setNonLayoutRelevant(mainFrame);
         });
     }
-    
+
     private static String readVersionFromMavenPomProperties() {
         final String path = "/META-INF/maven/fri.music/differencetones-piano/pom.properties";
         final Properties mavenPomProperties = new Properties();
         try {
-            mavenPomProperties.load(Main.class.getResourceAsStream(path));
+            mavenPomProperties.load(DifferenceTonesPiano.class.getResourceAsStream(path));
             return mavenPomProperties.getProperty("version");
         }
         catch (Throwable e) {
@@ -87,10 +86,9 @@ public final class Main
         }
     }
 
-
     private final JPanel panel = new JPanel(new BorderLayout());
-    
-    private Main() {
+
+    private DifferenceTonesPiano() {
         panel.add(buildHtmlBrowser(), BorderLayout.CENTER);
         panel.add(buildLeftButtons(), BorderLayout.WEST);
         panel.add(buildRightButtons(), BorderLayout.EAST);
