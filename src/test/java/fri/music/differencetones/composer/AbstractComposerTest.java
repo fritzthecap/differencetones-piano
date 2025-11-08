@@ -2,6 +2,7 @@ package fri.music.differencetones.composer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Arrays;
 import fri.music.AbstractToneSystem;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
@@ -11,6 +12,7 @@ import fri.music.differencetones.DifferenceTones;
 import fri.music.player.Note;
 import fri.music.player.NotesUtil;
 import fri.music.player.Player;
+import fri.music.player.notelanguage.InputTextScanner;
 import fri.music.player.notelanguage.MelodyFactory;
 import fri.music.wavegenerator.SineWaveSoundChannel;
 
@@ -48,6 +50,21 @@ abstract class AbstractComposerTest
                 melody, 
                 new JustIntonation(), 
                 DifferenceTones.PRECISE_DEVIATION_JI, 
+                expectedIntervals);
+    }
+    
+    /** Checks whether given melody translates into expected intervals. */
+    protected void assertCompose(
+            String melodyString,
+            AbstractToneSystem toneSystem, 
+            double deviation, 
+            String[][] expectedIntervals)
+    {
+        final String[] melodyArray = new InputTextScanner().toStringArray(melodyString);
+        assertCompose(
+                melodyArray,
+                toneSystem, 
+                deviation, 
                 expectedIntervals);
     }
     
@@ -99,9 +116,13 @@ abstract class AbstractComposerTest
             dumpAsJavaSourcecode(intervals);
             
             for (int i = 0; i < intervals.length; i++) {
-                final Note note = melodyNotes[i];
                 final Note[] interval = intervals[i];
-                System.out.println(note.ipnName+" = "+new DifferenceToneInversions.TonePair(interval[0], interval[1]));
+                if (interval.length == 2) {
+                    final Note note = melodyNotes[i];
+                    final DifferenceToneInversions.TonePair tonePair = 
+                            new DifferenceToneInversions.TonePair(interval[0], interval[1]);
+                    System.out.println(note+" = "+tonePair);
+                }
             }
         }
         
@@ -130,7 +151,12 @@ abstract class AbstractComposerTest
                     System.out.print("    ");
             }
             
-            System.out.print("{ \""+interval[0].ipnName+"\", \""+interval[1].ipnName+"\" },");
+            if (interval.length <= 1) // rest
+                System.out.print("{ \""+interval[0]+"\", },");
+            else if (interval.length == 2)
+                System.out.print("{ \""+interval[0]+"\", \""+interval[1]+"\" },");
+            else
+                throw new IllegalArgumentException("Test was made to output intervals but got a chord: "+Arrays.asList(intervals));
         }
         
         System.out.println();
