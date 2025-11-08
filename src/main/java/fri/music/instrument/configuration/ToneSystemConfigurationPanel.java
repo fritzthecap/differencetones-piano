@@ -50,7 +50,7 @@ public class ToneSystemConfigurationPanel extends ToneRangeConfigurationPanel
             modalScaleStartBaseName.setSelectedItem(modalScaleStartBaseNameParam);
 
         // field layout
-        final JComponent tuningsPanel = tuningComponent.getLeftAlignedChoice(); // null: default tuning
+        final JComponent tuningsPanel = tuningComponent.getLeftAlignedChoice();
         // set tunings choice on top
         panel.add(tuningsPanel, 0); // null: default tuning
         

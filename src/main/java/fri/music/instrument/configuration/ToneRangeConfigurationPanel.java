@@ -18,8 +18,8 @@ import fri.music.ToneSystem;
 import fri.music.utils.swing.layout.SmartComboBox;
 
 /**
- * A panel that lets configure some common options for
- * ToneSystem implementations.
+ * A panel that lets configure a number of octaves for a scale
+ * and the lowest tone of the scale, with its octave.
  */
 public class ToneRangeConfigurationPanel
 {

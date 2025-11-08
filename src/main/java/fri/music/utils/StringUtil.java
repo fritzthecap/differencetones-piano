@@ -93,5 +93,35 @@ public final class StringUtil
         return title;
     }
     
+    /** Appends given text-line and a newline to given string-builder. */
+    public static void appendLine(String line, StringBuilder sb) {
+        sb.append(line);
+        sb.append(StringUtil.NEWLINE);
+    }
+    
+    /** Appends a right-aligned column with 2 separator-blanks. */
+    public static void appendColumn(String content, int maxLength, StringBuilder sb) {
+        appendColumn(content, maxLength, 2, sb);
+    }
+    
+    /** Appends a right-aligned column with given separator-blanks. */
+    public static void appendColumn(String content, int maxLength, int blanksToAppend, StringBuilder sb) {
+        final int contentLength = content.length();
+        final int lessThanMaxLength = maxLength - contentLength;
+        for (int i = 0; i < lessThanMaxLength; i++)
+            sb.append(' '); // align any content to right
+        
+        sb.append(content);
+        
+        if (blanksToAppend > 0) { // not end of columns
+            if (lessThanMaxLength < 0) // subtract from blanks what is too much in content
+                blanksToAppend += lessThanMaxLength;
+
+            for (int i = 0; i < blanksToAppend; i++)
+                sb.append(' ');
+        }
+    }
+    
+    
     private StringUtil() {} // do not instantiate
 }

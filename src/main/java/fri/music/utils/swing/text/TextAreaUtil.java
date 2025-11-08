@@ -1,6 +1,10 @@
 package fri.music.utils.swing.text;
 
+import java.awt.Font;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import fri.music.utils.swing.window.DialogStarter;
 
 public final class TextAreaUtil
 {
@@ -19,6 +23,28 @@ public final class TextAreaUtil
         textArea.setCaretPosition(Math.min(caretPosition, textArea.getDocument().getLength()));
         textArea.requestFocusInWindow();
     }
+    
+    /**
+     * Shows given text in a non-modal dialog.
+     * @param parent required, the dialog parent.
+     * @param title required, the text to put into dialog title bar.
+     * @param text required, the text to render in text-area.
+     * @param font optional, the text-area font to use.
+     */
+    public static void showResultInTextDialog(JComponent parent, String title, String text, String font) {
+        final JTextArea textArea = new JTextArea(text);
+        textArea.setTabSize(2);
+        textArea.setEditable(false);
+        if (font != null)
+            textArea.setFont(Font.decode(font).deriveFont(Font.BOLD, 14f));
+        else
+            textArea.setFont(textArea.getFont().deriveFont(Font.BOLD, 14f));
+        
+        final TextAreaActions fontActions = new TextAreaActions(textArea); // adds context menu
+        
+        DialogStarter.start(title, parent, new JScrollPane(textArea), null, true);
+    }
+
     
     private TextAreaUtil() {} // do not instantiate
 }

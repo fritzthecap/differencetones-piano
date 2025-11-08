@@ -83,7 +83,7 @@ public abstract class AbstractComposer
             
             final TonePair bestInterval;
             if (isRest) {
-                bestInterval = new TonePair();
+                bestInterval = new TonePair(note);
             }
             else {
                 final Note previousNote = (i > 0) ? melody[i - 1] : null;
@@ -187,9 +187,9 @@ public abstract class AbstractComposer
         
         final String lowestIpnName = toneStock[lowestIndexInToneStock].ipnName;
         
-        // melodyOctaves up to 1.3 -> 4 octaves, up to 2.3 -> 5, up to 3.3 -> 6, ...
-        final int additionalOctavesTo4 = Math.min(0, (int) Math.ceil(melodyOctaves - 1.3));
-        toneStock = AbstractToneSystem.tones(toneStock, lowestIpnName, lowestIpnName, 4 + additionalOctavesTo4);
+        // melodyOctaves up to 0.3 -> 3 octaves, up to 1.3 -> 4, up to 2.3 -> 5, ...
+        final int additionalOctavesTo3 = Math.max(0, (int) Math.round(melodyOctaves - 0.3));
+        toneStock = AbstractToneSystem.tones(toneStock, lowestIpnName, lowestIpnName, 3 + additionalOctavesTo3);
         
         return new DifferenceToneInversions(
             new DifferenceToneInversions.Configuration(

@@ -62,9 +62,10 @@ public class DifferenceToneInversions extends DifferenceTones
     public record TonePair(Tone lowerTone, Tone upperTone)
     {
         /** Rest constructor. */
-        public TonePair() {
-            this(null, null);
+        public TonePair(Tone lowerTone) {
+            this(lowerTone, null);
         }
+        
         public int semitoneDistance() {
             if (isRest())
                 return 0;
@@ -76,12 +77,12 @@ public class DifferenceToneInversions extends DifferenceTones
             return ToneSystem.intervalName(semitoneDistance());
         }
         public boolean isRest() {
-            return lowerTone == null;
+            return upperTone == null;
         }
         @Override
         public final String toString() {
             if (isRest())
-                return ToneSystem.REST_SYMBOL;
+                return lowerTone.ipnName;
             return intervalName()+" "+lowerTone.ipnName+"-"+upperTone.ipnName;
         }
     }
@@ -168,7 +169,7 @@ public class DifferenceToneInversions extends DifferenceTones
         // in just-intonation, any tone-pair can give another difference tone, nearly no predictions are possible
         // build index of intervals from given tones
         // C-D, C-D#, C-E ... C-A#; C#-#D C#-E, ...
-        for (int lowerIndex = 2; // there won't be a difference tone below third semi-tone
+        for (int lowerIndex = 0;
                 lowerIndex < tones.length - config.smallestSemitoneDistance; // stop one before last
                 lowerIndex++) 
         {
@@ -179,14 +180,14 @@ public class DifferenceToneInversions extends DifferenceTones
                     semitoneOffset++)
             {
                 final Tone upperTone = tones[lowerIndex + semitoneOffset];
-                final Tone differenceTone = findDifferenceTones(lowerTone, upperTone)[0]; // we requested just one
+                final Tone differenceTone = findDifferenceTones(lowerTone, upperTone)[0]; // [0]: just primary difference-tone
                 
                 if (differenceTone != null) {
                     final TonePair tonePair = new TonePair(lowerTone, upperTone);
                     
                     List<TonePair> list = differenceToneToGeneratingTones.get(differenceTone);
                     if (list == null) {
-                        list = new ArrayList<TonePair>();
+                        list = new ArrayList<>();
                         differenceToneToGeneratingTones.put(differenceTone, list);
                     }
                     list.add(0, tonePair); // add to head, smaller intervals to front

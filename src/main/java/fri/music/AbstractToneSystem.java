@@ -128,6 +128,7 @@ public abstract class AbstractToneSystem implements ToneSystem
      * Delivers a sub-set of given tones.
      * @param tones the tone-system to filter.
      * @param lowestIpnName the start point of the requested tone array.
+     * @param baseToneIpnName just for exception message, the tone the scale was built upon.
      * @param octaves the 0-n number of octaves + 1 to return.
      *      When zero, just the lowest tone is returned.
      * @return all tones from given IPN-name up to given octaves + 1.
@@ -163,7 +164,7 @@ public abstract class AbstractToneSystem implements ToneSystem
                 : "built upon "+baseToneIpnName()+", modal start tone "+modalScaleStartIpnName;
         return name()+", "+
                 baseToneInfo+
-                ", "+octaves+" octaves"+
+                ", "+octaves+" octave(s)"+
                 ", calculated from "+ToneSystem.REFERENCE_FREQUENCY_IPN_NAME+
                 " with frequency "+Tone.frequencyFormat.format(referenceFrequency())+" Hertz";
     }

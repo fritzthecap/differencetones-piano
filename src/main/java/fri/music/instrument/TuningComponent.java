@@ -51,7 +51,7 @@ public class TuningComponent
         this.modalScaleStartIpnName = (modalScaleStartIpnName != null) ? modalScaleStartIpnName : ToneSystem.DEFAULT_BASETONE_IPN_NAME;
     }
     
-    /** Left-aligned container for combo-box. */
+    /** Left-aligned container for combo-box with default tuning. */
     public JComponent getLeftAlignedChoice() {
         final JPanel tuningsPanel = new JPanel();
         tuningsPanel.setLayout(new BoxLayout(tuningsPanel, BoxLayout.X_AXIS));

@@ -1,5 +1,6 @@
 package fri.music.differencetones;
 
+import java.util.Arrays;
 import java.util.Objects;
 import fri.music.Tone;
 import fri.music.ToneSystem;
@@ -176,30 +177,19 @@ public class DifferenceTones extends Tones
        if (upper == lower) // exact match was found, or both null
            return lower; // both are the same
        
-       /*if (upper == null) { // frequency is below lowest tone
-           final double gapToLower = lower.frequency - frequencyToMatch;
-           final double assumedGap = getNextUpper(lower).frequency - lower.frequency;
-           final double tolerance = assumedGap * deviationTolerance;
-           return (gapToLower > tolerance) ? null : lower;
-       }
-       if (lower == null) { // frequency is above highest tone
-           final double gapToUpper = frequencyToMatch - upper.frequency;
-           final double assumedGap = getNextLower(upper).frequency - upper.frequency;
-           final double tolerance = assumedGap * deviationTolerance;
-           return (gapToUpper > tolerance) ? null : upper;
-       }*/
-       
-       if (upper == null || // frequency is below lowest tone
-               lower == null) // frequency is above highest tone
-           return null; // can not calculate an exact result, assumptions lead to mismatches
+       if (upper == null || lower == null) // frequency is below lowest or above highest tone
+           return null; // can not calculate an exact result, assumptions lead to mismatches!
 
+       final double gap = upper.frequency - lower.frequency;
        final double gapToLower = frequencyToMatch - lower.frequency;
        final double gapToUpper = upper.frequency - frequencyToMatch;
-       final boolean preferLower = (gapToLower < gapToUpper);
        
-       final double gap = upper.frequency - lower.frequency;
-       final double tolerance = gap * deviationTolerance; // deviation is never negative
+       if (gap < 0.0 || gapToLower < 0.0 || gapToUpper < 0.0)
+           throw new IllegalStateException("Enclosing tones are not sorted by frequency: "+Arrays.asList(enclosingTones));
+       
+       final boolean preferLower = (gapToLower < gapToUpper);
        final double smallerGap = preferLower ? gapToLower : gapToUpper;
+       final double tolerance = gap * deviationTolerance; // deviation is never negative
        
        return (smallerGap > tolerance) ? null : preferLower ? lower : upper;
     }

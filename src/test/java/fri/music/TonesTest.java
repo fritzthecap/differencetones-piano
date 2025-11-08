@@ -48,11 +48,11 @@ class TonesTest
         Tone[] enclosingTones;
 
         enclosingTones = tones.getEnclosingTones(tones.getHighest().frequency + 4.0);
-        assertNull(enclosingTones[0]);
-        assertEquals("C10", enclosingTones[1].ipnName);
+        assertNull(enclosingTones[1]);
+        assertEquals("C10", enclosingTones[0].ipnName);
 
         enclosingTones = tones.getEnclosingTones(tones.getLowest().frequency - 50.0);
-        assertEquals("C0", enclosingTones[0].ipnName);
-        assertNull(enclosingTones[1]);
+        assertEquals("C0", enclosingTones[1].ipnName);
+        assertNull(enclosingTones[0]);
     }
 }

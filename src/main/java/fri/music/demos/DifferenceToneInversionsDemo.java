@@ -15,8 +15,15 @@ import fri.music.differencetones.DifferenceTones;
 public class DifferenceToneInversionsDemo
 {
     public static void main(String[] args) {
-        final String BASE_TONE = "C2";
+        final String BASE_TONE = "B1";
+        //final String BASE_TONE = "C2";
+
         final int octaves = 4; // C2 - C6
+        
+        final int narrowestInterval = ToneSystem.semitoneSteps(ToneSystem.MINOR_THIRD);
+        //final int narrowestInterval = ToneSystem.semitoneSteps(ToneSystem.MAJOR_SECOND);
+        final int widestInterval  = ToneSystem.semitoneSteps(ToneSystem.MAJOR_SIXTH); // the MINOR_SEVENTH difference tone is very hard to hear!
+        
         /**
          * 4 octaves cover 1.3 octaves (C2-E3) for a a melody made of difference tones
          * where all harmonious intervals are available for it.
@@ -24,7 +31,10 @@ public class DifferenceToneInversionsDemo
          */
         display(
                 new EqualTemperament(BASE_TONE, octaves), 
-                DifferenceTones.TOLERANT_DEVIATION_EDO_12);
+                DifferenceTones.TOLERANT_DEVIATION_EDO_12,
+                narrowestInterval,
+                widestInterval);
+        
         /**
          * 4 octaves cover 1.5 octaves (C2-F#3) for a melody made of difference tones
          * where many harmonious intervals (except tritone) are available for it.
@@ -32,31 +42,37 @@ public class DifferenceToneInversionsDemo
          */
         display(
                 new JustIntonation(BASE_TONE, octaves, ChromaticScales.LIMIT_5_SYMMETRIC_1), 
-                DifferenceTones.PRECISE_DEVIATION_JI);
-        display(
-                new JustIntonation(BASE_TONE, octaves, ChromaticScales.LIMIT_5_SYMMETRIC_2), 
-                DifferenceTones.PRECISE_DEVIATION_JI);
-        display(
-                new JustIntonation(BASE_TONE, octaves, ChromaticScales.LIMIT_5_ASYMMETRIC), 
-                DifferenceTones.PRECISE_DEVIATION_JI);
-        /**
-         * 4 octaves cover 1.5 octaves (C2-F#3) for a melody made of difference tones.
-         * The tones F and D# (IONIAN C-scale) are not present at all!
-         */
-        display(
-                new JustIntonation(BASE_TONE, octaves, ChromaticScales.HARMONIC_SERIES), 
-                DifferenceTones.TOLERANT_DEVIATION_JI);
+                DifferenceTones.PRECISE_DEVIATION_JI,
+                narrowestInterval,
+                widestInterval);
+//        display(
+//                new JustIntonation(BASE_TONE, octaves, ChromaticScales.LIMIT_5_SYMMETRIC_2), 
+//                DifferenceTones.PRECISE_DEVIATION_JI,
+//                narrowestInterval,
+//                widestInterval);
+//        display(
+//                new JustIntonation(BASE_TONE, octaves, ChromaticScales.LIMIT_5_ASYMMETRIC), 
+//                DifferenceTones.PRECISE_DEVIATION_JI,
+//                narrowestInterval,
+//                widestInterval);
+        
+//        /**
+//         * 4 octaves cover 1.5 octaves (C2-F#3) for a melody made of difference tones.
+//         * The tones F and D# (IONIAN C-scale) are not present at all!
+//         */
+//        display(
+//                new JustIntonation(BASE_TONE, octaves, ChromaticScales.HARMONIC_SERIES), 
+//                DifferenceTones.TOLERANT_DEVIATION_JI,
+//                narrowestInterval,
+//                widestInterval);
     }
     
-    private static void display(ToneSystem toneSystem, double deviationTolerance) {
-        final int SMALLEST_SEMITONE_STEPS = ToneSystem.semitoneSteps(ToneSystem.MAJOR_SECOND);
-        final int BIGGEST_SEMITONE_STEPS  = ToneSystem.semitoneSteps(ToneSystem.MAJOR_SIXTH); // the MINOR_SEVENTH difference tone is very hard to hear!
-
+    private static void display(ToneSystem toneSystem, double deviationTolerance, int narrowestInterval, int widestInterval) {
         final DifferenceToneInversions differenceToneInversions = new DifferenceToneInversions(
                 new DifferenceToneInversions.Configuration(
                     toneSystem.tones(),
-                    SMALLEST_SEMITONE_STEPS,
-                    BIGGEST_SEMITONE_STEPS,
+                    narrowestInterval,
+                    widestInterval,
                     deviationTolerance)
             );
         differenceToneInversions.removeDissonant(false);

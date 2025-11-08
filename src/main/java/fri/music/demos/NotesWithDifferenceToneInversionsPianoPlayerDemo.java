@@ -5,7 +5,6 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.notespiano.wave.NotesWithDifferenceToneInversionsPianoPlayer;
-import fri.music.instrument.notespiano.NoteExamples;
 import fri.music.instrument.wave.DifferenceToneInversionsPiano;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
 import fri.music.wavegenerator.WaveSoundChannel;

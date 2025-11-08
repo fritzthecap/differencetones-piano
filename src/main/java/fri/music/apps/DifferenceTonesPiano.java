@@ -66,8 +66,10 @@ public class DifferenceTonesPiano
     public static void main(String[] args) {
         final String version = readVersionFromMavenPomProperties();
         SwingUtilities.invokeLater(() -> {
-            final JFrame mainFrame = FrameStarter.start("Welcome to the World of Difference-Tones " + version,
-                    new DifferenceTonesPiano().panel, new Dimension(1040, 700));
+            final JFrame mainFrame = FrameStarter.start(
+                    "Welcome to the World of Difference-Tones "+version,
+                    new DifferenceTonesPiano().panel,
+                    new Dimension(1040, 700));
             // let apps start screen-centered instead of cascaded to mainFrame
             FrameStarter.setNonLayoutRelevant(mainFrame);
         });

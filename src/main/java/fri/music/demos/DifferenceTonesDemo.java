@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import fri.music.EqualTemperament;
 import fri.music.JustIntonation;
-import fri.music.JustIntonation.ChromaticScales;
 import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.Tones;
