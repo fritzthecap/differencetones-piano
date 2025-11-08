@@ -2,7 +2,6 @@ package fri.music.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import fri.music.utils.MathUtil;
 
 class MathUtilTest
 {

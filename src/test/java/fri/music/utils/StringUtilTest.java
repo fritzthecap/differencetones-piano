@@ -3,7 +3,6 @@ package fri.music.utils;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import fri.music.utils.StringUtil;
 
 class StringUtilTest
 {
