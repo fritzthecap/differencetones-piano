@@ -1,5 +1,6 @@
 package fri.music.instrument.wave;
 
+import java.util.Arrays;
 import java.util.List;
 import fri.music.Tone;
 import fri.music.differencetones.DifferenceTones;
@@ -45,4 +46,18 @@ public class DifferenceToneUtil
         return null;
     }
 
+    /**
+     * When searching difference-tone intervals for a tone, this is done through <code>Tones.getEnclosingTones()</code>.
+     * The lowest tone though would not let find all possible intervals, because there is no enclosing tone below it.
+     * For that reason it is recommended to search in a tone-stock that starts one below given lowest tone. 
+     * @param toneStock the tones array containing hopefully one below given lowest tone.
+     * @param lowest the tone to search the tone one below it.
+     * @return null when no lower tone in tone-stock, else the tone one below given lowest tone.
+     */
+    public static Tone oneToneBelow(Tone[] toneStock, Tone lowest) {
+        // we need the tone below lowest melody note to make deviation work also for bottom
+        int lowestToneIndex = Arrays.binarySearch(toneStock, lowest, (t1, t2) -> t1.midiNumber - t2.midiNumber);
+        lowestToneIndex--; // go one deeper
+        return (lowestToneIndex >= 0) ? toneStock[lowestToneIndex] : null;
+    }
 }

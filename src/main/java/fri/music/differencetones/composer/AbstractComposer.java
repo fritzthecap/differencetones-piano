@@ -11,6 +11,7 @@ import fri.music.Tone;
 import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
+import fri.music.instrument.wave.DifferenceToneUtil;
 import fri.music.player.Note;
 
 /**
@@ -155,7 +156,8 @@ public abstract class AbstractComposer
     /**
      * Builds a sufficient range of tones to model given melody with difference tones.
      * A melody with 1.3 octaves tone-range requires about 4 octaves above its lowest note.
-     * @param melody required, the melody to model with difference tones.
+     * @param lowest required, the lowest tone of the melody to model with difference tones.
+     * @param highest required, the highest tone of the melody to model with difference tones.
      * @param toneStock required, the 12-tone system to be used for the melody and its difference tones.
      * @param smallestSemitoneDistance optional, the number of semi-tones representing the 
      *      smallest difference-tone interval to provide in returned tone-inversions.
@@ -180,20 +182,23 @@ public abstract class AbstractComposer
         final double melodyOctaves = (double) numberOfSemitones / (double) ToneSystem.SEMITONES_PER_OCTAVE;
         
         // we need the tone below lowest melody note to make deviation work also for bottom
-        int lowestIndexInToneStock = Arrays.binarySearch(toneStock, lowest, (t1, t2) -> t1.midiNumber - t2.midiNumber);
-        lowestIndexInToneStock--; // go one deeper
-        if (lowestIndexInToneStock < 0)
+        final Tone oneBelow = DifferenceToneUtil.oneToneBelow(toneStock, lowest);
+        if (oneBelow == null)
             throw new IllegalArgumentException("Tone stock is too small for lowest melody note "+lowest.ipnName+", its lowest is "+toneStock[0].ipnName);
         
-        final String lowestIpnName = toneStock[lowestIndexInToneStock].ipnName;
+        final String lowestIpnName = oneBelow.ipnName;
         
-        // melodyOctaves up to 0.3 -> 3 octaves, up to 1.3 -> 4, up to 2.3 -> 5, ...
-        final int additionalOctavesTo3 = Math.max(0, (int) Math.round(melodyOctaves - 0.3));
-        toneStock = AbstractToneSystem.tones(toneStock, lowestIpnName, lowestIpnName, 3 + additionalOctavesTo3);
+        // for melodyOctaves up to 0.25 -> 3 octaves, up to 1.25 -> 4, up to 2.25 -> 5, ...
+        final int additionalOctavesTo3 = Math.max(0, (int) Math.round(melodyOctaves - 0.25));
+        final Tone[] calculationToneStock = AbstractToneSystem.tones(
+                toneStock, 
+                lowestIpnName, 
+                lowestIpnName, 
+                3 + additionalOctavesTo3);
         
         return new DifferenceToneInversions(
             new DifferenceToneInversions.Configuration(
-                toneStock, 
+                calculationToneStock, 
                 (smallestSemitoneDistance > 0) ? smallestSemitoneDistance : DifferenceToneInversions.Configuration.DEFAULT_SMALLEST_SEMITONE_STEPS,
                 (biggestSemitoneDistance > 0) ? biggestSemitoneDistance : DifferenceToneInversions.Configuration.DEFAULT_BIGGEST_SEMITONE_STEPS,
                 deviationTolerance
