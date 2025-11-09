@@ -36,18 +36,28 @@ public class ToneRangeConfigurationPanel
     private JComboBox<String> lowestToneScaleName;
     private JSlider lowestToneOctave;
     
-    public ToneRangeConfigurationPanel(int octavesParam, String lowestToneBaseNameParam, int lowestToneOctaveParam) {
+    public ToneRangeConfigurationPanel(
+            int octavesParam, 
+            String lowestToneBaseNameParam, 
+            int lowestToneOctaveParam)
+    {
         this(octavesParam, lowestToneBaseNameParam, lowestToneOctaveParam, true);
     }
     
-    public ToneRangeConfigurationPanel(int octavesParam, String lowestToneBaseNameParam, int lowestToneOctaveParam, boolean addScaleNameChoice) {
+    public ToneRangeConfigurationPanel(
+            int octavesParam, 
+            String lowestToneBaseNameParam, 
+            int lowestToneOctaveParam, 
+            boolean addScaleNameChoice)
+    {
         // field construction
         buildConfigurationFields(octavesParam, lowestToneBaseNameParam, lowestToneOctaveParam, addScaleNameChoice);
         
         // fields layout
         final JPanel lowestTonePanel = new JPanel();
         lowestTonePanel.setLayout(new BoxLayout(lowestTonePanel, BoxLayout.X_AXIS));
-        lowestTonePanel.setBorder(BorderFactory.createTitledBorder("Calculation Start Tone"));
+        lowestTonePanel.setBorder(BorderFactory.createTitledBorder(lowestTonePanelTitle()));
+        
         lowestTonePanel.add(lowestToneBaseName);
         if (lowestToneScaleName != null)
             lowestTonePanel.add(lowestToneScaleName);
@@ -59,7 +69,7 @@ public class ToneRangeConfigurationPanel
         panel.add(octaves);
         panel.add(lowestTonePanel);
     }
-    
+
     public final int getOctaves() {
         return octaves.getValue();
     }
@@ -68,6 +78,21 @@ public class ToneRangeConfigurationPanel
         return "" + lowestToneBaseName.getSelectedItem() + lowestToneOctave.getValue();
     }
     
+    // START Override-able UI texts
+    
+    protected String lowestTonePanelTitle() {
+        return "Calculation Start Tone";
+    }
+    
+    protected String lowestToneBaseNameTooltip() {
+        return "Calculation Start Tone of the Tonesystem";
+    }
+    
+    protected String lowestToneOctaveTooltip() {
+        return "Calculation Start Octave of the Tonesystem";
+    }
+    
+    // END Override-able UI texts
     
     protected final int getLowestToneOctave() {
         return lowestToneOctave.getValue();
@@ -154,7 +179,7 @@ public class ToneRangeConfigurationPanel
         
         this.lowestToneBaseName = new SmartComboBox(getToneBaseNames());
         lowestToneBaseName.setBorder(BorderFactory.createTitledBorder("Key"));
-        lowestToneBaseName.setToolTipText("Calculation Start Tone of the Tonesystem");
+        lowestToneBaseName.setToolTipText(lowestToneBaseNameTooltip());
         
         if (addScaleNameChoice)
             this.lowestToneScaleName = buildScaleNameChoice(lowestToneBaseName);
@@ -166,7 +191,7 @@ public class ToneRangeConfigurationPanel
                 ToneSystem.MAXIMUM_OCTAVES - 1, 
                 lowestToneOctaveParam);
         lowestToneOctave.setBorder(BorderFactory.createTitledBorder("Octave"));
-        lowestToneOctave.setToolTipText("Calculation Start Octave of the Tonesystem");
+        lowestToneOctave.setToolTipText(lowestToneOctaveTooltip());
         lowestToneOctave.setSnapToTicks(true);
         lowestToneOctave.setPaintLabels(true);
         lowestToneOctave.setPaintTicks(true);
