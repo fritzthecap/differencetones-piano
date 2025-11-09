@@ -2,20 +2,15 @@ package fri.music.instrument.configuration;
 
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import fri.music.AbstractToneSystem;
 import fri.music.Tone;
@@ -86,7 +81,10 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
         
         // get possible difference-tones
         final List<Tone> differenceTones = differenceToneInversions.differenceTones();
-        differenceTones.remove(0); // inversions were constructed with on below, but we don't want to see the one below
+        // inversions were constructed with one below lowest tone, to find enclosing tones
+        // also for lowest tone, but we don't want to see the one below here:
+        differenceTones.remove(0);
+        
         // prepare table column structure as sorted list of interval-names
         final List<String> tableColumns = intervalColumns(differenceTones, differenceToneInversions);
         // fill table with values
