@@ -58,7 +58,7 @@ public abstract class AbstractStrategicComposer extends AbstractComposer
         for (Strategy strategy : strategies) {
             final TonePair solution = strategy.solution(strategyContext);
             if (solution != null) {
-                logNoteMapping(note, strategy, solution);
+                logNoteMapping(note, strategy, solution, strategyContext);
                 return solution;
             }
         }
@@ -69,10 +69,14 @@ public abstract class AbstractStrategicComposer extends AbstractComposer
     
     private static final boolean LOG = false;
     
-    private void logNoteMapping(Note note, Strategy strategy, TonePair interval) {
+    private void logNoteMapping(Note note, Strategy strategy, TonePair interval, StrategyContext strategyContext) {
         if (LOG == false)
             return;
         
-        System.err.println("Note "+note+" was mapped by "+strategy.getClass().getSimpleName()+" to interval "+interval);
+        System.err.println(
+                "Note "+note+
+                " was mapped by "+strategy.getClass().getSimpleName()+
+                " to interval "+interval+
+                " from "+strategyContext.inversions().getIntervalsGenerating(note.ipnName));
     }
 }
