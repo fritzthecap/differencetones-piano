@@ -26,8 +26,7 @@ public abstract class AbstractStrategy implements Strategy
         // narrow interval first, high pitch first
         
         final Note note = context.note();
-        final Tone tone = new Tone(note.ipnName, note.frequency, note.midiNumber, note.cent);
-        generatingIntervals = context.inversions().getIntervalsGenerating(tone);
+        generatingIntervals = context.inversions().getIntervalsGenerating(note);
         if (generatingIntervals == null || generatingIntervals.size() <= 0)
             throw new IllegalArgumentException("Note '"+note+"' could not be mapped to an interval!");
         
