@@ -27,7 +27,7 @@ public abstract class AbstractByPitch extends AbstractStrategy
         
         final double pitchFraction = 
                 (double) context.semitoneDistanceFromLowest() / (double) context.maximumSemitoneDistance();
-        // will be 0 for lowest note, 1 for highest
+                // will be 0 for lowest note, 1 for highest
         
         indexByPitch = (int) Math.round(pitchFraction * (double) lastIntervalIndex);
         bestByPitch = generatingIntervals.get(indexByPitch);

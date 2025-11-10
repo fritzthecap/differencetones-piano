@@ -10,6 +10,7 @@ import fri.music.player.Note;
  * To be used in AbstractComposer.
  * Such a context is created newly for every note to be translated.
  * @param inversions to be used for finding tone-pairs that can generate a certain difference-tone.
+ * @param melodySizeFraction 0.5 for melody range 1/2 octave, 1.0 for 1 octave, 1.5 for 1+1/2 ...
  * @param maximumSemitoneDistance number of semi-tones between highest and lowest note.
  * @param semitoneDistanceFromLowest number of semi-tones between current and lowest note.
  * @param previousNote the preceding note of the current one.
@@ -20,6 +21,8 @@ import fri.music.player.Note;
 public record StrategyContext(
         /** To be used for finding tone-pairs that can generate a certain difference-tone. */
         DifferenceToneInversions inversions,
+        /** 0.5 for melody range 1/2 octave, 1.0 for 1 octave, 1.5 for 1+1/2, ... */
+        double melodySizeFraction,
         /** Number of semi-tones between highest and lowest note. */
         int maximumSemitoneDistance,
         /** Number of semi-tones between current and lowest note. */

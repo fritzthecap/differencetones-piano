@@ -37,6 +37,7 @@ public abstract class AbstractStrategicComposer extends AbstractComposer
     @Override
     protected TonePair mapNote(
             DifferenceToneInversions inversions,
+            double melodySizeFraction,
             int maximumSemitoneDistance,
             int semitoneDistanceFromLowest,
             Note previousNote,
@@ -46,6 +47,7 @@ public abstract class AbstractStrategicComposer extends AbstractComposer
     {
         final StrategyContext strategyContext = new StrategyContext(
                 inversions,
+                melodySizeFraction,
                 maximumSemitoneDistance,
                 semitoneDistanceFromLowest,
                 previousNote,

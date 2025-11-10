@@ -1,5 +1,6 @@
 package fri.music.differencetones.composer.strategy;
 
+import java.util.ArrayList;
 import java.util.List;
 import fri.music.Tone;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
@@ -22,17 +23,29 @@ public abstract class AbstractStrategy implements Strategy
     
     /** You MUST call this method to evaluate all fields visible for a sub-class! */
     protected void initialize(StrategyContext context) {
-        // get list of possible intervals, sorted by wideness of interval and pitch
-        // narrow interval first, high pitch first
-        
         final Note note = context.note();
-        generatingIntervals = context.inversions().getIntervalsGenerating(note);
+        
+        // get list of possible intervals, sorted by narrow interval first and high pitch first
+        generatingIntervals = new ArrayList<>(context.inversions().getIntervalsGenerating(note));
         if (generatingIntervals == null || generatingIntervals.size() <= 0)
             throw new IllegalArgumentException("Note '"+note+"' could not be mapped to an interval!");
+        
+        // take into account that melodies with small tone range should not use the
+        // whole intervals pool, because this may lead to pitch jumps that are too big
+        shrink(generatingIntervals, context.melodySizeFraction());
         
         lastIntervalIndex = generatingIntervals.size() - 1;
         considerAlternatives = (lastIntervalIndex > 0 && context.previousInterval() != null);
         isRepeatedNote = (context.previousNote() != null && note.ipnName.equals(context.previousNote().ipnName));
+    }
+
+    private void shrink(List<TonePair> generatingIntervals, double melodySizeFraction) {
+        final int targetSize = (int) Math.ceil((double) generatingIntervals.size() * melodySizeFraction); // round up
+        final int limitedTargetSize = Math.max(3, targetSize); // leave minimal 3 list members
+        for (int index = 0; 
+                generatingIntervals.size() > limitedTargetSize;
+                index = (index == 0) ? (generatingIntervals.size() - 1) : 0) // toggle remove from head and tail
+            generatingIntervals.remove(index);
     }
 
 

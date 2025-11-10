@@ -57,6 +57,7 @@ public abstract class AbstractComposer
     /** Maps given note in given context to a difference-tone <code>TonePair</code>. */
     protected abstract TonePair mapNote(
             DifferenceToneInversions inversions,
+            double melodySizeFraction,
             int maximumSemitoneDistance,
             int semitoneDistanceFromLowest,
             Note previousNote,
@@ -73,6 +74,9 @@ public abstract class AbstractComposer
         final Note lowest  = notesWithoutRests.stream().min((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
         final Note highest = notesWithoutRests.stream().max((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
         final int maximumSemitoneDistance = highest.midiNumber - lowest.midiNumber;
+        
+        final double SMALL_MELODY_LIMIT = (double) ToneSystem.SEMITONES_PER_OCTAVE;
+        final double melodySizeFraction = ((double) maximumSemitoneDistance / SMALL_MELODY_LIMIT);
         
         final DifferenceToneInversions inversions = createInversions(lowest, highest);
         final SequencedMap<NoteWithIndex,TonePair> result = new LinkedHashMap<>();
@@ -93,6 +97,7 @@ public abstract class AbstractComposer
                 
                 bestInterval = mapNote(
                             inversions,
+                            melodySizeFraction,
                             maximumSemitoneDistance,
                             semitoneDistanceFromLowest,
                             previousNote,
