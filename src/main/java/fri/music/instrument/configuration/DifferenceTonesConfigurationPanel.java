@@ -104,7 +104,7 @@ class DifferenceTonesConfigurationPanel
         choicePanel.add(intervalRange.getWidestChoice());
         
         this.intervalsButton = new JButton("Display Intervals");
-        this.allIntervalsOfScaleButton = new JButton("All of Scale");
+        this.allIntervalsOfScaleButton = new JButton("For Tone Range ...");
         final JPanel intervalsButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         intervalsButtonPanel.add(intervalsButton);
         intervalsButtonPanel.add(allIntervalsOfScaleButton);
