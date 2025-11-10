@@ -119,8 +119,8 @@ public class DifferenceToneInversions extends DifferenceTones
     }
     
     /**
-     * CAUTION: do not pass a <code>Note</code>, because its <code>hashCode()</code> 
-     * and <code>equals()</code> could be different than <code>Tone</code>!
+     * CAUTION: do not pass a <code>Note</code> in case <code>Note.hashCode()</code> 
+     * or <code>Note.equals()</code> are different from <code>Tone</code>!
      * @param differenceTone the difference-tone to find generating intervals for.
      * @return the intervals that would generate given difference-tone, smaller intervals and higher pitch sorted at head.
      */

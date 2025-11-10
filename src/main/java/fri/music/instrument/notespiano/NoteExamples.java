@@ -28,20 +28,28 @@ G4/2 E4/2
 G4/2 C5/2
 """);
     
-    Notes MOTIF_3 = new Notes("C-D-F", Notes.Type.Motifs, """
+    Notes MOTIF_3 = new Notes("E-F-G", Notes.Type.Motifs, """
 C4/4 D4/4 F4/2
 """);
     
-    Notes MOTIF_4 = new Notes("D-F-G", Notes.Type.Motifs, """
+    Notes MOTIF_4 = new Notes("D-E-F", Notes.Type.Motifs, """
 D4/4 F4/4 G4/2
 """);
     
-    Notes MOTIF_5 = new Notes("E-F-G-C", Notes.Type.Motifs, """
+    Notes MOTIF_5 = new Notes("C-D-F", Notes.Type.Motifs, """
+C4/4 D4/4 F4/2
+""");
+    
+    Notes MOTIF_6 = new Notes("D-F-G", Notes.Type.Motifs, """
+D4/4 F4/4 G4/2
+""");
+    
+    Notes MOTIF_7 = new Notes("E-F-G-C", Notes.Type.Motifs, """
 144
 E4/8 F4/8 G4/8 (C5/8 C5/2)
 """);
     
-    Notes MOTIF_6 = new Notes("F-E-C-G", Notes.Type.Motifs, """
+    Notes MOTIF_8 = new Notes("F-E-C-G", Notes.Type.Motifs, """
 144
 F4/8 E4/8 C4/8 (G3/8 G3/2)
 """);
@@ -211,6 +219,8 @@ G4 D4 G3/2
             MOTIF_4,
             MOTIF_5,
             MOTIF_6,
+            MOTIF_7,
+            MOTIF_8,
             C_CHORD,
             AM_CHORD,
             G_DIM_CHORD,
