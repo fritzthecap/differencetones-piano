@@ -162,10 +162,10 @@ class DifferenceTonesConfigurationPanel
     }
     public String getDifferenceTonesHeadingLines(Tone lowerTone, Tone upperTone) {
         final String intervalName = ToneSystem.intervalName(upperTone.midiNumber - lowerTone.midiNumber);
-        final String lowerToneText = lowerTone.ipnName+" ("+lowerTone.formattedFrequency()+")";
-        final String upperToneText = upperTone.ipnName+" ("+upperTone.formattedFrequency()+")";
+        final String intervalText1 = lowerTone.ipnName+" "+upperTone.ipnName;
+        final String intervalText2 = lowerTone.formattedFrequency()+" "+upperTone.formattedFrequency();
         return getGlobalHeadingLines()+
-            "Interval:   "+intervalName+" "+lowerToneText+" - "+upperToneText+StringUtil.NEWLINE+
+            "Interval:   "+intervalName+"  "+intervalText1+"  "+intervalText2+StringUtil.NEWLINE+
             "Difference: "+(Tone.frequencyFormat.format(Math.abs(upperTone.frequency - lowerTone.frequency)))+StringUtil.NEWLINE;
     }
     public boolean showOnlyPrimaryDifferenceTone() {
