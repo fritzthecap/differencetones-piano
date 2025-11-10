@@ -78,6 +78,8 @@ public abstract class AbstractComposer
         final SequencedMap<NoteWithIndex,TonePair> result = new LinkedHashMap<>();
         
         TonePair previousInterval = null;
+        Note previousNote = null;
+        
         for (int i = 0; i < melody.length; i++) {
             final Note note = melody[i];
             final boolean isRest = note.isRest();
@@ -87,7 +89,6 @@ public abstract class AbstractComposer
                 bestInterval = new TonePair(note);
             }
             else {
-                final Note previousNote = (i > 0) ? melody[i - 1] : null;
                 final int semitoneDistanceFromLowest = note.midiNumber - lowest.midiNumber;
                 
                 bestInterval = mapNote(
@@ -98,12 +99,12 @@ public abstract class AbstractComposer
                             previousInterval, 
                             note,
                             result);
+                
+                previousInterval = bestInterval;
+                previousNote = note;
             }
             
             result.put(new NoteWithIndex(note, i), bestInterval);
-            
-            if (isRest == false)
-                previousInterval = bestInterval;
         }
         
         return result;
