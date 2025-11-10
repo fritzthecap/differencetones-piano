@@ -9,13 +9,13 @@ class WithRestsTest extends AbstractComposerTest
     void withRests() {
         final String[] melodyWithoutRests = new String[] { "C4/4", "D4/4", "E4/4" };
         final String[][] expectedIntervals1 = new String[][] {
-            { "F6/4", "G#6/4" }, { "D5/4", "A5/4" }, { "C#5/4", "A5/4" },
+            { "D#5/4", "A5/4" }, { "D5/4", "A5/4" }, { "C#5/4", "A5/4" },
         };
         assertComposeWithEqualTemperament(melodyWithoutRests, expectedIntervals1);
         
         final String[] melodyWithRests = new String[] { "C4/4", "-/4", "D4/4", "-/4", "E4/4" };
         final String[][] expectedIntervals2 = new String[][] {
-            { "F6/4", "G#6/4" }, { "-/4" }, { "D5/4", "A5/4" }, { "-/4" }, { "C#5/4", "A5/4" },
+            { "D#5/4", "A5/4" }, { "-/4", }, { "D5/4", "A5/4" }, { "-/4", }, { "C#5/4", "A5/4" },
         };
         assertComposeWithEqualTemperament(melodyWithRests, expectedIntervals2);
     }

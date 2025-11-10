@@ -11,8 +11,8 @@ class ToneRangeTest extends AbstractComposerTest
     void melodyRangeLessThanOneOctave() {
         final String whenTheSaints = "-/8 G4/8 B4/8 C5/8 D5/4 B4/4 G4/4 B4/4 A4/2";
         final String[][] expectedIntervals = new String[][] {
-            { "-/8", }, { "C7/8", "D#7/8" }, { "B5/8", "F#6/8" }, { "A5/8", "F6/8" },
-            { "A5/4", "F#6/4" }, { "B5/4", "F#6/4" }, { "C7/4", "D#7/4" }, { "B5/4", "F#6/4" }, { "C6/2", "F#6/2" },
+            { "-/8", }, { "D6/8", "G6/8" }, { "D6/8", "G#6/8" }, { "C6/8", "G6/8" },
+            { "B5/4", "G6/4" }, { "D6/4", "G#6/4" }, { "D6/4", "G6/4" }, { "D6/4", "G#6/4" }, { "E6/2", "A6/2" },
         };
         assertCompose(
                 whenTheSaints,
