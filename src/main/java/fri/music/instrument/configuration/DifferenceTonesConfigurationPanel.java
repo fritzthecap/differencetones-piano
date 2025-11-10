@@ -1,6 +1,8 @@
 package fri.music.instrument.configuration;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -19,6 +21,7 @@ import fri.music.instrument.wave.DeviationComponent;
 import fri.music.instrument.wave.IntervalRangeComponent;
 import fri.music.utils.StringUtil;
 import fri.music.utils.swing.BorderUtil;
+import fri.music.utils.swing.ButtonUtil;
 import fri.music.utils.swing.text.TextFieldUtil;
 
 /**
@@ -65,8 +68,8 @@ class DifferenceTonesConfigurationPanel
         differenceTonesPanel.setLayout(new BoxLayout(differenceTonesPanel, BoxLayout.Y_AXIS));
         differenceTonesPanel.setBorder(BorderUtil.titledBorder("Difference-Tones of Interval", 4f, 3));
         
-        this.lowerIntervalTone = configureToneField("Tone 1", "C6");
-        this.upperIntervalTone = configureToneField("Tone 2", "D6");
+        this.lowerIntervalTone = configureToneField("Tone 1", "C5");
+        this.upperIntervalTone = configureToneField("Tone 2", "G5");
         final JPanel textFieldsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         textFieldsPanel.add(lowerIntervalTone);
         textFieldsPanel.add(upperIntervalTone);
@@ -78,6 +81,14 @@ class DifferenceTonesConfigurationPanel
         
         this.differenceTonesButton = new JButton("Display Difference-Tone(s)");
         differenceTonesButton.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        final ActionListener displayDifferenceToneListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ButtonUtil.doClick(differenceTonesButton);
+            }
+        };
+        lowerIntervalTone.addActionListener(displayDifferenceToneListener);
+        upperIntervalTone.addActionListener(displayDifferenceToneListener);
         
         final JPanel differenceToneButtonPanel = new JPanel();
         differenceToneButtonPanel.setLayout(new BoxLayout(differenceToneButtonPanel, BoxLayout.Y_AXIS));
@@ -92,18 +103,26 @@ class DifferenceTonesConfigurationPanel
         intervalsPanel.setLayout(new BoxLayout(intervalsPanel, BoxLayout.Y_AXIS));
         intervalsPanel.setBorder(BorderUtil.titledBorder("Intervals of Difference-Tone", 4f, 3));
         
-        this.differenceTone = configureToneField("Difference-Tone", "C3", 120);
+        this.differenceTone = configureToneField("Difference-Tone", "C4", 120);
         differenceTone.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         intervalsPanel.add(differenceTone);
         
         this.intervalRange = new IntervalRangeComponent();
         final JPanel choicePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        intervalRange.getNarrowestChoice().setSelectedItem(ToneSystem.MAJOR_SECOND);
-        intervalRange.getWidestChoice().setSelectedItem(ToneSystem.MINOR_SEVENTH);
+        //intervalRange.getNarrowestChoice().setSelectedItem(ToneSystem.MAJOR_SECOND);
+        //intervalRange.getWidestChoice().setSelectedItem(ToneSystem.MINOR_SEVENTH);
         choicePanel.add(intervalRange.getNarrowestChoice());
         choicePanel.add(intervalRange.getWidestChoice());
         
         this.intervalsButton = new JButton("Display Intervals");
+        final ActionListener displayIntervalsListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ButtonUtil.doClick(intervalsButton);
+            }
+        };
+        differenceTone.addActionListener(displayIntervalsListener);
+        
         this.allIntervalsOfScaleButton = new JButton("For Tone Range ...");
         final JPanel intervalsButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         intervalsButtonPanel.add(intervalsButton);
@@ -142,9 +161,11 @@ class DifferenceTonesConfigurationPanel
                 " Difference-Tone"+(showOnlyPrimaryDifferenceTone() ? "" : "s");
     }
     public String getDifferenceTonesHeadingLines(Tone lowerTone, Tone upperTone) {
+        final String intervalName = ToneSystem.intervalName(upperTone.midiNumber - lowerTone.midiNumber);
+        final String lowerToneText = lowerTone.ipnName+" ("+lowerTone.formattedFrequency()+")";
+        final String upperToneText = upperTone.ipnName+" ("+upperTone.formattedFrequency()+")";
         return getGlobalHeadingLines()+
-            "Interval:   "+lowerTone.ipnName+" ("+lowerTone.formattedFrequency()+") - "
-                          +upperTone.ipnName+" ("+upperTone.formattedFrequency()+")"+StringUtil.NEWLINE+
+            "Interval:   "+intervalName+" "+lowerToneText+" - "+upperToneText+StringUtil.NEWLINE+
             "Difference: "+(Tone.frequencyFormat.format(Math.abs(upperTone.frequency - lowerTone.frequency)))+StringUtil.NEWLINE;
     }
     public boolean showOnlyPrimaryDifferenceTone() {
@@ -200,15 +221,22 @@ class DifferenceTonesConfigurationPanel
             return toneNameListener; // is reusable for multiple instances
         
         return toneNameListener = new KeyAdapter() {
+            private String mostRecentIpnName = "";
+            
             @Override
             public void keyPressed(KeyEvent e) {
                 final boolean down = (e.getKeyCode() == KeyEvent.VK_DOWN);
                 if (down || e.getKeyCode() == KeyEvent.VK_UP) {
-                    final String ipnNameWithOctave = textField(e).getText().toUpperCase();
+                    final String text = textField(e).getText().toUpperCase();
+                    final String defaultText = (mostRecentIpnName.length() > 0) ? mostRecentIpnName : "C4";
+                    final String ipnNameWithOctave = (text.trim().length() > 0) ? text : defaultText;
+                    
                     final String ipnBaseName = StringUtil.getUntilFirstNumber(ipnNameWithOctave);
                     int octave = StringUtil.getFirstNumber(ipnNameWithOctave);
                     
                     if (ipnBaseName.length() > 0 && octave > -1) {
+                        mostRecentIpnName = ipnNameWithOctave;
+                        
                         final String nextIpnBaseName = getNext(ipnBaseName, down);
                         
                         if (down == false && nextIpnBaseName.equals(ToneSystem.IPN_BASE_NAMES[0]))

@@ -31,7 +31,12 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
     private JDialog dialog;
     
     public AllIntervalsOfScaleConfigurationPanel(DifferenceTonesConfigurationPanel differenceTonesConfigurationPanel) {
-        super(4, "C", 2, true); // true: show modal scale choice
+        super(
+                4, // number of octaves 
+                StringUtil.getUntilFirstNumber(differenceTonesConfigurationPanel.getDifferenceToneIpnName()), 
+                StringUtil.getFirstNumber(differenceTonesConfigurationPanel.getDifferenceToneIpnName()), 
+                true,  // show modal scale choice
+                false); // octaves not on top
         this.differenceTonesConfigurationPanel = differenceTonesConfigurationPanel;
     }
 
@@ -55,7 +60,7 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
             dialog.setVisible(true);
         }
         else {
-            final JButton showButton = new JButton("Display Intervals");
+            final JButton showButton = new JButton("Display Intervals for All");
             showButton.addActionListener(event -> showResultInTextDialog());
             
             final JPanel dialogPanel = new JPanel();

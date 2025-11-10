@@ -36,19 +36,18 @@ public class ToneRangeConfigurationPanel
     private JComboBox<String> lowestToneScaleName;
     private JSlider lowestToneOctave;
     
-    public ToneRangeConfigurationPanel(
-            int octavesParam, 
-            String lowestToneBaseNameParam, 
-            int lowestToneOctaveParam)
-    {
+    public ToneRangeConfigurationPanel(int octavesParam, String lowestToneBaseNameParam, int lowestToneOctaveParam) {
         this(octavesParam, lowestToneBaseNameParam, lowestToneOctaveParam, true);
     }
-    
+    public ToneRangeConfigurationPanel(int octavesParam, String lowestToneBaseNameParam, int lowestToneOctaveParam, boolean addScaleNameChoice) {
+        this(octavesParam, lowestToneBaseNameParam, lowestToneOctaveParam, addScaleNameChoice, true);
+    }
     public ToneRangeConfigurationPanel(
             int octavesParam, 
             String lowestToneBaseNameParam, 
             int lowestToneOctaveParam, 
-            boolean addScaleNameChoice)
+            boolean addScaleNameChoice,
+            boolean octavesOnTop)
     {
         // field construction
         buildConfigurationFields(octavesParam, lowestToneBaseNameParam, lowestToneOctaveParam, addScaleNameChoice);
@@ -66,8 +65,14 @@ public class ToneRangeConfigurationPanel
         this.panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
-        panel.add(octaves);
-        panel.add(lowestTonePanel);
+        if (octavesOnTop) {
+            panel.add(octaves);
+            panel.add(lowestTonePanel);
+        }
+        else {
+            panel.add(lowestTonePanel);
+            panel.add(octaves);
+        }
     }
 
     public final int getOctaves() {
