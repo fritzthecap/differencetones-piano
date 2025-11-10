@@ -45,15 +45,15 @@ public class Tone implements Comparable<Tone>
     }
     
     
-    /** Equality goes to IPN-name only. */
+    /** Equality goes to IPN-name only. Final to prevent override in Note. */
     @Override
-    public boolean equals(Object other) {
+    public final boolean equals(Object other) {
         return (other instanceof Tone) ? ((Tone) other).ipnName.equals(ipnName) : false;
     }
     
-    /** Hashcode goes to IPN-name only. */
+    /** Hashcode goes to IPN-name only. Final to prevent override in Note. */
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return ipnName.hashCode();
     }
 

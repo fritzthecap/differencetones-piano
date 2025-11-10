@@ -10,6 +10,10 @@ import fri.music.Tones;
  * It has a frequency from a tuning (tone-system), duration and volume.
  * If a note is the first in its bar, it will be emphasized,
  * i.e. its volume will be louder than all subsequent notes in same bar.
+ * <p/>
+ * Mind that both <code>Note</code> and <code>Tone</code> are sometimes used as parameters to
+ * methods that use them as hash-key, thus <code>equals()</code> and <code>hashCode()</code>
+ * should not be overridden here! 
  */
 public class Note extends Tone
 {
@@ -211,16 +215,4 @@ public class Note extends Tone
     public String toString() {
         return toString(ipnName, lengthNotation);
     }
-    
-    /* @Override
-    public boolean equals(Object other) {
-        if (super.equals(other) == false)
-            return false;
-        return Objects.equals(lengthNotation, ((Note) other).lengthNotation);
-    }
-    
-    @Override
-    public int hashCode() {
-        return super.hashCode() + Objects.hashCode(lengthNotation);
-    }*/
 }
