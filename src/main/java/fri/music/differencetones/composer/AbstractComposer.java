@@ -148,14 +148,14 @@ public abstract class AbstractComposer
         
         if (ToneSystem.MINOR_SECOND.equals(narrowestInterval) == false &&
                 ToneSystem.MAJOR_SEVENTH.equals(widestInterval) == false)
-            inversions.removeDissonant(false);
+            inversions.removeDissonant(false); // only when no dirty intervals were given explicitly
         
         return inversions;
     }
     
     /**
      * Builds a sufficient range of tones to model given melody with difference tones.
-     * A melody with 1.3 octaves tone-range requires about 4 octaves above its lowest note.
+     * A melody with 1 octave tone-range requires about 4 octaves above its lowest note.
      * @param lowest required, the lowest tone of the melody to model with difference tones.
      * @param highest required, the highest tone of the melody to model with difference tones.
      * @param toneStock required, the 12-tone system to be used for the melody and its difference tones.
@@ -188,13 +188,17 @@ public abstract class AbstractComposer
         
         final String lowestIpnName = oneBelow.ipnName;
         
-        // for melodyOctaves up to 0.25 -> 3 octaves, up to 1.25 -> 4, up to 2.25 -> 5, ...
-        final int additionalOctavesTo3 = Math.max(0, (int) Math.round(melodyOctaves - 0.25));
+        // Empirical recognition, rounded-up, 73 % deviation, MINOR_THIRD to MAJOR_SIXTH, 
+        //    all tunings including HARMONIC_SERIES, is:
+        // 4 octaves cover a melody range of 1 octave with enough difference-tone intervals,
+        // 5 octaves cover 2 melody octaves, 6 cover 3, ...
+        final int MINIMAL_OCTAVES = 3;
+        final int additionalOctaves = (int) Math.ceil(melodyOctaves); // 0.25 would result in 1
         final Tone[] calculationToneStock = AbstractToneSystem.tones(
                 toneStock, 
                 lowestIpnName, 
                 lowestIpnName, 
-                3 + additionalOctavesTo3);
+                MINIMAL_OCTAVES + additionalOctaves);
         
         return new DifferenceToneInversions(
             new DifferenceToneInversions.Configuration(

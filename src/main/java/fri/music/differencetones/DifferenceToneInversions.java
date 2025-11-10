@@ -119,6 +119,8 @@ public class DifferenceToneInversions extends DifferenceTones
     }
     
     /**
+     * CAUTION: do not pass a <code>Note</code>, because its <code>hashCode()</code> 
+     * and <code>equals()</code> could be different than <code>Tone</code>!
      * @param differenceTone the difference-tone to find generating intervals for.
      * @return the intervals that would generate given difference-tone, smaller intervals and higher pitch sorted at head.
      */
@@ -166,13 +168,10 @@ public class DifferenceToneInversions extends DifferenceTones
     }
 
     private void initialize() {
-        // in just-intonation, any tone-pair can give another difference tone, nearly no predictions are possible
-        // build index of intervals from given tones
-        // C-D, C-D#, C-E ... C-A#; C#-#D C#-E, ...
-        for (int lowerIndex = 0;
-                lowerIndex < tones.length - config.smallestSemitoneDistance; // stop one before last
-                lowerIndex++) 
-        {
+        // build map of intervals for all tones of given tone-range,
+        // for example with MINOR_THIRD and MAJOR_SIXTH: C-D#, C-E, C-F ... C-A; C#-E, C#-F, ...
+        final int lowerLimit = tones.length - config.smallestSemitoneDistance; // stop when inner loop would run empty
+        for (int lowerIndex = 0; lowerIndex < lowerLimit; lowerIndex++) {
             final Tone lowerTone = tones[lowerIndex];
             
             for (int semitoneOffset = config.smallestSemitoneDistance;
