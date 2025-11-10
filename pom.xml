@@ -7,7 +7,7 @@
 
     <groupId>fri.music</groupId>
     <artifactId>differencetones-piano</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     
     <organization>
         <name>Fritz Ritzberger</name>
