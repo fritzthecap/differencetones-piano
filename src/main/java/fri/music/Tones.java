@@ -11,8 +11,8 @@ import java.util.Map;
  * All tunings use the same tone names, as they must fit to a 
  * conventional piano keyboard with 12 keys per octave.
  * <p/>
- * Mind that the constructor of this class builds hashtables
- * from tones and thus is "expensive"!
+ * Mind that the constructor of this class builds 3 maps
+ * from given tones and thus is "expensive"!
  */
 public class Tones
 {
@@ -22,6 +22,10 @@ public class Tones
     private final Map<Integer,Tone> midiNumbersToTones;
     private final Map<Double,Tone> frequenciesToTones;
     
+    /**
+     * Builds three maps for given tones.
+     * @param tones the tones to manage.
+     */
     public Tones(Tone[] tones) {
         this.tones = (tones == null) ? new EqualTemperament().tones() : tones;
         
@@ -46,7 +50,7 @@ public class Tones
         final Tone tone = ipnNamesToTones.get(ipnName);
         if (tone == null)
             return -1;
-        return Arrays.binarySearch(tones, tone);
+        return Arrays.binarySearch(tones, tone); // Tone implements Comparable
     }
     
     /**
