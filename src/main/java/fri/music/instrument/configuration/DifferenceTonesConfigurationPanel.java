@@ -66,7 +66,7 @@ class DifferenceTonesConfigurationPanel
         // upper panel
         final JPanel differenceTonesPanel = new JPanel();
         differenceTonesPanel.setLayout(new BoxLayout(differenceTonesPanel, BoxLayout.Y_AXIS));
-        differenceTonesPanel.setBorder(BorderUtil.titledBorder("Difference-Tones of Interval", 4f, 3));
+        differenceTonesPanel.setBorder(BorderUtil.titledBorder("Difference-Tone(s) of Interval", 4f, 3));
         
         this.lowerIntervalTone = configureToneField("Tone 1", "C5");
         this.upperIntervalTone = configureToneField("Tone 2", "G5");
