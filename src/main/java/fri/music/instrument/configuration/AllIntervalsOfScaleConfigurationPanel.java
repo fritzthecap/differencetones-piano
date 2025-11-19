@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import fri.music.AbstractToneSystem;
 import fri.music.Tone;
 import fri.music.ToneSystem;
-import fri.music.Tones;
 import fri.music.differencetones.DifferenceToneInversions;
 import fri.music.instrument.wave.DifferenceToneUtil;
 import fri.music.utils.StringUtil;
@@ -33,7 +32,7 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
     
     public AllIntervalsOfScaleConfigurationPanel(DifferenceTonesConfigurationPanel differenceTonesConfigurationPanel) {
         super(
-                4, // number of octaves 
+                4, // default number of octaves 
                 StringUtil.getUntilFirstNumber(differenceTonesConfigurationPanel.getDifferenceToneIpnName()), 
                 StringUtil.getFirstNumber(differenceTonesConfigurationPanel.getDifferenceToneIpnName()), 
                 true,  // show modal scale choice
@@ -131,8 +130,7 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
         final String widestInterval = differenceTonesConfigurationPanel.getWidestInterval();
         
         final Tone[] toneStock = toneSystem.tones();
-        final Tone lowestTone = new Tones(toneStock).forIpnName(lowestToneIpnName); // TODO: DifferenceToneUtil
-        final Tone oneBelow = DifferenceToneUtil.oneToneBelow(toneStock, lowestTone);
+        final Tone oneBelow = DifferenceToneUtil.oneToneBelow(toneStock, lowestToneIpnName);
         final Tone[] tones = AbstractToneSystem.tones(
                 toneStock,
                 (oneBelow != null) ? oneBelow.ipnName : lowestToneIpnName,

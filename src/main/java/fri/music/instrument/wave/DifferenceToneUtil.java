@@ -52,12 +52,19 @@ public class DifferenceToneUtil
      * For that reason it is recommended to search in a tone-stock that starts one below given lowest tone. 
      * @param toneStock the tones array containing hopefully one below given lowest tone.
      * @param lowest the tone to search the tone one below it.
-     * @return null when no lower tone in tone-stock, else the tone one below given lowest tone.
+     * @return null when no lower tone found in tone-stock, else the tone one below given lowest tone.
      */
     public static Tone oneToneBelow(Tone[] toneStock, Tone lowest) {
         // we need the tone below lowest melody note to make deviation work also for bottom
         int lowestToneIndex = Arrays.binarySearch(toneStock, lowest, (t1, t2) -> t1.midiNumber - t2.midiNumber);
         lowestToneIndex--; // go one deeper
         return (lowestToneIndex >= 0) ? toneStock[lowestToneIndex] : null;
+    }
+
+    public static Tone oneToneBelow(Tone[] toneStock, String lowestToneIpnName) {
+        for (Tone tone : toneStock)
+            if (tone.ipnName.equals(lowestToneIpnName))
+                return oneToneBelow(toneStock, tone);
+        return null;
     }
 }
