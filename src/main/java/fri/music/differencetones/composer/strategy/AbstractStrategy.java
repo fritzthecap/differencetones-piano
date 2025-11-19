@@ -3,6 +3,7 @@ package fri.music.differencetones.composer.strategy;
 import java.util.ArrayList;
 import java.util.List;
 import fri.music.Tone;
+import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.player.Note;
 
@@ -30,7 +31,7 @@ public abstract class AbstractStrategy implements Strategy
         if (generatingIntervals == null || generatingIntervals.size() <= 0)
             throw new IllegalArgumentException("Note '"+note+"' could not be mapped to an interval!");
         
-        shrink(generatingIntervals, context.melodyOctaves());
+        shrink(generatingIntervals, context);
         
         lastIntervalIndex = generatingIntervals.size() - 1;
         considerAlternatives = (lastIntervalIndex > 0 && context.previousInterval() != null);
@@ -41,7 +42,8 @@ public abstract class AbstractStrategy implements Strategy
      * Take into account that melodies with small tone range should not use the
      * whole intervals pool, because this may lead to pitch jumps that are too big.
      */
-    private void shrink(List<TonePair> generatingIntervals, double melodyOctaves) {
+    private void shrink(List<TonePair> generatingIntervals, StrategyContext context) {
+        final double melodyOctaves = (double) context.maximumSemitoneDistance() / (double) ToneSystem.SEMITONES_PER_OCTAVE;
         final int targetSize = (int) Math.ceil((double) generatingIntervals.size() * melodyOctaves); // round up
         final int limitedTargetSize = Math.max(3, targetSize); // leave minimal 3 list members
         for (int index = 0; 
