@@ -264,7 +264,6 @@ public class JustIntonationChecker
     
     /** Represents the check-result for one harmony-relevant interval of a modal scale. */
     public record IntervalCheckResult(
-            Interval checkedInterval, // TODO: remove this unused member
             String lowerNote, 
             String upperNote, 
             String expectedRatio, 
@@ -586,7 +585,6 @@ public class JustIntonationChecker
                 }
                 
                 results.add(new IntervalCheckResult(
-                        intervalToCheck,
                         item.lowerTone.targetNoteName,
                         item.upperTone.targetNoteName,
                         expectedRatio,
