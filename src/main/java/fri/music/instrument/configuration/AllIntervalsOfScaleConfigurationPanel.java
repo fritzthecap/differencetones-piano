@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import fri.music.AbstractToneSystem;
 import fri.music.Tone;
@@ -71,21 +72,30 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
             dialogPanel.add(buttonPanel);
             
             dialog = DialogStarter.start(
-                    "Tone Range of Melody and Intervals",
+                    "Tone Range for Melody plus Intervals",
                     differenceTonesConfigurationPanel.panel,
                     dialogPanel,
                     true);
         }
     }
 
-    private void showResultInTextDialog() {
+    private boolean showResultInTextDialog() {
         final String lowestToneIpnName = getLowestToneIpnName();
         final int octaves = getOctaves();
         final ToneSystem toneSystem = differenceTonesConfigurationPanel.getToneSystem();
-        final DifferenceToneInversions differenceToneInversions = differenceToneInversions(toneSystem, lowestToneIpnName, octaves);
+        final DifferenceToneInversions differenceToneInversions; 
+        try {
+            differenceToneInversions = differenceToneInversions(toneSystem, lowestToneIpnName, octaves);
+        }
+        catch (IllegalArgumentException e) {
+            return errorDialog(e.getMessage());
+        }
         
         // get possible difference-tones
         final List<Tone> differenceTones = differenceToneInversions.differenceTones();
+        if (differenceTones.size() <= 1)
+            return errorDialog("No results, please choose more octaves or a lower start-tone!");
+
         // inversions were constructed with one below lowest tone, to find enclosing tones
         // also for lowest tone, but we don't want to see the one below here:
         differenceTones.remove(0);
@@ -111,6 +121,8 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
                 "Difference-Tone Intervals for "+toneSystem.name(),
                 sb.toString(),
                 Font.MONOSPACED);
+        
+        return true;
     }
 
     private DifferenceToneInversions differenceToneInversions(ToneSystem toneSystem, String lowestToneIpnName, int octaves) {
@@ -119,7 +131,7 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
         final String widestInterval = differenceTonesConfigurationPanel.getWidestInterval();
         
         final Tone[] toneStock = toneSystem.tones();
-        final Tone lowestTone = new Tones(toneStock).forIpnName(lowestToneIpnName);
+        final Tone lowestTone = new Tones(toneStock).forIpnName(lowestToneIpnName); // TODO: DifferenceToneUtil
         final Tone oneBelow = DifferenceToneUtil.oneToneBelow(toneStock, lowestTone);
         final Tone[] tones = AbstractToneSystem.tones(
                 toneStock,
@@ -137,6 +149,12 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
         
         return differenceToneInversions;
     }
+    
+   private boolean errorDialog(String message) {
+       JOptionPane.showMessageDialog(dialog, message, "Error", JOptionPane.ERROR_MESSAGE);
+       return false;
+   }
+
     
     private List<String> intervalColumns(List<Tone> differenceTones, DifferenceToneInversions differenceToneInversions) {
         final List<String> intervalColumns = new ArrayList<>();
