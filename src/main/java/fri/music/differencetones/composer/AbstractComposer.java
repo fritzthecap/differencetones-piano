@@ -54,10 +54,21 @@ public abstract class AbstractComposer
         return result;
     }
     
-    /** Maps given note in given context to a difference-tone <code>TonePair</code>. */
+    /**
+     * Maps given <code>note</code> in given context to a difference-tone interval.
+     * @param inversions the differecne-tone intervals to choose from.
+     * @param melodyOctaves melody tone range, 0.5 for 1/2 octave, 1.0 for 1 octave, ....
+     * @param maximumSemitoneDistance the number of semi-tones of the melody's tone range.
+     * @param semitoneDistanceFromLowest number of semi-tones between current and lowest melody note.
+     * @param previousNote the preceding melody note.
+     * @param previousInterval the preceding difference-tone interval.
+     * @param note the current note to map.
+     * @param result the list of mapped results for the whole melody.
+     * @return the difference-tone interval that should represent the current note.
+     */
     protected abstract TonePair mapNote(
             DifferenceToneInversions inversions,
-            double melodySizeFraction,
+            double melodyOctaves,
             int maximumSemitoneDistance,
             int semitoneDistanceFromLowest,
             Note previousNote,
@@ -75,8 +86,7 @@ public abstract class AbstractComposer
         final Note highest = notesWithoutRests.stream().max((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
         final int maximumSemitoneDistance = highest.midiNumber - lowest.midiNumber;
         
-        final double SMALL_MELODY_LIMIT = (double) ToneSystem.SEMITONES_PER_OCTAVE;
-        final double melodySizeFraction = ((double) maximumSemitoneDistance / SMALL_MELODY_LIMIT);
+        final double melodyOctaves = (double) maximumSemitoneDistance / (double) ToneSystem.SEMITONES_PER_OCTAVE;
         
         final DifferenceToneInversions inversions = createInversions(lowest, highest);
         final SequencedMap<NoteWithIndex,TonePair> result = new LinkedHashMap<>();
@@ -97,7 +107,7 @@ public abstract class AbstractComposer
                 
                 bestInterval = mapNote(
                             inversions,
-                            melodySizeFraction,
+                            melodyOctaves,
                             maximumSemitoneDistance,
                             semitoneDistanceFromLowest,
                             previousNote,

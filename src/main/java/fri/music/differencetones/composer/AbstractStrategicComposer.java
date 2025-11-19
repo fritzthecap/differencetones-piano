@@ -31,13 +31,11 @@ public abstract class AbstractStrategicComposer extends AbstractComposer
      */
     protected abstract List<Strategy> getSortedStrategies();
 
-    /**
-     * Maps given note using a sorted list of <code>Strategy</code> objects.
-     */
+    /** {@inheritDoc} */
     @Override
     protected TonePair mapNote(
             DifferenceToneInversions inversions,
-            double melodySizeFraction,
+            double melodyOctaves,
             int maximumSemitoneDistance,
             int semitoneDistanceFromLowest,
             Note previousNote,
@@ -47,7 +45,7 @@ public abstract class AbstractStrategicComposer extends AbstractComposer
     {
         final StrategyContext strategyContext = new StrategyContext(
                 inversions,
-                melodySizeFraction,
+                melodyOctaves,
                 maximumSemitoneDistance,
                 semitoneDistanceFromLowest,
                 previousNote,

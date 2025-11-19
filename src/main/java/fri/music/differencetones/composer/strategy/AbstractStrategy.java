@@ -30,17 +30,19 @@ public abstract class AbstractStrategy implements Strategy
         if (generatingIntervals == null || generatingIntervals.size() <= 0)
             throw new IllegalArgumentException("Note '"+note+"' could not be mapped to an interval!");
         
-        // take into account that melodies with small tone range should not use the
-        // whole intervals pool, because this may lead to pitch jumps that are too big
-        shrink(generatingIntervals, context.melodySizeFraction());
+        shrink(generatingIntervals, context.melodyOctaves());
         
         lastIntervalIndex = generatingIntervals.size() - 1;
         considerAlternatives = (lastIntervalIndex > 0 && context.previousInterval() != null);
         isRepeatedNote = (context.previousNote() != null && note.ipnName.equals(context.previousNote().ipnName));
     }
 
-    private void shrink(List<TonePair> generatingIntervals, double melodySizeFraction) {
-        final int targetSize = (int) Math.ceil((double) generatingIntervals.size() * melodySizeFraction); // round up
+    /**
+     * Take into account that melodies with small tone range should not use the
+     * whole intervals pool, because this may lead to pitch jumps that are too big.
+     */
+    private void shrink(List<TonePair> generatingIntervals, double melodyOctaves) {
+        final int targetSize = (int) Math.ceil((double) generatingIntervals.size() * melodyOctaves); // round up
         final int limitedTargetSize = Math.max(3, targetSize); // leave minimal 3 list members
         for (int index = 0; 
                 generatingIntervals.size() > limitedTargetSize;
