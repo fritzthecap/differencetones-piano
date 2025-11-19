@@ -124,7 +124,6 @@ class AllIntervalsOfScaleConfigurationPanel extends ToneRangeConfigurationPanel
         final Tone[] tones = AbstractToneSystem.tones(
                 toneStock,
                 (oneBelow != null) ? oneBelow.ipnName : lowestToneIpnName,
-                toneSystem.baseToneIpnName(),
                 octaves);
         
         final DifferenceToneInversions differenceToneInversions = new DifferenceToneInversions(

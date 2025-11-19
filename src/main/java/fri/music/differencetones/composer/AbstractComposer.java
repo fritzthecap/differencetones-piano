@@ -183,6 +183,13 @@ public abstract class AbstractComposer
             int biggestSemitoneDistance,
             double deviationTolerance)
     {
+        smallestSemitoneDistance = (smallestSemitoneDistance > 0) 
+                ? smallestSemitoneDistance
+                : DifferenceToneInversions.Configuration.DEFAULT_SMALLEST_SEMITONE_STEPS;
+        biggestSemitoneDistance = (biggestSemitoneDistance > 0)
+                ? biggestSemitoneDistance
+                : DifferenceToneInversions.Configuration.DEFAULT_BIGGEST_SEMITONE_STEPS;
+                
         // Find octave range of melody and calculate a subset of tones fitting to that range.
         final int numberOfSemitones = highest.midiNumber - lowest.midiNumber;
         final double melodyOctaves = (double) numberOfSemitones / (double) ToneSystem.SEMITONES_PER_OCTAVE;
@@ -192,25 +199,22 @@ public abstract class AbstractComposer
         if (oneBelow == null)
             throw new IllegalArgumentException("Tone stock is too small for lowest melody note "+lowest.ipnName+", its lowest is "+toneStock[0].ipnName);
         
-        final String lowestIpnName = oneBelow.ipnName;
-        
         // Empirical recognition, rounded-up, 73 % deviation, MINOR_THIRD to MAJOR_SIXTH, 
         //    all tunings including HARMONIC_SERIES, is:
         // 4 octaves cover a melody range of 1 octave with enough difference-tone intervals,
         // 5 octaves cover 2 melody octaves, 6 cover 3, ...
         final int MINIMAL_OCTAVES = 3;
-        final int additionalOctaves = (int) Math.ceil(melodyOctaves); // 0.25 would result in 1
+        final int additionalOctaves = (int) Math.ceil(melodyOctaves); // round-up: 0.25 would result in 1
         final Tone[] calculationToneStock = AbstractToneSystem.tones(
                 toneStock, 
-                lowestIpnName, 
-                lowestIpnName, 
+                oneBelow.ipnName, 
                 MINIMAL_OCTAVES + additionalOctaves);
         
         return new DifferenceToneInversions(
             new DifferenceToneInversions.Configuration(
                 calculationToneStock, 
-                (smallestSemitoneDistance > 0) ? smallestSemitoneDistance : DifferenceToneInversions.Configuration.DEFAULT_SMALLEST_SEMITONE_STEPS,
-                (biggestSemitoneDistance > 0) ? biggestSemitoneDistance : DifferenceToneInversions.Configuration.DEFAULT_BIGGEST_SEMITONE_STEPS,
+                smallestSemitoneDistance,
+                biggestSemitoneDistance,
                 deviationTolerance
             )
         );

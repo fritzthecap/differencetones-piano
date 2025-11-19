@@ -40,20 +40,22 @@ public abstract class AbstractToneSystem implements ToneSystem
         this.frequencyOfA4 = (frequencyOfA4 <= 0.0) ? ToneSystem.DEFAULT_REFERENCE_FREQUENCY : frequencyOfA4;
         this.baseToneIpnName = (baseToneIpnName == null) ? ToneSystem.DEFAULT_BASETONE_IPN_NAME : baseToneIpnName;
         this.modalScaleStartIpnName = (modalScaleStartIpnName == null) ? this.baseToneIpnName : modalScaleStartIpnName;
-        this.octaves = checkForMaximumOctaves(octaves);
+        this.octaves = calculateAndCheckMaximumOctaves(octaves, this.modalScaleStartIpnName);
     }
     
-    private int checkForMaximumOctaves(int octaves) {
-        final int startNoteOctave = getOctave(modalScaleStartIpnName);
-        final String startNoteWithoutOctave = removeOctave(modalScaleStartIpnName);
+    private int calculateAndCheckMaximumOctaves(int octaves, String startToneIpnName) {
+        final int startNoteOctave = getOctave(startToneIpnName);
+        final String startNoteWithoutOctave = removeOctave(startToneIpnName);
         final boolean isC = startNoteWithoutOctave.equals(ToneSystem.IPN_BASE_NAMES[0]);
-        final int maximumOctaves = ToneSystem.MAXIMUM_OCTAVES - startNoteOctave - (isC ? 0 : 1); // "D0" would need one less
+        final int maximumOctaves = ToneSystem.MAXIMUM_OCTAVES - startNoteOctave - (isC ? 0 : 1); // "C#0" would need one octave less
 
         if (octaves < 0) // number of octaves was NOT specified, calculate possible maximum
             return maximumOctaves;
         
         if (octaves > maximumOctaves)
-            throwNumberOfOctavesTooBig(octaves, baseToneIpnName());
+            throw new IllegalArgumentException(
+                    octaves+" octaves above "+startToneIpnName+
+                    " would exceed maximum tone range of "+ToneSystem.MAXIMUM_OCTAVES+" octaves!");
 
         return octaves;
     }
@@ -85,7 +87,7 @@ public abstract class AbstractToneSystem implements ToneSystem
     /** {@inheritDoc} */
     @Override
     public Tone[] tones() {
-        return AbstractToneSystem.tones(getOrCreateCachedTones(), modalScaleStartIpnName, baseToneIpnName(), octaves);
+        return AbstractToneSystem.tones(getOrCreateCachedTones(), modalScaleStartIpnName, octaves);
     }
     
     
@@ -134,26 +136,29 @@ public abstract class AbstractToneSystem implements ToneSystem
      * @return all tones from given IPN-name up to given octaves + 1.
      * @throws IllegalArgumentException when given number of octaves is too big for given tones stock.
      */
-    public static Tone[] tones(Tone[] tones, String lowestIpnName, String baseToneIpnName, int octaves) {
+    public static Tone[] tones(Tone[] tones, String startToneIpnName, int octaves) {
         if (octaves < 0)
             throw new IllegalArgumentException("Number of octaves can not be negative: "+octaves);
         
         final int startIndex = IntStream.range(0, tones.length)
-                .filter(i -> tones[i].ipnName.equals(lowestIpnName))
+                .filter(i -> tones[i].ipnName.equals(startToneIpnName))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> numberOfOctavesTooBig(octaves, startToneIpnName, tones));
         
         final int endIndex = startIndex + (ToneSystem.SEMITONES_PER_OCTAVE * octaves) + 1;
         if (endIndex > tones.length)
-            throwNumberOfOctavesTooBig(octaves, baseToneIpnName);
+            throw numberOfOctavesTooBig(octaves, startToneIpnName, tones);
         
         return Arrays.copyOfRange(tones, startIndex, endIndex);
     }
 
-    private static void throwNumberOfOctavesTooBig(int octaves, String baseToneIpnName) {
-        throw new IllegalArgumentException(
-                octaves+" octaves not possible for "+baseToneIpnName+
-                ", please choose a smaller number or change the tone!");
+    private static RuntimeException numberOfOctavesTooBig(int octaves, String startToneIpnName, Tone[] tones) {
+        final String lowestIpnName = tones[0].ipnName;
+        final String highestIpnName = tones[tones.length - 1].ipnName;
+        return new IllegalArgumentException(
+                octaves+" octaves above "+startToneIpnName+
+                " not possible for tone range "+lowestIpnName+" - "+highestIpnName+
+                ", please choose a smaller number or change the start-tone!");
     }
     
     @Override
