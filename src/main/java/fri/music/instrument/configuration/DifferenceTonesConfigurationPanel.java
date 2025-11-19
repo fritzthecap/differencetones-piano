@@ -123,7 +123,7 @@ class DifferenceTonesConfigurationPanel
         };
         differenceTone.addActionListener(displayIntervalsListener);
         
-        this.allIntervalsOfScaleButton = new JButton("For Tone Range ...");
+        this.allIntervalsOfScaleButton = new JButton("For a Tone Range ...");
         final JPanel intervalsButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         intervalsButtonPanel.add(intervalsButton);
         intervalsButtonPanel.add(allIntervalsOfScaleButton);

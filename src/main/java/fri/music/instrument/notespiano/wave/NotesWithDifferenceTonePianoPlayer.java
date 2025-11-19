@@ -39,7 +39,7 @@ public class NotesWithDifferenceTonePianoPlayer extends NotesPianoPlayer
         
         final JComponent playerPanel = super.getPlayer(melody);
         
-        this.convertToDifferenceTones = new JCheckBox("Play Difference Tones", true);
+        this.convertToDifferenceTones = new JCheckBox("Play as Difference Tones", true);
         convertToDifferenceTones.setToolTipText("Play Notes in Textarea as Difference Tones, Turn This OFF to Hear Simple Notes");
         final ActionListener resetPlayerListener = new ActionListener() {
             /** Reload player when changing. */
