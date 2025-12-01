@@ -22,7 +22,7 @@ The documentation / manual is an integrated part of the application, available o
 
 ## Install
 
-To run the _differencetones-piano_ __desktop-application__, you need at least [Java 17](https://openjdk.org/projects/jdk/17/) or better [Java 21](https://openjdk.org/projects/jdk/21/) installed on your computer. Java virtual machines are freely available as "Open Java", the JRE (runtime-environment) is enough, you don't need the JDK (development-kit) unless you want to write new code. Check that the executable interpreter (java.exe or java) is in the execution PATH of your operating-system. Run "java -version" to check your installed Java version. Then download the __differencetones-piano.jar__ either from root directory (latest) or from  [the latest release](https://github.com/fritzthecap/differencetones-piano/releases/tag/v1.2) and launch the application via
+To run the _differencetones-piano_ __desktop-application__, you need at least [Java 17](https://openjdk.org/projects/jdk/17/) or better [Java 21](https://openjdk.org/projects/jdk/21/) installed on your computer. Java virtual machines are freely available as "Open Java", the JRE (runtime-environment) is enough, you don't need the JDK (development-kit) unless you want to write new code. Check that the executable interpreter (java.exe or java) is in the execution PATH of your operating-system. Run "java -version" to check your installed Java version. Then download the __differencetones-piano.jar__ either from root directory (latest) or from  [the latest release](https://github.com/fritzthecap/differencetones-piano/releases/tag/v1.3) and launch the application via
 
     cd myDownloadDirectory
     java -jar differenctones-piano.jar
