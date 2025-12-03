@@ -44,6 +44,7 @@ public abstract class AbstractStrategy implements Strategy
      */
     private void shrink(List<TonePair> generatingIntervals, StrategyContext context) {
         final double melodyOctaves = (double) context.maximumSemitoneDistance() / (double) ToneSystem.SEMITONES_PER_OCTAVE;
+        // TODO: is this really a good solution for issue #2 ?
         final int targetSize = (int) Math.ceil((double) generatingIntervals.size() * melodyOctaves); // round up
         final int limitedTargetSize = Math.max(3, targetSize); // leave minimal 3 list members
         for (int index = 0; 
