@@ -208,6 +208,7 @@ public abstract class AbstractComposer
         //    all tunings including HARMONIC_SERIES, is:
         // 4 octaves cover a melody range of 1 octave with enough difference-tone intervals,
         // 5 octaves cover 2 melody octaves, 6 cover 3, ...
+        // See also issue #2
         final int MINIMAL_OCTAVES = 3;
         final int additionalOctaves = (int) Math.ceil(melodyOctaves); // round-up: 0.25 would result in 1
         final Tone[] calculationToneStock = AbstractToneSystem.tones(

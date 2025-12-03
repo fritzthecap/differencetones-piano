@@ -39,8 +39,8 @@ public abstract class AbstractStrategy implements Strategy
     }
 
     /**
-     * Take into account that melodies with small tone range should not use the
-     * whole intervals pool, because this may lead to pitch jumps that are too big.
+     * Take into account that melodies with a small tone range should not use the
+     * whole intervals pool, because this may lead to interval pitch jumps that are too big.
      */
     private void shrink(List<TonePair> generatingIntervals, StrategyContext context) {
         final double melodyOctaves = (double) context.maximumSemitoneDistance() / (double) ToneSystem.SEMITONES_PER_OCTAVE;
