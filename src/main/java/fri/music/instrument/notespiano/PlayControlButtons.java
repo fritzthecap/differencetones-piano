@@ -93,7 +93,7 @@ public class PlayControlButtons extends JPanel
         button.setMargin(new Insets(1, 1, 1, 1)); // else text will be "..."
         button.setFocusPainted(false); // no thin rectangle on focus
         // make button as small as possible
-        final Dimension size = new Dimension(25, 25);
+        final Dimension size = new Dimension(30, 30);
         button.setPreferredSize(size);
         button.setMaximumSize(size);
         button.setMinimumSize(size);
