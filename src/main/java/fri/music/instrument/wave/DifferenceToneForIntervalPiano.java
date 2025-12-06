@@ -1,7 +1,10 @@
 package fri.music.instrument.wave;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -85,7 +88,7 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
     /** Overridden to return a DifferenceToneMouseHandler. */
     @Override
     protected MouseHandler newMouseHandler() {
-        return new DifferenceToneMouseHandler(this, getWaveSoundChannel());
+        return new DifferenceToneMouseHandler(this);
     }
     
     
@@ -95,16 +98,17 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
      */
     private static class DifferenceToneMouseHandler extends AdditionalTonesPlayingMouseHandler
     {
-        private final WaveSoundChannel soundChannel;
         private final Border differenceToneBorder;
         private Border originalBorder;
         private Keyboard.Key selectedDifferenceKey;
-        private Notification notification;
+        private ToneNotification notification;
         
-        public DifferenceToneMouseHandler(PianoWithSound piano, WaveSoundChannel soundChannel) {
+        public DifferenceToneMouseHandler(PianoWithSound piano) {
             super(piano);
             
-            this.soundChannel = soundChannel;
+            if (piano.getSoundChannel() instanceof WaveSoundChannel == false)
+                throw new IllegalArgumentException("Can run only with a WaveSoundChannel!");
+                
             this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, 2);
         }
 
@@ -136,22 +140,26 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
         
         private void ensureNotesListener() {
             if (notification == null) { // can not do this in constructor as keyboardPanel is not yet built there
-                notification = new Notification(piano.getKeyboardPanel());
-                soundChannel.setNoteListener(new WaveSoundChannel.NoteListener() {
+                notification = new ToneNotification(piano.getKeyboardPanel());
+                waveSoundChannel().setNoteListener(new WaveSoundChannel.NoteListener() {
                     @Override
                     public void noteOn(Tone tone) {
-                        notification.addLine(tone.ipnName, 0);
+                        notification.addLine(tone);
                     }
                     @Override
                     public void noteOff(Tone tone) {
-                        notification.removeLine(tone.ipnName);
+                        notification.removeLine(tone);
                     }
                     @Override
                     public void allNotesOff() {
-                        notification.hide();
+                        notification.removeAll();
                     }
                 });
             }
+        }
+
+        private WaveSoundChannel waveSoundChannel() {
+            return (WaveSoundChannel) soundChannel();
         }
         
         private void handleDifferenceKey() {
@@ -162,7 +170,7 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
                     selectDifferenceTone(selectedDifferenceKey, false);
                 
                 final Keyboard.Key differenceToneKey = DifferenceToneUtil.getDifferenceToneKey(
-                        soundChannel.getTones(), 
+                        waveSoundChannel().getTones(), 
                         ((DifferenceToneForIntervalPiano) piano).getDeviation(),
                         piano,
                         twoPlayingKeys[0].midiNoteNumber,
@@ -205,5 +213,38 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
             
             visualSelect(key, select);
         }
-    }
+        
+        
+        private static class ToneNotification extends Notification
+        {
+            private final List<Tone> tones = new ArrayList<>();
+            
+            ToneNotification(Component parent) {
+                super(parent);
+            }
+
+            void addLine(Tone tone) {
+                if (tones.contains(tone))
+                    return; // do not duplicate tones that are just once on the piano
+                tones.add(tone);
+                tones.sort((t1, t2) -> t2.midiNumber - t1.midiNumber);
+                setLines(toLines());
+            }
+            void removeLine(Tone tone) {
+                if (tones.remove(tone))
+                    setLines(toLines());
+            }
+            void removeAll() {
+                tones.clear();
+                setLines(toLines());
+            }
+            
+            private List<String> toLines() {
+                final List<String> lines = new ArrayList<>();
+                for (Tone tone : tones)
+                    lines.add(tone.ipnName);
+                return lines;
+            }
+        }   // end class ToneNotification
+    }   // end class DifferenceToneMouseHandler
 }

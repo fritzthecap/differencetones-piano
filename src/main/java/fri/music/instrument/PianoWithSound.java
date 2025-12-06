@@ -255,10 +255,14 @@ public class PianoWithSound extends Piano
         }
         
         protected void noteOn(PianoWithSound.Keyboard.Key key) {
-            piano.getSoundChannel().noteOn(key.midiNoteNumber, piano.getVelocity());
+            soundChannel().noteOn(key.midiNoteNumber, piano.getVelocity());
         }
         protected void noteOff(PianoWithSound.Keyboard.Key key) {
-            piano.getSoundChannel().noteOff(key.midiNoteNumber);
+            soundChannel().noteOff(key.midiNoteNumber);
+        }
+
+        protected final SoundChannel soundChannel() {
+            return piano.getSoundChannel();
         }
     }   // end class MouseHandler
     
@@ -280,7 +284,10 @@ public class PianoWithSound extends Piano
         this.mouseHandler = newMouseHandler();
     }
     
-    /** @return the piano panel, as it was configured by Configuration in constructor. */
+    /** 
+     * Constructs a new piano panel when none exists, else returns the existing one.
+     * @return the piano panel, as it was configured by Configuration in constructor.
+     */
     @Override
     public JComponent getKeyboard() {
         if (pianoPanel != null)
@@ -288,7 +295,7 @@ public class PianoWithSound extends Piano
         return pianoPanel = super.getKeyboard();
     }
     
-    /** @return the keyboard panel with black and white piano keys. */
+    /** @return the keyboard panel with black and white piano keys, or null when none was constructed yet. */
     public JComponent getKeyboardPanel() {
         return pianoPanel;
     }
@@ -301,22 +308,22 @@ public class PianoWithSound extends Piano
         return getKeyboard();
     }
 
-    /** @return fixed velocity (touch force), 127 / 4 = a fourth of possible. To be overridden. */
+    /** @return constant default velocity (= touch force) of 127 / 4 = a fourth of possible. To be overridden. */
     protected int getVelocity() {
         return 127 / 4;
     }
 
-    /** Overridden factory method to use Piano.Keyboard. */
+    /** Overridden factory method using the PianoWithSound.Keyboard class. */
     @Override
     protected Piano.Keyboard newKeyboard(Piano.Configuration config) {
         return new PianoWithSound.Keyboard((PianoWithSound.Configuration) config);
     }
 
-    /** Factory method for mouse handling, called from constructor. */
+    /** Factory method for mouse handling, called from constructor. To be overridden for other mouse handlers. */
     protected MouseHandler newMouseHandler() {
         return new MouseHandler(this);
     }
-    /** The handler from factory. To be overridden for other mouse handlers. */
+    /** @return the mouse handler that as created in constructor, depends on newMouseHandler(). */
     public MouseHandler getMouseHandler() {
         return mouseHandler;
     }

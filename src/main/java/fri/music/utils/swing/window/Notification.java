@@ -10,7 +10,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.AbstractAction;
@@ -34,8 +33,7 @@ public class Notification
     private final Component component;
     private final Window window;
     private final JDialog dialog;
-    private final JLabel linesLabel = new JLabel();
-    private final List<String> lines = new ArrayList<>();
+    private final JLabel linesLabel;
     
     /** @param parent required, the component to show over. */
     public Notification(Component parent) {
@@ -43,13 +41,10 @@ public class Notification
         this.window = Objects.requireNonNull(SwingUtilities.windowForComponent(parent));
         this.dialog = new JDialog(window, "Undecorated");
         dialog.setUndecorated(true);
+        this.linesLabel = new JLabel();
         
-        linesLabel.setBorder(
-                BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(Color.BLUE, 3, true),
-                    BorderFactory.createEmptyBorder(8, 24, 8, 24) // left and right is wider
-                )
-            );
+        setBorder(BorderFactory.createLineBorder(Color.BLUE, 3, true));
+        
         KeyStrokeUtil.install(linesLabel, JComponent.WHEN_IN_FOCUSED_WINDOW, "closeAction", KeyEvent.VK_ENTER, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -84,35 +79,31 @@ public class Notification
         });
         
         dialog.add(linesLabel);
-        dialog.setOpacity(0.72f); // transparency
+        setOpacity(0.72f); // transparency
     }
     
-    public void addLine(String line, int index) {
-        final int i = (index < 0) ? lines.size() : Math.min(index, lines.size());
-        lines.add(i, line);
-        refresh();
-    }
-    
-    public void removeLine(String line) {
-        if (lines.remove(line))
-            refresh();
-    }
-    
-    public void hide() {
-        lines.clear();
-        refresh();
-    }
-    
+    /** Sets given border combined with some inner padding. */
     public void setBorder(Border border) {
-        linesLabel.setBorder(border);
+        linesLabel.setBorder(
+                BorderFactory.createCompoundBorder(
+                    border,
+                    BorderFactory.createEmptyBorder(8, 24, 8, 24) // left and right is wider
+                )
+            );
     }
 
+    /** Sets transparency, default opacity is 0.72f. */
     public void setOpacity(float opacity) {
         dialog.setOpacity(opacity);
     }
     
-    
-    private void refresh() {
+    /**
+     * Sets a list of lines to render.
+     * @param lines the text lines to render, 
+     *      closes the notification when open and given list is empty,
+     *      else opens it when not yet open.
+     */
+    public void setLines(List<String> lines) {
         if (lines.size() <= 0) {
             linesLabel.setText("");
             dialog.setVisible(false);
