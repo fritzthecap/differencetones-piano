@@ -282,9 +282,9 @@ public abstract class WaveGenerator
         final double samplesPerWave = sampleRate * waveDuration; // samples per second * seconds per wave
         
         final int samples;
-        if (continuous) // must be complete waves but not duration-accurate
+        if (continuous) // must be complete waves, not duration-accurate
             samples = (int) Math.round(samplesPerWave * (double) durationMillis) / 2; // 2: empirical time correction
-        else // must be a duration-accurate
+        else // must be duration-accurate
             samples = (int) Math.round(sampleRate * (double) durationMillis / 1000.0);
         
         final Fader fader = new Fader(state, samples, maxSamplesToFade);
