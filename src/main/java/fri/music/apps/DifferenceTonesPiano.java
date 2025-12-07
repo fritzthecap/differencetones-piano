@@ -122,13 +122,11 @@ public class DifferenceTonesPiano
     }
     
     
-    private record WavePianoParameters(PianoWithSound.Configuration pianoConfiguration, WaveSoundChannel soundChannel)
-    {
-    }
+    private PianoWithSound.Configuration pianoConfiguration = new PianoWithSound.Configuration(7, "C2");
     
-    private WavePianoParameters wavePianoParameters = new WavePianoParameters(
-            new PianoWithSound.Configuration(7, "C2"),
-            new GenericWaveSoundChannel(null, null));
+    private WaveSoundChannel newSoundChannel() {
+        return new GenericWaveSoundChannel(null, null);
+    }
     
     
     // left buttons
@@ -139,8 +137,7 @@ public class DifferenceTonesPiano
             @Override
             public void actionPerformed(ActionEvent e) {
                 final JPanel configurePianoPanel = new JPanel(new BorderLayout());
-                final PianoConfigurationPanel pianoConfigurationPanel = 
-                        new PianoConfigurationPanel(wavePianoParameters.pianoConfiguration());
+                final PianoConfigurationPanel pianoConfigurationPanel = new PianoConfigurationPanel(pianoConfiguration);
                 configurePianoPanel.add(pianoConfigurationPanel.panel, BorderLayout.CENTER);
                 final int answer = JOptionPane.showConfirmDialog(
                         panel, 
@@ -149,10 +146,8 @@ public class DifferenceTonesPiano
                         JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
                 
-                if (answer == JOptionPane.OK_OPTION) {
-                    final PianoWithSound.Configuration newConfiguration = pianoConfigurationPanel.getPianoConfiguration();
-                    wavePianoParameters = new WavePianoParameters(newConfiguration, wavePianoParameters.soundChannel());
-                }
+                if (answer == JOptionPane.OK_OPTION)
+                    pianoConfiguration = pianoConfigurationPanel.getPianoConfiguration();
             }
         });
         return configureTopButton(configurePianoButton, "Choose Tone Range and More for Your Piano");
@@ -164,7 +159,7 @@ public class DifferenceTonesPiano
             @Override
             public void actionPerformed(ActionEvent e) {
                 final DifferenceToneForIntervalPiano piano = 
-                        new DifferenceToneForIntervalPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel);
+                        new DifferenceToneForIntervalPiano(pianoConfiguration, newSoundChannel());
                 final JComponent keyboardPanel = piano.getKeyboard();
                 FrameStarter.start(title, false, keyboardPanel, piano.getWindowClosingListener());
             }
@@ -178,7 +173,7 @@ public class DifferenceTonesPiano
             @Override
             public void actionPerformed(ActionEvent e) {
                 final DifferenceToneInversionsPiano piano = 
-                        new DifferenceToneInversionsPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel);
+                        new DifferenceToneInversionsPiano(pianoConfiguration, newSoundChannel());
                 final JComponent panel = piano.getKeyboard();
                 FrameStarter.start(title, false, panel, piano.getWindowClosingListener());
             }
@@ -192,7 +187,7 @@ public class DifferenceTonesPiano
             @Override
             public void actionPerformed(ActionEvent e) {
                 final NotesWithDifferenceTonePianoPlayer player = new NotesWithDifferenceTonePianoPlayer(
-                        new DifferenceToneForNotesPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel));
+                        new DifferenceToneForNotesPiano(pianoConfiguration, newSoundChannel()));
                 final JComponent playerPanel = player.getPlayer(NoteExamples.AUGUSTIN.notes());
                 FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener());
             }
@@ -207,7 +202,7 @@ public class DifferenceTonesPiano
             public void actionPerformed(ActionEvent e) {
                 final NotesWithDifferenceToneInversionsPianoPlayer player = 
                         new NotesWithDifferenceToneInversionsPianoPlayer(
-                            new DifferenceToneInversionsPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel));
+                            new DifferenceToneInversionsPiano(pianoConfiguration, newSoundChannel()));
                 final JComponent playerPanel = player.getPlayer(null);
                 FrameStarter.start(title, false, playerPanel, player.getWindowClosingListener());
             }
@@ -352,7 +347,7 @@ public class DifferenceTonesPiano
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     final NotesPianoPlayer player = new NotesPianoPlayer(
-                            new PianoWithVolume(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel));
+                            new PianoWithVolume(pianoConfiguration, newSoundChannel()));
                     final JComponent playerPanel = player.getPlayer(NoteExamples.ODE_TO_JOY.notes());
                     FrameStarter.start(moreLauncherFrame, title, playerPanel, player.getWindowClosingListener());
                 }
@@ -366,7 +361,7 @@ public class DifferenceTonesPiano
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     final PianoWithSound piano = 
-                            new IntervalPlayingPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel);
+                            new IntervalPlayingPiano(pianoConfiguration, newSoundChannel());
                     final JComponent panel = piano.getKeyboard();
                     FrameStarter.start(moreLauncherFrame, title, panel, piano.getWindowClosingListener());
                 }
@@ -379,7 +374,7 @@ public class DifferenceTonesPiano
             final Action action = new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    final PianoWithSound piano = new TriadPlayingPiano(wavePianoParameters.pianoConfiguration, wavePianoParameters.soundChannel);
+                    final PianoWithSound piano = new TriadPlayingPiano(pianoConfiguration, newSoundChannel());
                     final JComponent keyboardPanel = piano.getKeyboard();
                     FrameStarter.start(moreLauncherFrame, title, keyboardPanel, piano.getWindowClosingListener());
                 }
