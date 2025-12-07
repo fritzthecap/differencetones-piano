@@ -1,0 +1,18 @@
+
+- Open terminal window
+- Change into the project directory where Maven pom.xml file is
+- Edit pom.xml and remove the '-SNAPSHOT' from <version> XML-element and save file
+- Remove old JAR files from compile target directory:
+    rm target/differencetones-piano-*.jar
+- Launch:
+    mvn package
+- Check that all unit-tests were successful and the JAR file in target has no SNAPSHOT postfix
+- Copy generated JAR file in target to project directory, leaving out version: 
+    cp target/differencetones-piano-*.jar ./differencetones-piano.jar
+- Check that correct version is in title-bar of application by launching it:
+    java -jar differencetones-piano.jar
+- Push everything to repository
+- Edit pom.xml, increase version number and add '-SNAPSHOT', save file
+- For major releases, create a release on github
+-- In that case, edit README.md on github and adjust the release version number in hyperlink
+- Push new SNAPSHOT version number in pom.xml to github
