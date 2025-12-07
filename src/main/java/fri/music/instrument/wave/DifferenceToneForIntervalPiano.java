@@ -222,7 +222,12 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
             ToneNotification(Component parent) {
                 super(parent);
             }
-
+            
+            @Override
+            protected String getTooltipText() {
+                return "List of Actually Pressed Piano Keys. "+super.getTooltipText();
+            }
+            
             void addLine(Tone tone) {
                 if (tones.contains(tone))
                     return; // do not duplicate tones that are just once on the piano

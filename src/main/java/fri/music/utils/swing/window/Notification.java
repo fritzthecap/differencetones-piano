@@ -57,7 +57,7 @@ public class Notification
                 dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
             }
         });
-        linesLabel.setToolTipText("Click to Close");
+        linesLabel.setToolTipText(getTooltipText());
         
         window.addComponentListener(new ComponentAdapter() {
             @Override
@@ -114,6 +114,10 @@ public class Notification
             LocationUtil.locateRelativeToComponent(dialog, window, component, true);
             dialog.setVisible(true);
         }
+    }
+    
+    protected String getTooltipText() {
+        return "Click to Close";
     }
     
     private String toHtml(List<String> lines) {
