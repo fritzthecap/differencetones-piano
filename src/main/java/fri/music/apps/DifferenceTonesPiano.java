@@ -56,7 +56,7 @@ import fri.music.wavegenerator.WaveSoundChannel;
  * The differencetones-piano application.
  * This class exposes all the apps available in this project.
  * 
- * @author Fritz Ritzberger, Dec 2024 - Oct 2025
+ * @author Fritz Ritzberger, Dec 2024 - Dec 2025
  */
 public class DifferenceTonesPiano
 {

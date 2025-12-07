@@ -288,20 +288,20 @@ public abstract class WaveGenerator
             samples = (int) Math.round(sampleRate * (double) durationMillis / 1000.0);
         
         final Fader fader = new Fader(state, samples, maxSamplesToFade);
-        final byte[] buffer = new byte[samples];
+        final byte[] buffer = new byte[samples]; // allocate wave form description buffer
         
-        for (int i = 0; i < samples; i++) {
+        for (int i = 0; i < samples; i++) { // fill wave form description buffer
             final double waveValue = createWaveValue(samplesPerWave, i);
-            buffer[i] = (byte) (waveValue * (double) amplitude * fader.nextValue(i));
+            buffer[i] = (byte) (waveValue * (double) amplitude * fader.nextValue(i)); // loudness control
         }
         return buffer;
     }
     
     /**
-     * Generates on sample for a specific wave form.
+     * Generates one sample for a specific wave form.
      * @param samplesPerWave the (sampleRate / frequency) value.
      * @param sampleIndex the index of the sample to generate.
-     * @return
+     * @return the wave-value at given index.
      */
     protected abstract double createWaveValue(double samplesPerWave, int sampleIndex);
 
