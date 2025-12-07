@@ -20,6 +20,9 @@ Equal temperament, just intonation, screen pianos, frequency sliders, wave gener
 The documentation / manual is an integrated part of the application, available on the main-window and lots of "Help" buttons. Read it online at 
 - [src/main/resources/fri/music/introduction.html](https://html-preview.github.io/?url=https://github.com/fritzthecap/differencetones-piano/blob/main/src/main/resources/fri/music/introduction.html)
 
+I would particularly recommend to read
+- [src/main/resources/fri/music/harmony.html](https://html-preview.github.io/?url=https://github.com/fritzthecap/differencetones-piano/blob/main/src/main/resources/fri/music/harmony.html)
+
 ## Install
 
 To run the _differencetones-piano_ __desktop-application__, you need at least [Java 17](https://openjdk.org/projects/jdk/17/) or better [Java 21](https://openjdk.org/projects/jdk/21/) installed on your computer. Java virtual machines are freely available as "Open Java", the JRE (runtime-environment) is enough, you don't need the JDK (development-kit) unless you want to write new code. Check that the executable interpreter (java.exe or java) is in the execution PATH of your operating-system. Run "java -version" to check your installed Java version. Then download the __differencetones-piano.jar__ either from root directory (latest) or from  [the latest release](https://github.com/fritzthecap/differencetones-piano/releases/tag/v1.4) and launch the application via
