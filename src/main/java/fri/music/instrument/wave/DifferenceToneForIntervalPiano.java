@@ -109,14 +109,24 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
             if (piano.getSoundChannel() instanceof WaveSoundChannel == false)
                 throw new IllegalArgumentException("Can run only with a WaveSoundChannel!");
                 
-            this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, 2);
+            this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, SELECTION_BORDER_THICKNESS);
         }
 
         /** Changes pressed and held keys "on the fly" when tuning changes. */
         public void reviseDifferenceTone() {
             handleDifferenceKey();
         }
-
+        
+        @Override
+        public void close() {
+            super.close();
+            if (notification != null) {
+                waveSoundChannel().setNoteListener(null);
+                notification.close();
+                notification = null;
+            }
+        }
+        
         @Override
         protected void reset() {
             super.reset();
@@ -184,8 +194,8 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
             else if (selectedDifferenceKey != null) {
                 if (holdPlayingNotes.contains(selectedDifferenceKey) == false) // selectedDifferenceKey is not on "Hold"
                     selectDifferenceTone(selectedDifferenceKey, false); // de-select and remove red border
-                else
-                    visualSelect(selectedDifferenceKey, false); // de-select, but leave the red border
+                //else
+                //    visualSelect(selectedDifferenceKey, false); // de-select, but leave the red border
                 
                 selectedDifferenceKey = null;
             }
@@ -211,7 +221,7 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
                 originalBorder = key.getBorder();
             key.setBorder(select ? differenceToneBorder : originalBorder);
             
-            visualSelect(key, select);
+            //visualSelect(key, select);
         }
         
         

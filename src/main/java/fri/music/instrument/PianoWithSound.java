@@ -181,6 +181,9 @@ public class PianoWithSound extends Piano
     /** Mouse handler that plays sound on mouse click, and manages glissandos. */
     public static class MouseHandler extends MouseKeyAdapter
     {
+        /** The thickness of piano-key selection borders for "Hold" and difference-tones. */
+        protected final int SELECTION_BORDER_THICKNESS = 3;
+        
         protected final PianoWithSound piano;
         private PianoWithSound.Keyboard.Key mouseOverKey;
         
@@ -246,11 +249,11 @@ public class PianoWithSound extends Piano
             mouseOverKey = null;
         }
         
-        protected void visualSelect(PianoWithSound.Keyboard.Key key, boolean pressed) {
+        protected final void visualSelect(PianoWithSound.Keyboard.Key key, boolean pressed) {
             ButtonUtil.visualSelect(key, pressed);
         }
         
-        protected PianoWithSound.Keyboard.Key getKey(InputEvent e) {
+        protected final PianoWithSound.Keyboard.Key getKey(InputEvent e) {
             return (PianoWithSound.Keyboard.Key) e.getSource();
         }
         
@@ -263,6 +266,11 @@ public class PianoWithSound extends Piano
 
         protected final SoundChannel soundChannel() {
             return piano.getSoundChannel();
+        }
+
+        /** Called by destroyKeyboard(). To be overridden for freeing resources. */
+        public void close() {
+            mouseOverKey = null;
         }
     }   // end class MouseHandler
     
@@ -331,7 +339,7 @@ public class PianoWithSound extends Piano
     /** Overridden to handle mouse events for playing sounds. */
     @Override
     protected void configureKeyboardKey(Piano.Keyboard.Key key) {
-        final MouseKeyAdapter mouseHandler = getMouseHandler();
+        final MouseKeyAdapter mouseHandler = Objects.requireNonNull(getMouseHandler());
         key.addMouseListener(mouseHandler);
         key.addKeyListener(mouseHandler);
     }
@@ -380,13 +388,18 @@ public class PianoWithSound extends Piano
     
     /** Removes mouse listener from all keys and turns off all sound. */
     public void destroyKeyboard(JComponent pianoPanel) {
-        for (PianoWithSound.Keyboard.Key key : getKeys())
-            key.removeMouseListener(getMouseHandler());
+        final MouseHandler mouseHandler = getMouseHandler();
+        if (mouseHandler != null) {
+            for (PianoWithSound.Keyboard.Key key : getKeys())
+                key.removeMouseListener(mouseHandler);
+            mouseHandler.close();
+        }
         
         if (getSoundChannel() != null) {
             getSoundChannel().allNotesOff(); // closes all wave-channels
             soundChannel = null;
             //System.err.println("Freed sound resource of "+this);
         }
+        
     }
 }

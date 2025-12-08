@@ -13,7 +13,6 @@ import javax.swing.border.Border;
 import fri.music.differencetones.DifferenceTones;
 import fri.music.instrument.PianoWithSound;
 import fri.music.instrument.PianoWithVolume;
-import fri.music.utils.swing.ButtonUtil;
 import fri.music.utils.swing.layout.ToolBarUtil;
 import fri.music.utils.swing.text.HelpWindowSingleton;
 import fri.music.wavegenerator.GenericWaveSoundChannel;
@@ -145,7 +144,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
         public DifferenceToneMouseHandler(DifferenceToneForNotesPiano piano, WaveSoundChannel soundChannel) {
             super(piano);
             this.soundChannel = soundChannel;
-            this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, 2);
+            this.differenceToneBorder = BorderFactory.createLineBorder(Color.RED, SELECTION_BORDER_THICKNESS);
         }
         
         @Override
@@ -202,7 +201,7 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
                 originalBorder = key.getBorder();
             key.setBorder(select ? differenceToneBorder : originalBorder);
             
-            ButtonUtil.visualSelect(key, select);
+            //ButtonUtil.visualSelect(key, select);
             
             key.paintImmediately(key.getVisibleRect());
         }

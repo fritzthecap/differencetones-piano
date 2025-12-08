@@ -6,9 +6,11 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Objects;
@@ -30,10 +32,38 @@ import fri.music.utils.swing.layout.LocationUtil;
  */
 public class Notification
 {
-    private final Component component;
-    private final Window window;
-    private final JDialog dialog;
-    private final JLabel linesLabel;
+    private final ComponentListener windowLayoutListener = new ComponentAdapter()
+    {
+        @Override
+        public void componentHidden(ComponentEvent e) {
+            dialog.setVisible(false);
+        }
+        @Override
+        public void componentMoved(ComponentEvent e) {
+            LocationUtil.locateRelativeToComponent(dialog, window, component, true);
+        }
+        @Override
+        public void componentResized(ComponentEvent e) {
+            LocationUtil.locateRelativeToComponent(dialog, window, component, true);
+        }
+        @Override
+        public void componentShown(ComponentEvent e) {
+            dialog.setVisible(true);
+        }
+    };
+    
+    private final MouseListener clickListener = new MouseAdapter()
+    {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
+        }
+    };
+
+    private /*final*/ Component component;
+    private /*final*/ Window window;
+    private /*final*/ JDialog dialog;
+    private /*final*/ JLabel linesLabel;
     
     /** @param parent required, the component to show over. */
     public Notification(Component parent) {
@@ -51,32 +81,10 @@ public class Notification
                 dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
             }
         });
-        linesLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
-            }
-        });
+        linesLabel.addMouseListener(clickListener);
         linesLabel.setToolTipText(getTooltipText());
         
-        window.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                dialog.setVisible(false);
-            }
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                LocationUtil.locateRelativeToComponent(dialog, window, component, true);
-            }
-            @Override
-            public void componentResized(ComponentEvent e) {
-                LocationUtil.locateRelativeToComponent(dialog, window, component, true);
-            }
-            @Override
-            public void componentShown(ComponentEvent e) {
-                dialog.setVisible(true);
-            }
-        });
+        window.addComponentListener(windowLayoutListener);
         
         dialog.add(linesLabel);
         setOpacity(0.72f); // transparency
@@ -116,6 +124,21 @@ public class Notification
         }
     }
     
+    public void close() {
+        try {
+            linesLabel.removeMouseListener(clickListener);
+            window.removeComponentListener(windowLayoutListener);
+            dialog.setVisible(false);
+            dialog.dispose();
+        }
+        finally {
+            dialog = null;
+            window.removeComponentListener(windowLayoutListener);
+            window = null;
+            component = null;
+        }
+    }
+
     protected String getTooltipText() {
         return "Click to Close";
     }
