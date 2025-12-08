@@ -5,9 +5,9 @@ import javax.swing.JButton;
 /** Utilities for Swing JButton. */
 public final class ButtonUtil
 {
-    /** Clicks given button with a zero millisecond delay. Default would be 68 millis. */
+    /** Clicks given button with a zero millisecond press-time. Default would be 68 millis. */
     public static void doClick(JButton button) {
-        button.doClick(0); // click without delay
+        button.doClick(0);
     }
 
     /** Sets given button visually pressed and paints it, but triggers no mouse-click. */
