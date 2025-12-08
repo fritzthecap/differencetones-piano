@@ -120,9 +120,6 @@ public class PlayControlButtons extends JPanel
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (listener == null)
-                        throw new IllegalStateException("You forgot to set a button listener!");
-                    
                     if (e.getSource() == fastBackward)
                         listener.fastBackwardPressed();
                     else if (e.getSource() == reverse)
