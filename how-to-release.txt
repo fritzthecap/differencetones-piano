@@ -21,7 +21,7 @@
     
 - Commit and push all project changes to repository
 
-- For major releases, create a release on github
+- For major releases, create a release on github, attach the differencetones-piano.jar file
 -- In that case, edit README.md on github and adjust the release version number in hyperlink,
    then fetch / pull this change to local disk
    
