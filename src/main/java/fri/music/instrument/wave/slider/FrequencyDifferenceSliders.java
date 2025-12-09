@@ -21,6 +21,7 @@ import javax.swing.event.ChangeListener;
 import fri.music.JustIntonation;
 import fri.music.Tone;
 import fri.music.ToneSystem;
+import fri.music.differencetones.DifferenceToneMath;
 import fri.music.utils.MathUtil;
 import fri.music.utils.swing.ButtonUtil;
 import fri.music.utils.swing.text.HelpWindowSingleton;
@@ -229,7 +230,8 @@ public class FrequencyDifferenceSliders extends AbstractFrequencySliders
                 
                 frequency1TextField.setText(Tone.frequencyFormat.format(frequency1));
                 frequency2TextField.setText(Tone.frequencyFormat.format(frequency2));
-                final double difference = differenceFrequencyPanel.getValue();
+                //final double difference = differenceFrequencyPanel.getValue(); // fixing issue #24
+                final double difference = DifferenceToneMath.primaryDifference(frequency1, frequency2);
                 frequency3TextField.setText(difference > 0.0 ? Tone.frequencyFormat.format(difference) : "");
                 
                 final String[] intervalInfo = getIntervalInfo();
