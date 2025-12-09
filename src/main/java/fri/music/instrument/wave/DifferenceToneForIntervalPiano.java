@@ -194,8 +194,6 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
             else if (selectedDifferenceKey != null) {
                 if (holdPlayingNotes.contains(selectedDifferenceKey) == false) // selectedDifferenceKey is not on "Hold"
                     selectDifferenceTone(selectedDifferenceKey, false); // de-select and remove red border
-                //else
-                //    visualSelect(selectedDifferenceKey, false); // de-select, but leave the red border
                 
                 selectedDifferenceKey = null;
             }
@@ -220,8 +218,6 @@ public class DifferenceToneForIntervalPiano extends IntervalPlayingPiano
             if (originalBorder == null) // save original border for reset
                 originalBorder = key.getBorder();
             key.setBorder(select ? differenceToneBorder : originalBorder);
-            
-            //visualSelect(key, select);
         }
         
         

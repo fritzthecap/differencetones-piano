@@ -201,8 +201,6 @@ public class DifferenceToneForNotesPiano extends PianoWithVolume
                 originalBorder = key.getBorder();
             key.setBorder(select ? differenceToneBorder : originalBorder);
             
-            //ButtonUtil.visualSelect(key, select);
-            
             key.paintImmediately(key.getVisibleRect());
         }
         
