@@ -299,8 +299,6 @@ public class DifferenceTonesPiano
     }
 
     private JButton configureAppLauncherButton(JButton button) {
-        button.setToolTipText("Click to Launch App");
-        
         final Font buttonFont = button.getFont();
         button.setFont(buttonFont.deriveFont(buttonFont.getStyle(), buttonFont.getSize() + 3f));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -319,6 +317,7 @@ public class DifferenceTonesPiano
         
         @Override
         protected JButton createActionComponent(Action action) {
+            ((AbstractAction) action).putValue(Action.SHORT_DESCRIPTION, "Click to Launch App");
             return configureAppLauncherButton(super.createActionComponent(action));
         }
     }
