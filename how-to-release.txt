@@ -1,9 +1,9 @@
 
-- Open terminal window
-
-- Change into the project directory where Maven pom.xml file is
+- Commit and push all source changes to repository, mention numbers of fixed issue in comments
 
 - Edit pom.xml and remove the '-SNAPSHOT' from <version> XML-element and save file
+
+- Open terminal window and go into the project-directory where Maven pom.xml file is
 
 - Remove old JAR files from compile target directory:
     rm target/differencetones-piano-*.jar
