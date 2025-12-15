@@ -40,13 +40,18 @@ public abstract class AbstractStrategy implements Strategy
 
     /**
      * Take into account that melodies with a small tone range should not use the
-     * whole intervals pool, because this may lead to interval pitch jumps that are too big.
+     * whole intervals pool, because this may lead to interval pitch jumps that are too big.<br/>
+     * <i>TODO: is this really a good solution for issue #2 ?</i>
      */
     private void shrink(List<TonePair> generatingIntervals, StrategyContext context) {
+        //if (generatingIntervals.size() < 6) // 6 means only the minimum MAJOR_THIRD to MAJOR_SIXTH are present
+        //    return; // intervals were already shrinked by user
+
+        // shrink only melody tone-ranges below one octave
         final double melodyOctaves = (double) context.maximumSemitoneDistance() / (double) ToneSystem.SEMITONES_PER_OCTAVE;
-        // TODO: is this really a good solution for issue #2 ?
         final int targetSize = (int) Math.ceil((double) generatingIntervals.size() * melodyOctaves); // round up
-        final int limitedTargetSize = Math.max(3, targetSize); // leave minimal 3 list members
+        final int limitedTargetSize = Math.max(3, targetSize); // leave minimal 3 list members in generatingIntervals
+        
         for (int index = 0; 
                 generatingIntervals.size() > limitedTargetSize;
                 index = (index == 0) ? (generatingIntervals.size() - 1) : 0) // toggle remove from head and tail
