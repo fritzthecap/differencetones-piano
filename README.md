@@ -13,7 +13,9 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/fritzthecap/differencetones-piano?color=pink)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/fritzthecap/differencetones-piano/total?color=pink)
 
-Equal temperament, just intonation, screen pianos, frequency sliders, wave generators - an educational Java/Swing project for musicians interested in difference-tones. It also offers a new way for harmonising melodies, including export to ABC notation from where you can print traditional music scores.
+Equal temperament, just intonation, screen pianos, frequency sliders, wave generators - an educational Java/Swing project for musicians interested in difference-tones. It also offers a **new way for harmonising melodies**, including export to
+[ABC notation](https://notabc.app/abc-converter) from where you can print traditional music scores.
+This project started in December 2024.
 
 ## Read
 
