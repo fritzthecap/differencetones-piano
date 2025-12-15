@@ -69,7 +69,7 @@ public class DifferenceTonesPiano
             final JFrame mainFrame = FrameStarter.start(
                     "Welcome to the World of Difference-Tones "+version,
                     new DifferenceTonesPiano().panel,
-                    new Dimension(1086, 700));
+                    new Dimension(1100, 700));
             // let apps start screen-centered instead of cascaded to mainFrame
             FrameStarter.setNonLayoutRelevant(mainFrame);
         });
