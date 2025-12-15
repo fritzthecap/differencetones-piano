@@ -35,14 +35,32 @@ This documentation refers to Java class <b>TuningsAndPurityCheckLauncher</b>.
     In the middle part you can calculate difference-tones from the interval you can enter
     in the two text-fields.
     Use CURSOR-UP and -DOWN to scroll to adjacent tones.
-    The checkbox "Display Only Primary" will contro whether you see
+    The checkbox "Display Only Primary" will control whether you see
     only the primary or also the secondary and tertiary difference-tone 
-    in the text output.
+    in the text output window.
 </p><p>
-    In the bottom part ypu can enter a difference-tone in the text-field
+    In the bottom part you can enter a difference-tone in the text-field
     and display all intervals that would generate it, according to the tuning settings on top.
     Use the two choices for narrowest and widest interval to 
-    limit the findings.
+    limit the findings. Push the button "Display Intervals" to display 
+    intervals that would generate the given tone as difference-tone. 
+</p><p>
+    The "For a Tone Range" button on bottom opens another configuration dialog
+    where you can enter the lowest tone and number of octaves for a whole tone-range 
+    you want to display intervals for. Push the "Display Intervals for All"
+    button to open a window that shows a <b>table</b> where 
+</p><ul>
+    <li>every row is a semi-tone within the given range, and</li>
+    <li>every column shows an interval that is able
+    to generate that tone as difference-tone.</li> 
+    <li>Every table-cell either contains 
+    the tone-pair that will generate that tone or will be empty when it won't. </li>
+</ul><p>
+    You can change back to the "Text Displays" dialog and 
+    change the <i>tuning</i> and <i>deviation tolerance</i> there. 
+    Doing so, you don't need to restart the intermediate "Tone Range" dialog, 
+    you can just push the "Display Intervals for All" button once again 
+    to display a new result-table for the altered parameters.
 </p>
 
 <h2 id="PurityCheck">Purity Check</h2>
