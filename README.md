@@ -77,7 +77,7 @@ This is a _Maven 3.6 / Java 21_ project (minimum _Java 17_), developed with _Ecl
 ### The application's main-window:
 
 <div align="center">
-<img width="1040" height="700" alt="DifferenceTonesPiano_MainWindow" src="https://github.com/user-attachments/assets/cef339b4-15d8-4024-a9f5-35a7a3b99935" />
+    <img width="1106" height="675" alt="DifferenceTonesPiano_MainWindow" src="https://github.com/user-attachments/assets/66b0cfc5-2336-4546-95c9-05c76c0f0a4f" />
 </div>
 
 
