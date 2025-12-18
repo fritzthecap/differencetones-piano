@@ -2,68 +2,85 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <title>Glossary</title>
+        <title>Diagrams</title>
         <link rel="stylesheet" href="WebBrowser.css">
-        <style>td, th { padding: 8; }</style>
     </head>
     
     <body>
         <h1 id="top" style="text-align: center;">Sine Wave Diagrams</h1>
         
         <p>
-            Sine-wave diagrams of the most harmonious intervals.
+            One Hertz means one wave in one second, 
+            so <b>100 Hertz</b> would be 100 waves in one second, or <b>one wave in 1/100 second</b>. 
+            A sine wave starts at zero, raises to top to fall down below zero, then raises up again to zero.
+            A cosine wave starts on top, falls down below zero, then crosses zero upwards to top again. 
+        </p>
+        <p>
+            All diagrams below show a <b>time-frame of 1/100 second</b>.
+            Frequencies of the two interval-tones are given in variables <b>a</b> and <b>b</b>,
+            whereby <b>b</b> was derived from <b>a</b> by multiplying it with the fraction of a pure interval. 
+            The deeper interval-tone (<b>a</b>) is green, the higher one (<b>b</b>) blue. 
+            Their resulting difference-tone is red. 
+        </p>
+        <p>
+            For instance, when you look at the octave, you see 6 green waves (<i>a = 600 Hertz</i>) 
+            and 12 blue waves (<i>b = 600 * 2/1 = 1200 Hertz</i>).
+            Their resulting red difference-tone has 6 waves in the 1/100 time-frame,
+            because the difference of <i>1200 - 600 = 600 Hertz</i>. <br/>
+            The major sixth goes with <i>1000 - 600 = 400 Hertz</i>, 
+            thus it has 4 waves in the 1/100 time-frame. 
+            The difference frequency (b - a) is calculated on bottom left of the diagram,
+            dividing it by 100 gives the number of expected waves. 
         </p>
         
         <ul>
-            <li><a href="#FIFTH">Fifth (3/2)</a></li>
-            <li><a href="#FOURTH">Fourth (4/3)</a></li>
-            <li><a href="#OCTAVE">Octave (2/1)</a></li>
-            <li><a href="#MAJOR_THIRD">Major Third (5/4)</a></li>
-            <li><a href="#MINOR_THIRD">Minor Third (6/5)</a></li>
-            <li><a href="#MINOR_SIXTH">Minor Sixth (8/5)</a></li>
-            <li><a href="#MAJOR_SIXTH">Major Sixth (5/3)</a></li>
+            <li><a href="#OCTAVE">Octave</a></li>
+            <li><a href="#MAJOR_SIXTH">Major Sixth</a></li>
+            <li><a href="#MINOR_SIXTH">Minor Sixth</a></li>
+            <li><a href="#FIFTH">Fifth</a></li>
+            <li><a href="#TRITONE">Tritone</a></li>
+            <li><a href="#FOURTH">Fourth</a></li>
+            <li><a href="#MAJOR_THIRD">Major Third</a></li>
+            <li><a href="#MINOR_THIRD">Minor Third</a></li>
         </ul>
         
-        <h2 id="FIFTH">Fifth</h2>
         <p>
-            Following diagram shows the sine-waves of two interval-tones 
-            in green (600 Hertz) and blue (900 Hertz) of duration 1/100 second, 
-            representing a fifth, and their resulting difference-tone in red 
-            (300 Hertz, thus there are three waves in 1/100 second, framed in yellow). 
+            <i>Remember:</i> the closer the interval-tones are to each other, 
+                the deeper their difference tone, the flatter its curve!
         </p>
-        <p>
-            One Hertz means one wave in one second, so 100 Hertz would be 100 waves in one second,
-            or one wave in 1/100 second. 
-            One wave consists of a curve above the horizontal zero-line and a curve below it. 
+            
+        <p id="OCTAVE">
+            <img src="wavediagrams/DifftoneWave_OCTAVE.png"></img>
         </p>
-        <p style="text-align: center;">
-            <img src="DifftoneWave_FIFTH.png"></img>
+        <hr/>
+        <p id="MAJOR_SIXTH">
+            <img src="wavediagrams/DifftoneWave_MAJOR_SIXTH.png"></img>
         </p>
-        
-        <h2 id="Others">Others</h2>
-        <p>
-            The diagrams below show the sine-wave interferences of other intervals
-            in same colors. The frequencies are given on top in variables <b>a</b> and <b>b</b>.
+        <hr/>
+        <p id="MINOR_SIXTH">
+            <img src="wavediagrams/DifftoneWave_MINOR_SIXTH.png"></img>
         </p>
-        
-        <p id="FOURTH" style="text-align: center; padding-left: 80;">
-            <img src="DifftoneWave_FOURTH.png"></img>
+        <hr/>
+        <p id="FIFTH">
+            <img src="wavediagrams/DifftoneWave_FIFTH.png"></img>
         </p>
-        <p id="OCTAVE" style="text-align: center; padding-left: 80;">
-            <img src="DifftoneWave_OCTAVE.png"></img>
+        <hr/>
+        <p id="TRITONE">
+            <img src="wavediagrams/DifftoneWave_TRITONE.png"></img>
         </p>
-        <p id="MAJOR_THIRD" style="text-align: center; padding-left: 80;">
-            <img src="DifftoneWave_MAJOR_THIRD.png"></img>
+        <hr/>
+        <p id="FOURTH">
+            <img src="wavediagrams/DifftoneWave_FOURTH.png"></img>
         </p>
-        <p id="MINOR_THIRD" style="text-align: center; padding-left: 80;">
-            <img src="DifftoneWave_MINOR_THIRD.png"></img>
+        <hr/>
+        <p id="MAJOR_THIRD">
+            <img src="wavediagrams/DifftoneWave_MAJOR_THIRD.png"></img>
         </p>
-        <p id="MINOR_SIXTH" style="text-align: center; padding-left: 80;">
-            <img src="DifftoneWave_MINOR_SIXTH.png"></img>
+        <hr/>
+        <p id="MINOR_THIRD">
+            <img src="wavediagrams/DifftoneWave_MINOR_THIRD.png"></img>
         </p>
-        <p id="MAJOR_SIXTH" style="text-align: center; padding-left: 80;">
-            <img src="DifftoneWave_MAJOR_SIXTH.png"></img>
-        </p>
-        
+        <hr/>
+                
     </body>
 </html>
