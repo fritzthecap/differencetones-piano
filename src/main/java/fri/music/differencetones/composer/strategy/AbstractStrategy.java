@@ -1,9 +1,7 @@
 package fri.music.differencetones.composer.strategy;
 
-import java.util.ArrayList;
 import java.util.List;
 import fri.music.Tone;
-import fri.music.ToneSystem;
 import fri.music.differencetones.DifferenceToneInversions.TonePair;
 import fri.music.player.Note;
 
@@ -27,37 +25,11 @@ public abstract class AbstractStrategy implements Strategy
         final Note note = context.note();
         
         // get list of possible intervals, sorted by narrow interval first and high pitch first
-        generatingIntervals = new ArrayList<>(context.inversions().getIntervalsGenerating(note));
-        if (generatingIntervals == null || generatingIntervals.size() <= 0)
-            throw new IllegalArgumentException("Note '"+note+"' could not be mapped to an interval!");
-        
-        shrink(generatingIntervals, context);
-        
+        generatingIntervals = context.inversions().getIntervalsGenerating(note);
         lastIntervalIndex = generatingIntervals.size() - 1;
         considerAlternatives = (lastIntervalIndex > 0 && context.previousInterval() != null);
         isRepeatedNote = (context.previousNote() != null && note.ipnName.equals(context.previousNote().ipnName));
     }
-
-    /**
-     * Take into account that melodies with a small tone range should not use the
-     * whole intervals pool, because this may lead to interval pitch jumps that are too big.<br/>
-     * <i>TODO: is this really a good solution for issue #2 ?</i>
-     */
-    private void shrink(List<TonePair> generatingIntervals, StrategyContext context) {
-        //if (generatingIntervals.size() < 6) // 6 means only the minimum MAJOR_THIRD to MAJOR_SIXTH are present
-        //    return; // intervals were already shrinked by user
-
-        // shrink only melody tone-ranges below one octave
-        final double melodyOctaves = (double) context.maximumSemitoneDistance() / (double) ToneSystem.SEMITONES_PER_OCTAVE;
-        final int targetSize = (int) Math.ceil((double) generatingIntervals.size() * melodyOctaves); // round up
-        final int limitedTargetSize = Math.max(3, targetSize); // leave minimal 3 list members in generatingIntervals
-        
-        for (int index = 0; 
-                generatingIntervals.size() > limitedTargetSize;
-                index = (index == 0) ? (generatingIntervals.size() - 1) : 0) // toggle remove from head and tail
-            generatingIntervals.remove(index);
-    }
-
 
     /** @return true when given tone-pairs is a parallel move, i.e. both have the same semi-tone distance. */
     protected final boolean isParallel(TonePair tonePair1, TonePair tonePair2) {

@@ -1,11 +1,13 @@
 package fri.music.differencetones.composer;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SequencedMap;
+import java.util.Set;
 import fri.music.AbstractToneSystem;
 import fri.music.Tone;
 import fri.music.ToneSystem;
@@ -82,9 +84,12 @@ public abstract class AbstractComposer
         final List<Note> notesWithoutRests = Arrays.stream(melody).filter(n -> (false == n.isRest())).toList();
         final Note lowest  = notesWithoutRests.stream().min((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
         final Note highest = notesWithoutRests.stream().max((note1, note2) -> note1.midiNumber - note2.midiNumber).orElseThrow();
+        final int distinctNotes = (int) notesWithoutRests.stream().map(note -> note.ipnName).distinct().count();
         final int maximumSemitoneDistance = highest.midiNumber - lowest.midiNumber;
         
         final DifferenceToneInversions inversions = createInversions(lowest, highest);
+        shrink(inversions, maximumSemitoneDistance, distinctNotes, melody);
+        
         final SequencedMap<NoteWithIndex,TonePair> result = new LinkedHashMap<>();
         
         TonePair previousInterval = null;
@@ -159,9 +164,68 @@ public abstract class AbstractComposer
         
         if (ToneSystem.MINOR_SECOND.equals(narrowestInterval) == false &&
                 ToneSystem.MAJOR_SEVENTH.equals(widestInterval) == false)
-            inversions.removeDissonant(false); // only when no dirty intervals were given explicitly
+            inversions.removeDissonant(false); // remove dissonant only when no "dirty" intervals were given explicitly
         
         return inversions;
+    }
+    
+    /**
+     * Take into account that melodies with a small tone range should not use the
+     * whole intervals pool, because this may lead to interval pitch jumps that are too big.<br/>
+     * This is a fix for issue #2.
+     */
+    private void shrink(DifferenceToneInversions inversions, int maximumSemitoneDistance, int distinctNotes, Note[] melody) {
+        final int minimumIntervals = (distinctNotes <= 2) ? distinctNotes : 3; // for more than 2 distinct notes, leave minimal 3 intervals
+        
+        final Set<Note> done = new HashSet<>(); // shrink interval-list for every note just once
+        
+        for (Note note : melody) {
+            if (note.isRest() == false && done.contains(note) == false) {
+                done.add(note); // prevent multiple removals
+                
+                final List<TonePair> generatingIntervals = inversions.getIntervalsGenerating(note);
+                if (generatingIntervals == null || generatingIntervals.size() <= 0)
+                    throw new IllegalArgumentException("Note '"+note+"' can not be mapped to an interval!");
+                
+                final double melodyOctaves = (double) maximumSemitoneDistance / (double) ToneSystem.SEMITONES_PER_OCTAVE;
+                
+                if (melodyOctaves < 1.0) { // shrink intervals only when tone-range of melody is below one octave
+                    final int maximumIntervals = 
+                            (int) Math.ceil((double) generatingIntervals.size() * melodyOctaves); // round upwards!
+                    final int targetSize = Math.max(minimumIntervals, maximumIntervals);
+                    
+                    shrink(generatingIntervals, targetSize);
+                }
+            }
+        }
+    }
+
+    private void shrink(List<TonePair> generatingIntervals, int targetSize) {
+        for (int indexToRemove = 0; generatingIntervals.size() > targetSize; ) {
+            final int tritoneIndex = (generatingIntervals.size() == 3) // maybe just FOURTH, TRITONE, FIFTH...
+                ? tritoneIndex(generatingIntervals) // ...then prefer to remove TRITONE when present
+                : -1;
+            
+            final boolean shouldRemoveTritone = (tritoneIndex >= 0);
+            if (shouldRemoveTritone) {
+                generatingIntervals.remove(tritoneIndex);
+            }
+            else {
+                generatingIntervals.remove(indexToRemove);
+                // toggle removal between head and tail
+                indexToRemove = (indexToRemove == 0 ? (generatingIntervals.size() - 1) : 0);
+            }
+        }
+    }
+
+    private int tritoneIndex(List<TonePair> generatingIntervals) {
+        final int tritoneSemitoneSteps = ToneSystem.semitoneSteps(ToneSystem.TRITONE);
+        for (int i = 0; i < generatingIntervals.size(); i++) {
+            final TonePair tonePair = generatingIntervals.get(i);
+            if (tonePair.semitoneDistance() == tritoneSemitoneSteps)
+                return i;
+        }
+        return -1;
     }
     
     /**
