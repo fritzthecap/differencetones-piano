@@ -32,7 +32,7 @@ import fri.music.utils.swing.text.TextAreaUtil;
  */
 public class TuningsAndPurityCheckLauncher
 {
-    public JComponent panel;
+    public final JComponent panel;
     
     private AllIntervalsOfScaleConfigurationPanel allIntervalsOfScaleConfiguration;
     
