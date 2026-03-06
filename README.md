@@ -40,6 +40,11 @@ Mind that this application __does not read/write anything from/to your file-syst
 
 This is a _Maven 3.6 / Java 21_ project (minimum _Java 17_), developed with _Eclipse 2024-09_. Integration into any Java-able IDE should be easy, there are no external dependencies except _junit-jupiter 6_ in _test_ scope.
 
+----
+<img width="517" height="61" alt="write-to-email" src="https://github.com/user-attachments/assets/8829f9c5-6ef6-4cc1-822d-d94ca6133d44" />
+
+----
+
 ## Screenshots
 
 ### Rendering and playing difference-tones for intervals in various tunings:
